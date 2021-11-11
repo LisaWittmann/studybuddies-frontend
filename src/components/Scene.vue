@@ -15,17 +15,12 @@ export default defineComponent({
       useSceneService();
     const { createTile } = useTileService();
 
-    // ---- testing data
+    // testing data
     const scene = createScene(vector(0, 1, 0), true);
     const tileSize = 20;
     scene.add(
-      createTile(
-        { width: tileSize, height: tileSize },
-        vector(0, 0, 0),
-        0x000000
-      )
+      createTile({ width: tileSize, height: tileSize }, vector(0, 0, 0))
     );
-    // ----
 
     onMounted(() => {
       insertCanvas("scene");
@@ -46,7 +41,7 @@ export default defineComponent({
       window.addEventListener("mousemove", onMouseMove);
     }
 
-    function onMouseMove(even: MouseEvent) {
+    function onMouseMove(event: MouseEvent) {
       console.log("dragging");
     }
 

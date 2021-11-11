@@ -77,7 +77,7 @@ function createTile(
       model.height,
       color,
       true,
-      vector(position.x, position.y, position.z - model.width / 2)
+      vector(position.x, position.y, position.z + model.width / 2)
     )
   );
 
@@ -91,6 +91,8 @@ function createTile(
       vector(position.x, position.y, position.z - model.width / 2)
     )
   );
+
+  tile.add(createLight(position, model.height));
 
   return tile;
 }
@@ -129,6 +131,18 @@ function createWall(
     wall.rotateOnAxis(axis, radiant(angle));
   }
   return wall;
+}
+
+/**
+ * creates point light underneath top plane
+ * @param position: center position of tile
+ * @param height: height of tile
+ * @returns: point light
+ */
+function createLight(position: THREE.Vector3, height: number) {
+  const light = new THREE.PointLight(0xffffff, 0.5, 50, 2);
+  light.position.set(position.x, position.y + height - 5, position.z);
+  return light;
 }
 
 export function useTileService() {
