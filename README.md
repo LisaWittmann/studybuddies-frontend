@@ -1,12 +1,6 @@
 # frontend
 
 ## Project setup
-
-use required node and npm version
-```
-nvm use
-```
-
 ```
 npm install
 ```
