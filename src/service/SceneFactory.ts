@@ -74,7 +74,7 @@ function updateCameraPosition(position: THREE.Vector3) {
   camera.position.set(position.x, position.y, position.z);
 }
 
-export function useSceneBuilder() {
+export function useSceneFactory() {
   return {
     createScene,
     renderScene,

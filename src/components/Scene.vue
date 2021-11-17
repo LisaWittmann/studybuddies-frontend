@@ -4,16 +4,16 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted } from "vue";
-import { useSceneBuilder } from "@/service/SceneBuilder";
-import { useTileBuilder } from "@/service/TileBuilder";
+import { useSceneFactory } from "@/service/SceneFactory";
+import { useTileFactory } from "@/service/TileFactory";
 import { vector } from "@/service/GeometryHelper";
 
 export default defineComponent({
   name: "scene",
   setup() {
     const { createScene, renderScene, insertCanvas, updateScene } =
-      useSceneBuilder();
-    const { createTile } = useTileBuilder();
+      useSceneFactory();
+    const { createTile } = useTileFactory();
 
     // testing data
     const scene = createScene(vector(0, 1, 0), true);

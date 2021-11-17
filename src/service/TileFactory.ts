@@ -145,6 +145,6 @@ function createLight(position: THREE.Vector3, height: number) {
   return light;
 }
 
-export function useTileBuilder() {
+export function useTileFactory() {
   return { createTile };
 }
