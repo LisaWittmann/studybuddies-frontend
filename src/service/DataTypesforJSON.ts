@@ -17,7 +17,7 @@ class Tile {
     orientation!: Orientation; 
     roomobjects!: []; //not sure if it works like this
 
-    constructor() { }
+    constructor() {}
 
     getId() {
         return this.id;
