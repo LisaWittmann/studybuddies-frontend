@@ -11,7 +11,7 @@ enum Orientation {
 /**
  * Datatype "Tile" which will be filled by parsing the JSON with the labyrinth structure.
  */
-class Tile {
+export class Tile {
     // "!" -> Not initialized, but no error. Instead you can use a constructor
     id!: number;
     orientation!: Orientation; 
