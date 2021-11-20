@@ -1,0 +1,10 @@
+@mixin flex-center() {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin text-break() {
+    word-wrap: break-word;
+    hyphens: auto;
+}
