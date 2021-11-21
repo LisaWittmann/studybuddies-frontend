@@ -12,8 +12,8 @@ export default defineComponent({
   name: "Game",
   components: { Scene, Instructions },
   setup() {
-    // deactivate after testing instructions
-    const showInstructions = ref(true);
+    // activate to test instructions
+    const showInstructions = ref(false);
 
     // test data
     const instructions = [

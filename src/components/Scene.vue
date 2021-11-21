@@ -24,21 +24,27 @@ export default defineComponent({
 
     onMounted(() => {
       insertCanvas("scene");
-      renderScene();
+      // automatically updating scene
+      requestAnimationFrame(render);
 
-      window.addEventListener("resize", updateScene);
-      window.addEventListener("mousedown", onMouseDown);
-      window.addEventListener("mouseup", onMouseUp);
+      addEventListener("resize", updateScene);
+      addEventListener("mousedown", onMouseDown);
+      addEventListener("mouseup", onMouseUp);
     });
 
     onBeforeUnmount(() => {
-      window.removeEventListener("resize", updateScene);
-      window.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mouseup", onMouseUp);
+      removeEventListener("resize", updateScene);
+      removeEventListener("mousedown", onMouseDown);
+      removeEventListener("mouseup", onMouseUp);
     });
 
+    function render() {
+      renderScene();
+      requestAnimationFrame(render);
+    }
+
     function onMouseDown(event: MouseEvent) {
-      window.addEventListener("mousemove", onMouseMove);
+      addEventListener("mousemove", onMouseMove);
     }
 
     function onMouseMove(event: MouseEvent) {
@@ -46,7 +52,7 @@ export default defineComponent({
     }
 
     function onMouseUp(event: MouseEvent) {
-      window.removeEventListener("mousemove", onMouseMove);
+      removeEventListener("mousemove", onMouseMove);
     }
   },
 });
