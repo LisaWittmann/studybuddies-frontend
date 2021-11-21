@@ -6,38 +6,45 @@
         <h2>Bitte gib deinen Benutzernamen und dein Passwort ein</h2>
       </div>
       <div class="login__form-wrapper">
-        <form v-if="login" class="login__form" action="/login" method="post">
+        <div v-if="inLoginState" class="login__form">
           <input
             type="username"
             placeholder="Benutzername"
-            v-model="username"
+            v-model="user.username"
+            required
           />
-          <input type="password" placeholder="Passwort" v-model="password" />
-          <button type="submit">Anmelden</button>
+          <input
+            type="password"
+            placeholder="Passwort"
+            v-model="user.password"
+            required
+          />
+          <button @click="login(user)">Anmelden</button>
           <p>
             Noch kein Benutzerkonto?
             <a @click="switchToRegister">Jetzt registrieren</a>
           </p>
-        </form>
+        </div>
 
-        <form v-else class="login__form" action="/register" method="post">
+        <div v-else class="login__form">
           <input
             type="username"
             placeholder="Benutzername"
-            v-model="username"
+            v-model="user.username"
+            required
           />
-          <input type="password" placeholder="Passwort" v-model="password" />
           <input
             type="password"
             placeholder="Passwort"
-            v-model="passwordRepeat"
+            v-model="user.password"
+            required
           />
-          <button type="submit">Registrieren</button>
+          <button @click="register(user)">Registrieren</button>
           <p>
             Du bist bereits registriert?
             <a @click="switchToLogin">Jetzt anmelden</a>
           </p>
-        </form>
+        </div>
       </div>
     </div>
   </div>
@@ -45,23 +52,30 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { User } from "@/service/User";
+import { useLoginService } from "@/service/LoginService";
 
 export default defineComponent({
   name: "Login",
   setup() {
     // handles login/register state
-    const login = ref(true);
+    const inLoginState = ref(true);
+    const { login, register } = useLoginService();
+    const user = new User();
 
     function switchToRegister() {
-      login.value = false;
+      inLoginState.value = false;
     }
 
     function switchToLogin() {
-      login.value = true;
+      inLoginState.value = true;
     }
 
     return {
+      user,
       login,
+      register,
+      inLoginState,
       switchToRegister,
       switchToLogin,
     };
