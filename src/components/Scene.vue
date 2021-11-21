@@ -54,7 +54,6 @@ export default defineComponent({
 
     //EventListeners-----
     function onMouseDown(event: MouseEvent) {
-      //window.addEventListener("mousedown", onMouseDown);
       console.log("mouse down", event.x, event.pageY);
       startX = event.x;
       startY = event.y;
@@ -62,14 +61,12 @@ export default defineComponent({
     }
 
     function onMouseMove(event: MouseEvent) {
-      //window.addEventListener("mousemove", onMouseMove);
       if (isDragging === true) {
         console.log("mousemove", event.clientX, event.clientY);
       }
     }
 
     function onMouseUp(event: MouseEvent) {
-      //window.removeEventListener("mouseup", onMouseDown);
       console.log("mouse up", event.x, event.pageY);
       isDragging = false;
     }
