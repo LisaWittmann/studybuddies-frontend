@@ -1,5 +1,9 @@
 import { reactive, readonly } from "vue";
+<<<<<<< HEAD
 import { Tile, Orientation, Item } from "@service/Tile";
+=======
+import { Tile, Orientation, Item } from "./Tile";
+>>>>>>> f131f1d (feat(#20) Backendconnection)
 
 /**
  * tileState: Constant to keep the tiles or store an errormessage
