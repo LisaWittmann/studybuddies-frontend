@@ -5,7 +5,7 @@ import { Vector3 } from "three";
  * @param angle: angle in degree
  * @returns: angle in radiant
  */
-export const radiant = (angle: number): number => {
+export const radians = (angle: number): number => {
   return (angle * Math.PI) / 180;
 };
 

@@ -20,7 +20,6 @@ export default defineComponent({
   setup() {
     const {
       createScene,
-      animate,
       renderScene,
       insertCanvas,
       updateScene,
@@ -32,7 +31,6 @@ export default defineComponent({
     let isDragging = false;
     let startX = 0;
     let startY = 0;
-  
 
     // testing data
     const scene = createScene(vector(0, 2, 0), true);
@@ -43,14 +41,18 @@ export default defineComponent({
 
     onMounted(() => {
       insertCanvas("scene");
-      renderScene();
-      animate();
+      requestAnimationFrame(render);
 
       window.addEventListener("resize", updateScene);
       window.addEventListener("mousedown", onMouseDown, false);
       window.addEventListener("mousemove", onMouseMove, false);
       window.addEventListener("mouseup", onMouseUp, false);
     });
+
+    function render() {
+      renderScene();
+      requestAnimationFrame(render);
+    }
 
     //EventListeners-----
     function onMouseDown(event: MouseEvent) {
