@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Tile } from "@/service/TestData";
-import { radiant, baseline, vector } from "@/service/GeometryHelper";
+import { radians, baseline, vector } from "@/service/GeometryHelper";
 
 /**
  * creates a group of planes representing a tile
@@ -128,7 +128,7 @@ function createWall(
     wall.position.set(position.x, position.y, position.z);
   }
   if (axis && angle) {
-    wall.rotateOnAxis(axis, radiant(angle));
+    wall.rotateOnAxis(axis, radians(angle));
   }
   return wall;
 }

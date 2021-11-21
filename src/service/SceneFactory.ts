@@ -64,18 +64,10 @@ function createScene(
   return scene;
 }
 
-/**
- * activates animation
- */
-function animate() {
-  renderScene();
-  orbitControls.update();
-  calculateCameraVectors(); //only for development
-  requestAnimationFrame(animate);
-}
-
 function renderScene() {
   renderer.render(scene, camera);
+  orbitControls.update();
+  calculateCameraVectors(); //only for development
 }
 
 /**
@@ -147,15 +139,12 @@ function updateScene() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-
-  renderScene();
 }
 
 //-------------------------------------------
 export function useSceneFactory() {
   return {
     createScene,
-    animate,
     renderScene,
     insertCanvas,
     updateScene,
