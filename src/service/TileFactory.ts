@@ -1,6 +1,12 @@
 import * as THREE from "three";
 import { Tile } from "@/service/TestData";
 import { radians, baseline, vector } from "@/service/GeometryHelper";
+import { Orientation } from "./Tile";
+
+let tile: THREE.Group;
+let tileWidth: number;
+let tileHeight: number;
+const tileColor = 0xa9a9a9;
 
 /**
  * creates a group of planes representing a tile
@@ -9,21 +15,19 @@ import { radians, baseline, vector } from "@/service/GeometryHelper";
  * @param color: color of all walls
  * @returns created three.js group as tile
  */
-function createTile(
-  model: Tile,
-  position: THREE.Vector3,
-  color = 0xa9a9a9
-): THREE.Group {
+function createTile(model: Tile, position: THREE.Vector3): THREE.Group {
   // create group
-  const tile = new THREE.Group();
+  tile = new THREE.Group();
   tile.position.set(position.x, position.y, position.z);
+  tileWidth = model.width;
+  tileHeight = model.height;
 
   // add bottom plane
   tile.add(
     createWall(
-      model.width,
-      model.width,
-      color,
+      tileWidth,
+      tileWidth,
+      tileColor,
       false,
       position,
       vector(1, 0, 0),
@@ -34,9 +38,9 @@ function createTile(
   // add top plane
   tile.add(
     createWall(
-      model.width,
-      model.width,
-      color,
+      tileWidth,
+      tileWidth,
+      tileColor,
       false,
       vector(position.x, model.height, position.z),
       vector(1, 0, 0),
@@ -44,57 +48,77 @@ function createTile(
     )
   );
 
-  // add left plane
-  tile.add(
-    createWall(
-      model.width,
-      model.height,
-      color,
-      true,
-      vector(position.x - model.width / 2, position.y, position.z),
-      vector(0, 1, 0),
-      90
-    )
-  );
-
-  // add right plane
-  tile.add(
-    createWall(
-      model.width,
-      model.height,
-      color,
-      true,
-      vector(position.x + model.width / 2, position.y, position.z),
-      vector(0, 1, 0),
-      90
-    )
-  );
-
-  // add front plane
-  tile.add(
-    createWall(
-      model.width,
-      model.height,
-      color,
-      true,
-      vector(position.x, position.y, position.z + model.width / 2)
-    )
-  );
-
-  // add back plane
-  tile.add(
-    createWall(
-      model.width,
-      model.height,
-      color,
-      true,
-      vector(position.x, position.y, position.z - model.width / 2)
-    )
-  );
-
   tile.add(createLight(position, model.height));
 
   return tile;
+}
+
+/**
+ * gets side on which a wall shoud be added and adds wall to THREE.Group
+ * @param sideToAdd
+ */
+function addWall(sideToAdd: Orientation, tilePosition: THREE.Vector3) {
+  switch (sideToAdd) {
+    case Orientation.NORTH:
+      tile.add(
+        createWall(
+          tileWidth,
+          tileHeight,
+          tileColor,
+          true,
+          vector(tilePosition.x, tilePosition.y, tilePosition.z - tileWidth / 2)
+        )
+      );
+
+      break;
+    case Orientation.EAST:
+      tile.add(
+        createWall(
+          tileWidth,
+          tileHeight,
+          tileColor,
+          true,
+          vector(
+            tilePosition.x + tileWidth / 2,
+            tilePosition.y,
+            tilePosition.z
+          ),
+          vector(0, 1, 0),
+          90
+        )
+      );
+      break;
+    case Orientation.SOUTH:
+      tile.add(
+        createWall(
+          tileWidth,
+          tileHeight,
+          tileColor,
+          true,
+          vector(tilePosition.x, tilePosition.y, tilePosition.z + tileWidth / 2)
+        )
+      );
+      break;
+    case Orientation.WEST:
+      tile.add(
+        createWall(
+          tileWidth,
+          tileHeight,
+          tileColor,
+          true,
+          vector(
+            tilePosition.x - tileWidth / 2,
+            tilePosition.y,
+            tilePosition.z
+          ),
+          vector(0, 1, 0),
+          90
+        )
+      );
+      break;
+    default:
+      console.log("Orientation not found");
+  }
 }
 
 /**
@@ -146,5 +170,5 @@ function createLight(position: THREE.Vector3, height: number) {
 }
 
 export function useTileFactory() {
-  return { createTile };
+  return { createTile, addWall };
 }

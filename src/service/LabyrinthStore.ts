@@ -102,7 +102,7 @@ function connectTiles(
  */
 export function useLabyrinthStore() {
   return {
-    labyrinthState: readonly(labyrinthState),
+    labyrinthState,
     updateLabyrinth,
   };
 }

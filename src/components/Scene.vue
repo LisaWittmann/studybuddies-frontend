@@ -15,7 +15,8 @@ import { useSceneFactory } from "@/service/SceneFactory";
 import { useTileFactory } from "@/service/TileFactory";
 import { vector } from "@/service/GeometryHelper";
 import { useObjectLoader} from "@/service/ObjectLoader";
-import { useLabyrinthStore } from "@/service/LabyrinthStore"
+import { useLabyrinthStore } from "@/service/LabyrinthStore";
+import { useLabyrinthFactory} from "@/service/LabyrinthFactory";
 
 export default defineComponent({
   name: "scene",
@@ -25,10 +26,10 @@ export default defineComponent({
       renderScene,
       insertCanvas,
       updateScene,
-      updateCameraPosition
     } = useSceneFactory();
-    const { createTile } = useTileFactory();
+    //const { createTile } = useTileFactory();
     const { loadObject } = useObjectLoader();
+    const { createLabyrinth } = useLabyrinthFactory();
 
     //mousemovement
     let isDragging = false;
@@ -37,10 +38,10 @@ export default defineComponent({
 
     // testing data
     const scene = createScene(vector(0, 2, 0), true);
-    const tileSize = 20;
+    /* const tileSize = 20;
     scene.add(
       createTile({ width: tileSize, height: tileSize }, vector(0, 0, 0))
-    );
+    ); */
 
     // Getting the usable labyrinthState Variable with every Tile as Object
     const {labyrinthState,updateLabyrinth} = useLabyrinthStore();
@@ -48,12 +49,11 @@ export default defineComponent({
       console.log(labyrinthState.tileMap)
     )
 
+    createLabyrinth(labyrinthState.tileMap, scene);
+
+
     // test object
     loadObject("squirrel.obj", scene, vector(0, 3, -5));
-
-
-
-
 
 
     onMounted(() => {
@@ -65,6 +65,7 @@ export default defineComponent({
       window.addEventListener("mousedown", onMouseDown, false);
       window.addEventListener("mousemove", onMouseMove, false);
       window.addEventListener("mouseup", onMouseUp, false);
+      
     });
 
     function render() {
@@ -90,6 +91,7 @@ export default defineComponent({
       console.log("mouse up", event.x, event.pageY);
       isDragging = false;
     }
+
 
     onBeforeUnmount(() => {
       window.removeEventListener("resize", updateScene);
