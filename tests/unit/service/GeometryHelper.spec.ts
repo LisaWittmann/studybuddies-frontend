@@ -1,4 +1,4 @@
-import { radians, vector, baseline } from "@/service/GeometryHelper";
+import { radians, vector, baseline } from "@/service/scene/helper/GeometryHelper";
 import { Vector3 } from "three";
 
 test("radians func with 0 degree returns 0", () => {

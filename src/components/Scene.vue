@@ -21,9 +21,9 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted } from "vue";
-import { useSceneFactory } from "@/service/SceneFactory";
-import { useTileFactory } from "@/service/TileFactory";
-import { vector } from "@/service/GeometryHelper";
+import { useSceneFactory } from "@/service/scene/SceneFactory";
+import { useTileFactory } from "@/service/scene/TileFactory";
+import { vector } from "@/service/scene/helper/GeometryHelper";
 import { useLabyrinthStore } from "@/service/LabyrinthStore";
 
 export default defineComponent({

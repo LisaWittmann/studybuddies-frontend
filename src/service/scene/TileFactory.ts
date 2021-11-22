@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Tile } from "@/service/TestData";
-import { radians, baseline, vector } from "@/service/GeometryHelper";
+import { radians, baseline, vector } from "@/service/scene/helper/GeometryHelper";
 
 /**
  * creates a group of planes representing a tile
