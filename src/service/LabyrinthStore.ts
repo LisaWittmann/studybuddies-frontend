@@ -34,8 +34,11 @@ async function updateLabyrinth() {
       console.log("bin im fetch");
       //labyrinthState.tileMap = jsondata.tileMap;
 
-      const tileMap = labyrinthState.tileMap;
 
+      /*
+       * Step 1: filling the LabyrinthState with dummydata
+      */
+      const tileMap = labyrinthState.tileMap;
       tileMap.set(1, new Tile(1, new Map(), [new Item(1)]));
       tileMap.set(2, new Tile(2, new Map(), [new Item(1)]));
       tileMap.set(3, new Tile(3, new Map(), [new Item(1)]));
@@ -43,8 +46,11 @@ async function updateLabyrinth() {
       tileMap.set(5, new Tile(5, new Map(), [new Item(1)]));
       tileMap.set(6, new Tile(6, new Map(), [new Item(1)]));
 
+      /**
+       *
+       *  Step 2: preparing the dummy connection Array to connect the Tiles in the next step
+      */ 
       const relArray = tempTileRelations.relationArray;
-
       relArray.push(
         [-1, 2, -1, -1],
         [-1, 3, 5, 1],
@@ -54,6 +60,10 @@ async function updateLabyrinth() {
         [4, -1, -1, -1]
       );
 
+      /*
+       *
+       * Step 3: Connecting the Tiles based on the Relation Array of Step 2
+      */
       tileMap.forEach((elem) => {
         for (let index = 0; index < 4; index++) {
           const check = relArray[elem.getId() - 1][index];
