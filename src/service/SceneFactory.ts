@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { vector } from "./GeometryHelper";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -41,6 +40,7 @@ function createScene(
   //CONTROLS-----------------
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.target = new THREE.Vector3(0, 2, 0);
+  orbitControls.enableZoom = false;
   orbitControls.update();
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
