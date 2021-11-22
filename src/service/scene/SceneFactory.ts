@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { Material } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 let scene: THREE.Scene;
@@ -7,6 +8,9 @@ let renderer: THREE.WebGLRenderer;
 //Camera
 let camera: THREE.PerspectiveCamera;
 let orbitControls: OrbitControls;
+
+let cursor: THREE.Vector2;
+let raycaster: THREE.Raycaster;
 
 //only for development------------------
 let cameraDirection: THREE.Vector3;
@@ -37,6 +41,9 @@ function createScene(
   camera = new THREE.PerspectiveCamera(90, ratio, 0.1, 1000);
   updateCameraPosition(cameraPosition);
 
+  //RAYCASTER----------------
+  raycaster = new THREE.Raycaster();
+
   //CONTROLS-----------------
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.target = new THREE.Vector3(0, 2, 0);
@@ -51,7 +58,7 @@ function createScene(
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x696969);
 
-  // grid helper for debugging
+  //GRID---------------------
   if (debug) {
     const grid = new THREE.GridHelper(50, 50, 0xffffff, 0xffffff);
     scene.add(grid);
@@ -97,14 +104,31 @@ function updateCameraPosition(position: THREE.Vector3) {
 function updateCameraOrbit() {
   console.log("update CameraOrbit");
   const forward = new THREE.Vector3();
-  console.log(forward);
   camera.getWorldDirection(forward);
-  console.log(camera.getWorldDirection(forward));
   orbitControls.target.copy(camera.position).add(forward);
+  console.log("Camera", camera);
+}
+
+function getIntersections(x: number, y: number) {
+  raycaster.setFromCamera({ x: x, y: y }, camera);
+  const intersects = raycaster.intersectObjects(scene.children);
+  console.log(intersects);
+
+  // testing intersections with hovering
+  for (const i of intersects) {
+    if (i.object.type == "Mesh") {
+      const object = i.object as THREE.Mesh;
+      hoverObject(object);
+    }
+  }
+}
+
+function hoverObject(object: THREE.Mesh): void {
+  const material = object.material as THREE.Material;
+  material.opacity = material.opacity == 1 ? 0.6 : 1;
 }
 
 /**
- *
  * calculates camera vectors
  * displays them on screen
  * only for development
@@ -149,5 +173,6 @@ export function useSceneFactory() {
     insertCanvas,
     updateScene,
     updateCameraPosition,
+    getIntersections,
   };
 }

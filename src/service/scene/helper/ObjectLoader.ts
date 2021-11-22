@@ -20,7 +20,11 @@ loader.setPath("/models/");
  * @param scene
  * @param objectPosition
  */
-function loadObject(objectToLoad: string, scene: THREE.Scene, objectPosition: THREE.Vector3) {
+function loadObject(
+  objectToLoad: string,
+  scene: THREE.Scene,
+  objectPosition: THREE.Vector3
+) {
   loader.load(objectToLoad, function (loadedObject) {
     object = loadedObject;
     object.name = objectToLoad;
@@ -31,7 +35,7 @@ function loadObject(objectToLoad: string, scene: THREE.Scene, objectPosition: TH
 
 /**
  * updates the possition of the loaded object according to the passed data
- * @param position 
+ * @param position
  */
 function updateObjectPosition(position: THREE.Vector3) {
   object.position.set(position.x, position.y, position.z);
