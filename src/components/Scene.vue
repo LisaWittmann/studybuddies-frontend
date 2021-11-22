@@ -21,27 +21,19 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted } from "vue";
-import { useSceneFactory } from "@/service/scene/SceneFactory";
-import { useTileFactory } from "@/service/scene/TileFactory";
-import { vector } from "@/service/scene/helper/GeometryHelper";
+import { useSceneFactory } from "@/service/SceneFactory";
+import { useTileFactory } from "@/service/TileFactory";
+import { useObjectLoader } from "@/service/ObjectLoader";
 import { useLabyrinthStore } from "@/service/LabyrinthStore";
+import { vector } from "@/service/GeometryHelper";
 
 export default defineComponent({
   name: "scene",
   setup() {
-    const {
-      createScene,
-      renderScene,
-      insertCanvas,
-      updateScene,
-      updateCameraPosition,
-    } = useSceneFactory();
+    const { createScene, renderScene, insertCanvas, updateScene } =
+      useSceneFactory();
     const { createTile } = useTileFactory();
-
-    //mousemovement
-    let isDragging = false;
-    let startX = 0;
-    let startY = 0;
+    const { loadObject } = useObjectLoader();
 
     // testing data
     const scene = createScene(vector(0, 2, 0), true);
@@ -54,45 +46,23 @@ export default defineComponent({
     const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
     updateLabyrinth().then(() => console.log(labyrinthState.tileMap));
 
-    onMounted(() => {
-      insertCanvas("scene");
-      requestAnimationFrame(render);
-
-      window.addEventListener("resize", updateScene);
-      window.addEventListener("mousedown", onMouseDown, false);
-      window.addEventListener("mousemove", onMouseMove, false);
-      window.addEventListener("mouseup", onMouseUp, false);
-    });
+    // test object
+    loadObject("squirrel.obj", scene, vector(0, 3, -5));
 
     function render() {
       renderScene();
       requestAnimationFrame(render);
     }
 
-    //EventListeners-----
-    function onMouseDown(event: MouseEvent) {
-      console.log("mouse down", event.x, event.pageY);
-      startX = event.x;
-      startY = event.y;
-      isDragging = true;
-    }
+    onMounted(() => {
+      insertCanvas("scene");
+      requestAnimationFrame(render);
 
-    function onMouseMove(event: MouseEvent) {
-      if (isDragging === true) {
-        console.log("mousemove", event.clientX, event.clientY);
-      }
-    }
-
-    function onMouseUp(event: MouseEvent) {
-      console.log("mouse up", event.x, event.pageY);
-      isDragging = false;
-    }
+      window.addEventListener("resize", updateScene);
+    });
 
     onBeforeUnmount(() => {
       window.removeEventListener("resize", updateScene);
-      window.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mouseup", onMouseUp);
-      window.removeEventListener("mousemove", onMouseMove);
     });
   },
 });
