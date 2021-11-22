@@ -25,7 +25,7 @@ export default defineComponent({
     );
 
     // test object
-    loadObject("squirrel.obj", scene);
+    loadObject("squirrel.obj", scene, vector(0, 3, -5));
     
 
     
