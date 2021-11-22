@@ -6,7 +6,11 @@
         <h2>Bitte gib deinen Benutzernamen und dein Passwort ein</h2>
       </div>
       <div class="login__form-wrapper">
-        <div v-if="inLoginState" class="login__form">
+        <form
+          v-if="inLoginState"
+          @submit.prevent="login(user)"
+          class="login__form"
+        >
           <input
             type="username"
             placeholder="Benutzername"
@@ -19,14 +23,14 @@
             v-model="user.password"
             required
           />
-          <button @click="login(user)">Anmelden</button>
+          <button type="submit">Anmelden</button>
           <p>
             Noch kein Benutzerkonto?
             <a @click="switchToRegister">Jetzt registrieren</a>
           </p>
-        </div>
+        </form>
 
-        <div v-else class="login__form">
+        <form v-else @submit.prevent="register(user)" class="login__form">
           <input
             type="username"
             placeholder="Benutzername"
@@ -39,12 +43,12 @@
             v-model="user.password"
             required
           />
-          <button @click="register(user)">Registrieren</button>
+          <button type="submit">Registrieren</button>
           <p>
             Du bist bereits registriert?
             <a @click="switchToLogin">Jetzt anmelden</a>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   </div>
@@ -146,10 +150,12 @@ export default defineComponent({
       background: $color-dark-grey;
       margin-top: $spacing-s;
       border: 2px solid $color-dark-grey;
+      cursor: pointer;
     }
 
     a {
       text-decoration: underline;
+      cursor: pointer;
 
       &:hover {
         color: $color-nearly-white;
