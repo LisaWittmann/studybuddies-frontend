@@ -14,6 +14,7 @@ import { defineComponent, onBeforeUnmount, onMounted } from "vue";
 import { useSceneFactory } from "@/service/SceneFactory";
 import { useTileFactory } from "@/service/TileFactory";
 import { vector } from "@/service/GeometryHelper";
+import { useObjectLoader} from "@/service/ObjectLoader";
 import { useLabyrinthStore } from "@/service/LabyrinthStore"
 
 export default defineComponent({
@@ -27,6 +28,7 @@ export default defineComponent({
       updateCameraPosition
     } = useSceneFactory();
     const { createTile } = useTileFactory();
+    const { loadObject } = useObjectLoader();
 
     //mousemovement
     let isDragging = false;
@@ -46,8 +48,17 @@ export default defineComponent({
       console.log(labyrinthState.tileMap)
     )
 
+    // test object
+    loadObject("squirrel.obj", scene, vector(0, 3, -5));
+
+
+
+
+
+
     onMounted(() => {
       insertCanvas("scene");
+      // automatically updating scene
       requestAnimationFrame(render);
 
       window.addEventListener("resize", updateScene);
@@ -71,7 +82,7 @@ export default defineComponent({
 
     function onMouseMove(event: MouseEvent) {
       if (isDragging === true) {
-        console.log("mousemove", event.clientX, event.clientY);
+        //console.log("mousemove", event.clientX, event.clientY);
       }
     }
 
