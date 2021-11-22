@@ -1,5 +1,5 @@
 import { reactive, readonly } from "vue";
-import { Tile, Orientation, Item } from "@service/Tile";
+import { Tile, Orientation, Item } from "@/service/Tile";
 
 /**
  * tileState: Constant to keep the tiles or store an errormessage
@@ -20,18 +20,19 @@ const tempTileRelations = reactive({
  */
 async function updateLabyrinth() {
   await fetch("" /*'/api/Labyrinth'*/, {
-    method: "GET",
     //headers: { 'Authorization': `Bearer ${loginstate.jwttoken}` }
   })
     .then((response) => {
-      if (!response.ok) {
+      /*if (!response.ok) {
         throw new Error(response.statusText);
-      }
+      }*/
 
-      return response.json();
+      return null;
     })
     .then((jsondata) => {
-      labyrinthState.tileMap = jsondata.tileMap;
+
+      console.log("bin im fetch");
+      //labyrinthState.tileMap = jsondata.tileMap;
 
       const tileMap = labyrinthState.tileMap;
 
@@ -58,19 +59,25 @@ async function updateLabyrinth() {
           const check = relArray[elem.getId() - 1][index];
           if (check != -1) {
             const secondTile = tileMap.get(check);
-
-            if (typeof secondTile != undefined) {
-              connectTiles(elem, secondTile, index);
-            }
+            connectTiles(elem, secondTile as Tile, index);
           }
         }
       });
+
     })
     .catch((fehler) => {
       labyrinthState.errormessage = fehler;
     });
+
 }
 
+/**
+ * 
+ * Connecting the references from Tile to Tile with its Relation
+ * @param firstTile Tile from which is connected
+ * @param secondTile Tile to connect to
+ * @param orientationRelation orientation to connect from firstTile
+ */
 function connectTiles(
   firstTile: Tile,
   secondTile: Tile,
