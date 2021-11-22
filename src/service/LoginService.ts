@@ -1,4 +1,5 @@
 import { User } from "@/service/User";
+import router from "@/router";
 
 async function login(user: User) {
   await fetch("/api/login", {
@@ -8,7 +9,9 @@ async function login(user: User) {
     },
     body: JSON.stringify(user),
   })
-    .then((res) => console.log(res))
+    .then((response) => {
+      if (response.ok) router.push("/lobby");
+    })
     .catch((err) => console.log(err));
 }
 
@@ -20,7 +23,9 @@ async function register(user: User) {
     },
     body: JSON.stringify(user),
   })
-    .then((res) => console.log(res))
+    .then((response) => {
+      if (response.ok) router.push("/lobby");
+    })
     .catch((err) => console.log(err));
 }
 

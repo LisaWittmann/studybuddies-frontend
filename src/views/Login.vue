@@ -15,13 +15,11 @@
             type="username"
             placeholder="Benutzername"
             v-model="user.username"
-            required
           />
           <input
             type="password"
             placeholder="Passwort"
             v-model="user.password"
-            required
           />
           <button type="submit">Anmelden</button>
           <p>
@@ -91,7 +89,6 @@ export default defineComponent({
 .login {
   width: 100%;
   height: 100%;
-  background-color: $color-grey;
   @include flex-center();
 
   &__content {
