@@ -47,7 +47,7 @@ export default defineComponent({
     scene.add(
       createTile({ width: tileSize, height: tileSize }, vector(0, 0, 0))
     );
-    scene.add(createObject(new Cube(2), vector(0, 0, -5)));
+    scene.add(createObject(new Cube(3), vector(0, 0, -5)));
 
     // Getting the usable labyrinthState Variable with every Tile as Object
     const { labyrinthState, updateLabyrinth } = useLabyrinthStore();

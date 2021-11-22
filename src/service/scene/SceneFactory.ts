@@ -111,7 +111,8 @@ function updateCameraOrbit() {
 
 function getIntersections(x: number, y: number) {
   raycaster.setFromCamera({ x: x, y: y }, camera);
-  const intersects = raycaster.intersectObjects(scene.children);
+  console.log(raycaster);
+  const intersects = raycaster.intersectObjects(scene.children, false);
   console.log(intersects);
 
   // testing intersections with hovering
