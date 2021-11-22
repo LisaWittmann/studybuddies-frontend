@@ -1,8 +1,19 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { vector } from "./GeometryHelper";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
+
+//Camera
 let camera: THREE.PerspectiveCamera;
+let orbitControls: OrbitControls;
+
+//only for development------------------
+let cameraDirection: THREE.Vector3;
+let camPositionSpan: any;
+let camLookAtSpan: any;
+//--------------------------------------
 
 /**
  * creates new threejs 3D scene
@@ -14,10 +25,29 @@ function createScene(
   cameraPosition: THREE.Vector3,
   debug = false
 ): THREE.Scene {
+  //RENDERER-----------------
+  renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true,
+  });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(90, ratio, 0.1, 1000);
   updateCameraPosition(cameraPosition);
 
+  //CONTROLS-----------------
+  orbitControls = new OrbitControls(camera, renderer.domElement);
+  orbitControls.target = new THREE.Vector3(0, 2, 0);
+  orbitControls.update();
+  orbitControls.addEventListener("end", () => {
+    updateCameraOrbit();
+  });
+  updateCameraOrbit();
+
+  //SCENE--------------------
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x696969);
 
@@ -27,21 +57,17 @@ function createScene(
     scene.add(grid);
   }
 
+  //LIGHT--------------------
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
   scene.add(ambientLight);
-
-  renderer = new THREE.WebGLRenderer({
-    alpha: true,
-    antialias: true,
-  });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
 
   return scene;
 }
 
 function renderScene() {
   renderer.render(scene, camera);
+  orbitControls.update();
+  calculateCameraVectors(); //only for development
 }
 
 /**
@@ -57,6 +83,56 @@ function insertCanvas(container: string | null) {
 }
 
 /**
+ * updates camera / player position
+ * @param position: new camera position
+ */
+function updateCameraPosition(position: THREE.Vector3) {
+  camera.position.set(position.x, position.y, position.z);
+  console.log("updateCameraPosition");
+}
+
+/**
+ * updates camera orbit/rotation
+ */
+function updateCameraOrbit() {
+  console.log("update CameraOrbit");
+  const forward = new THREE.Vector3();
+  console.log(forward);
+  camera.getWorldDirection(forward);
+  console.log(camera.getWorldDirection(forward));
+  orbitControls.target.copy(camera.position).add(forward);
+}
+
+/**
+ *
+ * calculates camera vectors
+ * displays them on screen
+ * only for development
+ */
+function calculateCameraVectors() {
+  cameraDirection = new THREE.Vector3();
+  camPositionSpan = document.querySelector("#position");
+  camLookAtSpan = document.querySelector("#lookingAt");
+  // this copies the camera's unit vector direction to cameraDirection
+  camera.getWorldDirection(cameraDirection);
+  // scale the unit vector up to get a more intuitive value
+  cameraDirection.set(
+    cameraDirection.x * 100,
+    cameraDirection.y * 100,
+    cameraDirection.z * 100
+  );
+  // update the onscreen spans with the camera's position and lookAt vectors
+  camPositionSpan.innerHTML = `Position: (${camera.position.x.toFixed(
+    1
+  )}, ${camera.position.y.toFixed(1)}, ${camera.position.z.toFixed(1)})`;
+  camLookAtSpan.innerHTML = `LookAt: (${(
+    camera.position.x + cameraDirection.x
+  ).toFixed(1)}, ${(camera.position.y + cameraDirection.y).toFixed(1)}, ${(
+    camera.position.z + cameraDirection.z
+  ).toFixed(1)})`;
+}
+
+/**
  * updates scene based on screen size
  */
 function updateScene() {
@@ -65,14 +141,7 @@ function updateScene() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-/**
- * updates camera / player position
- * @param position: new camera position
- */
-function updateCameraPosition(position: THREE.Vector3) {
-  camera.position.set(position.x, position.y, position.z);
-}
-
+//-------------------------------------------
 export function useSceneFactory() {
   return {
     createScene,
