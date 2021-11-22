@@ -7,6 +7,7 @@ import { defineComponent, onBeforeUnmount, onMounted } from "vue";
 import { useSceneFactory } from "@/service/SceneFactory";
 import { useTileFactory } from "@/service/TileFactory";
 import { vector } from "@/service/GeometryHelper";
+import { useObjectLoader} from "@/service/ObjectLoader";
 
 export default defineComponent({
   name: "scene",
@@ -14,6 +15,7 @@ export default defineComponent({
     const { createScene, renderScene, insertCanvas, updateScene } =
       useSceneFactory();
     const { createTile } = useTileFactory();
+    const { loadObject } = useObjectLoader();
 
     // testing data
     const scene = createScene(vector(0, 1, 0), true);
@@ -21,6 +23,14 @@ export default defineComponent({
     scene.add(
       createTile({ width: tileSize, height: tileSize }, vector(0, 0, 0))
     );
+
+    // test object
+    loadObject("squirrel.obj", scene);
+    
+
+    
+
+
 
     onMounted(() => {
       insertCanvas("scene");
