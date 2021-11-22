@@ -21,11 +21,11 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted } from "vue";
-import { useSceneFactory } from "@/service/SceneFactory";
-import { useTileFactory } from "@/service/TileFactory";
-import { useObjectLoader } from "@/service/ObjectLoader";
+import { useSceneFactory } from "@/service/scene/SceneFactory";
+import { useTileFactory } from "@/service/scene/TileFactory";
+import { useObjectLoader } from "@/service/scene/helper/ObjectLoader";
 import { useLabyrinthStore } from "@/service/LabyrinthStore";
-import { vector } from "@/service/GeometryHelper";
+import { vector } from "@/service/scene/helper/GeometryHelper";
 
 export default defineComponent({
   name: "scene",
@@ -47,7 +47,7 @@ export default defineComponent({
     updateLabyrinth().then(() => console.log(labyrinthState.tileMap));
 
     // test object
-    loadObject("squirrel.obj", scene, vector(0, 3, -5));
+    loadObject("navigation-arrow.obj", scene, vector(0, 0, -9));
 
     function render() {
       renderScene();
