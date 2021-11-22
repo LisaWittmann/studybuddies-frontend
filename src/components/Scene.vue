@@ -1,5 +1,12 @@
 <template>
   <div id="scene"></div>
+  <!-- displaying camera position + lookAt for development-->
+  <div id="camera-vectors" style="position: absolute; top: 0; right: 0; background: grey; padding: 8px; color: white;">
+    <span>Free Camera Vectors:</span><br>
+    <span id="position"></span><br>
+    <span id="lookingAt"></span>
+  </div>
+  <!-------------------------------------------------------->
 </template>
 
 <script lang="ts">
@@ -8,27 +15,44 @@ import { useSceneFactory } from "@/service/SceneFactory";
 import { useTileFactory } from "@/service/TileFactory";
 import { vector } from "@/service/GeometryHelper";
 import { useObjectLoader} from "@/service/ObjectLoader";
+import { useLabyrinthStore } from "@/service/LabyrinthStore"
 
 export default defineComponent({
   name: "scene",
   setup() {
-    const { createScene, renderScene, insertCanvas, updateScene } =
-      useSceneFactory();
+    const {
+      createScene,
+      renderScene,
+      insertCanvas,
+      updateScene,
+      updateCameraPosition
+    } = useSceneFactory();
     const { createTile } = useTileFactory();
     const { loadObject } = useObjectLoader();
 
+    //mousemovement
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+
     // testing data
-    const scene = createScene(vector(0, 1, 0), true);
+    const scene = createScene(vector(0, 2, 0), true);
     const tileSize = 20;
     scene.add(
       createTile({ width: tileSize, height: tileSize }, vector(0, 0, 0))
     );
 
+    // Getting the usable labyrinthState Variable with every Tile as Object
+    const {labyrinthState,updateLabyrinth} = useLabyrinthStore();
+    updateLabyrinth().then(() =>
+      console.log(labyrinthState.tileMap)
+    )
+
     // test object
     loadObject("squirrel.obj", scene, vector(0, 3, -5));
-    
 
-    
+
+
 
 
 
@@ -37,15 +61,10 @@ export default defineComponent({
       // automatically updating scene
       requestAnimationFrame(render);
 
-      addEventListener("resize", updateScene);
-      addEventListener("mousedown", onMouseDown);
-      addEventListener("mouseup", onMouseUp);
-    });
-
-    onBeforeUnmount(() => {
-      removeEventListener("resize", updateScene);
-      removeEventListener("mousedown", onMouseDown);
-      removeEventListener("mouseup", onMouseUp);
+      window.addEventListener("resize", updateScene);
+      window.addEventListener("mousedown", onMouseDown, false);
+      window.addEventListener("mousemove", onMouseMove, false);
+      window.addEventListener("mouseup", onMouseUp, false);
     });
 
     function render() {
@@ -53,17 +72,31 @@ export default defineComponent({
       requestAnimationFrame(render);
     }
 
+    //EventListeners-----
     function onMouseDown(event: MouseEvent) {
-      addEventListener("mousemove", onMouseMove);
+      console.log("mouse down", event.x, event.pageY);
+      startX = event.x;
+      startY = event.y;
+      isDragging = true;
     }
 
     function onMouseMove(event: MouseEvent) {
-      console.log("dragging");
+      if (isDragging === true) {
+        console.log("mousemove", event.clientX, event.clientY);
+      }
     }
 
     function onMouseUp(event: MouseEvent) {
-      removeEventListener("mousemove", onMouseMove);
+      console.log("mouse up", event.x, event.pageY);
+      isDragging = false;
     }
+
+    onBeforeUnmount(() => {
+      window.removeEventListener("resize", updateScene);
+      window.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("mousemove", onMouseMove);
+    });
   },
 });
 </script>
