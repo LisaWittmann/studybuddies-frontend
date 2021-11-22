@@ -1,9 +1,19 @@
 <template>
   <div id="scene"></div>
   <!-- displaying camera position + lookAt for development-->
-  <div id="camera-vectors" style="position: absolute; top: 0; right: 0; background: grey; padding: 8px; color: white;">
-    <span>Free Camera Vectors:</span><br>
-    <span id="position"></span><br>
+  <div
+    id="camera-vectors"
+    style="
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: grey;
+      padding: 8px;
+      color: white;
+    "
+  >
+    <span>Free Camera Vectors:</span><br />
+    <span id="position"></span><br />
     <span id="lookingAt"></span>
   </div>
   <!-------------------------------------------------------->
@@ -14,7 +24,7 @@ import { defineComponent, onBeforeUnmount, onMounted } from "vue";
 import { useSceneFactory } from "@/service/SceneFactory";
 import { useTileFactory } from "@/service/TileFactory";
 import { vector } from "@/service/GeometryHelper";
-import { useLabyrinthStore } from "@/service/LabyrinthStore"
+import { useLabyrinthStore } from "@/service/LabyrinthStore";
 
 export default defineComponent({
   name: "scene",
@@ -24,7 +34,7 @@ export default defineComponent({
       renderScene,
       insertCanvas,
       updateScene,
-      updateCameraPosition
+      updateCameraPosition,
     } = useSceneFactory();
     const { createTile } = useTileFactory();
 
@@ -41,10 +51,8 @@ export default defineComponent({
     );
 
     // Getting the usable labyrinthState Variable with every Tile as Object
-    const {labyrinthState,updateLabyrinth} = useLabyrinthStore();
-    updateLabyrinth().then(() =>
-      console.log(labyrinthState.tileMap)
-    )
+    const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
+    updateLabyrinth().then(() => console.log(labyrinthState.tileMap));
 
     onMounted(() => {
       insertCanvas("scene");

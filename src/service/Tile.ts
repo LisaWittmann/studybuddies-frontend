@@ -4,10 +4,10 @@
  * @todo remov export for testing
  */
 export enum Orientation {
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST,
+  NORTH,
+  EAST,
+  SOUTH,
+  WEST,
 }
 
 /**
@@ -18,36 +18,40 @@ export enum Orientation {
  * @todo remove export for testing
  */
 export class Item {
-    id: number;
+  id: number;
 
-    constructor(id: number){
-        this.id = id;
-    }
+  constructor(id: number) {
+    this.id = id;
+  }
 }
 
 /**
  * Datatype "Tile" which will be filled by parsing the JSON with the labyrinth structure.
  */
 export class Tile {
-    tileId: number;
-    tileRelationMap: Map<Orientation, Tile>; 
-    objectsInRoom: Array<Item>;
+  tileId: number;
+  tileRelationMap: Map<Orientation, Tile>;
+  objectsInRoom: Array<Item>;
 
-    constructor(tileId: number, tileRelationMap: Map<Orientation, Tile>, objectsInRoom: Array<Item>) {
-        this.tileId = tileId;
-        this.tileRelationMap = tileRelationMap;
-        this.objectsInRoom = objectsInRoom;
-    }
+  constructor(
+    tileId: number,
+    tileRelationMap: Map<Orientation, Tile>,
+    objectsInRoom: Array<Item>
+  ) {
+    this.tileId = tileId;
+    this.tileRelationMap = tileRelationMap;
+    this.objectsInRoom = objectsInRoom;
+  }
 
-    getId() {
-        return this.tileId;
-    }
+  getId() {
+    return this.tileId;
+  }
 
-    getTileRelationMap(){
-        return this.tileRelationMap;
-    }
+  getTileRelationMap() {
+    return this.tileRelationMap;
+  }
 
-    getRoomObjects() {
-        return this.objectsInRoom;
-    }
+  getRoomObjects() {
+    return this.objectsInRoom;
+  }
 }

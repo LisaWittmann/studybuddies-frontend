@@ -30,14 +30,12 @@ async function updateLabyrinth() {
       return null;
     })
     .then((jsondata) => {
-
       console.log("bin im fetch");
       //labyrinthState.tileMap = jsondata.tileMap;
 
-
       /*
        * Step 1: filling the LabyrinthState with dummydata
-      */
+       */
       const tileMap = labyrinthState.tileMap;
       tileMap.set(1, new Tile(1, new Map(), [new Item(1)]));
       tileMap.set(2, new Tile(2, new Map(), [new Item(1)]));
@@ -49,7 +47,7 @@ async function updateLabyrinth() {
       /**
        *
        *  Step 2: preparing the dummy connection Array to connect the Tiles in the next step
-      */ 
+       */
       const relArray = tempTileRelations.relationArray;
       relArray.push(
         [-1, 2, -1, -1],
@@ -63,7 +61,7 @@ async function updateLabyrinth() {
       /*
        *
        * Step 3: Connecting the Tiles based on the Relation Array of Step 2
-      */
+       */
       tileMap.forEach((elem) => {
         for (let index = 0; index < 4; index++) {
           const check = relArray[elem.getId() - 1][index];
@@ -73,16 +71,14 @@ async function updateLabyrinth() {
           }
         }
       });
-
     })
     .catch((fehler) => {
       labyrinthState.errormessage = fehler;
     });
-
 }
 
 /**
- * 
+ *
  * Connecting the references from Tile to Tile with its Relation
  * @param firstTile Tile from which is connected
  * @param secondTile Tile to connect to
