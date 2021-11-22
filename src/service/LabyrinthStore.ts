@@ -1,5 +1,5 @@
 import { reactive, readonly } from "vue";
-import { Tile, Orientation, Item } from "./Tile";
+import { Tile, Orientation, Item } from "@service/Tile";
 
 /**
  * tileState: Constant to keep the tiles or store an errormessage
