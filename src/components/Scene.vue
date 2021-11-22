@@ -82,7 +82,7 @@ export default defineComponent({
 
     function onMouseMove(event: MouseEvent) {
       if (isDragging === true) {
-        console.log("mousemove", event.clientX, event.clientY);
+        //console.log("mousemove", event.clientX, event.clientY);
       }
     }
 
