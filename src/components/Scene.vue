@@ -22,7 +22,7 @@
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted } from "vue";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
-import { useTileFactory } from "@/service/scene/TileFactory";
+import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 import { useLabyrinthStore } from "@/service/LabyrinthStore";
 import { vector } from "@/service/scene/helper/GeometryHelper";
 
@@ -36,18 +36,13 @@ export default defineComponent({
       updateScene,
       getIntersections,
     } = useSceneFactory();
-    const { createTile } = useTileFactory();
+    const { createLabyrinth } = useLabyrinthFactory();
 
     // testing data
     const scene = createScene(vector(0, 2, 0), true);
-    const tileSize = 20;
-    scene.add(
-      createTile({ width: tileSize, height: tileSize }, vector(0, 0, 0))
-    );
-
-    // Getting the usable labyrinthState Variable with every Tile as Object
     const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
     updateLabyrinth().then(() => console.log(labyrinthState.tileMap));
+    createLabyrinth(labyrinthState.tileMap, scene);
 
     function render() {
       renderScene();
@@ -65,12 +60,13 @@ export default defineComponent({
       insertCanvas("scene");
       requestAnimationFrame(render);
 
-      window.addEventListener("resize", updateScene);
-      window.addEventListener("mousedown", onMouseDown);
+      addEventListener("resize", updateScene);
+      addEventListener("mousedown", onMouseDown);
     });
 
     onBeforeUnmount(() => {
-      window.removeEventListener("resize", updateScene);
+      removeEventListener("resize", updateScene);
+      removeEventListener("mousedown", onMouseDown);
     });
   },
 });

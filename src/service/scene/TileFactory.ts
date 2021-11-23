@@ -24,6 +24,7 @@ function createTile(
   tile.add(createLight(position, model.height));
 
   //WALLS----------------
+  //switch (sideToAdd)
   const plane = new Plane(model.height, model.width);
 
   const bottom = position;
