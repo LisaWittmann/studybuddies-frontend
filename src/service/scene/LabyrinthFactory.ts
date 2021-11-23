@@ -34,12 +34,11 @@ async function placeTile(
   scene: THREE.Scene
 ) {
   for (const [key, value] of tile.tileRelationMap) {
-    if (value && value.getId() <= storedTiles.length) {
-      position = getNextPosition(storedTiles[value.getId() - 1], key);
+    if (value && value <= storedTiles.length) {
+      position = getNextPosition(storedTiles[value - 1], key);
       break;
     }
   }
-  console.log(position);
   storedTiles.push(position);
   scene.add(createTile(tile, tileSize, tileSize, position));
 }

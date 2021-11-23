@@ -47,7 +47,7 @@ function createStaticObject(
   height: number,
   position: THREE.Vector3,
   orientation: Orientation,
-  value: Tile | undefined,
+  tile: number | undefined,
   color = 0xa9a9a9
 ): THREE.Mesh {
   const { createObject } = useObjectFactory();
@@ -65,7 +65,7 @@ function createStaticObject(
 
   switch (orientation) {
     case Orientation.NORTH:
-      if (value) {
+      if (tile) {
         return createObject(
           arrow,
           vector(north.x, north.y, north.z - 1),
@@ -76,7 +76,7 @@ function createStaticObject(
         return createObject(wall, north, wallColor, false);
       }
     case Orientation.EAST:
-      if (value) {
+      if (tile) {
         return createObject(
           arrow,
           vector(east.x - 1, east.y, east.z),
@@ -90,7 +90,7 @@ function createStaticObject(
       }
       break;
     case Orientation.SOUTH:
-      if (value) {
+      if (tile) {
         return createObject(
           arrow,
           vector(south.x, south.y, south.z - 1),
@@ -101,7 +101,7 @@ function createStaticObject(
         return createObject(wall, south, wallColor, false);
       }
     case Orientation.WEST:
-      if (value) {
+      if (tile) {
         return createObject(
           arrow,
           vector(west.x - 1, west.y, west.z),

@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { Material } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 let scene: THREE.Scene;
@@ -57,7 +56,7 @@ function createScene(
 
   //GRID---------------------
   if (debug) {
-    const grid = new THREE.GridHelper(50, 50, 0xffffff, 0xffffff);
+    const grid = new THREE.GridHelper(100, 100, 0xffffff, 0xffffff);
     scene.add(grid);
   }
 
@@ -92,18 +91,15 @@ function insertCanvas(container: string | null) {
  */
 function updateCameraPosition(position: THREE.Vector3) {
   camera.position.set(position.x, position.y, position.z);
-  console.log("updateCameraPosition");
 }
 
 /**
  * updates camera orbit/rotation
  */
 function updateCameraOrbit() {
-  console.log("update CameraOrbit");
   const forward = new THREE.Vector3();
   camera.getWorldDirection(forward);
   orbitControls.target.copy(camera.position).add(forward);
-  console.log("Camera", camera);
 }
 
 /**

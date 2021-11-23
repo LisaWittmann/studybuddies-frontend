@@ -39,7 +39,7 @@ export default defineComponent({
     const { createLabyrinth } = useLabyrinthFactory();
 
     // testing data
-    const scene = createScene(vector(0, 2, 0));
+    const scene = createScene(vector(0, 2, 0), true);
     const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
     updateLabyrinth().then(() => createLabyrinth(labyrinthState, scene));
 

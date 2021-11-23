@@ -1,6 +1,5 @@
-import { reactive, readonly, computed } from "vue";
+import { reactive } from "vue";
 import { Tile, Orientation, Item } from "@/service/Tile";
-import { Labyrinth } from "./Labyrith";
 
 /**
  * tileState: Constant to keep the tiles or store an errormessage
@@ -20,60 +19,65 @@ const tempTileRelations = reactive({
  * updateLabyrinth: to update the Tiles for getting them initially and every time something changes.
  */
 async function updateLabyrinth() {
-  await fetch("" /*'/api/Labyrinth'*/, {
+  await fetch("/api/labyrinth/1", {
+    method: "GET",
     //headers: { 'Authorization': `Bearer ${loginstate.jwttoken}` }
   })
     .then((response) => {
-      /*if (!response.ok) {
-        throw new Error(response.statusText);
-      }*/
+      if (!response.ok) {
+        // load testing data if fetch is not possible
+        const tileMap = labyrinthState.tileMap;
+        tileMap.set(1, new Tile(1, new Map(), [new Item(1)]));
+        tileMap.set(2, new Tile(2, new Map(), [new Item(1)]));
+        tileMap.set(3, new Tile(3, new Map(), [new Item(1)]));
+        tileMap.set(4, new Tile(4, new Map(), [new Item(1)]));
+        tileMap.set(5, new Tile(5, new Map(), [new Item(1)]));
+        tileMap.set(6, new Tile(6, new Map(), [new Item(1)]));
+        const relArray = tempTileRelations.relationArray;
+        relArray.push(
+          [-1, 2, -1, -1],
+          [-1, 3, 5, 1],
+          [-1, 4, -1, 2],
+          [-1, -1, 6, 3],
+          [2, -1, -1, -1],
+          [4, -1, -1, -1]
+        );
 
-      return null;
+        tileMap.forEach((elem) => {
+          for (let index = 0; index < 4; index++) {
+            const check = relArray[elem.getId() - 1][index];
+            if (check != -1) {
+              const secondTile = tileMap.get(check);
+              connectTiles(elem, secondTile as Tile, index);
+            } else {
+              connectNull(elem, index);
+            }
+          }
+        });
+        labyrinthState.tileMap = tileMap;
+
+        throw new Error(response.statusText);
+      }
+
+      return response.json();
     })
     .then((jsondata) => {
-      console.log("bin im fetch");
-      //labyrinthState.tileMap = jsondata.tileMap;
-
       /*
-       * Step 1: filling the LabyrinthState with dummydata
+       * Step 1: Setting the LabyrinthState
        */
-      const tileMap = labyrinthState.tileMap;
-      tileMap.set(1, new Tile(1, new Map(), [new Item(1)]));
-      tileMap.set(2, new Tile(2, new Map(), [new Item(1)]));
-      tileMap.set(3, new Tile(3, new Map(), [new Item(1)]));
-      tileMap.set(4, new Tile(4, new Map(), [new Item(1)]));
-      tileMap.set(5, new Tile(5, new Map(), [new Item(1)]));
-      tileMap.set(6, new Tile(6, new Map(), [new Item(1)]));
-
-      /**
-       *
-       *  Step 2: preparing the dummy connection Array to connect the Tiles in the next step
-       */
-      const relArray = tempTileRelations.relationArray;
-      relArray.push(
-        [-1, 2, -1, -1],
-        [-1, 3, 5, 1],
-        [-1, 4, -1, 2],
-        [-1, -1, 6, 3],
-        [2, -1, -1, -1],
-        [4, -1, -1, -1]
-      );
+      labyrinthState.tileMap = jsondata.tileMap;
 
       /*
        *
-       * Step 3: Connecting the Tiles based on the Relation Array of Step 2
+       * Step 2: Connecting the Tiles based on the Relation Array of Step 2
        */
-      tileMap.forEach((elem) => {
+      for (const [key, tile] of labyrinthState.tileMap) {
         for (let index = 0; index < 4; index++) {
-          const check = relArray[elem.getId() - 1][index];
-          if (check != -1) {
-            const secondTile = tileMap.get(check);
-            connectTiles(elem, secondTile as Tile, index);
-          } else {
-            connectNull(elem, index);
+          if (!tile.getTileRelationMap().get(index)) {
+            connectNull(tile, index);
           }
         }
-      });
+      }
     })
     .catch((fehler) => {
       labyrinthState.errormessage = fehler;
@@ -84,19 +88,18 @@ async function updateLabyrinth() {
  *
  * Connecting the references from Tile to Tile with its Relation
  * @param firstTile Tile from which is connected
- * @param secondTile Tile to connect to
  * @param orientationRelation orientation to connect from firstTile
  */
+function connectNull(firstTile: Tile, orientationRelation: Orientation) {
+  firstTile.getTileRelationMap().set(orientationRelation, undefined);
+}
+
 function connectTiles(
   firstTile: Tile,
   secondTile: Tile,
   orientationRelation: Orientation
 ) {
-  firstTile.getTileRelationMap().set(orientationRelation, secondTile);
-}
-
-function connectNull(firstTile: Tile, orientationRelation: Orientation) {
-  firstTile.getTileRelationMap().set(orientationRelation, undefined);
+  firstTile.getTileRelationMap().set(orientationRelation, secondTile.getId());
 }
 
 /**
