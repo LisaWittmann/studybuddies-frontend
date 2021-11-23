@@ -47,7 +47,7 @@ export class Tile {
     return this.tileId;
   }
 
-  getTileRelationMap(): Map<Orientation, Tile> {
+  getTileRelationMap(): Map<Orientation, number | undefined> {
     return this.tileRelationMap;
   }
 
