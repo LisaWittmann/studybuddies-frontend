@@ -1,5 +1,6 @@
 import { reactive } from "vue";
 import { Tile, Orientation, Item } from "@/service/Tile";
+import { Labyrinth } from "@/service/Labyrinth";
 
 /**
  * tileState: Constant to keep the tiles or store an errormessage
@@ -26,6 +27,7 @@ async function updateLabyrinth() {
     .then((response) => {
       if (!response.ok) {
         // load testing data if fetch is not possible
+        /*
         const tileMap = labyrinthState.tileMap;
         tileMap.set(1, new Tile(1, new Map(), [new Item(1)]));
         tileMap.set(2, new Tile(2, new Map(), [new Item(1)]));
@@ -43,6 +45,7 @@ async function updateLabyrinth() {
           [4, -1, -1, -1]
         );
 
+
         tileMap.forEach((elem) => {
           for (let index = 0; index < 4; index++) {
             const check = relArray[elem.getId() - 1][index];
@@ -54,7 +57,10 @@ async function updateLabyrinth() {
             }
           }
         });
+
         labyrinthState.tileMap = tileMap;
+
+        */
 
         throw new Error(response.statusText);
       }
@@ -65,19 +71,60 @@ async function updateLabyrinth() {
       /*
        * Step 1: Setting the LabyrinthState
        */
-      labyrinthState.tileMap = jsondata.tileMap;
 
-      /*
-       *
-       * Step 2: Connecting the Tiles based on the Relation Array of Step 2
-       */
-      for (const [key, tile] of labyrinthState.tileMap) {
+
+
+        const test = jsondata.tileMap;
+
+        const map = new Map<number, Tile>();
+
+        for (const value in jsondata.tileMap) {
+            map.set(parseInt(value),new Tile(parseInt(value), undefined, new Array<Item>()));
+
+            const map2 = new Map<Orientation, number|undefined>();
+
+            for(const value2 in jsondata.tileMap[value].tileRelationMap) {
+                const nr:number = parseInt(value2)
+                let ori:Orientation;
+                //const test: Orientation = parseInt(value2);
+                switch (value2) {
+                case "NORTH":
+                   ori = Orientation.NORTH;
+                    break;
+                case "EAST":
+                    ori = Orientation.EAST;
+                    break;
+                case "SOUTH":
+                    ori = Orientation.SOUTH;
+                    break;
+                case "WEST":
+                    ori = Orientation.WEST;
+                    break;
+                default:
+                    ori = Orientation.EAST;
+                    break;
+                }
+
+                map2.set(ori,parseInt(jsondata.tileMap[value].tileRelationMap[value2]));
+                }
+
+                const test = map2.entries();
+
+                (map.get(parseInt(value)) as Tile).setTileRelationMap(map2);
+            }
+
+
+      for (const [key, tile] of map) {
         for (let index = 0; index < 4; index++) {
           if (!tile.getTileRelationMap().get(index)) {
             connectNull(tile, index);
           }
         }
       }
+
+        labyrinthState.tileMap = map;
+        console.log(map);
+
     })
     .catch((fehler) => {
       labyrinthState.errormessage = fehler;

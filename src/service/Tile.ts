@@ -10,6 +10,11 @@ export enum Orientation {
   WEST,
 }
 
+export interface TileRelation {
+  orientation: Orientation;
+  tile: number | undefined;
+}
+
 /**
  * item object to make an empty test Object to fill the tile
  * (Maybe outsource it in next sprints with more attributs)
@@ -35,12 +40,12 @@ export class Tile {
 
   constructor(
     tileId: number,
-    tileRelationMap: Map<Orientation, number | undefined>,
+    tileRelationMap: Map<Orientation, number|undefined> | undefined,
     objectsInRoom: Array<Item>
   ) {
     this.tileId = tileId;
-    this.tileRelationMap = tileRelationMap;
     this.objectsInRoom = objectsInRoom;
+    this.tileRelationMap = new Map<Orientation, number | undefined>();
   }
 
   getId(): number {
@@ -53,5 +58,9 @@ export class Tile {
 
   getRoomObjects(): Array<Item> {
     return this.objectsInRoom;
+  }
+
+  setTileRelationMap(map: Map<Orientation, number | undefined>) {
+    this.tileRelationMap = map;
   }
 }

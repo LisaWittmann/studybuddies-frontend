@@ -44,6 +44,8 @@ function createScene(
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.target = new THREE.Vector3(0, 2, 0);
   orbitControls.enableZoom = false;
+  //orbitControls.enablePan = false;
+  orbitControls.panSpeed = 5.0;
   orbitControls.update();
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();

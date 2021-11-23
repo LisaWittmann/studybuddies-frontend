@@ -13,6 +13,8 @@ async function uploadFiles(filelist: FileList) {
 
           throw new Error(response.statusText);
           return;
+        } else {
+            console.log("OKAY!");
         }
       } catch (reason) {
         console.log(reason);
