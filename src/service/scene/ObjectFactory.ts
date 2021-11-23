@@ -32,7 +32,7 @@ function createObject(
 function createCube(model: Cube, color = 0x199eb0): THREE.Mesh {
   return new THREE.Mesh(
     new THREE.BoxGeometry(model.width, model.height, model.depth),
-    new THREE.MeshStandardMaterial({ color })
+    new THREE.MeshStandardMaterial({ color: color })
   );
 }
 
