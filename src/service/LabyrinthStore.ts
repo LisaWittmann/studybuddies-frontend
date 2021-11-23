@@ -1,6 +1,5 @@
 import { reactive } from "vue";
 import { Tile, Orientation, Item } from "@/service/Tile";
-import { Labyrinth } from "@/service/Labyrinth";
 
 /**
  * tileState: Constant to keep the tiles or store an errormessage
@@ -12,6 +11,9 @@ const labyrinthState = reactive({
   errormessage: "",
 });
 
+/**
+ * dummy array to connect the dummy relations
+ */
 const tempTileRelations = reactive({
   relationArray: Array<Array<number>>(),
 });
@@ -26,7 +28,7 @@ async function updateLabyrinth() {
   })
     .then((response) => {
       if (!response.ok) {
-        // load testing data if fetch is not possible
+        // load dummy data if fetch is not possible
         const tileMap = labyrinthState.tileMap;
         tileMap.set(1, new Tile(1, new Map(), [new Item(1)]));
         tileMap.set(2, new Tile(2, new Map(), [new Item(1)]));
@@ -64,56 +66,60 @@ async function updateLabyrinth() {
       return response.json();
     })
     .then((jsondata) => {
-      /*
-       * Step 1: Setting the LabyrinthState
+      /**
+       * Creates an empty map to fill it with the jsondata
        */
+      const tileMap = new Map<number, Tile>();
 
-      const test = jsondata.tileMap;
-
-      const map = new Map<number, Tile>();
-
-      for (const value in jsondata.tileMap) {
-        map.set(
-          parseInt(value),
-          new Tile(parseInt(value), undefined, new Array<Item>())
+      /**
+       * iterates over the tiles in the jsondata tileMap to create Tiles for every json-Object Tile found
+       */
+      for (const jsonTile in jsondata.tileMap) {
+        tileMap.set(
+          parseInt(jsonTile),
+          new Tile(parseInt(jsonTile), undefined, new Array<Item>())
         );
 
-        const map2 = new Map<Orientation, number | undefined>();
+        /**
+         * creates an extra map to set the TileRelations afterwards
+         */
+        const tileRelationMap = new Map<Orientation, number | undefined>();
 
-        for (const value2 in jsondata.tileMap[value].tileRelationMap) {
-          const nr: number = parseInt(value2);
-          let ori: Orientation;
-          //const test: Orientation = parseInt(value2);
-          switch (value2) {
+        for (const jsonOrientation in jsondata.tileMap[jsonTile]
+          .tileRelationMap) {
+          let orientation: Orientation;
+          switch (jsonOrientation) {
             case "NORTH":
-              ori = Orientation.NORTH;
+              orientation = Orientation.NORTH;
               break;
             case "EAST":
-              ori = Orientation.EAST;
+              orientation = Orientation.EAST;
               break;
             case "SOUTH":
-              ori = Orientation.SOUTH;
+              orientation = Orientation.SOUTH;
               break;
             case "WEST":
-              ori = Orientation.WEST;
+              orientation = Orientation.WEST;
               break;
             default:
-              ori = Orientation.EAST;
+              orientation = Orientation.EAST;
               break;
           }
 
-          map2.set(
-            ori,
-            parseInt(jsondata.tileMap[value].tileRelationMap[value2])
+          tileRelationMap.set(
+            orientation,
+            parseInt(
+              jsondata.tileMap[jsonTile].tileRelationMap[jsonOrientation]
+            )
           );
         }
 
-        const test = map2.entries();
-
-        (map.get(parseInt(value)) as Tile).setTileRelationMap(map2);
+        (tileMap.get(parseInt(jsonTile)) as Tile).setTileRelationMap(
+          tileRelationMap
+        );
       }
 
-      for (const [key, tile] of map) {
+      for (const [key, tile] of tileMap) {
         for (let index = 0; index < 4; index++) {
           if (!tile.getTileRelationMap().get(index)) {
             connectNull(tile, index);
@@ -121,7 +127,7 @@ async function updateLabyrinth() {
         }
       }
 
-      labyrinthState.tileMap = map;
+      labyrinthState.tileMap = tileMap;
     })
     .catch((fehler) => {
       labyrinthState.errormessage = fehler;
