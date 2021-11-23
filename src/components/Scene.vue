@@ -41,8 +41,7 @@ export default defineComponent({
     // testing data
     const scene = createScene(vector(0, 2, 0), true);
     const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
-    updateLabyrinth().then(() => console.log(labyrinthState.tileMap));
-    createLabyrinth(labyrinthState.tileMap, scene);
+    updateLabyrinth().then(() => createLabyrinth(labyrinthState, scene));
 
     function render() {
       renderScene();

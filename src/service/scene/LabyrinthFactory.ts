@@ -1,12 +1,8 @@
 import * as THREE from "three";
-import { Tile, Orientation } from "@/service/Tile";
-import { useTileFactory } from "@/service/scene/TileFactory";  
-
-const { createTile } = useTileFactory();
-
-//examples -> todo: get from Tile.ts
-const tileSize = 20;
-const color = 0xa9a9a9;
+import { useTileFactory } from "@/service/scene/TileFactory";
+import { Labyrinth } from "@/service/Labyrith";
+import { Orientation, Tile } from "@/service/Tile";
+import { vector } from "./helper/GeometryHelper";
 
 /**
  * gets Map of all Tiles of a Labyrinth
@@ -15,32 +11,15 @@ const color = 0xa9a9a9;
  * @param labyrinthState
  * @param scene
  */
-function createLabyrinth(
-  labyrinthState: Map<number, Tile>,
-  scene: THREE.Scene
-) {
-  labyrinthState.forEach((value: Tile, key: number) => {
-    let tilePosition = new THREE.Vector3(0, 0, 0);
-    let tile = new THREE.Group();
-    if (key === 1) {
-      //first Tile
-      //todo: write as external method
-      tile = createTile({ width: tileSize, height: tileSize }, tilePosition);
-      value.tileRelationMap.forEach((value: Tile, key: Orientation) => {
-        if (value) {
-          console.log("value: " + value);
-          //add next Tile
-        } else {
-          //add wall on side of Orientation
-          console.log("wall on " + key);
-          //addWall(key, tilePosition);
-        }
-      });
-    } else {
-      tilePosition = calculatePosition(value);
-    }
-    scene.add(tile);
-  });
+function createLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
+  const { createTile } = useTileFactory();
+  const tileMap = labyrinth.tileMap;
+  const tileSize = 20;
+
+  // add fist tile on position 0, 0, 0
+  const currentTile = tileMap.get(1) as Tile;
+  const position = vector(0, 0, 0);
+  scene.add(createTile(currentTile, tileSize, tileSize, position));
 }
 
 /**
@@ -48,7 +27,7 @@ function createLabyrinth(
  * @param tile
  * @returns
  */
-function calculatePosition(tile: Tile): THREE.Vector3 {
+function calculatePosition(position: THREE.Vector3, orientation: Orientation): THREE.Vector3 {
   return new THREE.Vector3(1, 1, 1);
 }
 /**

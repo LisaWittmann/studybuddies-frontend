@@ -1,13 +1,14 @@
-import { reactive, readonly } from "vue";
+import { reactive, readonly, computed } from "vue";
 import { Tile, Orientation, Item } from "@/service/Tile";
+import { Labyrinth } from "./Labyrith";
 
 /**
  * tileState: Constant to keep the tiles or store an errormessage
  */
 const labyrinthState = reactive({
   tileMap: new Map<number, Tile>([]),
-  startPosition: [],
-  endpoint: Number,
+  startPosition: new Array<number>(),
+  endpoint: 0,
   errormessage: "",
 });
 
@@ -68,6 +69,8 @@ async function updateLabyrinth() {
           if (check != -1) {
             const secondTile = tileMap.get(check);
             connectTiles(elem, secondTile as Tile, index);
+          } else {
+            connectNull(elem, index);
           }
         }
       });
@@ -90,6 +93,10 @@ function connectTiles(
   orientationRelation: Orientation
 ) {
   firstTile.getTileRelationMap().set(orientationRelation, secondTile);
+}
+
+function connectNull(firstTile: Tile, orientationRelation: Orientation) {
+  firstTile.getTileRelationMap().set(orientationRelation, undefined);
 }
 
 /**

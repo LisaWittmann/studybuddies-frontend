@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Tile } from "@/service/TestData";
+import { Orientation, Tile } from "@/service/Tile";
 import { Cuboid, Plane } from "@/service/Shape";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { vector } from "@/service/scene/helper/GeometryHelper";
@@ -13,51 +13,107 @@ import { vector } from "@/service/scene/helper/GeometryHelper";
  */
 function createTile(
   model: Tile,
+  width: number,
+  height: number,
   position: THREE.Vector3,
   color = 0xa9a9a9
 ): THREE.Group {
   const tile = new THREE.Group();
   const { createObject } = useObjectFactory();
   tile.position.copy(position);
+  tile.userData.id = model.getId;
 
   //LIGHT-----------------
-  tile.add(createLight(position, model.height));
+  tile.add(createLight(position, height));
 
-  //WALLS----------------
-  //switch (sideToAdd)
-  const plane = new Plane(model.height, model.width);
-
+  //CONSTANTS-------------
   const bottom = position;
-  const top = vector(position.x, model.height, position.z);
-  const left = vector(position.x - model.width / 2, position.y, position.z);
-  const right = vector(position.x + model.width / 2, position.y, position.z);
-  const front = vector(position.x, position.y, position.z + model.width / 2);
-  const back = vector(position.x, position.y, position.z - model.width / 2);
+  const top = vector(position.x, height, position.z);
 
+  //STATIC-OBJECTS--------
+  const plane = new Plane(height, width);
   tile.add(createObject(plane, bottom, color, false, vector(1, 0, 0), 90));
   tile.add(createObject(plane, top, color, false, vector(1, 0, 0), 90));
 
-  tile.add(createObject(plane, left, color, false, vector(0, 1, 0), 90));
-  tile.add(createObject(plane, right, color, false, vector(0, 1, 0), 90));
-  tile.add(createObject(plane, front, color));
-  tile.add(createObject(plane, back, color));
-
-  //NAVIGATION------------
-  const edgePosition = model.width / 2 - 1;
-  const arrowColor = 0xeaf4ea;
-  const arrow = new Cuboid(1, 1, 2);
-
-  const north = vector(0, 0, -edgePosition);
-  const east = vector(-edgePosition, 0, 0);
-  const south = vector(0, 0, edgePosition);
-  const west = vector(edgePosition, 0, 0);
-
-  tile.add(createObject(arrow, north, arrowColor, true));
-  tile.add(createObject(arrow, south, arrowColor, true));
-  tile.add(createObject(arrow, east, arrowColor, true, vector(0, 1, 0), 90));
-  tile.add(createObject(arrow, west, arrowColor, true, vector(0, 1, 0), 90));
+  model.tileRelationMap.forEach((value, key) => {
+    tile.add(createStaticObject(width, height, position, key, value, color));
+  });
 
   return tile;
+}
+
+function createStaticObject(
+  width: number,
+  height: number,
+  position: THREE.Vector3,
+  orientation: Orientation,
+  value: Tile | undefined,
+  color = 0xa9a9a9
+): THREE.Mesh {
+  const { createObject } = useObjectFactory();
+
+  const wall = new Plane(width, height);
+  const arrow = new Cuboid(1, 1, 2);
+
+  const wallColor = color;
+  const arrowColor = 0xeaf4ea;
+
+  const north = vector(position.x, position.y, position.z - width / 2);
+  const east = vector(position.x + width / 2, position.y, position.z);
+  const south = vector(position.x, position.y, position.z + width / 2);
+  const west = vector(position.x - width / 2, position.y, position.z);
+
+  switch (orientation) {
+    case Orientation.NORTH:
+      if (value) {
+        return createObject(
+          arrow,
+          vector(north.x, north.y, north.z - 1),
+          arrowColor,
+          true
+        );
+      } else {
+        return createObject(wall, north, wallColor, false);
+      }
+    case Orientation.EAST:
+      if (value) {
+        return createObject(
+          arrow,
+          vector(east.x - 1, east.y, east.z),
+          arrowColor,
+          true,
+          vector(0, 1, 0),
+          90
+        );
+      } else {
+        return createObject(wall, east, wallColor, false, vector(0, 1, 0), 90);
+      }
+      break;
+    case Orientation.SOUTH:
+      if (value) {
+        return createObject(
+          arrow,
+          vector(south.x, south.y, south.z - 1),
+          arrowColor,
+          true
+        );
+      } else {
+        return createObject(wall, south, wallColor, false);
+      }
+    case Orientation.WEST:
+      if (value) {
+        return createObject(
+          arrow,
+          vector(west.x - 1, west.y, west.z),
+          arrowColor,
+          true,
+          vector(0, 1, 0),
+          90
+        );
+      } else {
+        return createObject(wall, west, wallColor, false, vector(0, 1, 0), 90);
+      }
+  }
 }
 
 // TODO: add coordinate converter for objects in tile pased on tile position
