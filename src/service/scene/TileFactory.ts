@@ -32,8 +32,10 @@ function createTile(
 
   //STATIC-OBJECTS--------
   const plane = new Plane(height, width);
-  tile.add(createObject(plane, bottom, color, false, vector(1, 0, 0), 90));
-  tile.add(createObject(plane, top, color, false, vector(1, 0, 0), 90));
+  tile.add(
+    createObject(plane, bottom, color, false, true, vector(1, 0, 0), 90)
+  );
+  tile.add(createObject(plane, top, color, false, true, vector(1, 0, 0), 90));
 
   model.tileRelationMap.forEach((value, key) => {
     tile.add(createStaticObject(width, height, position, key, value, color));
@@ -70,7 +72,8 @@ function createStaticObject(
           arrow,
           vector(north.x, north.y, north.z - 1),
           arrowColor,
-          true
+          true,
+          false
         );
       } else {
         return createObject(wall, north, wallColor, false);
@@ -82,11 +85,20 @@ function createStaticObject(
           vector(east.x - 1, east.y, east.z),
           arrowColor,
           true,
+          false,
           vector(0, 1, 0),
           90
         );
       } else {
-        return createObject(wall, east, wallColor, false, vector(0, 1, 0), 90);
+        return createObject(
+          wall,
+          east,
+          wallColor,
+          false,
+          true,
+          vector(0, 1, 0),
+          90
+        );
       }
       break;
     case Orientation.SOUTH:
@@ -95,7 +107,8 @@ function createStaticObject(
           arrow,
           vector(south.x, south.y, south.z - 1),
           arrowColor,
-          true
+          true,
+          false
         );
       } else {
         return createObject(wall, south, wallColor, false);
@@ -107,11 +120,20 @@ function createStaticObject(
           vector(west.x - 1, west.y, west.z),
           arrowColor,
           true,
+          false,
           vector(0, 1, 0),
           90
         );
       } else {
-        return createObject(wall, west, wallColor, false, vector(0, 1, 0), 90);
+        return createObject(
+          wall,
+          west,
+          wallColor,
+          false,
+          true,
+          vector(0, 1, 0),
+          90
+        );
       }
   }
 }

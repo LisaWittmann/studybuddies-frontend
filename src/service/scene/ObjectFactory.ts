@@ -17,6 +17,7 @@ function createObject(
   position: THREE.Vector3,
   color = 0x199eb0,
   clickable = false,
+  visible = true,
   axis?: THREE.Vector3,
   angle?: number
 ): THREE.Mesh {
@@ -34,6 +35,7 @@ function createObject(
     position = baseline(position, model.height);
   }
 
+  object.visible = visible;
   object.userData.clickable = clickable;
   object.position.copy(position);
   return object;
