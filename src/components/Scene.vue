@@ -57,7 +57,7 @@ export default defineComponent({
     function onMouseDown(event: MouseEvent) {
       getIntersections(
         (event.clientX / innerWidth) * 2 - 1,
-        (event.clientY / innerHeight) * 2 - 1
+        -(event.clientY / innerHeight) * 2 + 1
       );
     }
 

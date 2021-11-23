@@ -18,7 +18,7 @@ function createTile(
 ): THREE.Group {
   const tile = new THREE.Group();
   const { createObject } = useObjectFactory();
-  tile.position.set(position.x, position.y, position.z);
+  tile.position.copy(position);
 
   //LIGHT-----------------
   tile.add(createLight(position, model.height));
@@ -33,11 +33,11 @@ function createTile(
   const front = vector(position.x, position.y, position.z + model.width / 2);
   const back = vector(position.x, position.y, position.z - model.width / 2);
 
-  tile.add(createObject(plane, bottom, color, vector(1, 0, 0), 90));
-  tile.add(createObject(plane, top, color, vector(1, 0, 0), 90));
+  tile.add(createObject(plane, bottom, color, false, vector(1, 0, 0), 90));
+  tile.add(createObject(plane, top, color, false, vector(1, 0, 0), 90));
 
-  tile.add(createObject(plane, left, color, vector(0, 1, 0), 90));
-  tile.add(createObject(plane, right, color, vector(0, 1, 0), 90));
+  tile.add(createObject(plane, left, color, false, vector(0, 1, 0), 90));
+  tile.add(createObject(plane, right, color, false, vector(0, 1, 0), 90));
   tile.add(createObject(plane, front, color));
   tile.add(createObject(plane, back, color));
 
@@ -51,10 +51,10 @@ function createTile(
   const south = vector(0, 0, edgePosition);
   const west = vector(edgePosition, 0, 0);
 
-  tile.add(createObject(arrow, north, arrowColor));
-  tile.add(createObject(arrow, south, arrowColor));
-  tile.add(createObject(arrow, east, arrowColor, vector(0, 1, 0), 90));
-  tile.add(createObject(arrow, west, arrowColor, vector(0, 1, 0), 90));
+  tile.add(createObject(arrow, north, arrowColor, true));
+  tile.add(createObject(arrow, south, arrowColor, true));
+  tile.add(createObject(arrow, east, arrowColor, true, vector(0, 1, 0), 90));
+  tile.add(createObject(arrow, west, arrowColor, true, vector(0, 1, 0), 90));
 
   return tile;
 }

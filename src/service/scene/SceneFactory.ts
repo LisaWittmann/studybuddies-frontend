@@ -4,13 +4,10 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
+let raycaster: THREE.Raycaster;
 
-//Camera
 let camera: THREE.PerspectiveCamera;
 let orbitControls: OrbitControls;
-
-let cursor: THREE.Vector2;
-let raycaster: THREE.Raycaster;
 
 //only for development------------------
 let cameraDirection: THREE.Vector3;
@@ -41,7 +38,7 @@ function createScene(
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
-  camera = new THREE.PerspectiveCamera(90, ratio, 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
   updateCameraPosition(cameraPosition);
 
   //CONTROLS-----------------
@@ -111,20 +108,18 @@ function updateCameraOrbit() {
 
 function getIntersections(x: number, y: number) {
   raycaster.setFromCamera({ x: x, y: y }, camera);
-  console.log(raycaster);
-  const intersects = raycaster.intersectObjects(scene.children, false);
-  console.log(intersects);
+  const intersects = raycaster.intersectObjects(scene.children);
 
   // testing intersections with hovering
   for (const i of intersects) {
     if (i.object.type == "Mesh") {
       const object = i.object as THREE.Mesh;
-      hoverObject(object);
+      if (object.userData.clickable) handleClick(object);
     }
   }
 }
 
-function hoverObject(object: THREE.Mesh): void {
+function handleClick(object: THREE.Mesh): void {
   const material = object.material as THREE.Material;
   material.opacity = material.opacity == 1 ? 0.6 : 1;
 }
