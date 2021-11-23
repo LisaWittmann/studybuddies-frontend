@@ -1,9 +1,19 @@
 <template>
   <div id="scene"></div>
   <!-- displaying camera position + lookAt for development-->
-  <div id="camera-vectors" style="position: absolute; top: 0; right: 0; background: grey; padding: 8px; color: white;">
-    <span>Free Camera Vectors:</span><br>
-    <span id="position"></span><br>
+  <div
+    id="camera-vectors"
+    style="
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: grey;
+      padding: 8px;
+      color: white;
+    "
+  >
+    <span>Free Camera Vectors:</span><br />
+    <span id="position"></span><br />
     <span id="lookingAt"></span>
   </div>
   <!-------------------------------------------------------->
@@ -14,6 +24,8 @@ import { defineComponent, onBeforeUnmount, onMounted } from "vue";
 import { useSceneFactory } from "@/service/SceneFactory";
 import { useTileFactory } from "@/service/TileFactory";
 import { vector } from "@/service/GeometryHelper";
+import { useObjectLoader } from "@/service/ObjectLoader";
+import { useLabyrinthStore } from "@/service/LabyrinthStore";
 
 export default defineComponent({
   name: "scene",
@@ -23,9 +35,10 @@ export default defineComponent({
       renderScene,
       insertCanvas,
       updateScene,
-      updateCameraPosition
+      updateCameraPosition,
     } = useSceneFactory();
     const { createTile } = useTileFactory();
+    const { loadObject } = useObjectLoader();
 
     //mousemovement
     let isDragging = false;
@@ -39,8 +52,16 @@ export default defineComponent({
       createTile({ width: tileSize, height: tileSize }, vector(0, 0, 0))
     );
 
+    // Getting the usable labyrinthState Variable with every Tile as Object
+    const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
+    updateLabyrinth().then(() => console.log(labyrinthState.tileMap));
+
+    // test object
+    loadObject("squirrel.obj", scene, vector(0, 3, -5));
+
     onMounted(() => {
       insertCanvas("scene");
+      // automatically updating scene
       requestAnimationFrame(render);
 
       window.addEventListener("resize", updateScene);
@@ -64,7 +85,7 @@ export default defineComponent({
 
     function onMouseMove(event: MouseEvent) {
       if (isDragging === true) {
-        console.log("mousemove", event.clientX, event.clientY);
+        //console.log("mousemove", event.clientX, event.clientY);
       }
     }
 
