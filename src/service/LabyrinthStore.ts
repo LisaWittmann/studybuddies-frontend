@@ -26,11 +26,8 @@ async function updateLabyrinth() {
   })
     .then((response) => {
       if (!response.ok) {
-        /*
         // load testing data if fetch is not possible
-        //const map = new Map<number, Tile>();
-
-        //const tileMap = labyrinthState.tileMap;
+        const tileMap = labyrinthState.tileMap;
         tileMap.set(1, new Tile(1, new Map(), [new Item(1)]));
         tileMap.set(2, new Tile(2, new Map(), [new Item(1)]));
         tileMap.set(3, new Tile(3, new Map(), [new Item(1)]));
@@ -47,7 +44,6 @@ async function updateLabyrinth() {
           [4, -1, -1, -1]
         );
 
-
         tileMap.forEach((elem) => {
           for (let index = 0; index < 4; index++) {
             const check = relArray[elem.getId() - 1][index];
@@ -61,8 +57,6 @@ async function updateLabyrinth() {
         });
 
         labyrinthState.tileMap = tileMap;
-
-        */
 
         throw new Error(response.statusText);
       }
