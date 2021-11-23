@@ -10,11 +10,8 @@ async function uploadFiles(filelist: FileList) {
           body: data,
         });
         if (!response.ok) {
-
           throw new Error(response.statusText);
           return;
-        } else {
-            console.log("OKAY!");
         }
       } catch (reason) {
         console.log(reason);

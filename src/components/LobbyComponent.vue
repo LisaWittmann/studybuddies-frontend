@@ -1,16 +1,15 @@
 <template>
-    <input type="file" ref="data" id="file-input" @change="dataUpload"/><br />
+  <input type="file" ref="data" id="file-input" @change="dataUpload" /><br />
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import {useUploadService} from "@/service/UploadService";
+import { useUploadService } from "@/service/UploadService";
 
 export default defineComponent({
   name: "lobby",
   setup() {
-
-    const {uploadFiles} = useUploadService();
+    const { uploadFiles } = useUploadService();
     const data = ref({} as HTMLInputElement);
 
     async function dataUpload() {
@@ -21,7 +20,7 @@ export default defineComponent({
 
     return {
       data,
-      dataUpload
+      dataUpload,
     };
   },
 });

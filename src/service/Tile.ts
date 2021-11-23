@@ -40,7 +40,7 @@ export class Tile {
 
   constructor(
     tileId: number,
-    tileRelationMap: Map<Orientation, number|undefined> | undefined,
+    tileRelationMap: Map<Orientation, number | undefined> | undefined,
     objectsInRoom: Array<Item>
   ) {
     this.tileId = tileId;

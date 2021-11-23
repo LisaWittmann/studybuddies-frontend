@@ -21,9 +21,6 @@ function createLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
   for (const [key, value] of labyrinth.tileMap) {
     placeTile(position, value, scene);
   }
-
-  console.log(storedTiles);
-
 }
 
 /**
@@ -39,14 +36,12 @@ async function placeTile(
 ) {
   for (const [key, value] of tile.tileRelationMap) {
     if (value && storedTiles.get(value)) {
-      position = getNextPosition((storedTiles.get(value)) as THREE.Vector3, key);
+      position = getNextPosition(storedTiles.get(value) as THREE.Vector3, key);
       break;
     }
   }
   storedTiles.set(tile.getId(), position);
   scene.add(createTile(tile, tileSize, tileSize, position));
-
-
 }
 
 /**
