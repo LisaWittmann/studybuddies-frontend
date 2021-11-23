@@ -30,10 +30,10 @@ export class Item {
  */
 export class Tile {
     tileId: number;
-    tileRelationMap: Map<Orientation, Tile>; 
+    tileRelationMap: Map<Orientation, Number|undefined>; 
     objectsInRoom: Array<Item>;
 
-    constructor(tileId: number, tileRelationMap: Map<Orientation, Tile>, objectsInRoom: Array<Item>) {
+    constructor(tileId: number, tileRelationMap: Map<Orientation, Number|undefined>, objectsInRoom: Array<Item>) {
         this.tileId = tileId;
         this.tileRelationMap = tileRelationMap;
         this.objectsInRoom = objectsInRoom;
