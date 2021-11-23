@@ -36,13 +36,13 @@ function createScene(
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
+  //RAYCASTER----------------
+  raycaster = new THREE.Raycaster();
+
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(90, ratio, 0.1, 1000);
   updateCameraPosition(cameraPosition);
-
-  //RAYCASTER----------------
-  raycaster = new THREE.Raycaster();
 
   //CONTROLS-----------------
   orbitControls = new OrbitControls(camera, renderer.domElement);

@@ -23,9 +23,7 @@
 import { defineComponent, onBeforeUnmount, onMounted } from "vue";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useTileFactory } from "@/service/scene/TileFactory";
-import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { useLabyrinthStore } from "@/service/LabyrinthStore";
-import { Cube } from "@/service/Shape";
 import { vector } from "@/service/scene/helper/GeometryHelper";
 
 export default defineComponent({
@@ -39,7 +37,6 @@ export default defineComponent({
       getIntersections,
     } = useSceneFactory();
     const { createTile } = useTileFactory();
-    const { createObject } = useObjectFactory();
 
     // testing data
     const scene = createScene(vector(0, 2, 0), true);
@@ -47,7 +44,6 @@ export default defineComponent({
     scene.add(
       createTile({ width: tileSize, height: tileSize }, vector(0, 0, 0))
     );
-    scene.add(createObject(new Cube(3), vector(0, 0, -5)));
 
     // Getting the usable labyrinthState Variable with every Tile as Object
     const { labyrinthState, updateLabyrinth } = useLabyrinthStore();

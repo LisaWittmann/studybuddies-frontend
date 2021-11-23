@@ -1,15 +1,29 @@
 import * as THREE from "three";
-import type { Shape, Cube } from "@/service/Shape";
-import { baseline } from "@/service/scene/helper/GeometryHelper";
+import { Shape, Cube, Cuboid, Plane } from "@/service/Shape";
+import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 
 function createObject(
   model: Shape,
   position: THREE.Vector3,
-  color = 0xa9a9a9
+  color = 0x199eb0,
+  axis?: THREE.Vector3,
+  angle?: number
 ): THREE.Mesh {
-  const object = createCube(model, color);
-  position = baseline(position, model.height);
+  let object: THREE.Mesh = new THREE.Mesh();
+
+  if (model instanceof Cube) object = createCube(model, color);
+  if (model instanceof Cuboid) object = createCuboid(model, color);
+  if (model instanceof Plane) object = createPlane(model, color);
+
+  if (axis && angle) {
+    object.rotateOnAxis(axis, radians(angle));
+  }
+
+  if (!(model.depth == 0 && axis?.x == 1)) {
+    position = baseline(position, model.height);
+  }
   object.position.set(position.x, position.y, position.z);
+  console.log(object);
   return object;
 }
 
@@ -17,6 +31,20 @@ function createCube(model: Cube, color = 0x199eb0): THREE.Mesh {
   return new THREE.Mesh(
     new THREE.BoxGeometry(model.width, model.height, model.depth),
     new THREE.MeshStandardMaterial({ color })
+  );
+}
+
+function createCuboid(model: Cuboid, color = 0x199eb0): THREE.Mesh {
+  return new THREE.Mesh(
+    new THREE.BoxGeometry(model.width, model.height, model.depth),
+    new THREE.MeshStandardMaterial({ color: color })
+  );
+}
+
+function createPlane(model: Plane, color = 0x199eb0): THREE.Mesh {
+  return new THREE.Mesh(
+    new THREE.PlaneGeometry(model.width, model.height),
+    new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
 }
 

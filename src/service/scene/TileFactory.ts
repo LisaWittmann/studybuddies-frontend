@@ -1,10 +1,8 @@
 import * as THREE from "three";
 import { Tile } from "@/service/TestData";
-import {
-  radians,
-  baseline,
-  vector,
-} from "@/service/scene/helper/GeometryHelper";
+import { Cuboid, Plane } from "@/service/Shape";
+import { useObjectFactory } from "@/service/scene/ObjectFactory";
+import { vector } from "@/service/scene/helper/GeometryHelper";
 
 /**
  * creates a group of planes representing a tile
@@ -18,124 +16,50 @@ function createTile(
   position: THREE.Vector3,
   color = 0xa9a9a9
 ): THREE.Group {
-  // create group
   const tile = new THREE.Group();
+  const { createObject } = useObjectFactory();
   tile.position.set(position.x, position.y, position.z);
 
-  // add bottom plane
-  tile.add(
-    createWall(
-      model.width,
-      model.width,
-      color,
-      false,
-      position,
-      vector(1, 0, 0),
-      90
-    )
-  );
-
-  // add top plane
-  tile.add(
-    createWall(
-      model.width,
-      model.width,
-      color,
-      false,
-      vector(position.x, model.height, position.z),
-      vector(1, 0, 0),
-      90
-    )
-  );
-
-  // add left plane
-  tile.add(
-    createWall(
-      model.width,
-      model.height,
-      color,
-      true,
-      vector(position.x - model.width / 2, position.y, position.z),
-      vector(0, 1, 0),
-      90
-    )
-  );
-
-  // add right plane
-  tile.add(
-    createWall(
-      model.width,
-      model.height,
-      color,
-      true,
-      vector(position.x + model.width / 2, position.y, position.z),
-      vector(0, 1, 0),
-      90
-    )
-  );
-
-  // add front plane
-  tile.add(
-    createWall(
-      model.width,
-      model.height,
-      color,
-      true,
-      vector(position.x, position.y, position.z + model.width / 2)
-    )
-  );
-
-  // add back plane
-  tile.add(
-    createWall(
-      model.width,
-      model.height,
-      color,
-      true,
-      vector(position.x, position.y, position.z - model.width / 2)
-    )
-  );
-
+  //LIGHT-----------------
   tile.add(createLight(position, model.height));
+
+  //WALLS----------------
+  const plane = new Plane(model.height, model.width);
+
+  const bottom = position;
+  const top = vector(position.x, model.height, position.z);
+  const left = vector(position.x - model.width / 2, position.y, position.z);
+  const right = vector(position.x + model.width / 2, position.y, position.z);
+  const front = vector(position.x, position.y, position.z + model.width / 2);
+  const back = vector(position.x, position.y, position.z - model.width / 2);
+
+  tile.add(createObject(plane, bottom, color, vector(1, 0, 0), 90));
+  tile.add(createObject(plane, top, color, vector(1, 0, 0), 90));
+
+  tile.add(createObject(plane, left, color, vector(0, 1, 0), 90));
+  tile.add(createObject(plane, right, color, vector(0, 1, 0), 90));
+  tile.add(createObject(plane, front, color));
+  tile.add(createObject(plane, back, color));
+
+  //NAVIGATION------------
+  const edgePosition = model.width / 2 - 1;
+  const arrowColor = 0xeaf4ea;
+  const arrow = new Cuboid(1, 1, 2);
+
+  const north = vector(0, 0, -edgePosition);
+  const east = vector(-edgePosition, 0, 0);
+  const south = vector(0, 0, edgePosition);
+  const west = vector(edgePosition, 0, 0);
+
+  tile.add(createObject(arrow, north, arrowColor));
+  tile.add(createObject(arrow, south, arrowColor));
+  tile.add(createObject(arrow, east, arrowColor, vector(0, 1, 0), 90));
+  tile.add(createObject(arrow, west, arrowColor, vector(0, 1, 0), 90));
 
   return tile;
 }
 
-/**
- * creates 3D plane as wall representation
- * @param width: width of tile
- * @param height: height of tile
- * @param color: preferred color of walls
- * @param alignBaseline: deactivate automatic center positioning
- * @param position: global position of wall in tile
- * @param axis: rotating axis
- * @param angle: rotating angle in degree
- * @returns created threejs plane as wall
- */
-function createWall(
-  width: number,
-  height = width,
-  color = 0x000000,
-  alignBaseline = false,
-  position?: THREE.Vector3,
-  axis?: THREE.Vector3,
-  angle?: number
-): THREE.Mesh {
-  const wall = new THREE.Mesh(
-    new THREE.PlaneGeometry(width, height),
-    new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
-  );
-  if (position) {
-    if (alignBaseline) {
-      position = baseline(position, height);
-    }
-    wall.position.set(position.x, position.y, position.z);
-  }
-  if (axis && angle) {
-    wall.rotateOnAxis(axis, radians(angle));
-  }
-  return wall;
-}
+// TODO: check lightning in connected tiles
 
 /**
  * creates point light underneath top plane
@@ -145,7 +69,7 @@ function createWall(
  */
 function createLight(position: THREE.Vector3, height: number) {
   const light = new THREE.PointLight(0xffffff, 0.5, 50, 2);
-  light.position.set(position.x, position.y + height - 5, position.z);
+  light.position.set(position.x, position.y + height - 10, position.z);
   return light;
 }
 
