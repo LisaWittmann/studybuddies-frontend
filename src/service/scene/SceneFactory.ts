@@ -3,8 +3,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
+let raycaster: THREE.Raycaster;
 
-//Camera
 let camera: THREE.PerspectiveCamera;
 let orbitControls: OrbitControls;
 
@@ -32,9 +32,12 @@ function createScene(
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
+  //RAYCASTER----------------
+  raycaster = new THREE.Raycaster();
+
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
-  camera = new THREE.PerspectiveCamera(90, ratio, 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
   updateCameraPosition(cameraPosition);
 
   //CONTROLS-----------------
@@ -51,9 +54,9 @@ function createScene(
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x696969);
 
-  // grid helper for debugging
+  //GRID---------------------
   if (debug) {
-    const grid = new THREE.GridHelper(50, 50, 0xffffff, 0xffffff);
+    const grid = new THREE.GridHelper(100, 100, 0xffffff, 0xffffff);
     scene.add(grid);
   }
 
@@ -88,23 +91,41 @@ function insertCanvas(container: string | null) {
  */
 function updateCameraPosition(position: THREE.Vector3) {
   camera.position.set(position.x, position.y, position.z);
-  console.log("updateCameraPosition");
 }
 
 /**
  * updates camera orbit/rotation
  */
 function updateCameraOrbit() {
-  console.log("update CameraOrbit");
   const forward = new THREE.Vector3();
-  console.log(forward);
   camera.getWorldDirection(forward);
-  console.log(camera.getWorldDirection(forward));
   orbitControls.target.copy(camera.position).add(forward);
 }
 
 /**
- *
+ * gets intersecting object of converted cursor position
+ * @param x: converted x position of cursor
+ * @param y: converted y position of cursor
+ */
+function getIntersections(x: number, y: number) {
+  raycaster.setFromCamera({ x: x, y: y }, camera);
+  const intersects = raycaster.intersectObjects(scene.children);
+
+  // testing intersections
+  for (const i of intersects) {
+    if (i.object.type == "Mesh") {
+      const object = i.object as THREE.Mesh;
+      if (i.object.userData.clickable) handleClick(object);
+    }
+  }
+}
+
+function handleClick(object: THREE.Mesh): void {
+  const material = object.material as THREE.Material;
+  material.opacity = material.opacity == 1 ? 0.6 : 1;
+}
+
+/**
  * calculates camera vectors
  * displays them on screen
  * only for development
@@ -149,5 +170,6 @@ export function useSceneFactory() {
     insertCanvas,
     updateScene,
     updateCameraPosition,
+    getIntersections,
   };
 }
