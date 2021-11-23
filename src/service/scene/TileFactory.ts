@@ -21,7 +21,7 @@ function createTile(
   const tile = new THREE.Group();
   const { createObject } = useObjectFactory();
   tile.position.copy(position);
-  tile.userData.id = model.getId;
+  tile.userData.id = model.getId();
 
   //LIGHT-----------------
   tile.add(createLight(position, height));
