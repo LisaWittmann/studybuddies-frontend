@@ -1,5 +1,5 @@
 <template>
-  <Scene />
+  <h1>test</h1>
   <Instructions v-if="showInstructions" :instructions="instructions" />
 </template>
 
