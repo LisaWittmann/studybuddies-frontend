@@ -5,11 +5,11 @@ import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { vector } from "@/service/scene/helper/GeometryHelper";
 
 /**
- * creates a group of planes representing a tile
+ * creates a group of objects representing a tile
  * @param model: representing tile data
  * @param position: position in scene
  * @param color: color of all walls
- * @returns created three.js group as tile
+ * @returns initialized group of scene objects
  */
 function createTile(
   model: Tile,
@@ -58,6 +58,8 @@ function createTile(
 
   return tile;
 }
+
+// TODO: add coordinate converter for objects in tile pased on tile position
 
 // TODO: check lightning in connected tiles
 

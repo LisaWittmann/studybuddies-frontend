@@ -106,15 +106,20 @@ function updateCameraOrbit() {
   console.log("Camera", camera);
 }
 
+/**
+ * gets intersecting object of converted cursor position
+ * @param x: converted x position of cursor
+ * @param y: converted y position of cursor
+ */
 function getIntersections(x: number, y: number) {
   raycaster.setFromCamera({ x: x, y: y }, camera);
   const intersects = raycaster.intersectObjects(scene.children);
 
-  // testing intersections with hovering
+  // testing intersections
   for (const i of intersects) {
     if (i.object.type == "Mesh") {
       const object = i.object as THREE.Mesh;
-      if (object.userData.clickable) handleClick(object);
+      if (i.object.userData.clickable) handleClick(object);
     }
   }
 }
