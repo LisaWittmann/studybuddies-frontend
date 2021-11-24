@@ -32,11 +32,13 @@ function createTile(
 
   //STATIC-OBJECTS--------
   const plane = new Plane(height, width);
+  // top and bottom plane
   tile.add(
     createObject(plane, bottom, color, false, true, vector(1, 0, 0), 90)
   );
   tile.add(createObject(plane, top, color, false, true, vector(1, 0, 0), 90));
 
+  // place walls and navigation arrows based on tile relations
   model.tileRelationMap.forEach((value, key) => {
     tile.add(createStaticObject(width, height, position, key, value, color));
   });
@@ -44,6 +46,18 @@ function createTile(
   return tile;
 }
 
+/**
+ * creates static tile object based on given relation
+ * creates arrow to naviagte to next tile if relation exists
+ * creates wall if no relation exists
+ * @param width: width of tile
+ * @param height: height of tile
+ * @param position: position of tile
+ * @param orientation: orientation of tile relation
+ * @param tile: tile of tile relation
+ * @param color: color of walls
+ * @returns wall or navigation arrow object
+ */
 function createStaticObject(
   width: number,
   height: number,
@@ -76,7 +90,7 @@ function createStaticObject(
           false
         );
       } else {
-        return createObject(wall, north, wallColor, false);
+        return createObject(wall, north, wallColor, false, true);
       }
     case Orientation.EAST:
       if (tile) {
@@ -100,7 +114,6 @@ function createStaticObject(
           90
         );
       }
-      break;
     case Orientation.SOUTH:
       if (tile) {
         return createObject(
@@ -111,7 +124,7 @@ function createStaticObject(
           false
         );
       } else {
-        return createObject(wall, south, wallColor, false);
+        return createObject(wall, south, wallColor, false, true);
       }
     case Orientation.WEST:
       if (tile) {
@@ -137,10 +150,6 @@ function createStaticObject(
       }
   }
 }
-
-// TODO: add coordinate converter for objects in tile pased on tile position
-
-// TODO: check lightning in connected tiles
 
 /**
  * creates point light underneath top plane

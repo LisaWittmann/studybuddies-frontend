@@ -33,14 +33,10 @@ export class Tile {
   tileRelationMap: Map<Orientation, number | undefined>;
   objectsInRoom: Array<Item>;
 
-  constructor(
-    tileId: number,
-    tileRelationMap: Map<Orientation, number | undefined>,
-    objectsInRoom: Array<Item>
-  ) {
+  constructor(tileId: number, objectsInRoom: Array<Item>) {
     this.tileId = tileId;
-    this.tileRelationMap = tileRelationMap;
     this.objectsInRoom = objectsInRoom;
+    this.tileRelationMap = new Map<Orientation, number | undefined>();
   }
 
   getId(): number {
@@ -53,5 +49,9 @@ export class Tile {
 
   getRoomObjects(): Array<Item> {
     return this.objectsInRoom;
+  }
+
+  setTileRelationMap(map: Map<Orientation, number | undefined>): void {
+    this.tileRelationMap = map;
   }
 }

@@ -1,5 +1,10 @@
 import { Tile } from "@/service/Tile";
 
+/**
+ * labyrinth map:
+ * contains all tiles with relations
+ * contains start and endposition of labyrinth
+ */
 export class Labyrinth {
   tileMap: Map<number, Tile>;
   startPosition: number[];
@@ -10,8 +15,8 @@ export class Labyrinth {
     startPosition: number[],
     endpoint: number
   ) {
-    this.tileMap = tileMap;
     this.startPosition = startPosition;
     this.endpoint = endpoint;
+    this.tileMap = tileMap;
   }
 }

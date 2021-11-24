@@ -2,7 +2,7 @@ import { reactive } from "vue";
 import { Tile, Orientation, Item } from "@/service/Tile";
 
 /**
- * tileState: Constant to keep the tiles or store an errormessage
+ * constant to keep the tiles or store an errormessage
  */
 const labyrinthState = reactive({
   tileMap: new Map<number, Tile>([]),
@@ -11,28 +11,32 @@ const labyrinthState = reactive({
   errormessage: "",
 });
 
+/**
+ * helper to connect the fallback labyrinth
+ */
 const tempTileRelations = reactive({
   relationArray: Array<Array<number>>(),
 });
 
 /**
- * updateLabyrinth: to update the Tiles for getting them initially and every time something changes.
+ * update the tiles for getting them initially and every time something changes
+ * fetches labyrnith object of api and converts response into labyrinth data
+ * creates simple fallback labyrinth if fetch fails
  */
 async function updateLabyrinth() {
   await fetch("/api/labyrinth/1", {
     method: "GET",
-    //headers: { 'Authorization': `Bearer ${loginstate.jwttoken}` }
   })
     .then((response) => {
       if (!response.ok) {
-        // load testing data if fetch is not possible
+        // load fallback labyrinth if fetch is not possible
         const tileMap = labyrinthState.tileMap;
-        tileMap.set(1, new Tile(1, new Map(), [new Item(1)]));
-        tileMap.set(2, new Tile(2, new Map(), [new Item(1)]));
-        tileMap.set(3, new Tile(3, new Map(), [new Item(1)]));
-        tileMap.set(4, new Tile(4, new Map(), [new Item(1)]));
-        tileMap.set(5, new Tile(5, new Map(), [new Item(1)]));
-        tileMap.set(6, new Tile(6, new Map(), [new Item(1)]));
+        tileMap.set(1, new Tile(1, [new Item(1)]));
+        tileMap.set(2, new Tile(2, [new Item(1)]));
+        tileMap.set(3, new Tile(3, [new Item(1)]));
+        tileMap.set(4, new Tile(4, [new Item(1)]));
+        tileMap.set(5, new Tile(5, [new Item(1)]));
+        tileMap.set(6, new Tile(6, [new Item(1)]));
         const relArray = tempTileRelations.relationArray;
         relArray.push(
           [-1, 2, -1, -1],
@@ -46,14 +50,11 @@ async function updateLabyrinth() {
         tileMap.forEach((elem) => {
           for (let index = 0; index < 4; index++) {
             const check = relArray[elem.getId() - 1][index];
-            if (check != -1) {
-              const secondTile = tileMap.get(check);
-              connectTiles(elem, secondTile as Tile, index);
-            } else {
-              connectNull(elem, index);
-            }
+            const secondTile = tileMap.get(check);
+            connectTiles(elem, index, secondTile as Tile);
           }
         });
+
         labyrinthState.tileMap = tileMap;
 
         throw new Error(response.statusText);
@@ -62,22 +63,63 @@ async function updateLabyrinth() {
       return response.json();
     })
     .then((jsondata) => {
-      /*
-       * Step 1: Setting the LabyrinthState
-       */
-      labyrinthState.tileMap = jsondata.tileMap;
+      //create an empty map to fill it with the jsondata
+      const tileMap = new Map<number, Tile>();
 
-      /*
-       *
-       * Step 2: Connecting the Tiles based on the Relation Array of Step 2
-       */
-      for (const [key, tile] of labyrinthState.tileMap) {
+      //iterates over the tiles in the jsondata tileMap to create tiles for every tile in jsonobject
+      for (const jsonTile in jsondata.tileMap) {
+        tileMap.set(
+          parseInt(jsonTile),
+          new Tile(parseInt(jsonTile), new Array<Item>())
+        );
+
+        //workaround to parse json list in map
+        const tileRelationMap = new Map<Orientation, number | undefined>();
+
+        for (const jsonOrientation in jsondata.tileMap[jsonTile]
+          .tileRelationMap) {
+          let orientation: Orientation;
+          switch (jsonOrientation) {
+            case "NORTH":
+              orientation = Orientation.NORTH;
+              break;
+            case "EAST":
+              orientation = Orientation.EAST;
+              break;
+            case "SOUTH":
+              orientation = Orientation.SOUTH;
+              break;
+            case "WEST":
+              orientation = Orientation.WEST;
+              break;
+            default:
+              orientation = Orientation.EAST;
+              break;
+          }
+
+          tileRelationMap.set(
+            orientation,
+            parseInt(
+              jsondata.tileMap[jsonTile].tileRelationMap[jsonOrientation]
+            )
+          );
+        }
+
+        (tileMap.get(parseInt(jsonTile)) as Tile).setTileRelationMap(
+          tileRelationMap
+        );
+      }
+
+      //add empty relations for unset orientations of tilemap
+      for (const [, tile] of tileMap) {
         for (let index = 0; index < 4; index++) {
           if (!tile.getTileRelationMap().get(index)) {
-            connectNull(tile, index);
+            connectTiles(tile, index, undefined);
           }
         }
       }
+
+      labyrinthState.tileMap = tileMap;
     })
     .catch((fehler) => {
       labyrinthState.errormessage = fehler;
@@ -85,27 +127,20 @@ async function updateLabyrinth() {
 }
 
 /**
- *
- * Connecting the references from Tile to Tile with its Relation
- * @param firstTile Tile from which is connected
- * @param orientationRelation orientation to connect from firstTile
+ * add uni directional relation from firstTile to secondTile
+ * add empty relation if secondTile is undefined
+ * @param firstTile: tile on wich relation should be added
+ * @param secondTile: tile that sould be added to relation
+ * @param orientationRelation: orientation in which relation should be added
  */
-function connectNull(firstTile: Tile, orientationRelation: Orientation) {
-  firstTile.getTileRelationMap().set(orientationRelation, undefined);
-}
-
 function connectTiles(
   firstTile: Tile,
-  secondTile: Tile,
-  orientationRelation: Orientation
+  orientationRelation: Orientation,
+  secondTile: Tile | undefined
 ) {
-  firstTile.getTileRelationMap().set(orientationRelation, secondTile.getId());
+  firstTile.getTileRelationMap().set(orientationRelation, secondTile?.getId());
 }
 
-/**
- *
- * @returns the function to use them somewhere else with import
- */
 export function useLabyrinthStore() {
   return {
     labyrinthState,

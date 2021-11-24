@@ -38,6 +38,7 @@ function createObject(
   object.visible = visible;
   object.userData.clickable = clickable;
   object.position.copy(position);
+  object.visible = visible;
   return object;
 }
 
