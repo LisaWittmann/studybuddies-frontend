@@ -87,7 +87,7 @@ function createStaticObject(
           vector(north.x, north.y, north.z - 1),
           arrowColor,
           true,
-          false
+          true
         );
       } else {
         return createObject(wall, north, wallColor, false, true);
@@ -99,7 +99,7 @@ function createStaticObject(
           vector(east.x - 1, east.y, east.z),
           arrowColor,
           true,
-          false,
+          true,
           vector(0, 1, 0),
           90
         );
@@ -121,7 +121,7 @@ function createStaticObject(
           vector(south.x, south.y, south.z - 1),
           arrowColor,
           true,
-          false
+          true
         );
       } else {
         return createObject(wall, south, wallColor, false, true);
@@ -133,7 +133,7 @@ function createStaticObject(
           vector(west.x - 1, west.y, west.z),
           arrowColor,
           true,
-          false,
+          true,
           vector(0, 1, 0),
           90
         );

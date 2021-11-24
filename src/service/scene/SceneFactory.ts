@@ -34,6 +34,7 @@ function createScene(
 
   //RAYCASTER----------------
   raycaster = new THREE.Raycaster();
+  raycaster.far = 20;
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
