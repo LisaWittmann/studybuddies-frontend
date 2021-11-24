@@ -4,17 +4,17 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { useUploadService } from "@/service/UploadService";
+import { useLabyrinthService } from "@/service/LabyrinthService";
 
 export default defineComponent({
   name: "lobby",
   setup() {
-    const { uploadFiles } = useUploadService();
+    const { uploadJsonFiles } = useLabyrinthService();
     const data = ref({} as HTMLInputElement);
 
     async function dataUpload() {
       if (data.value.files != null) {
-        await uploadFiles(data.value.files);
+        await uploadJsonFiles(data.value.files);
       }
     }
 

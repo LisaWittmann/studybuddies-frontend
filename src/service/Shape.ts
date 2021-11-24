@@ -1,9 +1,16 @@
+/**
+ * interface for scene objects
+ */
 export interface Shape {
   height: number;
   width: number;
   depth: number;
 }
 
+/**
+ * implements shape interface
+ * represents geometry of a cube
+ */
 export class Cube implements Shape {
   height: number;
   width: number;
@@ -16,6 +23,10 @@ export class Cube implements Shape {
   }
 }
 
+/**
+ * implements shape interface
+ * represents geometry of a cuboid
+ */
 export class Cuboid implements Shape {
   height: number;
   width: number;
@@ -28,6 +39,10 @@ export class Cuboid implements Shape {
   }
 }
 
+/**
+ * implements shape interface
+ * represents geometry of a plane
+ */
 export class Plane implements Shape {
   height: number;
   width: number;

@@ -5,7 +5,6 @@ import { Orientation, Tile } from "@/service/Tile";
 import { vector } from "./helper/GeometryHelper";
 
 const { createTile } = useTileFactory();
-//const storedTiles: THREE.Vector3[] = [];
 const storedTiles = new Map<number, THREE.Vector3>();
 const tileSize = 20;
 
@@ -18,13 +17,13 @@ const tileSize = 20;
  */
 function createLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
   const position = vector(0, 0, 0);
-  for (const [key, value] of labyrinth.tileMap) {
+  for (const [, value] of labyrinth.tileMap) {
     placeTile(position, value, scene);
   }
 }
 
 /**
- * adds tile of labyrinth to scene
+ * adds tile of labyrinth to scene without recursion
  * @param position: starting position of first tile
  * @param tile: tile that should be placed in scene
  * @param scene: origin scene
@@ -40,6 +39,7 @@ async function placeTile(
       break;
     }
   }
+  // store placed tile with position to calculate position of next tiles
   storedTiles.set(tile.getId(), position);
   scene.add(createTile(tile, tileSize, tileSize, position));
 }
