@@ -21,11 +21,10 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted } from "vue";
-import { useSceneFactory } from "@/service/SceneFactory";
-import { useTileFactory } from "@/service/TileFactory";
-import { vector } from "@/service/GeometryHelper";
-import { useObjectLoader } from "@/service/ObjectLoader";
+import { useSceneFactory } from "@/service/scene/SceneFactory";
+import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 import { useLabyrinthStore } from "@/service/LabyrinthStore";
+import { vector } from "@/service/scene/helper/GeometryHelper";
 
 export default defineComponent({
   name: "scene",
@@ -35,70 +34,38 @@ export default defineComponent({
       renderScene,
       insertCanvas,
       updateScene,
-      updateCameraPosition,
+      getIntersections,
     } = useSceneFactory();
-    const { createTile } = useTileFactory();
-    const { loadObject } = useObjectLoader();
-
-    //mousemovement
-    let isDragging = false;
-    let startX = 0;
-    let startY = 0;
+    const { createLabyrinth } = useLabyrinthFactory();
 
     // testing data
-    const scene = createScene(vector(0, 2, 0), true);
-    const tileSize = 20;
-    scene.add(
-      createTile({ width: tileSize, height: tileSize }, vector(0, 0, 0))
-    );
-
-    // Getting the usable labyrinthState Variable with every Tile as Object
+    const scene = createScene(vector(0, 8, 0));
     const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
-    updateLabyrinth().then(() => console.log(labyrinthState.tileMap));
-
-    // test object
-    loadObject("squirrel.obj", scene, vector(0, 3, -5));
-
-    onMounted(() => {
-      insertCanvas("scene");
-      // automatically updating scene
-      requestAnimationFrame(render);
-
-      window.addEventListener("resize", updateScene);
-      window.addEventListener("mousedown", onMouseDown, false);
-      window.addEventListener("mousemove", onMouseMove, false);
-      window.addEventListener("mouseup", onMouseUp, false);
-    });
+    updateLabyrinth().then(() => createLabyrinth(labyrinthState, scene));
 
     function render() {
       renderScene();
       requestAnimationFrame(render);
     }
 
-    //EventListeners-----
     function onMouseDown(event: MouseEvent) {
-      console.log("mouse down", event.x, event.pageY);
-      startX = event.x;
-      startY = event.y;
-      isDragging = true;
+      getIntersections(
+        (event.clientX / innerWidth) * 2 - 1,
+        -(event.clientY / innerHeight) * 2 + 1
+      );
     }
 
-    function onMouseMove(event: MouseEvent) {
-      if (isDragging === true) {
-        //console.log("mousemove", event.clientX, event.clientY);
-      }
-    }
+    onMounted(() => {
+      insertCanvas("scene");
+      requestAnimationFrame(render);
 
-    function onMouseUp(event: MouseEvent) {
-      console.log("mouse up", event.x, event.pageY);
-      isDragging = false;
-    }
+      addEventListener("resize", updateScene);
+      addEventListener("mousedown", onMouseDown);
+    });
 
     onBeforeUnmount(() => {
-      window.removeEventListener("resize", updateScene);
-      window.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mouseup", onMouseUp);
-      window.removeEventListener("mousemove", onMouseMove);
+      removeEventListener("resize", updateScene);
+      removeEventListener("mousedown", onMouseDown);
     });
   },
 });
