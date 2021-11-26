@@ -33,10 +33,8 @@ function createTile(
   //STATIC-OBJECTS--------
   const plane = new Plane(height, width);
   // top and bottom plane
-  tile.add(
-    createObject(plane, bottom, color, false, true, vector(1, 0, 0), 90)
-  );
-  tile.add(createObject(plane, top, color, false, true, vector(1, 0, 0), 90));
+  tile.add(createObject(plane, bottom, color, true, {}, vector(1, 0, 0), 90));
+  tile.add(createObject(plane, top, color, true, {}, vector(1, 0, 0), 90));
 
   // place walls and navigation arrows based on tile relations
   model.tileRelationMap.forEach((value, key) => {
@@ -84,22 +82,30 @@ function createStaticObject(
       if (tile) {
         return createObject(
           arrow,
-          vector(north.x, north.y, north.z - 1),
+          vector(north.x, north.y, north.z + 2),
           arrowColor,
-          true,
-          false
+          false,
+          {
+            showInView: true,
+            orientation: orientation,
+            clickable: true,
+          }
         );
       } else {
-        return createObject(wall, north, wallColor, false, true);
+        return createObject(wall, north, wallColor, true);
       }
     case Orientation.EAST:
       if (tile) {
         return createObject(
           arrow,
-          vector(east.x - 1, east.y, east.z),
+          vector(east.x - 2, east.y, east.z),
           arrowColor,
-          true,
           false,
+          {
+            showInView: true,
+            orientation: orientation,
+            clickable: true,
+          },
           vector(0, 1, 0),
           90
         );
@@ -108,8 +114,8 @@ function createStaticObject(
           wall,
           east,
           wallColor,
-          false,
           true,
+          {},
           vector(0, 1, 0),
           90
         );
@@ -118,22 +124,30 @@ function createStaticObject(
       if (tile) {
         return createObject(
           arrow,
-          vector(south.x, south.y, south.z - 1),
+          vector(south.x, south.y, south.z - 2),
           arrowColor,
-          true,
-          false
+          false,
+          {
+            showInView: true,
+            orientation: orientation,
+            clickable: true,
+          }
         );
       } else {
-        return createObject(wall, south, wallColor, false, true);
+        return createObject(wall, south, wallColor, true);
       }
     case Orientation.WEST:
       if (tile) {
         return createObject(
           arrow,
-          vector(west.x - 1, west.y, west.z),
+          vector(west.x + 2, west.y, west.z),
           arrowColor,
-          true,
           false,
+          {
+            showInView: true,
+            orientation: orientation,
+            clickable: true,
+          },
           vector(0, 1, 0),
           90
         );
@@ -142,8 +156,8 @@ function createStaticObject(
           wall,
           west,
           wallColor,
-          false,
           true,
+          {},
           vector(0, 1, 0),
           90
         );

@@ -7,7 +7,8 @@ import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
  * @param model: implementation of shape
  * @param position: global position
  * @param color: color of object material
- * @param clickable: object interacts on click
+ * @param visible: should object be initially visible
+ * @param data: data that will be stored in object
  * @param axis: rotation axis as normalized vector
  * @param angle: rotation angle in degree
  * @returns initialized scene object as mesh
@@ -16,8 +17,8 @@ function createObject(
   model: Shape,
   position: THREE.Vector3,
   color = 0x199eb0,
-  clickable = false,
   visible = true,
+  data = {},
   axis?: THREE.Vector3,
   angle?: number
 ): THREE.Mesh {
@@ -35,10 +36,9 @@ function createObject(
     position = baseline(position, model.height);
   }
 
+  object.userData = data;
   object.visible = visible;
-  object.userData.clickable = clickable;
   object.position.copy(position);
-  object.visible = visible;
   return object;
 }
 

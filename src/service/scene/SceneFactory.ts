@@ -40,6 +40,10 @@ function createScene(
   camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
   updateCameraPosition(cameraPosition);
 
+  //SCENE--------------------
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x696969);
+
   //CONTROLS-----------------
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.target = cameraPosition;
@@ -51,10 +55,6 @@ function createScene(
     updateCameraOrbit();
   });
   updateCameraOrbit();
-
-  //SCENE--------------------
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x696969);
 
   //GRID---------------------
   if (debug) {
@@ -102,6 +102,7 @@ function updateCameraOrbit() {
   const forward = new THREE.Vector3();
   camera.getWorldDirection(forward);
   orbitControls.target.copy(camera.position).add(forward);
+  updateObjectsInView();
 }
 
 /**
@@ -117,7 +118,10 @@ function getIntersections(x: number, y: number) {
   for (const i of intersects) {
     if (i.object.type == "Mesh") {
       const object = i.object as THREE.Mesh;
-      if (i.object.userData.clickable) handleClick(object);
+      if (i.object.userData.clickable) {
+        handleClick(object);
+        console.log("clicked:", object.position);
+      }
     }
   }
 }
@@ -125,6 +129,42 @@ function getIntersections(x: number, y: number) {
 function handleClick(object: THREE.Mesh): void {
   const material = object.material as THREE.Material;
   material.opacity = material.opacity == 1 ? 0.6 : 1;
+}
+
+/**
+ * get all scene objects that are faced by camera in interaction radius
+ * and update visibility of scene objects that should only be visible in view
+ */
+function updateObjectsInView() {
+  camera.updateMatrix();
+  camera.updateMatrixWorld();
+  const frustum = new THREE.Frustum();
+  frustum.setFromProjectionMatrix(
+    new THREE.Matrix4().multiplyMatrices(
+      camera.projectionMatrix,
+      camera.matrixWorldInverse
+    )
+  );
+
+  scene.traverse((object) => {
+    if (object.userData.showInView) {
+      object.visible =
+        isInInteractionRadius(object.position) &&
+        frustum.containsPoint(object.position);
+    }
+  });
+}
+
+/**
+ * check if object is in interaction radius
+ * @param position: position of object
+ */
+function isInInteractionRadius(position: THREE.Vector3) {
+  return (
+    // TODO: replace number with global tileSize constant
+    Math.abs(position.x - camera.position.x) < 10 &&
+    Math.abs(position.z - camera.position.z) < 10
+  );
 }
 
 /**
