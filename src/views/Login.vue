@@ -21,13 +21,13 @@
             placeholder="Passwort"
             v-model="user.password"
           />
+          <span v-if="hasErrors" class="error">{{ errorMessage }}</span>
           <button type="submit">Anmelden</button>
           <p>
             Noch kein Benutzerkonto?
             <a @click="switchToRegister">Jetzt registrieren</a>
           </p>
         </form>
-
         <form v-else @submit.prevent="register(user)" class="login__form">
           <input
             type="username"
@@ -41,6 +41,7 @@
             v-model="user.password"
             required
           />
+          <span v-if="hasErrors" class="error">{{ errorMessage }}</span>
           <button type="submit">Registrieren</button>
           <p>
             Du bist bereits registriert?
@@ -55,22 +56,56 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { User } from "@/service/User";
-import { useLoginService } from "@/service/LoginService";
+import router from "@/router";
 
 export default defineComponent({
   name: "Login",
   setup() {
     // handles login/register state
     const inLoginState = ref(true);
-    const { login, register } = useLoginService();
     const user = new User();
+
+    const hasErrors = ref(false);
+    const errorMessage = ref("testing error message");
 
     function switchToRegister() {
       inLoginState.value = false;
+      hasErrors.value = false;
     }
 
     function switchToLogin() {
       inLoginState.value = true;
+      hasErrors.value = false;
+    }
+
+    function login() {
+      fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: JSON.stringify(user),
+      })
+        .then((response) => {
+          if (response.ok) router.push("/lobby");
+          else hasErrors.value = true;
+        })
+        .catch((err) => console.log(err));
+    }
+
+    function register() {
+      fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: JSON.stringify(user),
+      })
+        .then((response) => {
+          if (response.ok) switchToLogin();
+          else hasErrors.value = true;
+        })
+        .catch((err) => console.log(err));
     }
 
     return {
@@ -80,6 +115,8 @@ export default defineComponent({
       inLoginState,
       switchToRegister,
       switchToLogin,
+      hasErrors,
+      errorMessage,
     };
   },
 });
@@ -157,6 +194,10 @@ export default defineComponent({
       &:hover {
         color: $color-nearly-white;
       }
+    }
+
+    .error {
+      color: red;
     }
   }
 }
