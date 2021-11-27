@@ -2,6 +2,7 @@ import { readonly } from "vue";
 import { vector } from "@/service/scene/helper/GeometryHelper";
 
 export const tileSize = 20;
+export const cameraHeight = 8;
 
 export const axis = {
   x: readonly(vector(1, 0, 0)),

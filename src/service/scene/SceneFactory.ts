@@ -1,6 +1,12 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { tileSize } from "@/service/scene/helper/Constants";
+import { Orientation } from "@/service/Tile";
+import { Vector3 } from "three";
+import {
+  cameraHeight,
+  direction,
+  tileSize,
+} from "@/service/scene/helper/Constants";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -34,7 +40,7 @@ function createScene(
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
-  updateCameraPosition(cameraPosition);
+  updateCameraPosition(cameraPosition, Orientation.NORTH);
 
   //SCENE--------------------
   scene = new THREE.Scene();
@@ -42,10 +48,10 @@ function createScene(
 
   //CONTROLS-----------------
   orbitControls = new OrbitControls(camera, renderer.domElement);
-  orbitControls.target = cameraPosition;
   orbitControls.enableZoom = false;
   orbitControls.enablePan = false;
   orbitControls.update();
+  updateCameraTarget(Orientation.NORTH);
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
   });
@@ -85,8 +91,30 @@ function insertCanvas(container: string | null) {
  * updates camera / player position
  * @param position: new camera position
  */
-function updateCameraPosition(position: THREE.Vector3) {
-  camera.position.set(position.x, position.y, position.z);
+function updateCameraPosition(
+  position: THREE.Vector3,
+  orientation?: Orientation
+) {
+  camera.position.set(position.x, position.y + cameraHeight, position.z);
+  if (orientation) updateCameraTarget(orientation);
+}
+
+function updateCameraTarget(orientation: Orientation) {
+  const target = new Vector3().copy(camera.position);
+  switch (orientation) {
+    case Orientation.NORTH:
+      orbitControls.target = target.add(direction.north);
+      break;
+    case Orientation.EAST:
+      orbitControls.target = target.add(direction.east);
+      break;
+    case Orientation.SOUTH:
+      orbitControls.target = target.add(direction.south);
+      break;
+    case Orientation.WEST:
+      orbitControls.target = target.add(direction.west);
+      break;
+  }
 }
 
 /**

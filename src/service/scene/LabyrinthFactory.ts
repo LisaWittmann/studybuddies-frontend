@@ -1,11 +1,16 @@
 import * as THREE from "three";
 import { useTileFactory } from "@/service/scene/TileFactory";
+import { useSceneFactory } from "@/service/scene/SceneFactory";
+
 import { Labyrinth } from "@/service/Labyrinth";
 import { Orientation, Tile } from "@/service/Tile";
+
 import { vector } from "@/service/scene/helper/GeometryHelper";
 import { direction, tileSize } from "@/service/scene/helper/Constants";
 
 const { createTile } = useTileFactory();
+const { updateCameraPosition } = useSceneFactory();
+
 const storedTiles = new Map<number, THREE.Vector3>();
 
 /**
@@ -17,8 +22,13 @@ const storedTiles = new Map<number, THREE.Vector3>();
  */
 async function createLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
   const position = vector(0, 0, 0);
+  // for testing
+  const startTile = labyrinth.playerStartTileIds[0];
   for (const [, value] of labyrinth.tileMap) {
     placeTile(position, value, scene);
+    if (value.getId() == startTile) {
+      placeCamera(position, value);
+    }
   }
 }
 
@@ -44,6 +54,23 @@ async function placeTile(
   scene.add(createTile(tile, position));
 }
 
+/**
+ * places camera on position of player
+ * and sets camera target to an orientation with a tile relation
+ * so player won't face the wall when spawning
+ * @param position: position of main player
+ * @param tile: tile on which player is placed to check relations
+ */
+function placeCamera(position: THREE.Vector3, tile: Tile) {
+  let orientation = Orientation.NORTH;
+  for (const [key, value] of tile.getTileRelationMap()) {
+    if (value) {
+      orientation = key;
+      break;
+    }
+  }
+  updateCameraPosition(position, orientation);
+}
 /**
  * calculates position of next tile sibling based on orientation
  * @param position: last tile position

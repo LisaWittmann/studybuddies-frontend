@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { Orientation, Tile } from "@/service/Tile";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
+import { Orientation, Tile } from "@/service/Tile";
 import { tileSize } from "@/service/scene/helper/Constants";
 
 /**
