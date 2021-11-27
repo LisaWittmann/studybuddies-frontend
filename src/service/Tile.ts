@@ -14,10 +14,12 @@ export enum Orientation {
 export class Item {
   id: number;
   modelName: string;
+  positionInRoom: Vector3;
 
-  constructor(id: number, modelName: string) {
+  constructor(id: number, modelName: string, positionInRoom: Vector3) {
     this.id = id;
     this.modelName = modelName;
+    this.positionInRoom = positionInRoom;
   }
 }
 
@@ -120,6 +122,6 @@ export class Arrow extends StaticItem {
   clickable = true;
 
   position = (): Vector3 => {
-    return this.getPosition(tileSize / 2 - 2);
+    return this.getPosition(tileSize / 2 - 1);
   };
 }
