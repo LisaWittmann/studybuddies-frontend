@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { tileSize } from "@/service/scene/helper/Constants";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -7,12 +8,6 @@ let raycaster: THREE.Raycaster;
 
 let camera: THREE.PerspectiveCamera;
 let orbitControls: OrbitControls;
-
-//only for development------------------
-let cameraDirection: THREE.Vector3;
-let camPositionSpan: any;
-let camLookAtSpan: any;
-//--------------------------------------
 
 /**
  * creates new threejs 3D scene
@@ -34,28 +29,27 @@ function createScene(
 
   //RAYCASTER----------------
   raycaster = new THREE.Raycaster();
-  raycaster.far = 20;
+  raycaster.far = tileSize;
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
   updateCameraPosition(cameraPosition);
 
+  //SCENE--------------------
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x696969);
+
   //CONTROLS-----------------
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.target = cameraPosition;
   orbitControls.enableZoom = false;
-  //orbitControls.enablePan = false;
-  orbitControls.panSpeed = 5.0;
+  orbitControls.enablePan = false;
   orbitControls.update();
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
   });
   updateCameraOrbit();
-
-  //SCENE--------------------
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x696969);
 
   //GRID---------------------
   if (debug) {
@@ -73,7 +67,6 @@ function createScene(
 function renderScene() {
   renderer.render(scene, camera);
   orbitControls.update();
-  calculateCameraVectors(); //only for development
 }
 
 /**
@@ -126,34 +119,6 @@ function getIntersections(x: number, y: number) {
 function handleClick(object: THREE.Mesh): void {
   const material = object.material as THREE.Material;
   material.opacity = material.opacity == 1 ? 0.6 : 1;
-}
-
-/**
- * calculates camera vectors
- * displays them on screen
- * only for development
- */
-function calculateCameraVectors() {
-  cameraDirection = new THREE.Vector3();
-  camPositionSpan = document.querySelector("#position");
-  camLookAtSpan = document.querySelector("#lookingAt");
-  // this copies the camera's unit vector direction to cameraDirection
-  camera.getWorldDirection(cameraDirection);
-  // scale the unit vector up to get a more intuitive value
-  cameraDirection.set(
-    cameraDirection.x * 100,
-    cameraDirection.y * 100,
-    cameraDirection.z * 100
-  );
-  // update the onscreen spans with the camera's position and lookAt vectors
-  camPositionSpan.innerHTML = `Position: (${camera.position.x.toFixed(
-    1
-  )}, ${camera.position.y.toFixed(1)}, ${camera.position.z.toFixed(1)})`;
-  camLookAtSpan.innerHTML = `LookAt: (${(
-    camera.position.x + cameraDirection.x
-  ).toFixed(1)}, ${(camera.position.y + cameraDirection.y).toFixed(1)}, ${(
-    camera.position.z + cameraDirection.z
-  ).toFixed(1)})`;
 }
 
 /**
