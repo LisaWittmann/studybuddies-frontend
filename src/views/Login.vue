@@ -11,15 +11,18 @@
           @submit.prevent="login(user)"
           class="login__form"
         >
-          
-          <span v-if="usernameEmpty" class="error">{{ emptyUsernameMessage }}</span>
+          <span v-if="usernameEmpty" class="error">{{
+            emptyUsernameMessage
+          }}</span>
           <input
             type="username"
             placeholder="Benutzername"
             v-model="user.username"
           />
 
-          <span v-if="passwordEmpty" class="error">{{ emptyPasswordMessage }}</span>
+          <span v-if="passwordEmpty" class="error">{{
+            emptyPasswordMessage
+          }}</span>
           <input
             type="password"
             placeholder="Passwort"
@@ -33,19 +36,22 @@
           </p>
         </form>
         <form v-else @submit.prevent="register(user)" class="login__form">
+          <span v-if="usernameEmpty" class="error">{{
+            emptyUsernameMessage
+          }}</span>
           <input
             type="username"
             placeholder="Benutzername"
             v-model="user.username"
-            required
           />
+          <span v-if="passwordEmpty" class="error">{{
+            emptyPasswordMessage
+          }}</span>
           <input
             type="password"
             placeholder="Passwort"
             v-model="user.password"
-            required
           />
-          <span v-if="hasErrors" class="error">{{ errorMessage }}</span>
           <button type="submit">Registrieren</button>
           <p>
             Du bist bereits registriert?
@@ -75,8 +81,8 @@ export default defineComponent({
     const usernameEmpty = ref(false);
     const passwordEmpty = ref(false);
 
-    const emptyUsernameMessage = 'Benutzername darf nicht leer sein';
-    const emptyPasswordMessage = 'Passwort darf nicht leer sein';
+    const emptyUsernameMessage = "Benutzername darf nicht leer sein";
+    const emptyPasswordMessage = "Passwort darf nicht leer sein";
 
     function switchToRegister() {
       inLoginState.value = false;
@@ -90,27 +96,24 @@ export default defineComponent({
 
     // Refactor entire logic into computed
     function validateProcess() {
-      if(!user.username) {
+      if (!user.username) {
         usernameEmpty.value = true;
         hasErrors.value = true;
-        console.log('Username empty')
       } else {
         usernameEmpty.value = false;
       }
 
-      if(!user.password) {
+      if (!user.password) {
         passwordEmpty.value = true;
         hasErrors.value = true;
-        console.log('Pass empty')
       } else {
         passwordEmpty.value = false;
       }
 
-      if(user.username && user.password) {
+      if (user.username && user.password) {
         usernameEmpty.value = false;
         passwordEmpty.value = false;
         hasErrors.value = false;
-        console.log(`User: ${user.username}\nPass: ${user.password}`)
         return true;
       }
 
@@ -118,7 +121,7 @@ export default defineComponent({
     }
 
     function login() {
-      if(validateProcess()) {
+      if (validateProcess()) {
         fetch("/api/login", {
           method: "POST",
           headers: {
@@ -127,16 +130,15 @@ export default defineComponent({
           body: JSON.stringify(user),
         })
           .then((response) => {
-            console.log(response)
             if (response.ok) router.push("/lobby");
             else hasErrors.value = true;
           })
           .catch((err) => console.log(err));
-        }
+      }
     }
 
     function register() {
-      if(validateProcess()) {
+      if (validateProcess()) {
         fetch("/api/register", {
           method: "POST",
           headers: {
@@ -149,7 +151,7 @@ export default defineComponent({
             else hasErrors.value = true;
           })
           .catch((err) => console.log(err));
-        }
+      }
     }
 
     return {
@@ -164,7 +166,7 @@ export default defineComponent({
       emptyUsernameMessage,
       emptyPasswordMessage,
       usernameEmpty,
-      passwordEmpty
+      passwordEmpty,
     };
   },
 });
