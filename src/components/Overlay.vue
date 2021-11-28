@@ -29,6 +29,6 @@ export default defineComponent({
   top: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.7);
-  color: $color-nearly-white;
+  color: $color-white;
 }
 </style>
