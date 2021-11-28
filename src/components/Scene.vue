@@ -1,22 +1,5 @@
 <template>
   <div id="scene"></div>
-  <!-- displaying camera position + lookAt for development-->
-  <div
-    id="camera-vectors"
-    style="
-      position: absolute;
-      top: 0;
-      right: 0;
-      background: grey;
-      padding: 8px;
-      color: white;
-    "
-  >
-    <span>Free Camera Vectors:</span><br />
-    <span id="position"></span><br />
-    <span id="lookingAt"></span>
-  </div>
-  <!-------------------------------------------------------->
 </template>
 
 <script lang="ts">

@@ -1,5 +1,12 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Orientation } from "@/service/Tile";
+import { Vector3 } from "three";
+import {
+  cameraHeight,
+  direction,
+  tileSize,
+} from "@/service/scene/helper/Constants";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -7,12 +14,6 @@ let raycaster: THREE.Raycaster;
 
 let camera: THREE.PerspectiveCamera;
 let orbitControls: OrbitControls;
-
-//only for development------------------
-let cameraDirection: THREE.Vector3;
-let camPositionSpan: any;
-let camLookAtSpan: any;
-//--------------------------------------
 
 /**
  * creates new threejs 3D scene
@@ -34,11 +35,16 @@ function createScene(
 
   //RAYCASTER----------------
   raycaster = new THREE.Raycaster();
+  raycaster.far = tileSize;
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
-  updateCameraPosition(cameraPosition);
+  updateCameraPosition(cameraPosition, Orientation.NORTH);
+
+  //SCENE--------------------
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x696969);
 
   //SCENE--------------------
   scene = new THREE.Scene();
@@ -46,11 +52,10 @@ function createScene(
 
   //CONTROLS-----------------
   orbitControls = new OrbitControls(camera, renderer.domElement);
-  orbitControls.target = cameraPosition;
   orbitControls.enableZoom = false;
-  //orbitControls.enablePan = false;
-  orbitControls.panSpeed = 5.0;
+  orbitControls.enablePan = false;
   orbitControls.update();
+  updateCameraTarget(Orientation.NORTH);
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
   });
@@ -72,7 +77,6 @@ function createScene(
 function renderScene() {
   renderer.render(scene, camera);
   orbitControls.update();
-  calculateCameraVectors(); //only for development
 }
 
 /**
@@ -91,8 +95,30 @@ function insertCanvas(container: string | null) {
  * updates camera / player position
  * @param position: new camera position
  */
-function updateCameraPosition(position: THREE.Vector3) {
-  camera.position.set(position.x, position.y, position.z);
+function updateCameraPosition(
+  position: THREE.Vector3,
+  orientation?: Orientation
+) {
+  camera.position.set(position.x, position.y + cameraHeight, position.z);
+  if (orientation) updateCameraTarget(orientation);
+}
+
+function updateCameraTarget(orientation: Orientation) {
+  const target = new Vector3().copy(camera.position);
+  switch (orientation) {
+    case Orientation.NORTH:
+      orbitControls.target = target.add(direction.north);
+      break;
+    case Orientation.EAST:
+      orbitControls.target = target.add(direction.east);
+      break;
+    case Orientation.SOUTH:
+      orbitControls.target = target.add(direction.south);
+      break;
+    case Orientation.WEST:
+      orbitControls.target = target.add(direction.west);
+      break;
+  }
 }
 
 /**
@@ -161,38 +187,9 @@ function updateObjectsInView() {
  */
 function isInInteractionRadius(position: THREE.Vector3) {
   return (
-    // TODO: replace number with global tileSize constant
-    Math.abs(position.x - camera.position.x) < 10 &&
-    Math.abs(position.z - camera.position.z) < 10
+    Math.abs(position.x - camera.position.x) < tileSize / 2 &&
+    Math.abs(position.z - camera.position.z) < tileSize / 2
   );
-}
-
-/**
- * calculates camera vectors
- * displays them on screen
- * only for development
- */
-function calculateCameraVectors() {
-  cameraDirection = new THREE.Vector3();
-  camPositionSpan = document.querySelector("#position");
-  camLookAtSpan = document.querySelector("#lookingAt");
-  // this copies the camera's unit vector direction to cameraDirection
-  camera.getWorldDirection(cameraDirection);
-  // scale the unit vector up to get a more intuitive value
-  cameraDirection.set(
-    cameraDirection.x * 100,
-    cameraDirection.y * 100,
-    cameraDirection.z * 100
-  );
-  // update the onscreen spans with the camera's position and lookAt vectors
-  camPositionSpan.innerHTML = `Position: (${camera.position.x.toFixed(
-    1
-  )}, ${camera.position.y.toFixed(1)}, ${camera.position.z.toFixed(1)})`;
-  camLookAtSpan.innerHTML = `LookAt: (${(
-    camera.position.x + cameraDirection.x
-  ).toFixed(1)}, ${(camera.position.y + cameraDirection.y).toFixed(1)}, ${(
-    camera.position.z + cameraDirection.z
-  ).toFixed(1)})`;
 }
 
 /**

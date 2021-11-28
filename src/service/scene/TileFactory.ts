@@ -1,8 +1,7 @@
 import * as THREE from "three";
-import { Orientation, Tile } from "@/service/Tile";
-import { Cuboid, Plane } from "@/service/Shape";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
-import { vector } from "@/service/scene/helper/GeometryHelper";
+import { Orientation, Tile } from "@/service/Tile";
+import { tileSize } from "@/service/scene/helper/Constants";
 
 /**
  * creates a group of objects representing a tile
@@ -13,33 +12,29 @@ import { vector } from "@/service/scene/helper/GeometryHelper";
  */
 function createTile(
   model: Tile,
-  width: number,
-  height: number,
   position: THREE.Vector3,
   color = 0xa9a9a9
 ): THREE.Group {
+  const { createFloor, createCeiling, createItem } = useObjectFactory();
   const tile = new THREE.Group();
-  const { createObject } = useObjectFactory();
   tile.position.copy(position);
-  tile.userData.id = model.getId();
+  tile.userData = model;
 
   //LIGHT-----------------
-  tile.add(createLight(position, height));
+  tile.add(createLight(position));
 
-  //CONSTANTS-------------
-  const bottom = position;
-  const top = vector(position.x, height, position.z);
-
-  //STATIC-OBJECTS--------
-  const plane = new Plane(height, width);
-  // top and bottom plane
-  tile.add(createObject(plane, bottom, color, true, {}, vector(1, 0, 0), 90));
-  tile.add(createObject(plane, top, color, true, {}, vector(1, 0, 0), 90));
-
-  // place walls and navigation arrows based on tile relations
+  //STATIC-ITEMS----------
+  tile.add(createFloor(position, color));
+  tile.add(createCeiling(position, color));
   model.tileRelationMap.forEach((value, key) => {
-    tile.add(createStaticObject(width, height, position, key, value, color));
+    const object = createStaticItem(position, key, value, color);
+    tile.add(object);
   });
+
+  //ITEMS-----------------
+  for (const item of model.objectsInRoom) {
+    createItem(item, tile);
+  }
 
   return tile;
 }
@@ -48,121 +43,21 @@ function createTile(
  * creates static tile object based on given relation
  * creates arrow to naviagte to next tile if relation exists
  * creates wall if no relation exists
- * @param width: width of tile
- * @param height: height of tile
  * @param position: position of tile
  * @param orientation: orientation of tile relation
  * @param tile: tile of tile relation
  * @param color: color of walls
  * @returns wall or navigation arrow object
  */
-function createStaticObject(
-  width: number,
-  height: number,
+function createStaticItem(
   position: THREE.Vector3,
   orientation: Orientation,
   tile: number | undefined,
   color = 0xa9a9a9
 ): THREE.Mesh {
-  const { createObject } = useObjectFactory();
-
-  const wall = new Plane(width, height);
-  const arrow = new Cuboid(1, 1, 2);
-
-  const wallColor = color;
-  const arrowColor = 0xeaf4ea;
-
-  const north = vector(position.x, position.y, position.z - width / 2);
-  const east = vector(position.x + width / 2, position.y, position.z);
-  const south = vector(position.x, position.y, position.z + width / 2);
-  const west = vector(position.x - width / 2, position.y, position.z);
-
-  switch (orientation) {
-    case Orientation.NORTH:
-      if (tile) {
-        return createObject(
-          arrow,
-          vector(north.x, north.y, north.z + 2),
-          arrowColor,
-          false,
-          {
-            showInView: true,
-            orientation: orientation,
-            clickable: true,
-          }
-        );
-      } else {
-        return createObject(wall, north, wallColor, true);
-      }
-    case Orientation.EAST:
-      if (tile) {
-        return createObject(
-          arrow,
-          vector(east.x - 2, east.y, east.z),
-          arrowColor,
-          false,
-          {
-            showInView: true,
-            orientation: orientation,
-            clickable: true,
-          },
-          vector(0, 1, 0),
-          90
-        );
-      } else {
-        return createObject(
-          wall,
-          east,
-          wallColor,
-          true,
-          {},
-          vector(0, 1, 0),
-          90
-        );
-      }
-    case Orientation.SOUTH:
-      if (tile) {
-        return createObject(
-          arrow,
-          vector(south.x, south.y, south.z - 2),
-          arrowColor,
-          false,
-          {
-            showInView: true,
-            orientation: orientation,
-            clickable: true,
-          }
-        );
-      } else {
-        return createObject(wall, south, wallColor, true);
-      }
-    case Orientation.WEST:
-      if (tile) {
-        return createObject(
-          arrow,
-          vector(west.x + 2, west.y, west.z),
-          arrowColor,
-          false,
-          {
-            showInView: true,
-            orientation: orientation,
-            clickable: true,
-          },
-          vector(0, 1, 0),
-          90
-        );
-      } else {
-        return createObject(
-          wall,
-          west,
-          wallColor,
-          true,
-          {},
-          vector(0, 1, 0),
-          90
-        );
-      }
-  }
+  const { createArrow, createWall } = useObjectFactory();
+  if (tile) return createArrow(orientation, position);
+  return createWall(orientation, position, color);
 }
 
 /**
@@ -171,9 +66,9 @@ function createStaticObject(
  * @param height: height of tile
  * @returns: point light
  */
-function createLight(position: THREE.Vector3, height: number) {
+function createLight(position: THREE.Vector3) {
   const light = new THREE.PointLight(0xffffff, 0.5, 50, 2);
-  light.position.set(position.x, position.y + height - 10, position.z);
+  light.position.set(position.x, position.y + tileSize - 10, position.z);
   return light;
 }
 

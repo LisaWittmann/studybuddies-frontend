@@ -1,21 +1,15 @@
 import { reactive } from "vue";
-import { Tile, Orientation, Item } from "@/service/Tile";
+import { Tile, Orientation } from "@/service/Tile";
+import { Labyrinth } from "@/service/Labyrinth";
 
 /**
  * constant to keep the tiles or store an errormessage
  */
 const labyrinthState = reactive({
   tileMap: new Map<number, Tile>([]),
-  startPosition: new Array<number>(),
-  endpoint: 0,
+  endTileId: 0,
+  playerStartTileIds: new Array<number>(),
   errormessage: "",
-});
-
-/**
- * helper to connect the fallback labyrinth
- */
-const tempTileRelations = reactive({
-  relationArray: Array<Array<number>>(),
 });
 
 /**
@@ -28,58 +22,26 @@ async function updateLabyrinth() {
     method: "GET",
   })
     .then((response) => {
-      if (!response.ok) {
-        // load fallback labyrinth if fetch is not possible
-        const tileMap = labyrinthState.tileMap;
-        tileMap.set(1, new Tile(1, [new Item(1)]));
-        tileMap.set(2, new Tile(2, [new Item(1)]));
-        tileMap.set(3, new Tile(3, [new Item(1)]));
-        tileMap.set(4, new Tile(4, [new Item(1)]));
-        tileMap.set(5, new Tile(5, [new Item(1)]));
-        tileMap.set(6, new Tile(6, [new Item(1)]));
-        const relArray = tempTileRelations.relationArray;
-        relArray.push(
-          [-1, 2, -1, -1],
-          [-1, 3, 5, 1],
-          [-1, 4, -1, 2],
-          [-1, -1, 6, 3],
-          [2, -1, -1, -1],
-          [4, -1, -1, -1]
-        );
-
-        tileMap.forEach((elem) => {
-          for (let index = 0; index < 4; index++) {
-            const check = relArray[elem.getId() - 1][index];
-            const secondTile = tileMap.get(check);
-            connectTiles(elem, index, secondTile as Tile);
-          }
-        });
-
-        labyrinthState.tileMap = tileMap;
-
-        throw new Error(response.statusText);
-      }
-
+      if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((jsondata) => {
-      //create an empty map to fill it with the jsondata
-      const tileMap = new Map<number, Tile>();
+      const labyrinth = new Labyrinth(
+        jsondata.endTileId,
+        jsondata.playerStartTileIds
+      );
 
-      //iterates over the tiles in the jsondata tileMap to create tiles for every tile in jsonobject
-      for (const jsonTile in jsondata.tileMap) {
-        tileMap.set(
-          parseInt(jsonTile),
-          new Tile(parseInt(jsonTile), new Array<Item>())
-        );
+      //iterate over the tiles in the jsondata tileMap to create tiles for every tile in jsonobject
+      for (const key in jsondata.tileMap) {
+        const tile = jsondata.tileMap[key];
+        const id = parseInt(key);
+        labyrinth.tileMap.set(id, new Tile(tile.tileId, tile.objectsInRoom));
 
         //workaround to parse json list in map
         const tileRelationMap = new Map<Orientation, number | undefined>();
-
-        for (const jsonOrientation in jsondata.tileMap[jsonTile]
-          .tileRelationMap) {
+        for (const orientationKey in tile.tileRelationMap) {
           let orientation: Orientation;
-          switch (jsonOrientation) {
+          switch (orientationKey) {
             case "NORTH":
               orientation = Orientation.NORTH;
               break;
@@ -99,19 +61,13 @@ async function updateLabyrinth() {
 
           tileRelationMap.set(
             orientation,
-            parseInt(
-              jsondata.tileMap[jsonTile].tileRelationMap[jsonOrientation]
-            )
+            parseInt(tile.tileRelationMap[orientationKey])
           );
         }
-
-        (tileMap.get(parseInt(jsonTile)) as Tile).setTileRelationMap(
-          tileRelationMap
-        );
+        labyrinth.tileMap.get(id)?.setTileRelationMap(tileRelationMap);
       }
-
       //add empty relations for unset orientations of tilemap
-      for (const [, tile] of tileMap) {
+      for (const [, tile] of labyrinth.tileMap) {
         for (let index = 0; index < 4; index++) {
           if (!tile.getTileRelationMap().get(index)) {
             connectTiles(tile, index, undefined);
@@ -119,10 +75,12 @@ async function updateLabyrinth() {
         }
       }
 
-      labyrinthState.tileMap = tileMap;
+      labyrinthState.tileMap = labyrinth.tileMap;
+      labyrinthState.endTileId = labyrinth.endTileId;
+      labyrinthState.playerStartTileIds = labyrinth.playerStartTileIds;
     })
-    .catch((fehler) => {
-      labyrinthState.errormessage = fehler;
+    .catch((error) => {
+      labyrinthState.errormessage = error;
     });
 }
 
