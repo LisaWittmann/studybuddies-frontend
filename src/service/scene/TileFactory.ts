@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
-import { Orientation, Tile } from "@/service/Tile";
+import { Tile } from "@/service/Tile";
 import { tileSize } from "@/service/scene/helper/Constants";
 
 /**
@@ -15,7 +15,7 @@ function createTile(
   position: THREE.Vector3,
   color = 0xa9a9a9
 ): THREE.Group {
-  const { createFloor, createCeiling, createItem } = useObjectFactory();
+  const { createFloor, createCeiling, createArrow, createWall, createItem } = useObjectFactory();
   const tile = new THREE.Group();
   tile.position.copy(position);
   tile.userData = model;
@@ -27,37 +27,16 @@ function createTile(
   tile.add(createFloor(position, color));
   tile.add(createCeiling(position, color));
   model.tileRelationMap.forEach((value, key) => {
-    const object = createStaticItem(position, key, value, color);
-    tile.add(object);
+    if (value) createArrow(key, position, tile);
+    else tile.add(createWall(key, position, color));
   });
 
   //ITEMS-----------------
   for (const item of model.objectsInRoom) {
-    createItem(item, tile);
+    createItem(item, tile, item.positionInRoom);
   }
-
+  console.log(tile);
   return tile;
-}
-
-/**
- * creates static tile object based on given relation
- * creates arrow to naviagte to next tile if relation exists
- * creates wall if no relation exists
- * @param position: position of tile
- * @param orientation: orientation of tile relation
- * @param tile: tile of tile relation
- * @param color: color of walls
- * @returns wall or navigation arrow object
- */
-function createStaticItem(
-  position: THREE.Vector3,
-  orientation: Orientation,
-  tile: number | undefined,
-  color = 0xa9a9a9
-): THREE.Mesh {
-  const { createArrow, createWall } = useObjectFactory();
-  if (tile) return createArrow(orientation, position);
-  return createWall(orientation, position, color);
 }
 
 /**

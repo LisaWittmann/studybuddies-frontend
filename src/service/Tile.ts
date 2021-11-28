@@ -74,11 +74,11 @@ class StaticItem {
       case Orientation.NORTH:
         return 0;
       case Orientation.EAST:
-        return 90;
+        return -270;
       case Orientation.SOUTH:
-        return 180;
+        return -180;
       case Orientation.WEST:
-        return 270;
+        return -90;
     }
   };
 
@@ -89,6 +89,7 @@ class StaticItem {
    */
   protected getPosition(distance: number): Vector3 {
     const position = new Vector3().copy(this.tilePosition);
+    console.log(position);
     switch (this.orientation) {
       case Orientation.NORTH:
         return position.addScaledVector(direction.north, distance);
@@ -119,9 +120,9 @@ export class Wall extends StaticItem {
  */
 export class Arrow extends StaticItem {
   showInView = true;
-  clickable = true;
+  modelName = "arrow";
 
   position = (): Vector3 => {
-    return this.getPosition(tileSize / 2 - 1);
+    return this.getPosition(tileSize / 2 - 2);
   };
 }
