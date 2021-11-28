@@ -85,13 +85,13 @@ function getNextPosition(
   const next = new THREE.Vector3().copy(position);
   switch (orientation) {
     case Orientation.NORTH:
-      return next.addScaledVector(direction.north, -(tileSize));
+      return next.addScaledVector(direction.north, -tileSize);
     case Orientation.EAST:
-      return next.addScaledVector(direction.east, -(tileSize));
+      return next.addScaledVector(direction.east, -tileSize);
     case Orientation.SOUTH:
-      return next.addScaledVector(direction.south, -(tileSize));
+      return next.addScaledVector(direction.south, -tileSize);
     case Orientation.WEST:
-      return next.addScaledVector(direction.west, -(tileSize));
+      return next.addScaledVector(direction.west, -tileSize);
   }
 }
 

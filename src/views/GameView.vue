@@ -1,16 +1,16 @@
 <template>
-  <Scene />
-  <Instructions v-if="showInstructions" :instructions="instructions" />
+  <SceneComponent />
+  <InstructionComponent v-if="showInstructions" :instructions="instructions" />
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import Scene from "@/components/Scene.vue";
-import Instructions from "@/components/Instructions.vue";
+import SceneComponent from "@/components/SceneComponent.vue";
+import InstructionComponent from "@/components/InstructionComponent.vue";
 
 export default defineComponent({
-  name: "Game",
-  components: { Scene, Instructions },
+  name: "GameView",
+  components: { SceneComponent, InstructionComponent },
   setup() {
     // activate to test instructions
     const showInstructions = ref(false);
