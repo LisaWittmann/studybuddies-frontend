@@ -1,5 +1,5 @@
 import { Vector3 } from "three";
-import { tileSize, direction } from "@/service/scene/helper/Constants";
+import { tileSize, direction, colors } from "@/service/scene/helper/Constants";
 
 /**
  * enumeration of cardinal points for object positioning
@@ -73,13 +73,13 @@ class StaticItem {
   rotationY = (): number => {
     switch (this.orientation) {
       case Orientation.NORTH:
-        return 180;
-      case Orientation.EAST:
-        return 90;
-      case Orientation.SOUTH:
         return 0;
-      case Orientation.WEST:
+      case Orientation.EAST:
         return 270;
+      case Orientation.SOUTH:
+        return 180;
+      case Orientation.WEST:
+        return 90;
     }
   };
 
@@ -121,6 +121,7 @@ export class Wall extends StaticItem {
 export class Arrow extends StaticItem {
   showInView = true;
   modelName = "arrow";
+  color = colors.lightGreen;
 
   position = (): Vector3 => {
     return this.getPosition(tileSize / 2 - 2);

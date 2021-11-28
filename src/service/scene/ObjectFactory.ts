@@ -28,9 +28,12 @@ async function createItem(
       if (model instanceof Arrow) {
         object.rotateOnAxis(axis.y, radians(model.rotationY()));
         object.visible = false;
+        object.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.material.color.setHex(model.color);
+          }
+        });
       }
-
-      const debug = new THREE.Box3().setFromObject(object);
       parent.add(object);
     });
   });

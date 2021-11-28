@@ -35,7 +35,7 @@ function createScene(
 
   //RAYCASTER----------------
   raycaster = new THREE.Raycaster();
-  raycaster.far = tileSize / 2;
+  raycaster.far = tileSize;
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
@@ -142,18 +142,10 @@ function getIntersections(x: number, y: number) {
 
   // testing intersections
   for (const i of intersects) {
-    if (i.object.type == "Mesh") {
-      if (i.object.userData.clickable) {
-        const object = i.object as THREE.Mesh;
-        handleClick(object);
-      }
+    if (i.object.userData.clickable | i.object.parent?.userData.clickable) {
+      console.log("clicked", i.object);
     }
   }
-}
-
-function handleClick(object: THREE.Mesh): void {
-  const material = object.material as THREE.Material;
-  material.opacity = material.opacity == 1 ? 0.6 : 1;
 }
 
 /**
