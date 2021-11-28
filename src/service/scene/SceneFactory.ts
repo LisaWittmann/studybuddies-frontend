@@ -35,7 +35,7 @@ function createScene(
 
   //RAYCASTER----------------
   raycaster = new THREE.Raycaster();
-  //raycaster.far = tileSize;
+  raycaster.far = tileSize / 2;
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
@@ -63,7 +63,7 @@ function createScene(
 
   //GRID---------------------
   if (debug) {
-    const grid = new THREE.GridHelper(100, tileSize, 0xffffff, 0xffffff);
+    const grid = new THREE.GridHelper(100, 20, 0xffffff, 0xffffff);
     scene.add(grid);
   }
 
@@ -142,7 +142,6 @@ function getIntersections(x: number, y: number) {
 
   // testing intersections
   for (const i of intersects) {
-    console.log("clicked:", i.object.position);
     if (i.object.type == "Mesh") {
       if (i.object.userData.clickable) {
         const object = i.object as THREE.Mesh;
@@ -186,7 +185,7 @@ function updateObjectsInView() {
  * @param position: position of object
  */
 function isInInteractionRadius(position: THREE.Vector3) {
-  const radius = tileSize / 2 - 1;
+  const radius = tileSize / 2;
   return (
     Math.abs(position.x - Math.floor(camera.position.x)) < radius &&
     Math.abs(position.z - Math.floor(camera.position.z)) < radius

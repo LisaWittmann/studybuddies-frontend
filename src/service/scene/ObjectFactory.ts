@@ -12,7 +12,11 @@ const materialLoader = new MTLLoader();
 objectLoader.setPath("/models/");
 materialLoader.setPath("/models/");
 
-async function createItem(model: Item | Arrow, parent: THREE.Group | THREE.Scene, position: THREE.Vector3) {
+async function createItem(
+  model: Item | Arrow,
+  parent: THREE.Group | THREE.Scene,
+  position: THREE.Vector3
+) {
   const path = model.modelName.toLowerCase();
   await materialLoader.loadAsync(`${path}.mtl`).then((materials) => {
     materials.preload();
@@ -75,6 +79,7 @@ function createArrow(
   parent: THREE.Group
 ) {
   const arrow = new Arrow(orientation, tilePosition);
+  console.log(arrow, arrow.position());
   createItem(arrow, parent, arrow.position());
 }
 

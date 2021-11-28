@@ -69,16 +69,17 @@ class StaticItem {
     this.tilePosition = tilePosition;
   }
 
+  // check for items individually, only works for arrows
   rotationY = (): number => {
     switch (this.orientation) {
       case Orientation.NORTH:
-        return 0;
+        return 180;
       case Orientation.EAST:
-        return -270;
+        return 90;
       case Orientation.SOUTH:
-        return -180;
+        return 0;
       case Orientation.WEST:
-        return -90;
+        return 270;
     }
   };
 
@@ -89,7 +90,6 @@ class StaticItem {
    */
   protected getPosition(distance: number): Vector3 {
     const position = new Vector3().copy(this.tilePosition);
-    console.log(position);
     switch (this.orientation) {
       case Orientation.NORTH:
         return position.addScaledVector(direction.north, distance);

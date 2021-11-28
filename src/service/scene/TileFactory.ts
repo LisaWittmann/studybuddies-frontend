@@ -15,9 +15,9 @@ function createTile(
   position: THREE.Vector3,
   color = 0xa9a9a9
 ): THREE.Group {
-  const { createFloor, createCeiling, createArrow, createWall, createItem } = useObjectFactory();
+  const { createFloor, createCeiling, createArrow, createWall, createItem } =
+    useObjectFactory();
   const tile = new THREE.Group();
-  tile.position.copy(position);
   tile.userData = model;
 
   //LIGHT-----------------
@@ -35,7 +35,6 @@ function createTile(
   for (const item of model.objectsInRoom) {
     createItem(item, tile, item.positionInRoom);
   }
-  console.log(tile);
   return tile;
 }
 
