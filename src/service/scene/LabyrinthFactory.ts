@@ -71,6 +71,7 @@ function placeCamera(position: THREE.Vector3, tile: Tile) {
   }
   updateCameraPosition(position, orientation);
 }
+
 /**
  * calculates position of next tile sibling based on orientation
  * @param position: last tile position
