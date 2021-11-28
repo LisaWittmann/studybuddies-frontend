@@ -60,7 +60,7 @@ export class Tile {
  * that are not included in objects in room
  * contains items orientation and parent tile's position for calculation
  */
-class StaticItem {
+class FixedObject {
   orientation: Orientation;
   tilePosition: Vector3;
 
@@ -74,11 +74,11 @@ class StaticItem {
       case Orientation.NORTH:
         return 0;
       case Orientation.EAST:
-        return 90;
+        return 270;
       case Orientation.SOUTH:
         return 180;
       case Orientation.WEST:
-        return 270;
+        return 90;
     }
   };
 
@@ -106,7 +106,7 @@ class StaticItem {
  * wall of tile
  * contains orientation where it should be placed
  */
-export class Wall extends StaticItem {
+export class Wall extends FixedObject {
   position = (): Vector3 => {
     return this.getPosition(tileSize / 2);
   };
@@ -117,7 +117,7 @@ export class Wall extends StaticItem {
  * is only visible in current tile when facing its orientation
  * contains orientation where it directs to
  */
-export class Arrow extends StaticItem {
+export class Arrow extends FixedObject {
   showInView = true;
   clickable = true;
 

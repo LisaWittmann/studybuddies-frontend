@@ -17,7 +17,6 @@ function createTile(
 ): THREE.Group {
   const { createFloor, createCeiling, createItem } = useObjectFactory();
   const tile = new THREE.Group();
-  tile.position.copy(position);
   tile.userData = model;
 
   //LIGHT-----------------
@@ -27,7 +26,7 @@ function createTile(
   tile.add(createFloor(position, color));
   tile.add(createCeiling(position, color));
   model.tileRelationMap.forEach((value, key) => {
-    const object = createStaticItem(position, key, value, color);
+    const object = createFixedObject(position, key, value, color);
     tile.add(object);
   });
 
@@ -49,7 +48,7 @@ function createTile(
  * @param color: color of walls
  * @returns wall or navigation arrow object
  */
-function createStaticItem(
+function createFixedObject(
   position: THREE.Vector3,
   orientation: Orientation,
   tile: number | undefined,

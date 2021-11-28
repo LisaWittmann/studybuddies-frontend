@@ -12,6 +12,11 @@ const materialLoader = new MTLLoader();
 objectLoader.setPath("/models/");
 materialLoader.setPath("/models/");
 
+/**
+ * creates item by loading its obj representation from models directory
+ * @param item: item that should be loaded and added to scene
+ * @param parent: group or scene object will be added to after loading
+ */
 async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
   const model = item.modelName.toLowerCase();
   await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
@@ -26,6 +31,12 @@ async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
   });
 }
 
+/**
+ * creates plane representing tile's floor
+ * @param position: tile position
+ * @param color: floor color in hexa
+ * @returns THREE.Mesh representation of floor
+ */
 function createFloor(position: THREE.Vector3, color = 0x199eb0) {
   const object = new THREE.Mesh(
     new THREE.PlaneGeometry(tileSize, tileSize),
@@ -36,6 +47,12 @@ function createFloor(position: THREE.Vector3, color = 0x199eb0) {
   return object;
 }
 
+/**
+ * creates plane representing tile's ceiling
+ * @param position: tile position
+ * @param color: floor color in hexa
+ * @returns THREE.Mesh representation of ceiling
+ */
 function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
   const object = new THREE.Mesh(
     new THREE.PlaneGeometry(tileSize, tileSize),
@@ -46,6 +63,13 @@ function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
   return object;
 }
 
+/**
+ * creates plane representing tile's wall on given orientation
+ * @param orientation: orientaion which wall should be placed and aligned on
+ * @param tilePosition: position of parent tile
+ * @param color: wall color in hexa
+ * @returns THREE.Mesh representation of wall
+ */
 function createWall(
   orientation: Orientation,
   tilePosition: THREE.Vector3,
@@ -63,6 +87,12 @@ function createWall(
   return object;
 }
 
+/**
+ * creates an arrow object that is aligned and directs to given orientation
+ * @param orientation: orientation arrow should directs to
+ * @param tilePosition: position of parent tile
+ * @returns: clickable arrow representation
+ */
 function createArrow(
   orientation: Orientation,
   tilePosition: THREE.Vector3

@@ -71,6 +71,7 @@ function placeCamera(position: THREE.Vector3, tile: Tile) {
   }
   updateCameraPosition(position, orientation);
 }
+
 /**
  * calculates position of next tile sibling based on orientation
  * @param position: last tile position
@@ -84,13 +85,13 @@ function getNextPosition(
   const next = new THREE.Vector3().copy(position);
   switch (orientation) {
     case Orientation.NORTH:
-      return next.addScaledVector(direction.north, -(tileSize / 2));
+      return next.addScaledVector(direction.north, -(tileSize));
     case Orientation.EAST:
-      return next.addScaledVector(direction.east, -(tileSize / 2));
+      return next.addScaledVector(direction.east, -(tileSize));
     case Orientation.SOUTH:
-      return next.addScaledVector(direction.south, -(tileSize / 2));
+      return next.addScaledVector(direction.south, -(tileSize));
     case Orientation.WEST:
-      return next.addScaledVector(direction.west, -(tileSize / 2));
+      return next.addScaledVector(direction.west, -(tileSize));
   }
 }
 
