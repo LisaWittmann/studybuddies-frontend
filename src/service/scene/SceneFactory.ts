@@ -44,7 +44,7 @@ function createScene(
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.target = cameraPosition;
   orbitControls.enableZoom = false;
-  //orbitControls.enablePan = false;
+  orbitControls.enablePan = false;
   orbitControls.panSpeed = 5.0;
   orbitControls.update();
   orbitControls.addEventListener("end", () => {
