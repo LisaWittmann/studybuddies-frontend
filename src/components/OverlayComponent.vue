@@ -9,7 +9,7 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "Overlay",
+  name: "OverlayComponent",
   props: {
     opened: {
       type: Boolean,

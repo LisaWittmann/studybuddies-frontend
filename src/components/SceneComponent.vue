@@ -10,7 +10,7 @@ import { useLabyrinthStore } from "@/service/LabyrinthStore";
 import { vector } from "@/service/scene/helper/GeometryHelper";
 
 export default defineComponent({
-  name: "scene",
+  name: "SceneComponent",
   setup() {
     const {
       createScene,

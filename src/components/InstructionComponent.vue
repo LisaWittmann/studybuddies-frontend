@@ -1,5 +1,5 @@
 <template>
-  <Overlay :opened="opened">
+  <OverlayComponent :opened="opened">
     <div class="instruction">
       <i
         v-if="showPrevButton"
@@ -15,16 +15,16 @@
         @click="skipInstruction"
       ></i>
     </div>
-  </Overlay>
+  </OverlayComponent>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from "vue";
-import Overlay from "@/components/Overlay.vue";
+import OverlayComponent from "@/components/OverlayComponent.vue";
 
 export default defineComponent({
-  name: "Instructions",
-  components: { Overlay },
+  name: "InstructionComponent",
+  components: { OverlayComponent },
   props: {
     instructions: {
       type: Array,
