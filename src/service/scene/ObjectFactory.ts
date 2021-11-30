@@ -3,7 +3,8 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 
 import { Orientation } from "@/service/Tile";
-import { Arrow, Wall, Item } from "@/service/Objects";
+import { Item } from "@/service/Item";
+import { Arrow, Wall } from "@/service/FixedObject";
 
 import { axis, settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";

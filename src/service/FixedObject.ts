@@ -2,24 +2,6 @@ import { Vector3 } from "three";
 import { settings, direction } from "@/service/scene/helper/SceneConstants";
 import { Orientation } from "@/service/Tile";
 
-export class Item {
-  id: number;
-  modelName: string;
-  positionInRoom: Vector3;
-
-  constructor(id: number, modelName: string, positionInRoom: Vector3) {
-    this.id = id;
-    this.modelName = modelName;
-    this.positionInRoom = positionInRoom;
-  }
-}
-
-export enum Position {
-  WALL,
-  BOTTOM,
-  CEILING,
-}
-
 /**
  * base class of static items in scene like walls and arrows
  * that are not included in objects in room

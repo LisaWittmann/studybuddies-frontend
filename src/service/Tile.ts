@@ -1,4 +1,4 @@
-import { Item } from "@/service/Objects";
+import { Item } from "@/service/Item";
 
 /**
  * enumeration of cardinal points for object positioning
