@@ -1,6 +1,6 @@
 
 export interface eventMessage {
-    operation: Enumerator,
+    operation: Operation,
     lobbykey: string,
     username: string,
     data: string
@@ -8,5 +8,7 @@ export interface eventMessage {
 
 export enum Operation {
     MOVEMENT,
-    CLICK
+    CLICK,
+    TRADE,
+    CHAT
 }
