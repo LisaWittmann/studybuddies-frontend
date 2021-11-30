@@ -2,11 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Orientation } from "@/service/Tile";
 import { Vector3 } from "three";
-import {
-  cameraHeight,
-  direction,
-  tileSize,
-} from "@/service/scene/helper/Constants";
+import { settings, direction } from "@/service/scene/helper/SceneConstants";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -35,16 +31,12 @@ function createScene(
 
   //RAYCASTER----------------
   raycaster = new THREE.Raycaster();
-  raycaster.far = tileSize;
+  raycaster.far = settings.tileSize;
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
   updateCameraPosition(cameraPosition, Orientation.NORTH);
-
-  //SCENE--------------------
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x696969);
 
   //SCENE--------------------
   scene = new THREE.Scene();
@@ -100,7 +92,11 @@ function updateCameraPosition(
   position: THREE.Vector3,
   orientation?: Orientation
 ) {
-  camera.position.set(position.x, position.y + cameraHeight, position.z);
+  camera.position.set(
+    position.x,
+    position.y + settings.cameraHeight,
+    position.z
+  );
   if (orientation) updateCameraTarget(orientation);
 }
 
@@ -178,7 +174,7 @@ function updateObjectsInView() {
  * @param position: position of object
  */
 function isInInteractionRadius(position: THREE.Vector3) {
-  const radius = tileSize / 2;
+  const radius = settings.tileSize / 2;
   return (
     Math.abs(position.x - Math.floor(camera.position.x)) < radius &&
     Math.abs(position.z - Math.floor(camera.position.z)) < radius

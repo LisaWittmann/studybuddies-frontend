@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { Tile } from "@/service/Tile";
-import { tileSize } from "@/service/scene/helper/Constants";
+import { settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * creates a group of objects representing a tile
@@ -45,8 +45,12 @@ function createTile(
  * @returns: point light
  */
 function createLight(position: THREE.Vector3) {
-  const light = new THREE.PointLight(0xffffff, 0.5, 50, 2);
-  light.position.set(position.x, position.y + tileSize - 10, position.z);
+  const light = new THREE.PointLight(0xffffff, 1, 50, 2);
+  light.position.set(
+    position.x,
+    position.y + settings.tileSize / 2,
+    position.z
+  );
   return light;
 }
 
