@@ -37,12 +37,12 @@ stompclient.onConnect = (/*frame*/) => {
                 /**
                  * @todo: use it when gameState exists and new FE structure is finished
                  */
-                const movePlayer =  gameState.playerMap.get(eventMessage.username);
+                /*const movePlayer =  gameState.playerMap.get(eventMessage.username);
                 const startTileID: number = movePlayer.getPosition();
                 const destTileID = gameState.labyrinth.tileMap.get(startTileID).getTileRelationMap.get(eventMessage.data);
                 if(destTileID) {
                     movePlayer.setPosition(destTileID);
-                }
+                }*/
 
                 // -> now UpdateManager (which should be watching after new FE structure is finished) should see a change in gameState
                 //    and should move the right Player to the corresponding Tile (in the 3D-Room)
