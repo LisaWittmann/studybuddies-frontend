@@ -6,7 +6,7 @@ import { Labyrinth } from "@/service/Labyrinth";
 import { Orientation, Tile } from "@/service/Tile";
 
 import { vector } from "@/service/scene/helper/GeometryHelper";
-import { direction, tileSize } from "@/service/scene/helper/Constants";
+import { direction, settings } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
 const { updateCameraPosition } = useSceneFactory();
@@ -85,13 +85,13 @@ function getNextPosition(
   const next = new THREE.Vector3().copy(position);
   switch (orientation) {
     case Orientation.NORTH:
-      return next.addScaledVector(direction.north, -tileSize);
+      return next.addScaledVector(direction.north, -settings.tileSize);
     case Orientation.EAST:
-      return next.addScaledVector(direction.east, -tileSize);
+      return next.addScaledVector(direction.east, -settings.tileSize);
     case Orientation.SOUTH:
-      return next.addScaledVector(direction.south, -tileSize);
+      return next.addScaledVector(direction.south, -settings.tileSize);
     case Orientation.WEST:
-      return next.addScaledVector(direction.west, -tileSize);
+      return next.addScaledVector(direction.west, -settings.tileSize);
   }
 }
 

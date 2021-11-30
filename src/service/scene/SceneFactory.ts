@@ -2,11 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Orientation } from "@/service/Tile";
 import { Vector3 } from "three";
-import {
-  cameraHeight,
-  direction,
-  tileSize,
-} from "@/service/scene/helper/Constants";
+import { settings, direction } from "@/service/scene/helper/SceneConstants";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -35,7 +31,7 @@ function createScene(
 
   //RAYCASTER----------------
   raycaster = new THREE.Raycaster();
-  raycaster.far = tileSize;
+  raycaster.far = settings.tileSize;
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
@@ -95,7 +91,7 @@ function updateCameraPosition(
   position: THREE.Vector3,
   orientation?: Orientation
 ) {
-  camera.position.set(position.x, position.y + cameraHeight, position.z);
+  camera.position.set(position.x, position.y + settings.cameraHeight, position.z);
   if (orientation) updateCameraTarget(orientation);
 }
 
