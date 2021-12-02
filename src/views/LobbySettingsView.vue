@@ -10,7 +10,7 @@ export default defineComponent({
   name: "LobbySettingsView",
   components: { LobbySettingsComponent },
   setup() {
-    return {  };
+    return {};
   },
 });
 </script>

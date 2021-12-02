@@ -1,17 +1,17 @@
 <template>
-
   <section class="dropDownMenuWrapper">
-
-  <button class="dropDownMenuButton" v-on:click="openClose">Labyrinth auswählen (Dropdown)</button>
-  <!---  <button class="dropDownMenuButton" @click="openClose">{{selectedLabyrinth}}</button>  --->
+    <button class="dropDownMenuButton" v-on:click="openClose">
+      Labyrinth auswählen (Dropdown)
+    </button>
+    <!---  <button class="dropDownMenuButton" @click="openClose">{{selectedLabyrinth}}</button>  --->
 
     <div class="iconWrapper">
-      <div class="bar1" :class="{ 'bar1--open' : isOpen }" />
-      <div class="bar2" :class="{ 'bar2--open' : isOpen }" />
-      <div class="bar3" :class="{ 'bar3--open' : isOpen }" />
+      <div class="bar1" :class="{ 'bar1--open': isOpen }" />
+      <div class="bar2" :class="{ 'bar2--open': isOpen }" />
+      <div class="bar3" :class="{ 'bar3--open': isOpen }" />
     </div>
 
-<!--- v-if does not work, idk why yet --->
+    <!--- v-if does not work, idk why yet --->
     <section class="dropdownMenu" v-if="isOpen === true">
       <div class="menuArrow" />
       <section class="option">
@@ -22,16 +22,13 @@
       </section>
       <section class="option">
         <a href="#">Labyrinth 3</a>
-      </section>      
+      </section>
     </section>
-
   </section>
-
 </template>
 
-
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "DropdownMenu",
@@ -41,18 +38,17 @@ export default defineComponent({
     // should open or close the dropdown menu
     function openClose() {
       //console.log("In Funktion openClose()");
-      if(isOpen.value == false) {
-          isOpen.value = true;
-      }else{
+      if (isOpen.value == false) {
+        isOpen.value = true;
+      } else {
         isOpen.value = false;
       }
       //console.log(isOpen);
     }
-    return { isOpen, openClose }
+    return { isOpen, openClose };
   },
-})
+});
 </script>
-
 
 <style lang="scss" scoped>
 .dropDownMenuWrapper {
@@ -63,7 +59,7 @@ export default defineComponent({
   border-radius: 8px;
   background: white;
   border: 1px solid #eee;
-  box-shadow: 10px 10px 0 0 rgba(black,.03);
+  box-shadow: 10px 10px 0 0 rgba(black, 0.03);
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
   * {
@@ -101,7 +97,7 @@ export default defineComponent({
     position: absolute;
     right: 30px;
     top: 50%;
-    transform: translate(0,-50%);
+    transform: translate(0, -50%);
     z-index: 1;
 
     .bar1 {
@@ -113,7 +109,7 @@ export default defineComponent({
       top: 50%;
       left: 50%;
       border-radius: 9999px;
-      transform: translate(-50%, calc(-50% - 8px) );
+      transform: translate(-50%, calc(-50% - 8px));
       transition: all 0.2s ease;
     }
 
@@ -158,7 +154,7 @@ export default defineComponent({
       top: 50%;
       left: 50%;
       border-radius: 9999px;
-      transform: translate(-50%, calc(-50% + 8px) );
+      transform: translate(-50%, calc(-50% + 8px));
       transition: all 0.2s ease;
     }
 
@@ -168,10 +164,9 @@ export default defineComponent({
 
     .bar3--open {
       top: 50%;
-      transform: translate(-50%, -50% ) rotate(-45deg);
+      transform: translate(-50%, -50%) rotate(-45deg);
       background: red;
     }
-
   }
 
   .iconWrapper--noTitle {
@@ -192,7 +187,7 @@ export default defineComponent({
     min-height: 10px;
     border-radius: 8px;
     border: 1px solid #eee;
-    box-shadow: 10px 10px 0 0 rgba(black,.03);
+    box-shadow: 10px 10px 0 0 rgba(black, 0.03);
     background: white;
     padding: 10px 30px;
     animation: menu 0.3s ease forwards;
@@ -236,7 +231,6 @@ export default defineComponent({
         outline: none;
         cursor: pointer;
       }
-
     }
 
     .desc {
@@ -247,7 +241,6 @@ export default defineComponent({
       margin: 3px 0 0 0;
       cursor: default;
     }
-
   }
 
   .dropdownMenu--dark {
@@ -261,14 +254,16 @@ export default defineComponent({
     * {
       color: #eee;
     }
-
   }
 
   @keyframes menu {
-    from { transform: translate3d( 0, 30px ,0 ) }
-    to { transform: translate3d( 0, 20px ,0 ) }
+    from {
+      transform: translate3d(0, 30px, 0);
+    }
+    to {
+      transform: translate3d(0, 20px, 0);
+    }
   }
-
 }
 
 .dropDownMenuWrapper--noTitle {
@@ -281,6 +276,4 @@ export default defineComponent({
   background: #333;
   border: none;
 }
-
-
 </style>

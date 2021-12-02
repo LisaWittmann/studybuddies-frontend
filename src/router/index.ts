@@ -25,7 +25,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/lobby/code",
     name: "LobbySettingsView",
     component: LobbySettingsView,
-  }
+  },
 ];
 
 const router = createRouter({
