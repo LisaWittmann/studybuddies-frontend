@@ -1,170 +1,141 @@
 <template>
-  <div class="relative">
-    <a @click="toggleVisibility" href="#">
-      <svg
-        fill="currentColor"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="24"
-        height="24"
-      >
-        <path
-          class="heroicon-ui"
-          d="M15.3 9.3a1 1 0 0 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1
-            1.4-1.4l3.3 3.29 3.3-3.3z"
-        ></path>
-      </svg>
-    </a>
-    <ul
-      v-if="isVisible"
-      class="
-        absolute
-        normal-case
-        font-normal
-        right-0
-        bg-white
-        shadow
-        overflow-hidden
-        rounded
-        w-48
-        border
-        mt-2
-        py-1
-        z-20
-      "
-    >
-      <li>
-        <a href="#">
-          <svg
-            fill="currentColor"
-            class="text-gray-600"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path class="heroicon-ui"></path>
-          </svg>
-          <span class="ml-2">Labyrinth 1</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="flex items-center px-3 py-3 hover:bg-gray-200">
-          <svg
-            fill="currentColor"
-            class="text-gray-600"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path class="heroicon-ui"></path>
-          </svg>
-          <span class="ml-2">Labyrinth 2</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="flex items-center px-3 py-3 hover:bg-gray-200">
-          <svg
-            fill="currentColor"
-            class="text-gray-600"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path class="heroicon-ui"></path>
-          </svg>
-          <span class="ml-2">Labyrinth 3</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="flex items-center px-3 py-3 hover:bg-gray-200">
-          <svg
-            fill="currentColor"
-            class="text-gray-600"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path class="heroicon-ui"></path>
-          </svg>
-          <span class="ml-2">Labyrinth 4</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="flex items-center px-3 py-3 hover:bg-gray-200">
-          <svg
-            fill="currentColor"
-            class="text-gray-600"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path class="heroicon-ui"></path>
-          </svg>
-          <span class="ml-2">Labyrinth 5</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="flex items-center px-3 py-3 hover:bg-gray-200">
-          <svg
-            fill="currentColor"
-            class="text-gray-600"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path class="heroicon-ui"></path>
-          </svg>
-          <span class="ml-2">Labyrinth 6</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="flex items-center px-3 py-3 hover:bg-gray-200">
-          <svg
-            fill="currentColor"
-            class="text-gray-600"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-          >
-            <path d="M0 0h24v24H0z" fill="none"></path>
-            <path></path>
-          </svg>
-          <span class="ml-2">Labyrinth 7</span>
-        </a>
-      </li>
-    </ul>
-  </div>
+
+  <section class="dropDownMenuWrapper">
+
+  <button class="dropDownMenuButton" v-on:click="openClose">Labyrinth auswählen (Dropdown)</button>
+  <!---  <button class="dropDownMenuButton" @click="openClose">{{selectedLabyrinth}}</button>  --->
+
+    <div class="iconWrapper">
+      <div class="bar1" :class="{ 'bar1--open' : isOpen }" />
+      <div class="bar2" :class="{ 'bar2--open' : isOpen }" />
+      <div class="bar3" :class="{ 'bar3--open' : isOpen }" />
+    </div>
+
+<!--- v-if does not work, idk why yet --->
+    <section class="dropdownMenu" v-if="isOpen === true">
+      <div class="menuArrow" />
+      <section class="option">
+        <a href="#">Labyrinth 1</a>
+      </section>
+      <section class="option">
+        <a href="#">Labyrinth 2</a>
+      </section>
+      <section class="option">
+        <a href="#">Labyrinth 3</a>
+      </section>      
+    </section>
+
+  </section>
+
 </template>
 
-<!---FEHLER WEGEN TS--->
+
 <script lang="ts">
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  data() {
-    return {
-      isVisible: false,
-      focusedIndex: 0,
-    };
+  name: "DropdownMenu",
+  setup() {
+    let isOpen = false;
+
+    // should open or close the dropdown menu
+    function openClose() {
+      //console.log("In Funktion openClose()");
+      if(isOpen == false) {
+          isOpen = true;
+      }else{
+        isOpen = false;
+      }
+      //console.log(isOpen);
+    }
+    return { isOpen, openClose }
   },
-  methods: {
-    toggleVisibility() {
-      this.isVisible = !this.isVisible;
-    },
-    hideDropdown() {
-      this.isVisible = false;
-      this.focusedIndex = 0;
-    },
-  },
-});
+})
 </script>
 
-<style scoped>
+
+<style lang="scss" scoped>
+.dropDownMenuWrapper {
+  position: relative;
+  width: 500px;
+  left: 37vw;
+  height: 30px;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid #eee;
+  box-shadow: 10px 10px 0 0 rgba(black,.03);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+  * {
+    box-sizing: border-box;
+    text-align: left;
+  }
+  .iconWrapper {
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translate(0,-50%);
+    z-index: 1;
+
+    .bar1 {
+      width: 100%;
+      max-width: 28px;
+      height: 3px;
+      background: blue;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 9999px;
+      transform: translate(-50%, calc(-50% - 8px) );
+      transition: all 0.2s ease;
+    }
+
+.bar1--open {
+      transform: translate(-50%, -50%) rotate(45deg);
+      margin-top: 0;
+      background: red;
+    }
+
+.bar2 {
+      width: 100%;
+      max-width: 28px;
+      height: 3px;
+      background: blue;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 9999px;
+      opacity: 1;
+      transform: translate(-50%, -50%);
+      transition: all 0.2s ease;
+    }
+.bar2--open {
+      opacity: 0;
+    }
+
+.bar3 {
+      width: 100%;
+      max-width: 28px;
+      height: 3px;
+      background: blue;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 9999px;
+      transform: translate(-50%, calc(-50% + 8px) );
+      transition: all 0.2s ease;
+}
+
+.bar3--open {
+      top: 50%;
+      transform: translate(-50%, -50% ) rotate(-45deg);
+      background: red;
+    }
+
+  }
+}
+
+
 </style>
