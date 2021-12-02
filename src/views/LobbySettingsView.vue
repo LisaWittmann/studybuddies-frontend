@@ -1,6 +1,5 @@
 <template>
   <LobbySettingsComponent />
-  <Instructions v-if="showInstructions" :instructions="instructions" />
 </template>
 
 <script lang="ts">
