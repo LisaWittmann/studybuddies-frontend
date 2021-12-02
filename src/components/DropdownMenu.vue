@@ -11,7 +11,6 @@
       <div class="bar3" :class="{ 'bar3--open': isOpen }" />
     </div>
 
-    <!--- v-if does not work, idk why yet --->
     <section class="dropdownMenu" v-if="isOpen === true">
       <div class="menuArrow" />
       <section class="option">
@@ -35,15 +34,13 @@ export default defineComponent({
   setup() {
     let isOpen = ref(false);
 
-    // should open or close the dropdown menu
+    // open or close the dropdown menu
     function openClose() {
-      //console.log("In Funktion openClose()");
       if (isOpen.value == false) {
         isOpen.value = true;
       } else {
         isOpen.value = false;
       }
-      //console.log(isOpen);
     }
     return { isOpen, openClose };
   },
