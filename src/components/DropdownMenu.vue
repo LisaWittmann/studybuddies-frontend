@@ -31,20 +31,20 @@
 
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   name: "DropdownMenu",
   setup() {
-    let isOpen = false;
+    let isOpen = ref(false);
 
     // should open or close the dropdown menu
     function openClose() {
       //console.log("In Funktion openClose()");
-      if(isOpen == false) {
-          isOpen = true;
+      if(isOpen.value == false) {
+          isOpen.value = true;
       }else{
-        isOpen = false;
+        isOpen.value = false;
       }
       //console.log(isOpen);
     }
