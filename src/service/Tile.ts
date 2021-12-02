@@ -1,7 +1,7 @@
+import { Item } from "@/service/Item";
+
 /**
- * Enumeration to align the tiles according to cardinal points.
- * (export is only for dummy objects)
- * @todo remov export for testing
+ * enumeration of cardinal points for object positioning
  */
 export enum Orientation {
   NORTH,
@@ -11,22 +11,8 @@ export enum Orientation {
 }
 
 /**
- * item object to make an empty test Object to fill the tile
- * (Maybe outsource it in next sprints with more attributs)
- * (export is only for dummy objects)
- * @todo outsource it for next sprints
- * @todo remove export for testing
- */
-export class Item {
-  id: number;
-
-  constructor(id: number) {
-    this.id = id;
-  }
-}
-
-/**
- * Datatype "Tile" which will be filled by parsing the JSON with the labyrinth structure.
+ * datatype "Tile" which will be filled by parsing the JSON with the labyrinth structure
+ * contains relation to surrounding tiles and items that sould be placed inside of tile
  */
 export class Tile {
   tileId: number;
