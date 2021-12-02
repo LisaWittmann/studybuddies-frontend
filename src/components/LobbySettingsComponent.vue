@@ -4,7 +4,8 @@
         <p>Labyrinth hochladen</p>
         <input type="file" ref="data" id="file-input" @change="dataUpload" /><br />
         <p>Labyrinth auswählen</p>
-        <DropdownMenu />
+        <DropdownMenu /><br />
+        <button class="button" v-on:click="readyClicked">Bereit</button>
     </section>
 </template>
 
@@ -30,6 +31,11 @@ export default defineComponent({
       data,
       dataUpload,
     };
+
+    function readyClicked() {
+        //functionality if both players clicked on ready button
+        alert("Clicked!");
+    }
   },
 });
 </script>
