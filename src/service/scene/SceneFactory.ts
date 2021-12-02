@@ -1,5 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Orientation } from "@/service/Tile";
+import { Vector3 } from "three";
+import { settings, direction } from "@/service/scene/helper/SceneConstants";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -7,12 +10,6 @@ let raycaster: THREE.Raycaster;
 
 let camera: THREE.PerspectiveCamera;
 let orbitControls: OrbitControls;
-
-//only for development------------------
-let cameraDirection: THREE.Vector3;
-let camPositionSpan: any;
-let camLookAtSpan: any;
-//--------------------------------------
 
 /**
  * creates new threejs 3D scene
@@ -34,31 +31,32 @@ function createScene(
 
   //RAYCASTER----------------
   raycaster = new THREE.Raycaster();
+  raycaster.far = settings.tileSize;
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
-  updateCameraPosition(cameraPosition);
-
-  //CONTROLS-----------------
-  orbitControls = new OrbitControls(camera, renderer.domElement);
-  orbitControls.target = cameraPosition;
-  orbitControls.enableZoom = false;
-  orbitControls.enablePan = false;
-  orbitControls.panSpeed = 5.0;
-  orbitControls.update();
-  orbitControls.addEventListener("end", () => {
-    updateCameraOrbit();
-  });
-  updateCameraOrbit();
+  updateCameraPosition(cameraPosition, Orientation.NORTH);
 
   //SCENE--------------------
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x696969);
 
+  //CONTROLS-----------------
+  orbitControls = new OrbitControls(camera, renderer.domElement);
+  orbitControls.enableZoom = false;
+  orbitControls.enablePan = false;
+  orbitControls.panSpeed = 5.0;
+  orbitControls.update();
+  updateCameraTarget(Orientation.NORTH);
+  orbitControls.addEventListener("end", () => {
+    updateCameraOrbit();
+  });
+  updateCameraOrbit();
+
   //GRID---------------------
   if (debug) {
-    const grid = new THREE.GridHelper(100, 100, 0xffffff, 0xffffff);
+    const grid = new THREE.GridHelper(100, 20, 0xffffff, 0xffffff);
     scene.add(grid);
   }
 
@@ -72,7 +70,6 @@ function createScene(
 function renderScene() {
   renderer.render(scene, camera);
   orbitControls.update();
-  calculateCameraVectors(); //only for development
 }
 
 /**
@@ -91,8 +88,34 @@ function insertCanvas(container: string | null) {
  * updates camera / player position
  * @param position: new camera position
  */
-function updateCameraPosition(position: THREE.Vector3) {
-  camera.position.set(position.x, position.y, position.z);
+function updateCameraPosition(
+  position: THREE.Vector3,
+  orientation?: Orientation
+) {
+  camera.position.set(
+    position.x,
+    position.y + settings.cameraHeight,
+    position.z
+  );
+  if (orientation) updateCameraTarget(orientation);
+}
+
+function updateCameraTarget(orientation: Orientation) {
+  const target = new Vector3().copy(camera.position);
+  switch (orientation) {
+    case Orientation.NORTH:
+      orbitControls.target = target.add(direction.north);
+      break;
+    case Orientation.EAST:
+      orbitControls.target = target.add(direction.east);
+      break;
+    case Orientation.SOUTH:
+      orbitControls.target = target.add(direction.south);
+      break;
+    case Orientation.WEST:
+      orbitControls.target = target.add(direction.west);
+      break;
+  }
 }
 
 /**
@@ -102,6 +125,7 @@ function updateCameraOrbit() {
   const forward = new THREE.Vector3();
   camera.getWorldDirection(forward);
   orbitControls.target.copy(camera.position).add(forward);
+  updateObjectsInView();
 }
 
 /**
@@ -115,44 +139,46 @@ function getIntersections(x: number, y: number) {
 
   // testing intersections
   for (const i of intersects) {
-    if (i.object.type == "Mesh") {
-      const object = i.object as THREE.Mesh;
-      if (i.object.userData.clickable) handleClick(object);
+    if (i.object.userData.clickable | i.object.parent?.userData.clickable) {
+      console.log("clicked", i.object);
     }
   }
 }
 
-function handleClick(object: THREE.Mesh): void {
-  const material = object.material as THREE.Material;
-  material.opacity = material.opacity == 1 ? 0.6 : 1;
+/**
+ * get all scene objects that are faced by camera in interaction radius
+ * and update visibility of scene objects that should only be visible in view
+ */
+function updateObjectsInView() {
+  camera.updateMatrix();
+  camera.updateMatrixWorld();
+  const frustum = new THREE.Frustum();
+  frustum.setFromProjectionMatrix(
+    new THREE.Matrix4().multiplyMatrices(
+      camera.projectionMatrix,
+      camera.matrixWorldInverse
+    )
+  );
+
+  scene.traverse((object) => {
+    if (object.userData.showInView) {
+      object.visible =
+        isInInteractionRadius(object.position) &&
+        frustum.containsPoint(object.position);
+    }
+  });
 }
 
 /**
- * calculates camera vectors
- * displays them on screen
- * only for development
+ * check if object is in interaction radius
+ * @param position: position of object
  */
-function calculateCameraVectors() {
-  cameraDirection = new THREE.Vector3();
-  camPositionSpan = document.querySelector("#position");
-  camLookAtSpan = document.querySelector("#lookingAt");
-  // this copies the camera's unit vector direction to cameraDirection
-  camera.getWorldDirection(cameraDirection);
-  // scale the unit vector up to get a more intuitive value
-  cameraDirection.set(
-    cameraDirection.x * 100,
-    cameraDirection.y * 100,
-    cameraDirection.z * 100
+function isInInteractionRadius(position: THREE.Vector3) {
+  const radius = settings.tileSize / 2;
+  return (
+    Math.abs(position.x - Math.floor(camera.position.x)) < radius &&
+    Math.abs(position.z - Math.floor(camera.position.z)) < radius
   );
-  // update the onscreen spans with the camera's position and lookAt vectors
-  camPositionSpan.innerHTML = `Position: (${camera.position.x.toFixed(
-    1
-  )}, ${camera.position.y.toFixed(1)}, ${camera.position.z.toFixed(1)})`;
-  camLookAtSpan.innerHTML = `LookAt: (${(
-    camera.position.x + cameraDirection.x
-  ).toFixed(1)}, ${(camera.position.y + cameraDirection.y).toFixed(1)}, ${(
-    camera.position.z + cameraDirection.z
-  ).toFixed(1)})`;
 }
 
 /**
