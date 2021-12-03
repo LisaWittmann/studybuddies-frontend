@@ -25,7 +25,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/find",
     name: "FindLobby",
     component: FindLobby,
-  }
+  },
 ];
 
 const router = createRouter({
