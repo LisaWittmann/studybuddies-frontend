@@ -3,7 +3,6 @@
     <button class="dropDownMenuButton" v-on:click="openClose">
       Labyrinth auswählen (Dropdown)
     </button>
-    <!---  <button class="dropDownMenuButton" @click="openClose">{{selectedLabyrinth}}</button>  --->
 
     <div class="iconWrapper">
       <div class="bar1" :class="{ 'bar1--open': isOpen }" />
