@@ -5,15 +5,20 @@
       <li class="headline-elements">
         <h2>Labyrinth hochladen:</h2>
       </li>
-      <li class="upload-labyrinth">  
-        <input type="file" ref="data" id="file-input" @change="dataUpload"/>
+      <li class="upload-labyrinth">
+        <input type="file" ref="data" id="file-input" @change="dataUpload" />
       </li>
       <li class="headline-elements">
         <h2>Labyrinth auswählen:</h2>
       </li>
-      <li class="select-labyrinth">  
+      <li class="select-labyrinth">
         <DropdownMenu />
-        <button class="confirm-labyrinth-button" v-on:click="confirmSelectedLabyrinth">Bestätigen</button>
+        <button
+          class="confirm-labyrinth-button"
+          v-on:click="confirmSelectedLabyrinth"
+        >
+          Bestätigen
+        </button>
       </li>
     </ul>
     <button class="ready-button" v-on:click="readyClicked">Bereit</button>
@@ -52,24 +57,24 @@ export default defineComponent({
     return {
       data,
       dataUpload,
-      readyClicked, 
-      confirmSelectedLabyrinth
+      readyClicked,
+      confirmSelectedLabyrinth,
     };
   },
 });
 </script>
 <style lang="scss" scoped>
-  .labyrinth-context {
-    list-style: none;
-  }
+.labyrinth-context {
+  list-style: none;
+}
 
-  .headline-elements {
-    margin-top: 10%;
-  }
+.headline-elements {
+  margin-top: 10%;
+}
 
-  .ready-button {
-    margin-top: 10%;
-    width: 10em;
-    height: 3em;
-  }
+.ready-button {
+  margin-top: 10%;
+  width: 10em;
+  height: 3em;
+}
 </style>
