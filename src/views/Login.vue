@@ -6,7 +6,9 @@
         <h2>Bitte gib deinen Benutzernamen und dein Passwort ein</h2>
       </div>
       <div class="login__form-wrapper">
-        <form
+        <input type="text" name="username" v-model="username">
+        <input type="password" name="password" v-model="password">
+        <!-- <form
           v-if="inLoginState"
           @submit.prevent="login(user)"
           class="login__form"
@@ -57,7 +59,7 @@
             Du bist bereits registriert?
             <a @click="switchToLogin">Jetzt anmelden</a>
           </p>
-        </form>
+        </form> -->
       </div>
     </div>
   </div>
@@ -66,17 +68,22 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { User } from "@/service/User";
+import { useLoginStore } from "@/service/LoginStore";
 import router from "@/router";
 
 export default defineComponent({
   name: "Login",
   setup() {
     // handles login/register state
-    const inLoginState = ref(false);
-    const user = new User();
+    // const inLoginState = ref(false);
+    // const user = new User();
 
     const hasErrors = ref(false);
-    const errorMessage = ref("testing error message");
+    // const errorMessage = ref("testing error message");
+    const {
+      loginstate,
+      doLogin
+    } = useLoginStore()
 
     const usernameEmpty = ref(false);
     const passwordEmpty = ref(false);
@@ -85,49 +92,48 @@ export default defineComponent({
     const emptyPasswordMessage = "Passwort darf nicht leer sein";
 
     function switchToRegister() {
-      inLoginState.value = false;
+      // loginstate.isLoggedIn.value = false;
       hasErrors.value = false;
     }
 
     function switchToLogin() {
-      inLoginState.value = true;
+      // inLoginState.value = true;
       hasErrors.value = false;
     }
 
     // Refactor entire logic into computed
-    function validateProcess() {
-      if (!user.username) {
-        usernameEmpty.value = true;
-        hasErrors.value = true;
-      } else {
-        usernameEmpty.value = false;
-      }
+    // function validateProcess() {
+    //   if (!loginstate.username) {
+    //     usernameEmpty.value = true;
+    //     hasErrors.value = true;
+    //   } else {
+    //     usernameEmpty.value = false;
+    //   }
 
-      if (!user.password) {
-        passwordEmpty.value = true;
-        hasErrors.value = true;
-      } else {
-        passwordEmpty.value = false;
-      }
+    //   if (!loginstate.) {
+    //     passwordEmpty.value = true;
+    //     hasErrors.value = true;
+    //   } else {
+    //     passwordEmpty.value = false;
+    //   }
 
-      if (user.username && user.password) {
-        usernameEmpty.value = false;
-        passwordEmpty.value = false;
-        hasErrors.value = false;
-        return true;
-      }
+    //   if (user.username && user.password) {
+    //     usernameEmpty.value = false;
+    //     passwordEmpty.value = false;
+    //     hasErrors.value = false;
+    //     return true;
+    //   }
 
-      return false;
-    }
+    //   return false;
+    // }
 
     function login() {
-      if (validateProcess()) {
         fetch("/api/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json;charset=utf-8",
           },
-          body: JSON.stringify(user),
+          body: JSON.stringify(loginstate.username),
         })
           .then((response) => {
             if (response.ok) router.push("/lobby");
@@ -135,16 +141,14 @@ export default defineComponent({
           })
           .catch((err) => console.log(err));
       }
-    }
 
     function register() {
-      if (validateProcess()) {
         fetch("/api/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json;charset=utf-8",
           },
-          body: JSON.stringify(user),
+          body: JSON.stringify(loginstate.username),
         })
           .then((response) => {
             if (response.ok) switchToLogin();
@@ -152,17 +156,16 @@ export default defineComponent({
           })
           .catch((err) => console.log(err));
       }
-    }
 
     return {
-      user,
+      // user,
       login,
       register,
-      inLoginState,
+      // inLoginState,
       switchToRegister,
       switchToLogin,
       hasErrors,
-      errorMessage,
+      // errorMessage,
       emptyUsernameMessage,
       emptyPasswordMessage,
       usernameEmpty,
