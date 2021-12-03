@@ -21,7 +21,7 @@
         </button>
       </li>
     </ul>
-    <button class="ready-button" v-on:click="readyClicked">Bereit</button>
+    <button class="ready-button" @click="readyClicked">Bereit</button>
   </section>
 </template>
 

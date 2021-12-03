@@ -1,6 +1,6 @@
 <template>
   <section class="dropdown-menu-wrapper">
-    <button class="dropdown-menu-button" v-on:click="openClose">
+    <button class="dropdown-menu-button" @click="openClose">
       Labyrinth auswählen
     </button>
 
@@ -10,18 +10,18 @@
       <div class="bar-3" :class="{ 'bar-3--open': isOpen }" />
     </div>
 
-    <section class="dropdown-menu" v-if="isOpen === true">
+    <div class="dropdown-menu" v-if="isOpen === true">
       <div class="menu-arrow" />
-      <section class="option">
+      <div class="option">
         <a href="#">Labyrinth 1</a>
-      </section>
-      <section class="option">
+      </div>
+      <div class="option">
         <a href="#">Labyrinth 2</a>
-      </section>
-      <section class="option">
+      </div>
+      <div class="option">
         <a href="#">Labyrinth 3</a>
-      </section>
-    </section>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -145,16 +145,6 @@ export default defineComponent({
     }
   }
 
-  .icon-wrapper--noTitle {
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: auto;
-    height: auto;
-    transform: none;
-  }
-
   .dropdown-menu {
     position: absolute;
     top: 100%;
@@ -203,15 +193,6 @@ export default defineComponent({
         cursor: pointer;
       }
     }
-
-    .desc {
-      opacity: 0.5;
-      display: block;
-      width: 100%;
-      font-size: 14px;
-      margin: 3px 0 0 0;
-      cursor: default;
-    }
   }
 
   @keyframes menu {
@@ -222,11 +203,5 @@ export default defineComponent({
       transform: translate3d(0, 20px, 0);
     }
   }
-}
-
-.dropdown-menu-wrapper--noTitle {
-  padding: 0;
-  width: 60px;
-  height: 60px;
 }
 </style>
