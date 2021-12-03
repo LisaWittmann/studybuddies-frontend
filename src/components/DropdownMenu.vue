@@ -1,17 +1,17 @@
 <template>
-  <section class="dropDownMenuWrapper">
-    <button class="dropDownMenuButton" v-on:click="openClose">
-      Labyrinth auswählen (Dropdown)
+  <section class="dropdown-menu-wrapper">
+    <button class="dropdown-menu-button" v-on:click="openClose">
+      Labyrinth auswählen
     </button>
 
-    <div class="iconWrapper">
-      <div class="bar1" :class="{ 'bar1--open': isOpen }" />
-      <div class="bar2" :class="{ 'bar2--open': isOpen }" />
-      <div class="bar3" :class="{ 'bar3--open': isOpen }" />
+    <div class="icon-wrapper">
+      <div class="bar-1" :class="{ 'bar-1--open': isOpen }" />
+      <div class="bar-2" :class="{ 'bar-2--open': isOpen }" />
+      <div class="bar-3" :class="{ 'bar-3--open': isOpen }" />
     </div>
 
-    <section class="dropdownMenu" v-if="isOpen === true">
-      <div class="menuArrow" />
+    <section class="dropdown-menu" v-if="isOpen === true">
+      <div class="menu-arrow" />
       <section class="option">
         <a href="#">Labyrinth 1</a>
       </section>
@@ -35,11 +35,7 @@ export default defineComponent({
 
     // open or close the dropdown menu
     function openClose() {
-      if (isOpen.value == false) {
-        isOpen.value = true;
-      } else {
-        isOpen.value = false;
-      }
+      isOpen.value = !isOpen.value;
     }
     return { isOpen, openClose };
   },
@@ -47,7 +43,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.dropDownMenuWrapper {
+.dropdown-menu-wrapper {
   position: relative;
   width: 500px;
   margin: 0 auto;
@@ -63,7 +59,7 @@ export default defineComponent({
     text-align: left;
   }
 
-  .dropDownMenuButton {
+  .dropdown-menu-button {
     border: none;
     font-size: inherit;
     background: none;
@@ -83,11 +79,7 @@ export default defineComponent({
     cursor: pointer;
   }
 
-  .dropDownMenuButton--dark {
-    color: #eee;
-  }
-
-  .iconWrapper {
+  .icon-wrapper {
     width: 25px;
     height: 25px;
     position: absolute;
@@ -96,7 +88,7 @@ export default defineComponent({
     transform: translate(0, -50%);
     z-index: 1;
 
-    .bar1 {
+    .bar-1 {
       width: 100%;
       max-width: 28px;
       height: 3px;
@@ -109,17 +101,13 @@ export default defineComponent({
       transition: all 0.2s ease;
     }
 
-    .bar1--dark {
-      background: #eee;
-    }
-
-    .bar1--open {
+    .bar-1--open {
       transform: translate(-50%, -50%) rotate(45deg);
       margin-top: 0;
       background: red;
     }
 
-    .bar2 {
+    .bar-2 {
       width: 100%;
       max-width: 28px;
       height: 3px;
@@ -133,15 +121,11 @@ export default defineComponent({
       transition: all 0.2s ease;
     }
 
-    .bar2--dark {
-      background: #eee;
-    }
-
-    .bar2--open {
+    .bar-2--open {
       opacity: 0;
     }
 
-    .bar3 {
+    .bar-3 {
       width: 100%;
       max-width: 28px;
       height: 3px;
@@ -154,18 +138,14 @@ export default defineComponent({
       transition: all 0.2s ease;
     }
 
-    .bar3--dark {
-      background: #eee;
-    }
-
-    .bar3--open {
+    .bar-3--open {
       top: 50%;
       transform: translate(-50%, -50%) rotate(-45deg);
       background: red;
     }
   }
 
-  .iconWrapper--noTitle {
+  .icon-wrapper--noTitle {
     left: 0;
     top: 0;
     bottom: 0;
@@ -175,7 +155,7 @@ export default defineComponent({
     transform: none;
   }
 
-  .dropdownMenu {
+  .dropdown-menu {
     position: absolute;
     top: 100%;
     width: 100%;
@@ -188,7 +168,7 @@ export default defineComponent({
     padding: 10px 30px;
     animation: menu 0.3s ease forwards;
 
-    .menuArrow {
+    .menu-arrow {
       width: 20px;
       height: 20px;
       position: absolute;
@@ -199,11 +179,6 @@ export default defineComponent({
       background: white;
       transform: rotate(45deg);
       border-radius: 4px 0 0 0;
-    }
-
-    .menuArrow--dark {
-      background: #333;
-      border: none;
     }
 
     .option {
@@ -239,19 +214,6 @@ export default defineComponent({
     }
   }
 
-  .dropdownMenu--dark {
-    background: #333;
-    border: none;
-
-    .option {
-      border-bottom: 1px solid #888;
-    }
-
-    * {
-      color: #eee;
-    }
-  }
-
   @keyframes menu {
     from {
       transform: translate3d(0, 30px, 0);
@@ -262,14 +224,11 @@ export default defineComponent({
   }
 }
 
-.dropDownMenuWrapper--noTitle {
+.dropdown-menu-wrapper--noTitle {
   padding: 0;
   width: 60px;
   height: 60px;
 }
 
-.dropDownMenuWrapper--dark {
-  background: #333;
-  border: none;
-}
+
 </style>

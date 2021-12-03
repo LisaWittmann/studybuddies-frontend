@@ -1,17 +1,21 @@
 <template>
-  <h1>Lobby Einstellungen</h1>
-  <br /><br /><br /><br />
+  <h1 class="view-headline">Lobby Einstellungen</h1>
   <section class="section">
-    <h2>Labyrinth hochladen:</h2>
-    <input
-      type="file"
-      ref="data"
-      id="file-input"
-      @change="dataUpload"
-    /><br /><br /><br /><br />
-    <h2>Labyrinth auswählen:</h2>
-    <DropdownMenu /><br /><br /><br /><br />
-    <button class="button" v-on:click="readyClicked">Bereit</button>
+    <ul class="labyrinth-context">
+      <li class="headline-elements">
+        <h2>Labyrinth hochladen:</h2>
+      </li>
+      <li class="upload-labyrinth">  
+        <input type="file" ref="data" id="file-input" @change="dataUpload"/>
+      </li>
+      <li class="headline-elements">
+        <h2>Labyrinth auswählen:</h2>
+      </li>
+      <li class="select-labyrinth">  
+        <DropdownMenu />
+      </li>
+    </ul>
+    <button class="ready-button" v-on:click="readyClicked">Bereit</button>
   </section>
 </template>
 
@@ -40,8 +44,23 @@ export default defineComponent({
 
     function readyClicked() {
       //functionality if both players clicked on ready button
-      alert("Clicked!");
+      
     }
   },
 });
 </script>
+<style lang="scss" scoped>
+  .labyrinth-context {
+    list-style: none;
+  }
+
+  .headline-elements {
+    margin-top: 10%;
+  }
+
+  .ready-button {
+    margin-top: 10%;
+    width: 10em;
+    height: 3em;
+  }
+</style>
