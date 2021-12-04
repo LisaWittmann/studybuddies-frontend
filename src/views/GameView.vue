@@ -7,6 +7,7 @@
 import { defineComponent, ref } from "vue";
 import SceneComponent from "@/components/SceneComponent.vue";
 import InstructionComponent from "@/components/InstructionComponent.vue";
+import { useGameStore } from "@/service/GameStore"
 
 export default defineComponent({
   name: "GameView",
