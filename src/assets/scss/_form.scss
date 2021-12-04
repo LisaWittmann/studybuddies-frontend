@@ -1,0 +1,56 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    input,
+    button {
+        font-size: 16px;
+        border-radius: 15px;
+        padding: 5px 10px;
+    }
+
+    input {
+        background: transparent;
+        color: $color-dark-green;
+        border: 2px solid $color-dark-green;
+        min-height: 25px;
+        margin-bottom: $spacing-xs;
+
+        &::placeholder,
+        &::-moz-placeholder {
+            opacity: 1;
+            color: $color-green;
+        }
+        
+        &:focus {
+            &::placeholder,
+            &::-moz-placeholder {
+                opacity: 0;
+            }
+        }
+    }
+
+    button {
+        min-height: 40px;
+        color: $color-white;
+        background: $color-dark-green;
+        margin-top: $spacing-s;
+        border: 2px solid $color-dark-green;
+        cursor: pointer;
+    }
+
+    a {
+        text-decoration: underline;
+        color: $color-dark-green;
+        cursor: pointer;
+
+        &:hover {
+            color: $color-green;
+        }
+    }
+
+    .error {
+        color: darkred;
+    }
+}

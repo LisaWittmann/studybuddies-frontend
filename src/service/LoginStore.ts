@@ -1,60 +1,50 @@
 import { reactive, readonly } from "vue";
+import { User } from "@/service/User";
 
-const loginstate = reactive({
+const loginState = reactive({
   username: "",
   errormessage: "",
   isLoggedIn: false,
 });
 
-export function doLogout() {
-  loginstate.username = "";
-  loginstate.errormessage = "";
-  loginstate.isLoggedIn = false;
+function logout() {
+  loginState.username = "";
+  loginState.errormessage = "";
+  loginState.isLoggedIn = false;
 }
 
-export async function doLogin(user: string, pass: string): Promise<boolean> {
-  try {
-    const userObj = {
-      username: user,
-      password: pass,
-    };
-
-    const response = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify(userObj),
+async function login(user: User) {
+  fetch("/api/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+    },
+    body: JSON.stringify(user),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(
+          "Dein Passwort war nicht korrekt. Bitte versuche es noch einmal."
+        );
+      }
+      return response.json();
+    })
+    .then((jsondata) => {
+      loginState.username = jsondata.username;
+      loginState.errormessage = "";
+      loginState.isLoggedIn = true;
+    })
+    .catch((error) => {
+      loginState.username = "";
+      loginState.isLoggedIn = false;
+      loginState.errormessage = error.message;
     });
-
-    if (!response.ok) {
-      console.error("ERROR");
-      loginstate.errormessage = "Fehler beim einloggen!";
-      return false;
-    }
-
-    const responseData = response.json();
-    console.log(responseData);
-
-    loginstate.username = user;
-    loginstate.errormessage = "";
-    loginstate.isLoggedIn = true;
-
-    console.log(loginstate);
-
-    return true;
-  } catch (reason) {
-    console.warn(`Catch activated`);
-    loginstate.errormessage = String(reason);
-
-    return false;
-  }
 }
 
 export function useLoginStore() {
   return {
-    loginstate: readonly(loginstate),
-    doLogin,
-    doLogout,
+    loginState: readonly(loginState),
+    login,
+    logout,
   };
 }
