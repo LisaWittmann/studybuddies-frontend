@@ -3,6 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Orientation } from "@/service/Tile";
 import { Vector3 } from "three";
 import { settings, direction } from "@/service/scene/helper/SceneConstants";
+import { EmitsOptions, SetupContext } from "vue";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -128,25 +129,23 @@ function updateCameraOrbit() {
 
 /**
  * gets intersecting object of converted cursor position
+ * @param context: context of delegating component to emit changes
  * @param x: converted x position of cursor
  * @param y: converted y position of cursor
  */
-function getIntersections(x: number, y: number) {
+function getIntersections(
+  context: SetupContext<EmitsOptions>,
+  x: number,
+  y: number
+) {
   raycaster.setFromCamera({ x: x, y: y }, camera);
   const intersects = raycaster.intersectObjects(scene.children);
 
   // testing intersections
-  for (const i of intersects) {
-    if (i.object.type == "Mesh") {
-      const object = i.object as THREE.Mesh;
-      if (i.object.userData.clickable) handleClick(object);
-    }
+  for (const intersection of intersects) {
+    const object = intersection.object;
+    if (object.userData.clickable) context.emit("click");
   }
-}
-
-function handleClick(object: THREE.Mesh): void {
-  const material = object.material as THREE.Material;
-  material.opacity = material.opacity == 1 ? 0.6 : 1;
 }
 
 /**
