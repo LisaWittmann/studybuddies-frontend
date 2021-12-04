@@ -34,7 +34,7 @@ import { User } from "@/service/User";
 import router from "@/router";
 
 export default defineComponent({
-  name: "Login",
+  name: "RegisterView",
   setup() {
     const user = new User();
     const errorMessage = ref("");

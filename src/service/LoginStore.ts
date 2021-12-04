@@ -1,5 +1,6 @@
 import { reactive, readonly } from "vue";
 import { User } from "@/service/User";
+import router from "@/router";
 
 const loginState = reactive({
   username: "",
@@ -34,6 +35,8 @@ async function login(user: User) {
       loginState.username = jsondata.username;
       loginState.errormessage = "";
       loginState.isLoggedIn = true;
+      console.log(loginState);
+      router.push("/lobby");
     })
     .catch(() => {
       loginState.username = "";

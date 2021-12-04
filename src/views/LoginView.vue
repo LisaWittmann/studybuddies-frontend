@@ -4,7 +4,7 @@
       <div class="login__content-header">
         <h1>Anmelden</h1>
       </div>
-      <form @submit.prevent="loginUser(user)" class="form">
+      <form @submit.prevent="login(user)" class="form">
         <input
           type="username"
           placeholder="Benutzername"
@@ -32,24 +32,16 @@
 import { defineComponent } from "vue";
 import { useLoginStore } from "@/service/LoginStore";
 import { User } from "@/service/User";
-import router from "@/router";
 
 export default defineComponent({
-  name: "Login",
+  name: "LoginView",
   setup() {
     const { loginState, login } = useLoginStore();
     const user = new User();
 
-    function loginUser(user: User) {
-      login(user).then(() => {
-        console.log(loginState);
-        if (loginState.isLoggedIn) router.push("/lobby");
-      });
-    }
-
     return {
       user,
-      loginUser,
+      login,
       errorMessage: loginState.errormessage,
     };
   },
