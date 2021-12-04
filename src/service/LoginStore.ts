@@ -23,9 +23,10 @@ async function login(user: User) {
   })
     .then((response) => {
       if (!response.ok) {
-        throw new Error(
-          "Dein Passwort war nicht korrekt. Bitte versuche es noch einmal."
-        );
+        loginState.username = "";
+        loginState.isLoggedIn = false;
+        loginState.errormessage =
+          "Dein Passwort war nicht korrekt. Bitte versuche es noch einmal.";
       }
       return response.json();
     })
@@ -34,10 +35,11 @@ async function login(user: User) {
       loginState.errormessage = "";
       loginState.isLoggedIn = true;
     })
-    .catch((error) => {
+    .catch(() => {
       loginState.username = "";
       loginState.isLoggedIn = false;
-      loginState.errormessage = error.message;
+      loginState.errormessage =
+        "Etwas ist schiefgelaufen. Bitte versuche es noch einmal";
     });
 }
 

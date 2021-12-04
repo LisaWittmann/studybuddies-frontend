@@ -29,6 +29,10 @@
                 opacity: 0;
             }
         }
+
+        &:focus:invalid {
+            border-color: darkred;
+        }
     }
 
     button {

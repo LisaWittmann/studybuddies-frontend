@@ -17,12 +17,12 @@
           v-model="user.password"
           required
         />
-        <span v-if="hasErrors" class="error">{{ errorMessage }}</span>
         <button type="submit">Registrieren</button>
         <p>
           Du bist bereits registriert?
           <a href="/login">Jetzt anmelden</a>
         </p>
+        <span class="error">{{ errorMessage }}</span>
       </form>
     </div>
   </div>
@@ -37,7 +37,6 @@ export default defineComponent({
   name: "Login",
   setup() {
     const user = new User();
-    const hasErrors = ref(false);
     const errorMessage = ref("");
 
     function register() {
@@ -50,18 +49,16 @@ export default defineComponent({
       })
         .then((response) => {
           if (!response.ok) {
-            throw new Error(
-              "Deine Registrierung ist fehlgeschlagen. Bitte versuche es noch einmal."
-            );
+            errorMessage.value =
+              "Deine Registrierung ist fehlgeschlagen. Bitte versuche es noch einmal.";
           } else {
-            hasErrors.value = false;
             errorMessage.value = "";
             router.push("/login");
           }
         })
-        .catch((error) => {
-          hasErrors.value = true;
-          errorMessage.value = error.message;
+        .catch(() => {
+          errorMessage.value =
+            "Etwas ist schiefgelaufen. Bitte versuceh es noch einmal";
         });
     }
 
@@ -81,15 +78,12 @@ export default defineComponent({
   @include flex-center();
 
   &__content {
-    max-width: 50%;
+    max-width: 400px;
+    width: 70%;
     margin: auto;
 
     &-header {
       margin-bottom: $spacing-m;
-
-      h1 {
-        line-height: 100%;
-      }
     }
   }
 }

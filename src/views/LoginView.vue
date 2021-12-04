@@ -9,21 +9,27 @@
           type="username"
           placeholder="Benutzername"
           v-model="user.username"
+          required
         />
-        <input type="password" placeholder="Passwort" v-model="user.password" />
-        <span v-if="hasErrors" class="error">{{ errorMessage }}</span>
+        <input
+          type="password"
+          placeholder="Passwort"
+          v-model="user.password"
+          required
+        />
         <button type="submit">Anmelden</button>
         <p>
           Noch kein Benutzerkonto?
           <a href="/register">Jetzt registrieren</a>
         </p>
+        <span class="error">{{ errorMessage }}</span>
       </form>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 import { useLoginStore } from "@/service/LoginStore";
 import { User } from "@/service/User";
 import router from "@/router";
@@ -31,14 +37,12 @@ import router from "@/router";
 export default defineComponent({
   name: "Login",
   setup() {
-    const user = new User();
     const { loginState, login } = useLoginStore();
-    const hasErrors = ref(false);
+    const user = new User();
 
     function loginUser(user: User) {
       login(user).then(() => {
         console.log(loginState);
-        hasErrors.value = loginState.isLoggedIn;
         if (loginState.isLoggedIn) router.push("/lobby");
       });
     }
@@ -46,7 +50,6 @@ export default defineComponent({
     return {
       user,
       loginUser,
-      hasErrors,
       errorMessage: loginState.errormessage,
     };
   },
@@ -60,15 +63,12 @@ export default defineComponent({
   @include flex-center();
 
   &__content {
-    max-width: 50%;
+    max-width: 400px;
+    width: 70%;
     margin: auto;
 
     &-header {
       margin-bottom: $spacing-m;
-
-      h1 {
-        line-height: 100%;
-      }
     }
   }
 }
