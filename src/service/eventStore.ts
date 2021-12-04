@@ -1,7 +1,7 @@
 import { reactive, readonly } from "@vue/reactivity";
 import { Client } from "@stomp/stompjs";
 import { useLabyrinthStore } from "./LabyrinthStore";
-import { eventMessage, Operation } from "./eventMessage";
+import { EventMessage, Operation } from "./EventMessage";
 
 const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
 
@@ -33,14 +33,14 @@ stompclient.onConnect = (/*frame*/) => {
 
     console.log(JSON.parse(message.body));
 
-    const eventMessage: eventMessage = JSON.parse(message.body);
+    const EventMessage: EventMessage = JSON.parse(message.body);
 
-    switch (eventMessage.operation) {
+    switch (EventMessage.operation) {
       case Operation.MOVEMENT:
         /**
          * @todo: use it when gameState exists and new FE structure is finished
          */
-        /*const movePlayer =  gameState.playerMap.get(eventMessage.username);
+        /*const movePlayer =  gameState.playerMap.get(EventMessage.username);
                 const startTileID: number = movePlayer.getPosition();
                 const destTileID = gameState.labyrinth.tileMap.get(startTileID).getTileRelationMap.get(eventMessage.data);
                 if(destTileID) {
@@ -61,7 +61,7 @@ stompclient.onConnect = (/*frame*/) => {
         break;
     }
 
-    console.log(eventMessage.operation);
+    console.log(EventMessage.operation);
   });
 };
 
