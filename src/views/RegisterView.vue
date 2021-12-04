@@ -56,7 +56,7 @@ export default defineComponent({
         })
         .catch(() => {
           errorMessage.value =
-            "Deine Registrierung ist fehlgeschlagen. Bitte versuceh es noch einmal";
+            "Deine Registrierung ist fehlgeschlagen. Bitte versuche es noch einmal";
         });
     }
 
