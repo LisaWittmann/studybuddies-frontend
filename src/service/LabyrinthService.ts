@@ -17,7 +17,7 @@ async function uploadJsonFiles(filelist: FileList) {
           }
         })
         .catch((error) => {
-          console.log(error);
+          console.error(error);
         });
     }
   }

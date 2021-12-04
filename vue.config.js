@@ -6,7 +6,7 @@ module.exports = {
         secure: false,
       },
       "^/websocket": {
-        target: "ws://localhost:9090/",
+        target: "ws://localhost:9090/messagebroker",
         ws: true,
         secure: false,
       },
@@ -15,7 +15,7 @@ module.exports = {
   css: {
     loaderOptions: {
       sass: {
-        additionalData: `@import "@/assets/scss/main.scss";`,
+        additionalData: `@import "@/assets/scss/variables/main.scss";`,
       },
     },
   },
