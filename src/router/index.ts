@@ -32,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "LobbySettingsView",
     component: LobbySettingsView,
   },
+  {
+    path: "/find",
+    name: "FindLobby",
+    component: FindLobbyView,
+  },
 ];
 
 const router = createRouter({
