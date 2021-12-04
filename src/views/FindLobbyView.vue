@@ -6,7 +6,8 @@
         Spiel finden <input type="text" /> <button type="submit">OK</button>
       </li>
       <li>
-        Spiel erstellen <button @click="createGame">Spiel erstellen</button>
+        Spiel erstellen
+        <button type="button" @click="createGame">Spiel erstellen</button>
       </li>
     </ul>
   </form>
@@ -19,16 +20,20 @@ import router from "@/router";
 export default defineComponent({
   name: "FindLobby",
   setup() {
-    fetch("/api/lobby/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-    })
-      .then((response) => {
-        if (response.ok) router.push("/");
+    function createGame() {
+      fetch("/api/lobby/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        },
       })
-      .catch((err) => console.log(err));
+        .then((response) => {
+          if (response.ok) router.push("/");
+        })
+        .catch((err) => console.log(err));
+    }
+
+    return { createGame };
   },
 });
 </script>
