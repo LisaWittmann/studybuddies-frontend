@@ -1,6 +1,8 @@
 import { reactive } from "vue";
 import { Tile, Orientation } from "@/service/Tile";
 import { Labyrinth } from "@/service/Labyrinth";
+import { Item } from "./Item";
+import { Vector3 } from "three";
 
 /**
  * constant to keep the tiles or store an errormessage
@@ -35,7 +37,13 @@ async function updateLabyrinth() {
       for (const key in jsondata.tileMap) {
         const tile = jsondata.tileMap[key];
         const id = parseInt(key);
-        labyrinth.tileMap.set(id, new Tile(tile.tileId, tile.objectsInRoom));
+        const objectsInRoom = new Array<Item>();
+
+        for(const item of tile.objectsInRoom){
+          objectsInRoom.push(new Item(item.id, item.modelName, new Vector3()));
+        }
+        
+        labyrinth.tileMap.set(id, new Tile(tile.tileId, objectsInRoom));
 
         //workaround to parse json list in map
         const tileRelationMap = new Map<Orientation, number | undefined>();
@@ -64,6 +72,7 @@ async function updateLabyrinth() {
             parseInt(tile.tileRelationMap[orientationKey])
           );
         }
+
         labyrinth.tileMap.get(id)?.setTileRelationMap(tileRelationMap);
       }
       //add empty relations for unset orientations of tilemap
