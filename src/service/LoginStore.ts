@@ -7,12 +7,21 @@ const loginstate = reactive({
     isLoggedIn: false
 })
 
+export function doLogout() {
+    loginstate.username = ''
+    loginstate.errormessage = ''
+    loginstate.isLoggedIn = false
+}
+
 export async function doLogin(user: string, password: string): Promise<boolean> {
+    console.log('doLogin() called')
     try {
         const userObj = {
             username: user,
             password: password
         }
+
+        console.log(`UserObj: ${userObj}`)
     
         const response = await fetch('/api/login', {
             method: 'POST',
@@ -23,21 +32,26 @@ export async function doLogin(user: string, password: string): Promise<boolean> 
         })
     
         // API Call verarbeiten
-        const responseData = response.text
-        console.log(responseData)
+        const responseData = await response.json
 
+        // Testing
+        loginstate.username = user
+        loginstate.errormessage = ''
+        loginstate.isLoggedIn = true
+
+        return true
 
     } catch(reason) {
         loginstate.errormessage = String(reason)
-    }
 
-    
-    return false;
+        return false
+    }
 }
 
 export function useLoginStore() {
     return {
         loginstate: readonly(loginstate),
-        doLogin
+        doLogin,
+        doLogout
     }
 }

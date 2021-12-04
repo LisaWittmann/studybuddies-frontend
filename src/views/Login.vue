@@ -8,6 +8,7 @@
       <div class="login__form-wrapper">
         <input type="text" name="username" v-model="username">
         <input type="password" name="password" v-model="password">
+        <button @click="handleLogin(username, password)">Login</button>
         <!-- <form
           v-if="inLoginState"
           @submit.prevent="login(user)"
@@ -66,10 +67,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import { User } from "@/service/User";
+import { defineComponent, onMounted, ref } from "vue";
+// import { User } from "@/service/User";
 import { useLoginStore } from "@/service/LoginStore";
-import router from "@/router";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "Login",
@@ -77,29 +78,43 @@ export default defineComponent({
     // handles login/register state
     // const inLoginState = ref(false);
     // const user = new User();
+    const router = useRouter()
+    const username = ''
+    const password = ''
 
     const hasErrors = ref(false);
     // const errorMessage = ref("testing error message");
     const {
       loginstate,
-      doLogin
+      doLogin,
+      doLogout
     } = useLoginStore()
 
-    const usernameEmpty = ref(false);
-    const passwordEmpty = ref(false);
+    onMounted(async() => {
+      await doLogout()
+    })
 
-    const emptyUsernameMessage = "Benutzername darf nicht leer sein";
-    const emptyPasswordMessage = "Passwort darf nicht leer sein";
-
-    function switchToRegister() {
-      // loginstate.isLoggedIn.value = false;
-      hasErrors.value = false;
+    async function handleLogin(username: string, password: string) {
+      console.log(`Username: ${username}\nPass: ${password}`)
+      await doLogin(username, password)
+      await router.push('/lobby')
     }
 
-    function switchToLogin() {
-      // inLoginState.value = true;
-      hasErrors.value = false;
-    }
+    // const usernameEmpty = ref(false);
+    // const passwordEmpty = ref(false);
+
+    // const emptyUsernameMessage = "Benutzername darf nicht leer sein";
+    // const emptyPasswordMessage = "Passwort darf nicht leer sein";
+
+    // function switchToRegister() {
+    //   // loginstate.isLoggedIn.value = false;
+    //   hasErrors.value = false;
+    // }
+
+    // function switchToLogin() {
+    //   // inLoginState.value = true;
+    //   hasErrors.value = false;
+    // }
 
     // Refactor entire logic into computed
     // function validateProcess() {
@@ -127,49 +142,55 @@ export default defineComponent({
     //   return false;
     // }
 
-    function login() {
-        fetch("/api/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json;charset=utf-8",
-          },
-          body: JSON.stringify(loginstate.username),
-        })
-          .then((response) => {
-            if (response.ok) router.push("/lobby");
-            else hasErrors.value = true;
-          })
-          .catch((err) => console.log(err));
-      }
+    // function login() {
+    //     fetch("/api/login", {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json;charset=utf-8",
+    //       },
+    //       body: JSON.stringify(loginstate.username),
+    //     })
+    //       .then((response) => {
+    //         if (response.ok) router.push("/lobby");
+    //         else hasErrors.value = true;
+    //       })
+    //       .catch((err) => console.log(err));
+    //   }
 
-    function register() {
-        fetch("/api/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json;charset=utf-8",
-          },
-          body: JSON.stringify(loginstate.username),
-        })
-          .then((response) => {
-            if (response.ok) switchToLogin();
-            else hasErrors.value = true;
-          })
-          .catch((err) => console.log(err));
-      }
+    // function register() {
+    //     fetch("/api/register", {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json;charset=utf-8",
+    //       },
+    //       body: JSON.stringify(loginstate.username),
+    //     })
+    //       .then((response) => {
+    //         if (response.ok) switchToLogin();
+    //         else hasErrors.value = true;
+    //       })
+    //       .catch((err) => console.log(err));
+    //   }
+
+
 
     return {
       // user,
-      login,
-      register,
-      // inLoginState,
-      switchToRegister,
-      switchToLogin,
-      hasErrors,
-      // errorMessage,
-      emptyUsernameMessage,
-      emptyPasswordMessage,
-      usernameEmpty,
-      passwordEmpty,
+      // login,
+      // register,
+      // // inLoginState,
+      // switchToRegister,
+      // switchToLogin,
+      // hasErrors,
+      // // errorMessage,
+      // emptyUsernameMessage,
+      // emptyPasswordMessage,
+      // usernameEmpty,
+      // passwordEmpty,
+      username,
+      password,
+      handleLogin,
+      loginstate
     };
   },
 });
