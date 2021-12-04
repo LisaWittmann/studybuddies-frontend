@@ -1,85 +1,119 @@
 import * as THREE from "three";
-import { Shape, Cube, Cuboid, Plane } from "@/service/Shape";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
+
+import { Orientation } from "@/service/Tile";
+import { Item } from "@/service/Item";
+import { Arrow, Wall } from "@/service/FixedObject";
+
+import { axis, settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 
+const objectLoader = new OBJLoader();
+const materialLoader = new MTLLoader();
+
+objectLoader.setPath("/models/");
+materialLoader.setPath("/models/");
+
 /**
- * creates sceneobject based on given shaope
- * @param model: implementation of shape
- * @param position: global position
- * @param color: color of object material
- * @param clickable: object interacts on click
- * @param axis: rotation axis as normalized vector
- * @param angle: rotation angle in degree
- * @returns initialized scene object as mesh
+ * creates item by loading its obj representation from models directory
+ * @param item: item that should be loaded and added to scene
+ * @param parent: group or scene object will be added to after loading
  */
-function createObject(
-  model: Shape,
-  position: THREE.Vector3,
-  color = 0x199eb0,
-  clickable = false,
-  visible = true,
-  axis?: THREE.Vector3,
-  angle?: number
-): THREE.Mesh {
-  let object: THREE.Mesh = new THREE.Mesh();
+async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
+  const model = item.modelName.toLowerCase();
+  await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
+    materials.preload();
+    objectLoader.setMaterials(materials);
+    objectLoader.loadAsync(`${model}.obj`).then((object) => {
+      object.position.copy(item.positionInRoom);
+      object.userData = item;
+      object.userData.clickable = true;
+      parent.add(object);
+    });
+  });
+}
 
-  if (model instanceof Cube) object = createCube(model, color);
-  if (model instanceof Cuboid) object = createCuboid(model, color);
-  if (model instanceof Plane) object = createPlane(model, color);
-
-  if (axis && angle) {
-    object.rotateOnAxis(axis, radians(angle));
-  }
-
-  if (!(model.depth == 0 && axis?.x == 1)) {
-    position = baseline(position, model.height);
-  }
-
-  object.userData.clickable = clickable;
+/**
+ * creates plane representing tile's floor
+ * @param position: tile position
+ * @param color: floor color in hexa
+ * @returns THREE.Mesh representation of floor
+ */
+function createFloor(position: THREE.Vector3, color = 0x199eb0) {
+  const object = new THREE.Mesh(
+    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
+    new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
+  );
   object.position.copy(position);
-  object.visible = visible;
+  object.rotateOnAxis(axis.x, radians(90));
   return object;
 }
 
 /**
- * creates cube scene object
- * @param model: instance of cube
- * @param color: color of cube material
- * @returns initialized cube as mesh
+ * creates plane representing tile's ceiling
+ * @param position: tile position
+ * @param color: floor color in hexa
+ * @returns THREE.Mesh representation of ceiling
  */
-function createCube(model: Cube, color = 0x199eb0): THREE.Mesh {
-  return new THREE.Mesh(
-    new THREE.BoxGeometry(model.width, model.height, model.depth),
-    new THREE.MeshStandardMaterial({ color: color })
-  );
-}
-
-/**
- * creates cuboid scene object
- * @param model: instance of cuboid
- * @param color: color of cuboid material
- * @returns initialized cuboid as mesh
- */
-function createCuboid(model: Cuboid, color = 0x199eb0): THREE.Mesh {
-  return new THREE.Mesh(
-    new THREE.BoxGeometry(model.width, model.height, model.depth),
-    new THREE.MeshStandardMaterial({ color: color })
-  );
-}
-
-/**
- * creates plane scene object
- * @param model: instance of plane
- * @param color: color of plane material
- * @returns initialized plane as mesh
- */
-function createPlane(model: Plane, color = 0x199eb0): THREE.Mesh {
-  return new THREE.Mesh(
-    new THREE.PlaneGeometry(model.width, model.height),
+function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
+  const object = new THREE.Mesh(
+    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
+  object.position.set(position.x, position.y + settings.tileSize, position.z);
+  object.rotateOnAxis(axis.x, radians(90));
+  return object;
+}
+
+/**
+ * creates plane representing tile's wall on given orientation
+ * @param orientation: orientaion which wall should be placed and aligned on
+ * @param tilePosition: position of parent tile
+ * @param color: wall color in hexa
+ * @returns THREE.Mesh representation of wall
+ */
+function createWall(
+  orientation: Orientation,
+  tilePosition: THREE.Vector3,
+  color = 0x199eb0
+): THREE.Mesh {
+  const wall = new Wall(orientation, tilePosition);
+  const position = baseline(wall.position(), settings.tileSize);
+  const object = new THREE.Mesh(
+    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
+    new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
+  );
+  object.position.copy(position);
+  object.rotateOnAxis(axis.y, radians(wall.rotationY()));
+  object.userData = wall;
+  return object;
+}
+
+/**
+ * creates an arrow object that is aligned and directs to given orientation
+ * @param orientation: orientation arrow should directs to
+ * @param tilePosition: position of parent tile
+ * @returns: clickable arrow representation
+ */
+function createArrow(
+  orientation: Orientation,
+  tilePosition: THREE.Vector3
+): THREE.Mesh {
+  const arrow = new Arrow(orientation, tilePosition);
+  const position = baseline(arrow.position(), 1);
+  // testing arrow object
+  const object = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 2),
+    new THREE.MeshStandardMaterial({ color: 0xeaf4ea })
+  );
+  object.position.copy(position);
+  object.rotateOnAxis(axis.y, radians(arrow.rotationY()));
+  object.userData = arrow;
+  object.visible = false;
+  return object;
 }
 
 export function useObjectFactory() {
-  return { createObject };
+  return { createArrow, createWall, createCeiling, createFloor, createItem };
 }
