@@ -11,7 +11,7 @@ import { vector } from "@/service/scene/helper/GeometryHelper";
 
 export default defineComponent({
   name: "SceneComponent",
-  setup() {
+  setup(props, context) {
     const {
       createScene,
       renderScene,
@@ -33,6 +33,7 @@ export default defineComponent({
 
     function onMouseDown(event: MouseEvent) {
       getIntersections(
+        context,
         (event.clientX / innerWidth) * 2 - 1,
         -(event.clientY / innerHeight) * 2 + 1
       );
