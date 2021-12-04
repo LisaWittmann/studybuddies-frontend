@@ -23,26 +23,21 @@ async function login(user: User) {
     body: JSON.stringify(user),
   })
     .then((response) => {
-      if (!response.ok) {
-        loginState.username = "";
-        loginState.isLoggedIn = false;
-        loginState.errormessage =
-          "Dein Passwort war nicht korrekt. Bitte versuche es noch einmal.";
-      }
+      if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((jsondata) => {
       loginState.username = jsondata.username;
       loginState.errormessage = "";
       loginState.isLoggedIn = true;
-      console.log(loginState);
       router.push("/lobby");
+      console.log(loginState);
     })
     .catch(() => {
       loginState.username = "";
       loginState.isLoggedIn = false;
       loginState.errormessage =
-        "Etwas ist schiefgelaufen. Bitte versuche es noch einmal";
+        "Dein Passwort war nicht korrekt. Bitte versuche es noch einmal.";
     });
 }
 

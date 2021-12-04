@@ -6,7 +6,7 @@ module.exports = {
         secure: false,
       },
       "^/websocket": {
-        target: "ws://localhost:9090/",
+        target: "ws://localhost:9090/messagebroker",
         ws: true,
         secure: false,
       },

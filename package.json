@@ -14,7 +14,9 @@
     "core-js": "^3.6.5",
     "three": "^0.134.0",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0-0"
+    "vue-router": "^4.0.0-0",
+    "websocket": "^1.0.34",
+    "webstomp-client": "^1.2.6"
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",

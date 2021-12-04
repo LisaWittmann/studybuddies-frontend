@@ -22,7 +22,7 @@
           Noch kein Benutzerkonto?
           <a href="/register">Jetzt registrieren</a>
         </p>
-        <span class="error">{{ errorMessage }}</span>
+        <span class="error">{{ loginState.errormessage }}</span>
       </form>
     </div>
   </div>
@@ -42,7 +42,7 @@ export default defineComponent({
     return {
       user,
       login,
-      errorMessage: loginState.errormessage,
+      loginState,
     };
   },
 });

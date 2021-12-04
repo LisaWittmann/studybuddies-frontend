@@ -48,17 +48,15 @@ export default defineComponent({
         body: JSON.stringify(user),
       })
         .then((response) => {
-          if (!response.ok) {
-            errorMessage.value =
-              "Deine Registrierung ist fehlgeschlagen. Bitte versuche es noch einmal.";
-          } else {
-            errorMessage.value = "";
-            router.push("/login");
-          }
+          if (!response.ok) throw new Error(response.statusText);
+        })
+        .then(() => {
+          errorMessage.value = "";
+          router.push("/login");
         })
         .catch(() => {
           errorMessage.value =
-            "Etwas ist schiefgelaufen. Bitte versuceh es noch einmal";
+            "Deine Registrierung ist fehlgeschlagen. Bitte versuceh es noch einmal";
         });
     }
 
