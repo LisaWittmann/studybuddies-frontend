@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import FindLobbyView from "@/views/FindLobbyView.vue";
 import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import LobbyView from "@/views/LobbyView.vue";
@@ -26,11 +25,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/lobby",
     name: "LobbyView",
     component: LobbyView,
-  },
-  {
-    path: "/find",
-    name: "FindLobbyView",
-    component: FindLobbyView,
   },
 ];
 
