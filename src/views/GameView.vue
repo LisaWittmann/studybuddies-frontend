@@ -1,6 +1,6 @@
 <template>
   <SceneComponent
-    :mainPlayer=""
+    :mainPlayer="mainPlayer"
     @click-object="sendItemId"
     @move-player="movePlayer"
   />
@@ -13,6 +13,10 @@ import SceneComponent from "@/components/SceneComponent.vue";
 import InstructionComponent from "@/components/InstructionComponent.vue";
 import { useGameStore } from "@/service/GameStore";
 import { Orientation } from "@/service/Tile";
+import { activePlayer } from "@/service/Player";
+import { useMoveOperation } from "@/service/MoveService";
+import { MoveOperation, Operation } from "@/service/EventMessage";
+import "@/service/EventStore";
 
 export default defineComponent({
   name: "GameView",
@@ -22,7 +26,9 @@ export default defineComponent({
     const showInstructions = ref(false);
 
     const { gameState, updateGame } = useGameStore();
-    const mainPlayer = gameState.playerMap.get();
+    console.log(gameState);
+    const mainPlayer = gameState.playerMap.get("TestUser");
+    const { sendMove } = useMoveOperation();
 
     // test data
     const instructions = [
@@ -47,14 +53,16 @@ export default defineComponent({
     }
 
     function movePlayer(orientation: Orientation) {
+      sendMove(new MoveOperation("MOVEMENT", "lobbykey", (mainPlayer as activePlayer).username, Orientation[orientation].toString()))
       console.log("move player to", orientation);
+
     }
     return {
       instructions,
       showInstructions,
       sendItemId,
       movePlayer,
-      gameState,
+      mainPlayer,
     };
   },
 });
