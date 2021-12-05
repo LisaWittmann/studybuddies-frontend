@@ -1,5 +1,8 @@
 <template>
   <LobbySettingsComponent/>
+  <div v-for="(username, i) of users" v-bind:key="i">
+    {{ username }}
+  </div>
 </template>
 
 <script lang="ts">
@@ -13,7 +16,7 @@ export default defineComponent({
   setup() {
     const route = router.currentRoute.value;
     const lobbyKey = route.params.key;
-    const users: Map<string, boolean> = new Map<string, boolean>([]);
+    const users: Array<string> = new Array<string>();
 
     fetch("/api/lobby/users/" + lobbyKey, {
       method: "GET"
@@ -23,7 +26,6 @@ export default defineComponent({
           return response.json();
         })
         .then((jsonData) => {
-          console.log(jsonData);
           users.values = jsonData;
           console.log(users);
         })
@@ -31,7 +33,7 @@ export default defineComponent({
           console.log("error ;)");
         });
 
-    return {};
+    return {users};
   },
 });
 </script>
