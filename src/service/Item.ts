@@ -1,6 +1,7 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/Tile";
 import { direction, position, settings } from "./scene/helper/SceneConstants";
+import { radians } from "./scene/helper/GeometryHelper";
 
 /**
  * enumeration of vertical object position in tile
@@ -36,16 +37,6 @@ export class Item {
     this.positionInRoom = (<any>Position)[positionInRoom]; //convert string from JSON to Enum
     this.orientations = orientations;
     this.calcPosition = calcPosition;
-
-    //Konvertierung zu Enum notwendig????
-    /* const ori = new Array<Orientation>();
-    for (const o in orientations) {
-      const newO: Orientation = (<any>Orientation)[o];
-      console.log(typeof newO);
-      ori.push(newO);
-    }
-
-    this.orientations = ori; */
   }
 
   /**
@@ -53,6 +44,7 @@ export class Item {
    * @returns height where item is positioned
    */
   calcPositionInRoom = (): Vector3 => {
+    //set vertical position
     switch (this.positionInRoom) {
       case Position.FLOOR:
         this.calcPosition.copy(position.floor);
@@ -65,7 +57,8 @@ export class Item {
         break;
     }
 
-    //pan calculation
+    //calculation for object positioning
+    //set horizontal position
     this.orientations.forEach((o) => {
       //cast string from array to enum for simple use of enum in switch
       const eO: Orientation = (<any>Orientation)[o];
@@ -73,72 +66,59 @@ export class Item {
 
       switch (eO) {
         case Orientation.NORTH:
-          console.log("switch north");
           directionVector.copy(direction.north);
           this.calcPosition = this.calcPosition.add(directionVector);
           break;
         case Orientation.EAST:
-          console.log("switch east");
           directionVector.copy(direction.east);
           this.calcPosition = this.calcPosition.add(directionVector);
           break;
         case Orientation.SOUTH:
-          console.log("switch south");
           directionVector.copy(direction.south);
           this.calcPosition = this.calcPosition.add(directionVector);
           break;
         case Orientation.WEST:
-          console.log("switch west");
           directionVector.copy(direction.west);
           this.calcPosition = this.calcPosition.add(directionVector);
           break;
-        default:
-          console.log("default");
       }
     });
 
     //move item quarter of the current tile size
     this.calcPosition = this.calcPosition.multiplyScalar(settings.tileSize / 4);
-    console.log(this.calcPosition);
 
     return this.calcPosition;
   };
 
   /**
-   *
+   * currently rotates item so that the front of the item is always pointed at the user
+   * rotation counter clockwise
    * @returns how many degrees object must be rotated
    */
-  /* rotationY = (): number => {
+  rotationY = (): number => {
     let viewdirection = 0;
     this.orientations.forEach((o) => {
-      switch (o) {
+      const eO: Orientation = (<any>Orientation)[o];
+      switch (eO) {
         case Orientation.NORTH:
-          
+          viewdirection += 0;
           break;
         case Orientation.EAST:
+          viewdirection += 270;
           break;
         case Orientation.SOUTH:
+          viewdirection += 180;
           break;
         case Orientation.WEST:
+          viewdirection += 90;
           break;
       }
     });
 
-
-
-      switch (this.orientation) {
-        case Orientation.NORTH:
-          return 0;
-        case Orientation.EAST:
-          return 270;
-        case Orientation.SOUTH:
-          return 180;
-        case Orientation.WEST:
-          return 90;
-      }
-    };
-    
-    
-
-  }; */
+    //bisect angle of orientation to get view direction into corners
+    if (this.orientations.length == 2) {
+      viewdirection = viewdirection / 2;
+    }
+    return radians(viewdirection);
+  };
 }
