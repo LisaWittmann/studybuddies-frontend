@@ -18,13 +18,12 @@ function createTile(
   const { createFloor, createCeiling, createArrow, createWall, createItem } =
     useObjectFactory();
   const tile = new THREE.Group();
-  tile.userData = model;
 
   //LIGHT-----------------
   tile.add(createLight(position));
 
   //STATIC-ITEMS----------
-  tile.add(createFloor(position, color));
+  tile.add(createFloor(position, color, model));
   tile.add(createCeiling(position, color));
   model.tileRelationMap.forEach((value, key) => {
     if (value) createArrow(key, position, tile);

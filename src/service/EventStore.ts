@@ -69,16 +69,15 @@ stompclient.onConnect = (/*frame*/) => {
               break;
           }*/
 
-            const destTileID: number = Number.parseInt(eventMessage.data);
+          const destTileID: number = Number.parseInt(eventMessage.data);
 
           if (destTileID) {
-
-              movePlayer.setPosition(destTileID);
-              updatePlayer(movePlayer);
-              console.log(gameState.playerMap.get("TestUser"));
+            movePlayer.setPosition(destTileID);
+            updatePlayer(movePlayer);
+            console.log(gameState.playerMap.get("TestUser"));
           } else {
             gameState.errormessage =
-                "There is no Tilereference for this definition of data";
+              "There is no Tilereference for this definition of data";
           }
         } else {
           gameState.errormessage = "No existing User";

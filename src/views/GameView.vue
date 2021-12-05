@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import SceneComponent from "@/components/SceneComponent.vue";
 import InstructionComponent from "@/components/InstructionComponent.vue";
 import { useGameStore } from "@/service/GameStore";
@@ -53,10 +53,17 @@ export default defineComponent({
     }
 
     function movePlayer(orientation: Orientation) {
-      sendMove(new MoveOperation("MOVEMENT", "lobbykey", (mainPlayer as activePlayer).username, Orientation[orientation].toString()))
+      sendMove(
+        new MoveOperation(
+          "MOVEMENT",
+          "lobbykey",
+          (mainPlayer as activePlayer).username,
+          Orientation[orientation].toString()
+        )
+      );
       console.log("move player to", orientation);
-
     }
+
     return {
       instructions,
       showInstructions,

@@ -6,7 +6,7 @@ import { MoveOperation } from "./EventMessage";
  */
 async function sendMove(moveOperation: MoveOperation) {
   if (moveOperation) {
-    console.log("fetch start")
+    console.log("fetch start");
     await fetch("/api/lobby/move", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

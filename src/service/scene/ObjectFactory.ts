@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 
-import { Orientation } from "@/service/Tile";
+import { Orientation, Tile } from "@/service/Tile";
 import { Item } from "@/service/Item";
 import { Arrow, Wall } from "@/service/FixedObject";
 
@@ -49,16 +49,18 @@ async function createItem(
 
 /**
  * creates plane representing tile's floor
+ * contains tile position and userData
  * @param position: tile position
  * @param color: floor color in hexa
  * @returns THREE.Mesh representation of floor
  */
-function createFloor(position: THREE.Vector3, color = 0x199eb0) {
+function createFloor(position: THREE.Vector3, color = 0x199eb0, model: Tile) {
   const object = new THREE.Mesh(
     new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.copy(position);
+  object.userData = model;
   object.rotateOnAxis(axis.x, radians(90));
   return object;
 }

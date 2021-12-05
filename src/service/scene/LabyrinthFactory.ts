@@ -20,11 +20,15 @@ const storedTiles = new Map<number, THREE.Vector3>();
  * @param labyrinthState
  * @param scene
  */
-async function createLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
+async function createLabyrinth(
+  tileMap: Map<number, Tile>,
+  playerStartTileIds: Array<number>,
+  scene: THREE.Scene
+) {
   const position = vector(0, 0, 0);
   // for testing
-  const startTile = labyrinth.playerStartTileIds[0];
-  for (const [, value] of labyrinth.tileMap) {
+  const startTile = playerStartTileIds[0];
+  for (const [, value] of tileMap) {
     placeTile(position, value, scene);
     if (value.getId() == startTile) {
       placeCamera(position, value);

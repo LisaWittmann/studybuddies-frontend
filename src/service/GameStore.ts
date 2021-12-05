@@ -22,11 +22,8 @@ const gameState = reactive({
 
 gameState.playerMap.set(
   "TestUser",
-  new activePlayer(
-    "TestUser",
-    true,
-    gameState.labyrinth.playerStartTileIds[0]
-  ));
+  new activePlayer("TestUser", true, gameState.labyrinth.playerStartTileIds[0])
+);
 
 async function updateGame() {
   updateLabyrinth();

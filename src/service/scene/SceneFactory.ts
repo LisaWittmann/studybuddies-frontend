@@ -37,7 +37,7 @@ function createScene(
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
-  updateCameraPosition(cameraPosition, Orientation.NORTH);
+  camera.position.copy(cameraPosition);
 
   //SCENE--------------------
   scene = new THREE.Scene();
@@ -98,6 +98,7 @@ function updateCameraPosition(
     position.z
   );
   if (orientation) updateCameraTarget(orientation);
+  else updateCameraOrbit();
 }
 
 function updateCameraTarget(orientation: Orientation) {
