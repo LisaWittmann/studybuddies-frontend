@@ -8,6 +8,7 @@ import { MoveOperation } from "./eventMessage";
     if (moveOperation) {
         await fetch("/lobby/move", {
           method: "POST",
+          headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(moveOperation),
         })
           .then((response) => {
