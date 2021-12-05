@@ -3,7 +3,7 @@
   <form class="login__form">
     <ul>
       <li>
-        Spiel finden <input type="text" v-model="lobbyKey"/>
+        Spiel finden <input type="text" v-model="lobbyKey" />
         <button type="button" @click="joinGame">OK</button>
       </li>
       <li>
@@ -15,9 +15,9 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
+import { defineComponent, ref } from "vue";
 import router from "@/router";
-import {useLoginStore} from "@/service/LoginStore.ts";
+import { useLoginStore } from "@/service/LoginStore.ts";
 
 export default defineComponent({
   name: "FindLobby",
@@ -34,12 +34,12 @@ export default defineComponent({
         },
         body: loginState.loginState.username,
       }).then((response) => {
-        if(response.ok) {
+        if (response.ok) {
           router.push("/lobby/" + key);
         } else {
           console.log(response.statusText);
         }
-      })
+      });
     }
     function createGame() {
       console.log(loginState.loginState.username);
@@ -50,18 +50,18 @@ export default defineComponent({
         },
         body: loginState.loginState.username,
       })
-          .then((response) => {
-            if (response.ok) {
-              return response.json();
-            }
-          })
-          .then((jsonData) => {
-            router.push("/lobby/" + jsonData.key);
-          })
-          .catch((err) => console.log(err));
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+        })
+        .then((jsonData) => {
+          router.push("/lobby/" + jsonData.key);
+        })
+        .catch((err) => console.log(err));
     }
 
-    return {lobbyKey, createGame, joinGame};
+    return { lobbyKey, createGame, joinGame };
   },
 });
 </script>
