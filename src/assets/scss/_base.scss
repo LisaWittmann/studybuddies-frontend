@@ -1,0 +1,20 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: $font-outfit;
+    color: $color-black;
+}
+
+input, button {
+    font-family: $font-outfit;
+    font-weight: 300;
+}
+
+p, span, a {
+    font-family: $font-outfit;
+    font-weight: 300;
+}
+
+h1, h2 {
+    font-weight: 500;
+}

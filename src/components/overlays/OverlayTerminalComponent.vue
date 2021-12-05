@@ -53,10 +53,10 @@ export default defineComponent({
 .terminal {
   max-width: 500px;
   width: 80%;
-  font-family: monospace;
 
   &__header {
     @include flex-center();
+    font-family: $font-inconsolata;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     border: 1px solid #252525;
@@ -81,6 +81,7 @@ export default defineComponent({
 
   &__content {
     position: relative;
+    font-family: $font-inconsolata;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
     border: 1px solid #252525;
@@ -90,6 +91,10 @@ export default defineComponent({
     line-height: 130%;
     text-align: left;
     padding: 8px;
+
+    span {
+      font-family: $font-inconsolata;
+    }
 
     .state {
       &--neutral {

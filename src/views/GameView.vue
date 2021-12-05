@@ -30,7 +30,7 @@ export default defineComponent({
   },
   setup() {
     const showInstructions = ref(false);
-    const showTerminal = ref(false);
+    const showTerminal = ref(true);
 
     // instructions for current game quest e.g. finding partner player
     const instructions = [
