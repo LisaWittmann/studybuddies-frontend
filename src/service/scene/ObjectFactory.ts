@@ -26,7 +26,7 @@ async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
-      object.position.copy(item.positionInRoom);
+      object.position.copy(item.calcPositionInRoom());
       object.userData = item;
       object.userData.clickable = true;
       parent.add(object);

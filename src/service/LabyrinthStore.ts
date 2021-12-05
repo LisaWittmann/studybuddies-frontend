@@ -38,11 +38,18 @@ async function updateLabyrinth() {
         const tile = jsondata.tileMap[key];
         const id = parseInt(key);
         const objectsInRoom = new Array<Item>();
-
-        for(const item of tile.objectsInRoom){
-          objectsInRoom.push(new Item(item.id, item.modelName, new Vector3()));
+        for (const item of tile.objectsInRoom) {
+          objectsInRoom.push(
+            new Item(
+              item.id,
+              item.modelName,
+              item.positionInRoom,
+              item.orientations,
+              new Vector3()
+            )
+          );
         }
-        
+
         labyrinth.tileMap.set(id, new Tile(tile.tileId, objectsInRoom));
 
         //workaround to parse json list in map

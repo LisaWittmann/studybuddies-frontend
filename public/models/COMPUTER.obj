@@ -1,6 +1,6 @@
 # Blender v2.93.5 OBJ File: 'PC.blend'
 # www.blender.org
-mtllib PC.mtl
+mtllib COMPUTER.mtl
 o Cube
 v 0.851965 0.016281 0.304975
 v 0.851965 0.172388 0.313255
