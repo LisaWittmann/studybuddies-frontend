@@ -29,9 +29,10 @@ const routes: Array<RouteRecordRaw> = [
     component: LobbyView,
   },
   {
-    path: "/lobby/code",
+    path: "/lobby/:key",
     name: "LobbySettingsView",
     component: LobbySettingsView,
+    props: true,
   },
   {
     path: "/find",
