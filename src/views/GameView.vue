@@ -1,5 +1,5 @@
 <template>
-  <SceneComponent />
+  <SceneComponent :mainPlayer="" />
   <InstructionComponent v-if="showInstructions" :instructions="instructions" />
 </template>
 
@@ -16,13 +16,16 @@ export default defineComponent({
     // activate to test instructions
     const showInstructions = ref(false);
 
+    const { gameState, updateGame } = useGameStore();
+    const mainPlayer = gameState.playerMap.get();
+
     // test data
     const instructions = [
       "Willkommen unter den Eichen",
       "Deine erste Aufgabe erwartet dich",
       "Finde zur Semester Einführungsveranstaltung",
     ];
-    return { instructions, showInstructions };
+    return { instructions, showInstructions, gameState };
   },
 });
 </script>

@@ -1,8 +1,8 @@
 import { MoveOperation } from "./eventMessage";
 
 /**
- * post eventMessage Object to api to read in labyrinth model
- * @param filelist: list of selected labyrinth for upload
+ * post eventMessage Object to api to
+ *
  */
  async function sendMove(moveOperation: MoveOperation) {
     if (moveOperation) {
