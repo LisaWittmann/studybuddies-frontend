@@ -22,6 +22,9 @@
       </li>
     </ul>
     <button class="ready-button" @click="readyClicked">Bereit</button>
+
+    <h2>Zurück zur Lobbyfindung:</h2>
+    <button type="button" @click="exitLobby">verlassen</button>
   </section>
 </template>
 
@@ -29,6 +32,8 @@
 import { defineComponent, ref } from "vue";
 import { useLabyrinthService } from "@/service/LabyrinthService";
 import DropdownMenu from "@/components/DropdownMenu.vue";
+import router from "@/router";
+import { useLoginStore } from "@/service/LoginStore.ts";
 
 export default defineComponent({
   name: "LobbySettingsComponent",
@@ -54,11 +59,33 @@ export default defineComponent({
       alert("Confirm button clicked!");
     }
 
+    const loginState = useLoginStore();
+    const lobbyKey = ref("");
+
+    function exitLobby() {
+      const route = router.currentRoute.value;
+      const lobbyKey = route.params.key;
+      fetch("/api/lobby/leave/" + lobbyKey, {
+        method: "POST",
+        headers: {
+          "Content-Type": "html/text;charset=utf-8",
+        },
+        body: loginState.loginState.username,
+      }).then((response) => {
+        if (response.ok) {
+          router.push("/find");
+        } else {
+          console.log(response.statusText);
+        }
+      });
+    }
+
     return {
       data,
       dataUpload,
       readyClicked,
       confirmSelectedLabyrinth,
+      exitLobby,
     };
   },
 });
