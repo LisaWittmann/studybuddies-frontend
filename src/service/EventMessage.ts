@@ -1,5 +1,5 @@
 
-export interface eventMessage {
+export interface EventMessage {
     operation: Operation,
     lobbykey: string,
     username: string,
@@ -13,7 +13,7 @@ export enum Operation {
     CHAT
 }
 
-export class MoveOperation implements eventMessage {
+export class MoveOperation implements EventMessage {
     operation: Operation;
     lobbykey: string;
     username: string;

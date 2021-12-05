@@ -1,7 +1,7 @@
 import { reactive, readonly } from '@vue/reactivity';
 import { Client } from '@stomp/stompjs';
 import { useLabyrinthStore } from './LabyrinthStore';
-import { eventMessage, Operation } from './eventMessage';
+import { EventMessage, Operation } from './EventMessage';
 import { useGameStore } from './GameStore';
 import { Player } from './Player';
 import { Orientation } from './Tile';
@@ -32,7 +32,7 @@ stompclient.onConnect = (/*frame*/) => {
 
         console.log(JSON.parse(message.body));
 
-        const eventMessage: eventMessage = JSON.parse(message.body)
+        const eventMessage: EventMessage = JSON.parse(message.body)
 
         switch(eventMessage.operation) {
             case Operation.MOVEMENT:

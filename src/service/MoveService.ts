@@ -1,4 +1,4 @@
-import { MoveOperation } from "./eventMessage";
+import { MoveOperation } from "./EventMessage";
 
 /**
  * post eventMessage Object to api to
