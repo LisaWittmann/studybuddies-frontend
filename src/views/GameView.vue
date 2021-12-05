@@ -1,5 +1,9 @@
 <template>
-  <SceneComponent @click-object="sendItemId" :mainPlayer="" />
+  <SceneComponent
+    :mainPlayer=""
+    @click-object="sendItemId"
+    @move-player="movePlayer"
+  />
   <InstructionComponent v-if="showInstructions" :instructions="instructions" />
 </template>
 
@@ -7,7 +11,8 @@
 import { defineComponent, ref } from "vue";
 import SceneComponent from "@/components/SceneComponent.vue";
 import InstructionComponent from "@/components/InstructionComponent.vue";
-import { useGameStore } from "@/service/GameStore"
+import { useGameStore } from "@/service/GameStore";
+import { Orientation } from "@/service/Tile";
 
 export default defineComponent({
   name: "GameView",
@@ -40,7 +45,17 @@ export default defineComponent({
         console.error(`Fehler: ${reason}`);
       }
     }
-    return { instructions, showInstructions, sendItemId, gameState};
+
+    function movePlayer(orientation: Orientation) {
+      console.log("move player to", orientation);
+    }
+    return {
+      instructions,
+      showInstructions,
+      sendItemId,
+      movePlayer,
+      gameState,
+    };
   },
 });
 </script>

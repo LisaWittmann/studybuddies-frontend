@@ -148,6 +148,8 @@ function getIntersections(
     // if parent object is a 'valid' object (no tile)
     if (object.parent?.userData.id != null) {
       context.emit("click-object", object.parent.userData.id);
+    } else if (object.parent?.userData.showInView) {
+      context.emit("move-player", object.parent.userData.orientation);
     }
   }
 }
