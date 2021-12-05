@@ -44,8 +44,8 @@ function createScene(
 
   //CONTROLS-----------------
   orbitControls = new OrbitControls(camera, renderer.domElement);
-  //orbitControls.enableZoom = false;
-  //orbitControls.enablePan = false;
+  orbitControls.enableZoom = false;
+  orbitControls.enablePan = false;
   orbitControls.update();
   updateCameraTarget(Orientation.NORTH);
   orbitControls.addEventListener("end", () => {
@@ -91,7 +91,11 @@ function updateCameraPosition(
   position: THREE.Vector3,
   orientation?: Orientation
 ) {
-  camera.position.set(position.x, position.y + settings.cameraHeight, position.z);
+  camera.position.set(
+    position.x,
+    position.y + settings.cameraHeight,
+    position.z
+  );
   if (orientation) updateCameraTarget(orientation);
 }
 
