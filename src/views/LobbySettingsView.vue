@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import router from "@/router";
 import LobbySettingsComponent from "@/components/LobbySettingsComponent.vue";
 
@@ -16,7 +16,7 @@ export default defineComponent({
   setup() {
     const route = router.currentRoute.value;
     const lobbyKey = route.params.key;
-    let users: Array<string> = new Array<string>();
+    const users = ref(new Array<string>());
 
     fetch("/api/lobby/users/" + lobbyKey, {
       method: "GET",
@@ -26,7 +26,7 @@ export default defineComponent({
         return response.json();
       })
       .then((jsonData) => {
-        users = jsonData;
+        users.value = jsonData;
         console.log(users);
       })
       .catch((error) => {
