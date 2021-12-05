@@ -39,7 +39,6 @@ export default defineComponent({
             }
           })
           .then((jsonData) => {
-            console.log(jsonData);
             router.push("/lobby/" + jsonData.key);
           })
           .catch((err) => console.log(err));
