@@ -1,14 +1,13 @@
-
 export interface eventMessage {
-    operation: Operation,
-    lobbykey: string,
-    username: string,
-    data: string
+  operation: Operation;
+  lobbykey: string;
+  username: string;
+  data: string;
 }
 
 export enum Operation {
-    MOVEMENT,
-    CLICK,
-    TRADE,
-    CHAT
+  MOVEMENT,
+  CLICK,
+  TRADE,
+  CHAT,
 }

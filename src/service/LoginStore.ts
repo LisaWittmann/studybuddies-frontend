@@ -30,7 +30,7 @@ async function login(user: User) {
       loginState.username = jsondata.username;
       loginState.errormessage = "";
       loginState.isLoggedIn = true;
-      router.push("/lobby");
+      router.push("/find");
       console.log(loginState);
     })
     .catch(() => {

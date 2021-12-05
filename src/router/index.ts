@@ -4,6 +4,7 @@ import RegisterView from "@/views/RegisterView.vue";
 import LobbyView from "@/views/LobbyView.vue";
 import GameView from "@/views/GameView.vue";
 import LobbySettingsView from "@/views/LobbySettingsView.vue";
+import FindLobbyView from "@/views/FindLobbyView.vue";
 
 // TODO: set routes properly after testing game
 const routes: Array<RouteRecordRaw> = [
@@ -31,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/lobby/code",
     name: "LobbySettingsView",
     component: LobbySettingsView,
+  },
+  {
+    path: "/find",
+    name: "FindLobby",
+    component: FindLobbyView,
   },
 ];
 
