@@ -47,44 +47,22 @@ stompclient.onConnect = (/*frame*/) => {
     switch (eventMessage.operation) {
       case "MOVEMENT":
         if (movePlayer != undefined) {
-          /**
-           * Switch case to let the eventMessage data be flexibel as String, so it can be used with other Operations too
-           */
-          /*let orientation: Orientation | undefined;
-          switch (eventMessage.data) {
-            case "NORTH":
-              orientation = Orientation.NORTH;
-              break;
-            case "EAST":
-              orientation = Orientation.NORTH;
-              break;
-            case "SOUTH":
-              orientation = Orientation.NORTH;
-              break;
-            case "WEST":
-              orientation = Orientation.NORTH;
-              break;
-            default:
-              orientation = undefined;
-              break;
-          }*/
 
           const destTileID: number = Number.parseInt(eventMessage.data);
 
           if (destTileID) {
             movePlayer.setPosition(destTileID);
             updatePlayer(movePlayer);
-            console.log(gameState.playerMap.get("TestUser"));
+            // -> now the watcher can update the 3D Room
+            // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
+
           } else {
             gameState.errormessage =
               "There is no Tilereference for this definition of data";
           }
         } else {
           gameState.errormessage = "No existing User";
-        }
-
-        // -> now UpdateManager (which should be watching after new FE structure is finished) should see a change in gameState
-        //    and should move the right Player to the corresponding Tile (in the 3D-Room)
+        } 
 
         break;
       case "CLICK":

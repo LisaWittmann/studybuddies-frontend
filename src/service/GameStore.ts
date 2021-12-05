@@ -9,8 +9,6 @@ const gameState = reactive({
   /**
    * PlayerMap: To hold both Players
    * PlayerMap key: Username of the Users
-   * //True -> acitve Player
-   * //False -> other Player
    *
    * Errormessage: To display all kind of Errors in the according scene
    */
@@ -29,6 +27,10 @@ async function updateGame() {
   updateLabyrinth();
 }
 
+/**
+ * Updates the Player so, the watcher can build the changes
+ * @param player: the new (changed) player object
+ */
 async function updatePlayer(player: Player) {
   gameState.playerMap.set(player.username, player);
 }
