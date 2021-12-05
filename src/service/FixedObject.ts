@@ -1,6 +1,10 @@
 import { Vector3 } from "three";
-import { settings, direction } from "@/service/scene/helper/SceneConstants";
 import { Orientation } from "@/service/Tile";
+import {
+  settings,
+  direction,
+  colors,
+} from "@/service/scene/helper/SceneConstants";
 
 /**
  * base class of static items in scene like walls and arrows
@@ -66,9 +70,10 @@ export class Wall extends FixedObject {
  */
 export class Arrow extends FixedObject {
   showInView = true;
-  clickable = true;
+  modelName = "arrow";
+  color = colors.beige;
 
   position = (): Vector3 => {
-    return this.getPosition(settings.tileSize / 2 - 1);
+    return this.getPosition(settings.tileSize / 2 - 2);
   };
 }

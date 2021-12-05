@@ -20,15 +20,28 @@ materialLoader.setPath("/models/");
  * @param item: item that should be loaded and added to scene
  * @param parent: group or scene object will be added to after loading
  */
-async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
-  const model = item.modelName.toLowerCase();
-  await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
+async function createItem(
+  model: Item | Arrow,
+  parent: THREE.Group | THREE.Scene,
+  position: THREE.Vector3
+) {
+  const path = model.modelName.toLowerCase();
+  await materialLoader.loadAsync(`${path}.mtl`).then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
-    objectLoader.loadAsync(`${model}.obj`).then((object) => {
-      object.position.copy(item.positionInRoom);
-      object.userData = item;
+    objectLoader.loadAsync(`${path}.obj`).then((object) => {
+      object.position.copy(position);
+      object.userData = model;
       object.userData.clickable = true;
+      if (model instanceof Arrow) {
+        object.rotateOnAxis(axis.y, radians(model.rotationY()));
+        object.visible = false;
+        object.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.material.color.setHex(model.color);
+          }
+        });
+      }
       parent.add(object);
     });
   });
@@ -98,20 +111,11 @@ function createWall(
  */
 function createArrow(
   orientation: Orientation,
-  tilePosition: THREE.Vector3
-): THREE.Mesh {
+  tilePosition: THREE.Vector3,
+  parent: THREE.Group
+) {
   const arrow = new Arrow(orientation, tilePosition);
-  const position = baseline(arrow.position(), 1);
-  // testing arrow object
-  const object = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 2),
-    new THREE.MeshStandardMaterial({ color: 0xeaf4ea })
-  );
-  object.position.copy(position);
-  object.rotateOnAxis(axis.y, radians(arrow.rotationY()));
-  object.userData = arrow;
-  object.visible = false;
-  return object;
+  createItem(arrow, parent, arrow.position());
 }
 
 export function useObjectFactory() {

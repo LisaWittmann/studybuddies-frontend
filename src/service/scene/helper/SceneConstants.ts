@@ -6,7 +6,7 @@ import { vector } from "@/service/scene/helper/GeometryHelper";
  */
 export const settings = {
   tileSize: 20,
-  cameraHeight: 5,
+  cameraHeight: 8,
 };
 
 /**

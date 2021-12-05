@@ -47,6 +47,7 @@ function createScene(
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.enableZoom = false;
   orbitControls.enablePan = false;
+  orbitControls.panSpeed = 5.0;
   orbitControls.update();
   updateCameraTarget(Orientation.NORTH);
   orbitControls.addEventListener("end", () => {
@@ -56,7 +57,7 @@ function createScene(
 
   //GRID---------------------
   if (debug) {
-    const grid = new THREE.GridHelper(100, 100, 0xffffff, 0xffffff);
+    const grid = new THREE.GridHelper(100, 20, 0xffffff, 0xffffff);
     scene.add(grid);
   }
 
@@ -125,6 +126,7 @@ function updateCameraOrbit() {
   const forward = new THREE.Vector3();
   camera.getWorldDirection(forward);
   orbitControls.target.copy(camera.position).add(forward);
+  updateObjectsInView();
 }
 
 /**
@@ -149,6 +151,42 @@ function getIntersections(
       context.emit("click-object", object.parent.userData.id);
     }
   }
+}
+
+/**
+ * get all scene objects that are faced by camera in interaction radius
+ * and update visibility of scene objects that should only be visible in view
+ */
+function updateObjectsInView() {
+  camera.updateMatrix();
+  camera.updateMatrixWorld();
+  const frustum = new THREE.Frustum();
+  frustum.setFromProjectionMatrix(
+    new THREE.Matrix4().multiplyMatrices(
+      camera.projectionMatrix,
+      camera.matrixWorldInverse
+    )
+  );
+
+  scene.traverse((object) => {
+    if (object.userData.showInView) {
+      object.visible =
+        isInInteractionRadius(object.position) &&
+        frustum.containsPoint(object.position);
+    }
+  });
+}
+
+/**
+ * check if object is in interaction radius
+ * @param position: position of object
+ */
+function isInInteractionRadius(position: THREE.Vector3) {
+  const radius = settings.tileSize / 2;
+  return (
+    Math.abs(position.x - Math.floor(camera.position.x)) < radius &&
+    Math.abs(position.z - Math.floor(camera.position.z)) < radius
+  );
 }
 
 /**
