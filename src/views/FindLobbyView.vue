@@ -3,7 +3,8 @@
   <form class="login__form">
     <ul>
       <li>
-        Spiel finden <input type="text" /> <button type="submit">OK</button>
+        Spiel finden <input type="text"/>
+        <button type="submit">OK</button>
       </li>
       <li>
         Spiel erstellen
@@ -14,26 +15,37 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import {defineComponent} from "vue";
 import router from "@/router";
+import {useLoginStore} from "@/service/LoginStore.ts";
 
 export default defineComponent({
   name: "FindLobby",
   setup() {
+    const loginstate = useLoginStore();
+
     function createGame() {
+      console.log(loginstate.loginState.username);
       fetch("/api/lobby/create", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json;charset=utf-8",
+          "Content-Type": "html/text;charset=utf-8",
         },
+        body: loginstate.loginState.username,
       })
-        .then((response) => {
-          if (response.ok) router.push("/");
-        })
-        .catch((err) => console.log(err));
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+          })
+          .then((jsonData) => {
+            console.log(jsonData);
+            router.push("/lobby/" + jsonData.key);
+          })
+          .catch((err) => console.log(err));
     }
 
-    return { createGame };
+    return {createGame};
   },
 });
 </script>
