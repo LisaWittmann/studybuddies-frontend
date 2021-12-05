@@ -32,9 +32,9 @@ async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
 
       //BoundingBox------
       const box = new THREE.Box3().setFromObject(object);
-
       const boundingBoxHelper = new THREE.BoxHelper(object, 0xff0000);
       boundingBoxHelper.update();
+
       parent.add(object, boundingBoxHelper);
     });
   });

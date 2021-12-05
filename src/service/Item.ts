@@ -96,10 +96,10 @@ export class Item {
           console.log("default");
       }
     });
-    console.log(this.calcPosition);
 
-    //pan half the current tile size
-    this.calcPosition = this.calcPosition.multiplyScalar(settings.tileSize / 2);
+    //move item quarter of the current tile size
+    this.calcPosition = this.calcPosition.multiplyScalar(settings.tileSize / 4);
+    console.log(this.calcPosition);
 
     return this.calcPosition;
   };
