@@ -3,14 +3,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted } from "vue";
+import { defineComponent, onBeforeUnmount, onMounted, reactive } from "vue";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 import { useLabyrinthStore } from "@/service/LabyrinthStore";
 import { vector } from "@/service/scene/helper/GeometryHelper";
+import { activePlayer } from "@/service/Player";
 
 export default defineComponent({
   name: "SceneComponent",
+  props: {
+    mainPlayer: activePlayer,
+  },
   setup() {
     const {
       createScene,
