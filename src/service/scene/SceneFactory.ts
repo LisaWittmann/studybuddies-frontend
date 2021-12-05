@@ -3,6 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Orientation } from "@/service/Tile";
 import { Vector3 } from "three";
 import { settings, direction } from "@/service/scene/helper/SceneConstants";
+import { EmitsOptions, SetupContext } from "vue";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -46,7 +47,6 @@ function createScene(
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.enableZoom = false;
   orbitControls.enablePan = false;
-  orbitControls.panSpeed = 5.0;
   orbitControls.update();
   updateCameraTarget(Orientation.NORTH);
   orbitControls.addEventListener("end", () => {
@@ -56,7 +56,7 @@ function createScene(
 
   //GRID---------------------
   if (debug) {
-    const grid = new THREE.GridHelper(100, 20, 0xffffff, 0xffffff);
+    const grid = new THREE.GridHelper(100, 100, 0xffffff, 0xffffff);
     scene.add(grid);
   }
 
@@ -130,17 +130,24 @@ function updateCameraOrbit() {
 
 /**
  * gets intersecting object of converted cursor position
+ * @param context: context of delegating component to emit changes
  * @param x: converted x position of cursor
  * @param y: converted y position of cursor
  */
-function getIntersections(x: number, y: number) {
+function getIntersections(
+  context: SetupContext<EmitsOptions>,
+  x: number,
+  y: number
+) {
   raycaster.setFromCamera({ x: x, y: y }, camera);
   const intersects = raycaster.intersectObjects(scene.children);
 
   // testing intersections
-  for (const i of intersects) {
-    if (i.object.userData.clickable | i.object.parent?.userData.clickable) {
-      console.log("clicked", i.object);
+  for (const intersection of intersects) {
+    const object = intersection.object;
+    // if parent object is a 'valid' object (no tile)
+    if (object.parent?.userData.id != null) {
+      context.emit("click-object", object.parent.userData.id);
     }
   }
 }

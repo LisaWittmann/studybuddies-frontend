@@ -16,8 +16,14 @@ const stompclient = new Client({ brokerURL: wsurl });
 /**
  * Connection Error Feedback for the Stompclient
  */
-stompclient.onWebSocketError = (/*event*/) => { console.log("websocketerror"); gameState.errormessage = "WS-Fehler" }
-stompclient.onStompError = (/*frame*/) => { console.log("Stomperror"); gameState.errormessage = "STOMP-Fehler" }
+stompclient.onWebSocketError = (/*event*/) => {
+  console.log("websocketerror");
+    gameState.errormessage = "WS-Fehler";
+};
+stompclient.onStompError = (/*frame*/) => {
+  console.log("Stomperror");
+    gameState.errormessage = "STOMP-Fehler";
+};
 
 /**
  * Stompclient Methode to subscribe the Backend Messages on successful Connection and work with it
@@ -70,7 +76,7 @@ stompclient.onConnect = (/*frame*/) => {
                     if(orientation != undefined) {
                         const startTileID: number = movePlayer.getPosition();
                         const destTileID = gameState.labyrinth.tileMap.get(startTileID)?.getTileRelationMap().get(orientation);
-                        
+
                         if(destTileID) {
                             movePlayer.setPosition(destTileID);
                             updatePlayer(movePlayer);
@@ -85,7 +91,7 @@ stompclient.onConnect = (/*frame*/) => {
                 } else {
                     gameState.errormessage = "No existing User";
                 }
-                
+
 
                 // -> now UpdateManager (which should be watching after new FE structure is finished) should see a change in gameState
                 //    and should move the right Player to the corresponding Tile (in the 3D-Room)
@@ -101,7 +107,7 @@ stompclient.onConnect = (/*frame*/) => {
             case Operation.TRADE:
 
                 break;
-            default: 
+            default:
 
                 break;
         }
@@ -114,7 +120,8 @@ stompclient.onConnect = (/*frame*/) => {
 /**
  * Methode to handle the Disconnection
  */
-stompclient.onDisconnect = () => { /* Verbindung abgebaut*/ }
-
+stompclient.onDisconnect = () => {
+  /* Verbindung abgebaut*/
+};
 
 stompclient.activate();

@@ -15,7 +15,7 @@ export default defineComponent({
   props: {
     mainPlayer: activePlayer,
   },
-  setup() {
+  setup(props, context) {
     const {
       createScene,
       renderScene,
@@ -37,6 +37,7 @@ export default defineComponent({
 
     function onMouseDown(event: MouseEvent) {
       getIntersections(
+        context,
         (event.clientX / innerWidth) * 2 - 1,
         -(event.clientY / innerHeight) * 2 + 1
       );
