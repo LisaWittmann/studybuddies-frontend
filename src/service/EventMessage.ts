@@ -1,4 +1,4 @@
-export interface EventMessage {
+export interface eventMessage {
   operation: Operation;
   lobbykey: string;
   username: string;
