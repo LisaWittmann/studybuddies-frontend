@@ -1,5 +1,5 @@
 import router from "@/router";
-import { useLoginStore } from "@/service/LoginStore";
+import { useLoginStore } from "@/service/login/LoginStore";
 
 const { loginState } = useLoginStore();
 
