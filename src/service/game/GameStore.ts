@@ -35,11 +35,6 @@ function setLabyrinth(labyrinthId: number) {
   gameState.labyrinthId = labyrinthId;
   updateLabyrinth(gameState.labyrinthId);
   console.log(gameState);
-  let index = 0;
-  for (const [value, key] of gameState.playerMap) {
-    key.setPosition(gameState.labyrinth.playerStartTileIds[index]);
-    index++;
-  }
 }
 /**
  * Updates the Player so, the watcher can build the changes
