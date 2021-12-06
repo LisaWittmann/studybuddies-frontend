@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Orientation } from "@/service/Tile";
+import { Orientation } from "@/service/labyrinth/Tile";
 import { Vector3 } from "three";
 import { settings, direction } from "@/service/scene/helper/SceneConstants";
 import { EmitsOptions, SetupContext } from "vue";
@@ -14,14 +14,10 @@ let orbitControls: OrbitControls;
 
 /**
  * creates new threejs 3D scene
- * @param cameraPosition: position of camera / player in scene
  * @param debug: activates grid helper
  * @returns initialized scene with simple lightning
  */
-function createScene(
-  cameraPosition: THREE.Vector3,
-  debug = false
-): THREE.Scene {
+function createScene(debug = false): THREE.Scene {
   //RENDERER-----------------
   renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -37,7 +33,7 @@ function createScene(
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
-  updateCameraPosition(cameraPosition, Orientation.NORTH);
+  camera.position.set(0, settings.cameraHeight, 0);
 
   //SCENE--------------------
   scene = new THREE.Scene();
@@ -47,9 +43,7 @@ function createScene(
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.enableZoom = false;
   orbitControls.enablePan = false;
-  orbitControls.panSpeed = 5.0;
   orbitControls.update();
-  updateCameraTarget(Orientation.NORTH);
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
   });
@@ -57,7 +51,7 @@ function createScene(
 
   //GRID---------------------
   if (debug) {
-    const grid = new THREE.GridHelper(100, 20, 0xffffff, 0xffffff);
+    const grid = new THREE.GridHelper(100, 100, 0xffffff, 0xffffff);
     scene.add(grid);
   }
 
@@ -99,6 +93,7 @@ function updateCameraPosition(
     position.z
   );
   if (orientation) updateCameraTarget(orientation);
+  else updateCameraOrbit();
 }
 
 function updateCameraTarget(orientation: Orientation) {
@@ -149,6 +144,8 @@ function getIntersections(
     // if parent object is a 'valid' object (no tile)
     if (object.parent?.userData.id != null) {
       context.emit("click-object", object.parent.userData.id);
+    } else if (object.parent?.userData.showInView) {
+      context.emit("move-player", object.parent.userData.orientation);
     }
   }
 }

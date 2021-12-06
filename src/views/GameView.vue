@@ -1,42 +1,49 @@
 <template>
-  <SceneComponent @click-object="sendItemId" />
-  <InstructionComponent v-if="showInstructions" :instructions="instructions" />
+  <SceneComponent
+    :labyrinth="labyrinth"
+    :mainPlayer="mainPlayer"
+    @click-object="itemSelection"
+    @move-player="movePlayer"
+  />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
+import { useGameStore } from "@/service/game/GameStore";
+import { useGameService } from "@/service/game/GameService";
+
+import { Orientation } from "@/service/labyrinth/Tile";
+import { MoveOperation } from "@/service/game/EventMessage";
+import { MainPlayer } from "@/service/game/Player";
+
 import SceneComponent from "@/components/SceneComponent.vue";
-import InstructionComponent from "@/components/InstructionComponent.vue";
+import "@/service/game/EventStore";
 
 export default defineComponent({
   name: "GameView",
-  components: { SceneComponent, InstructionComponent },
+  components: { SceneComponent },
   setup() {
-    // activate to test instructions
-    const showInstructions = ref(false);
+    const { gameState, updateGame } = useGameStore();
+    const { playerMovement, itemSelection } = useGameService();
 
-    // test data
-    const instructions = [
-      "Willkommen unter den Eichen",
-      "Deine erste Aufgabe erwartet dich",
-      "Finde zur Semester Einführungsveranstaltung",
-    ];
+    const mainPlayer = gameState.playerMap.get("TestUser");
 
-    // send the clicked item id to backend
-    async function sendItemId(itemId: number): Promise<void> {
-      try {
-        await fetch("/api/click/" + itemId, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(itemId),
-        });
-      } catch (reason) {
-        console.error(`Fehler: ${reason}`);
-      }
+    function movePlayer(orientation: Orientation) {
+      playerMovement(
+        new MoveOperation(
+          "lobbykey",
+          (mainPlayer as MainPlayer).username,
+          Orientation[orientation].toString()
+        )
+      );
     }
-    return { instructions, showInstructions, sendItemId };
+
+    return {
+      itemSelection,
+      movePlayer,
+      mainPlayer,
+      labyrinth: gameState.labyrinth,
+    };
   },
 });
 </script>

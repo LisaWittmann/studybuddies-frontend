@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { useLabyrinthService } from "@/service/LabyrinthService";
+import { useLabyrinthService } from "@/service/labyrinth/LabyrinthService";
 
 export default defineComponent({
   name: "LobbyView",

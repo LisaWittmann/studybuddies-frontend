@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
-import { Tile } from "@/service/Tile";
+import { Tile } from "@/service/labyrinth/Tile";
 import { settings } from "@/service/scene/helper/SceneConstants";
 
 /**
@@ -24,7 +24,7 @@ function createTile(
   tile.add(createLight(position));
 
   //STATIC-ITEMS----------
-  tile.add(createFloor(position, color));
+  tile.add(createFloor(position, color, model));
   tile.add(createCeiling(position, color));
   model.tileRelationMap.forEach((value, key) => {
     if (value) createArrow(key, position, tile);

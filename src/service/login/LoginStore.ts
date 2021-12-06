@@ -1,5 +1,5 @@
 import { reactive, readonly } from "vue";
-import { User } from "@/service/User";
+import { User } from "@/service/login/User";
 import router from "@/router";
 
 const loginState = reactive({

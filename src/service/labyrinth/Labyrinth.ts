@@ -1,4 +1,4 @@
-import { Tile } from "@/service/Tile";
+import { Tile } from "@/service/labyrinth/Tile";
 
 /**
  * labyrinth map:

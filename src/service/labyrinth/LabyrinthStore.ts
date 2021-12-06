@@ -1,15 +1,14 @@
-import { reactive } from "vue";
-import { Tile, Orientation } from "@/service/Tile";
-import { Labyrinth } from "@/service/Labyrinth";
+import { reactive, readonly } from "vue";
+import { Tile, Orientation } from "@/service/labyrinth/Tile";
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 
 /**
  * constant to keep the tiles or store an errormessage
  */
-const labyrinthState = reactive({
+const labyrinthState: Labyrinth = reactive<Labyrinth>({
   tileMap: new Map<number, Tile>([]),
   endTileId: 0,
   playerStartTileIds: new Array<number>(),
-  errormessage: "",
 });
 
 /**
@@ -40,27 +39,8 @@ async function updateLabyrinth() {
         //workaround to parse json list in map
         const tileRelationMap = new Map<Orientation, number | undefined>();
         for (const orientationKey in tile.tileRelationMap) {
-          let orientation: Orientation;
-          switch (orientationKey) {
-            case "NORTH":
-              orientation = Orientation.NORTH;
-              break;
-            case "EAST":
-              orientation = Orientation.EAST;
-              break;
-            case "SOUTH":
-              orientation = Orientation.SOUTH;
-              break;
-            case "WEST":
-              orientation = Orientation.WEST;
-              break;
-            default:
-              orientation = Orientation.EAST;
-              break;
-          }
-
           tileRelationMap.set(
-            orientation,
+            (<any>Orientation)[orientationKey],
             parseInt(tile.tileRelationMap[orientationKey])
           );
         }
@@ -80,7 +60,7 @@ async function updateLabyrinth() {
       labyrinthState.playerStartTileIds = labyrinth.playerStartTileIds;
     })
     .catch((error) => {
-      labyrinthState.errormessage = error;
+      console.error(error);
     });
 }
 

@@ -30,7 +30,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { User } from "@/service/User";
+import { User } from "@/service/login/User";
 import router from "@/router";
 
 export default defineComponent({
