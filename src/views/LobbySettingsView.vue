@@ -1,19 +1,41 @@
 <template>
-  <LobbySettingsComponent />
-  <div v-for="(username, i) of users" :key="i">
-    {{ username }}
-  </div>
+  <h1>Platzhalter Logo</h1>
+  <section>
+    <UserListComponent :users="users" />
+  </section>
+  <section>
+    <h2>Labyrinth hochladen:</h2>
+    <label class="file-upload">
+      <input type="file" ref="data" accept=".json" @change="dataUpload" />
+      Hochladen
+    </label>
+  </section>
+  <section>
+    <h2>Labyrinth auswählen:</h2>
+    <DropdownComponent />
+  </section>
+  <section>
+    <div class="button-wrapper">
+      <button @click="confirmSettings">Bereit</button>
+      <button @click="exitLobby(lobbyKey)">Verlassen</button>
+    </div>
+  </section>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { useLobbyService } from "@/service/LobbyService";
+import DropdownComponent from "@/components/DropdownComponent.vue";
+import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
-import LobbySettingsComponent from "@/components/LobbySettingsComponent.vue";
 
 export default defineComponent({
   name: "LobbySettingsView",
-  components: { LobbySettingsComponent },
+  components: { UserListComponent, DropdownComponent },
   setup() {
+    const { uploadJsonFiles, selectLabyrinth, confirmSettings, exitLobby } =
+      useLobbyService();
+
     const route = router.currentRoute.value;
     const lobbyKey = route.params.key;
     const users = ref(new Array<string>());
@@ -33,7 +55,44 @@ export default defineComponent({
         console.error(error);
       });
 
-    return { users };
+    return { uploadJsonFiles, confirmSettings, exitLobby, lobbyKey, users };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+h1 {
+  border: 1px solid black;
+  padding: 1em;
+}
+
+section {
+  margin: $spacing-l 0;
+}
+
+.button-wrapper {
+  @include flex-center();
+  flex-direction: column;
+}
+
+button {
+  margin: 10px;
+  min-height: 35px;
+  background: transparent;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.file-upload,
+button {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 6px 12px;
+  width: 80%;
+  max-width: 200px;
+  cursor: pointer;
+}
+</style>

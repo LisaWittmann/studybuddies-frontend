@@ -29,7 +29,7 @@
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
-  name: "DropdownMenu",
+  name: "DropdownComponent",
   setup() {
     let isOpen = ref(false);
 

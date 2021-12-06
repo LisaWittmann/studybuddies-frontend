@@ -24,11 +24,6 @@ const routes: Array<RouteRecordRaw> = [
     component: RegisterView,
   },
   {
-    path: "/lobby",
-    name: "LobbyView",
-    component: LobbyView,
-  },
-  {
     path: "/lobby/:key",
     name: "LobbySettingsView",
     component: LobbySettingsView,
