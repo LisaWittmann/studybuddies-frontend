@@ -1,7 +1,8 @@
 <template>
   <section class="dropdown-menu-wrapper">
     <button class="dropdown-menu-button" @click="openClose">
-      Labyrinth auswählen
+      <span v-if="selectedItem">{{ selectedItem }}</span>
+      <span v-else>Labyrinth auswählen</span>
     </button>
 
     <div class="icon-wrapper">
@@ -12,14 +13,13 @@
 
     <div class="dropdown-menu" v-if="isOpen === true">
       <div class="menu-arrow" />
-      <div class="option">
-        <a href="#">Labyrinth 1</a>
-      </div>
-      <div class="option">
-        <a href="#">Labyrinth 2</a>
-      </div>
-      <div class="option">
-        <a href="#">Labyrinth 3</a>
+      <div
+        class="option"
+        v-for="(item, index) of items"
+        :key="index"
+        @click="selectItem(item)"
+      >
+        <div>{{ item }}</div>
       </div>
     </div>
   </section>
@@ -29,15 +29,28 @@
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
+  props: {
+    items: {
+      type: [],
+      default: ["Labyrinth 1", "Labyrinth 2", "Labyrinth 3"],
+    },
+  },
   name: "DropdownComponent",
   setup() {
     let isOpen = ref(false);
+    let selectedItem = ref("");
 
     // open or close the dropdown menu
     function openClose() {
       isOpen.value = !isOpen.value;
     }
-    return { isOpen, openClose };
+
+    function selectItem(item: string) {
+      selectedItem.value = item;
+      isOpen.value = false;
+    }
+
+    return { isOpen, openClose, selectItem, selectedItem };
   },
 });
 </script>
@@ -141,6 +154,7 @@ export default defineComponent({
     background: white;
     padding: 10px 30px;
     animation: menu 0.3s ease forwards;
+    font-weight: 300;
 
     .menu-arrow {
       width: 20px;

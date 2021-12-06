@@ -16,8 +16,8 @@
   </section>
   <section>
     <div class="button-wrapper">
-      <button @click="confirmSettings">Bereit</button>
-      <button @click="exitLobby(lobbyKey)">Verlassen</button>
+      <button class="button button--confirm" @click="confirmSettings">Bereit</button>
+      <button class="button button--exit" @click="exitLobby(lobbyKey)">Verlassen</button>
     </div>
   </section>
 </template>
@@ -78,11 +78,25 @@ h1 {
   flex-direction: column;
 }
 
-button {
+.button {
   margin: 10px;
   min-height: 35px;
   background: transparent;
   font-size: 16px;
+
+  &--exit {
+    &:hover,
+    &:active {
+      background: darkred;
+    }
+  }
+
+  &--confirm {
+    &:hover,
+    &:active {
+      background: $color-green;
+    }
+  }
 }
 
 input[type="file"] {
