@@ -39,27 +39,8 @@ async function updateLabyrinth() {
         //workaround to parse json list in map
         const tileRelationMap = new Map<Orientation, number | undefined>();
         for (const orientationKey in tile.tileRelationMap) {
-          let orientation: Orientation;
-          switch (orientationKey) {
-            case "NORTH":
-              orientation = Orientation.NORTH;
-              break;
-            case "EAST":
-              orientation = Orientation.EAST;
-              break;
-            case "SOUTH":
-              orientation = Orientation.SOUTH;
-              break;
-            case "WEST":
-              orientation = Orientation.WEST;
-              break;
-            default:
-              orientation = Orientation.EAST;
-              break;
-          }
-
           tileRelationMap.set(
-            orientation,
+            (<any>Orientation)[orientationKey],
             parseInt(tile.tileRelationMap[orientationKey])
           );
         }
