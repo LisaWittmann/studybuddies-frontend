@@ -11,6 +11,7 @@ import { settings } from "@/service/scene/helper/SceneConstants";
  * @returns initialized group of scene objects
  */
 function createTile(
+  tileKey: number,
   model: Tile,
   position: THREE.Vector3,
   color = 0xa9a9a9
@@ -19,6 +20,7 @@ function createTile(
     useObjectFactory();
   const tile = new THREE.Group();
   tile.userData = model;
+  tile.userData.tileId = tileKey;
 
   //LIGHT-----------------
   tile.add(createLight(position));
