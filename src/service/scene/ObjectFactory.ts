@@ -8,6 +8,7 @@ import { Arrow, Wall } from "@/service/FixedObject";
 
 import { axis, settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
+import { Vector3 } from "three";
 
 const objectLoader = new OBJLoader();
 const materialLoader = new MTLLoader();
@@ -26,10 +27,18 @@ async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
-      object.position.copy(item.positionInRoom);
+      object.position.copy(item.calcPositionInRoom());
+      //rotation already calculated to radians
+      object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
-      parent.add(object);
+
+      //BoundingBox------
+      const box = new THREE.Box3().setFromObject(object);
+      const boundingBoxHelper = new THREE.BoxHelper(object, 0xff0000);
+      boundingBoxHelper.update();
+
+      parent.add(object, boundingBoxHelper);
     });
   });
 }
