@@ -121,7 +121,10 @@ function createArrow(
   createItem(arrow, parent, arrow.position());
 }
 
-function createPlayer(model: PartnerPlayer, position: THREE.Vector3): THREE.Object3D | undefined {
+function createPlayer(
+  model: PartnerPlayer,
+  position: THREE.Vector3
+): THREE.Object3D | undefined {
   console.log("creating partner player");
   return undefined;
 }

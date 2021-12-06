@@ -13,9 +13,15 @@ function updateMainPlayer(tilePosition: Vector3) {
   updateCameraPosition(tilePosition);
 }
 
-function updatePartnerPlayerPosition(tilePosition: Vector3) {
+function updatePartnerPlayer(
+  player: PartnerPlayer,
+  tilePosition: Vector3,
+  scene: Scene
+) {
   console.log("updating partner position");
   const position = calculatePartnerPositon(tilePosition);
+  //if (scene.children.includes(partner)) partner?.position.copy(position);
+  //else initPartnerPlayer(player, tilePosition, scene);
 }
 
 function initPartnerPlayer(
@@ -32,4 +38,8 @@ function initPartnerPlayer(
 function calculatePartnerPositon(tilePosition: Vector3): Vector3 {
   console.log("calculating partner position");
   return tilePosition;
+}
+
+export function usePlayerFactory() {
+  return { updateMainPlayer, updatePartnerPlayer };
 }
