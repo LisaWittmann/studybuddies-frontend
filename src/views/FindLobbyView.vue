@@ -21,7 +21,7 @@ import { useLoginStore } from "@/service/LoginStore";
 export default defineComponent({
   name: "FindLobby",
   setup() {
-    const loginState = useLoginStore();
+    const { loginState } = useLoginStore();
     const lobbyKey = ref("");
 
     function joinGame() {
@@ -31,7 +31,7 @@ export default defineComponent({
         headers: {
           "Content-Type": "html/text;charset=utf-8",
         },
-        body: loginState.loginState.username,
+        body: loginState.username,
       }).then((response) => {
         if (response.ok) {
           router.push("/lobby/" + key);
@@ -41,13 +41,13 @@ export default defineComponent({
       });
     }
     function createGame() {
-      console.log(loginState.loginState.username);
+      console.log(loginState.username);
       fetch("/api/lobby/create", {
         method: "POST",
         headers: {
           "Content-Type": "html/text;charset=utf-8",
         },
-        body: loginState.loginState.username,
+        body: loginState.username,
       })
         .then((response) => {
           if (response.ok) {
