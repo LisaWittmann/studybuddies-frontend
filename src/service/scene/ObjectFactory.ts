@@ -8,6 +8,7 @@ import { Arrow, Wall } from "@/service/labyrinth/FixedObject";
 
 import { axis, settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
+import { PartnerPlayer } from "../game/Player";
 
 const objectLoader = new OBJLoader();
 const materialLoader = new MTLLoader();
@@ -120,6 +121,18 @@ function createArrow(
   createItem(arrow, parent, arrow.position());
 }
 
+function createPlayer(model: PartnerPlayer, position: THREE.Vector3): THREE.Object3D | undefined {
+  console.log("creating partner player");
+  return undefined;
+}
+
 export function useObjectFactory() {
-  return { createArrow, createWall, createCeiling, createFloor, createItem };
+  return {
+    createArrow,
+    createWall,
+    createCeiling,
+    createFloor,
+    createItem,
+    createPlayer,
+  };
 }
