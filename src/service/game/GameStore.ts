@@ -1,17 +1,16 @@
-import { reactive } from "@vue/runtime-dom";
-import { useLabyrinthStore } from "./LabyrinthStore";
-import { activePlayer, Player } from "./Player";
+import { reactive, readonly } from "vue";
+import { MainPlayer, Player } from "@/service/game/Player";
+import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 
 const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
 updateLabyrinth();
 
+/**
+ * PlayerMap: To hold both Players
+ * PlayerMap key: Username of the Users
+ * Errormessage: To display all kind of Errors in the according scene
+ */
 const gameState = reactive({
-  /**
-   * PlayerMap: To hold both Players
-   * PlayerMap key: Username of the Users
-   *
-   * Errormessage: To display all kind of Errors in the according scene
-   */
   labyrinth: labyrinthState,
   playerMap: new Map<string, Player>(),
   errormessage: "",
@@ -20,7 +19,7 @@ const gameState = reactive({
 
 gameState.playerMap.set(
   "TestUser",
-  new activePlayer("TestUser", true, gameState.labyrinth.playerStartTileIds[0])
+  new MainPlayer("TestUser", true, gameState.labyrinth.playerStartTileIds[0])
 );
 
 async function updateGame() {

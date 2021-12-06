@@ -1,5 +1,5 @@
 import { Vector3 } from "three";
-import { Orientation } from "@/service/Tile";
+import { Orientation } from "@/service/labyrinth/Tile";
 import {
   settings,
   direction,

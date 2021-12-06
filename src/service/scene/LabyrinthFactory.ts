@@ -1,15 +1,12 @@
 import * as THREE from "three";
 import { useTileFactory } from "@/service/scene/TileFactory";
-import { useSceneFactory } from "@/service/scene/SceneFactory";
 
-import { Labyrinth } from "@/service/Labyrinth";
-import { Orientation, Tile } from "@/service/Tile";
+import { Orientation, Tile } from "@/service/labyrinth/Tile";
 
 import { vector } from "@/service/scene/helper/GeometryHelper";
 import { direction, settings } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
-const { updateCameraPosition } = useSceneFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
 
@@ -20,18 +17,14 @@ const storedTiles = new Map<number, THREE.Vector3>();
  * @param labyrinthState
  * @param scene
  */
-async function createLabyrinth(
-  tileMap: Map<number, Tile>,
-  playerStartTileIds: Array<number>,
-  scene: THREE.Scene
-) {
+async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
   const position = vector(0, 0, 0);
-  // for testing
-  const startTile = playerStartTileIds[0];
-  for (const [, value] of tileMap) {
-    placeTile(position, value, scene);
-    if (value.getId() == startTile) {
-      placeCamera(position, value);
+  for (const [, value] of labyrinth.tileMap) {
+    const tile = getTile(value.tileId, scene);
+    if (!tile) {
+      placeTile(position, value, scene);
+    } else if (value.objectsInRoom != tile.userData.objectsInRoom) {
+      updateTile(tile, value);
     }
   }
 }
@@ -58,22 +51,41 @@ async function placeTile(
   scene.add(createTile(tile, position));
 }
 
+async function updateTile(tile: THREE.Object3D, model: Tile) {
+  console.log("updating tile");
+}
+
 /**
- * places camera on position of player
- * and sets camera target to an orientation with a tile relation
- * so player won't face the wall when spawning
- * @param position: position of main player
- * @param tile: tile on which player is placed to check relations
+ * get tile 3D object by tileId
+ * @param tileId: unique id of tile in scene
+ * @param scene: scene that might contain tile
+ * @returns 3D representation of tile with id
  */
-function placeCamera(position: THREE.Vector3, tile: Tile) {
-  let orientation = Orientation.NORTH;
-  for (const [key, value] of tile.getTileRelationMap()) {
-    if (value) {
-      orientation = key;
-      break;
-    }
+function getTile(
+  tileId: number,
+  scene: THREE.Scene
+): THREE.Object3D | undefined {
+  for (const child of scene.children) {
+    if (child.userData.tileId == tileId) return child;
   }
-  updateCameraPosition(position, orientation);
+  return undefined;
+}
+
+/**
+ * get tile position by in scene by tile id
+ * @returns position in scene or undefined if tile is not in scene
+ */
+function getTilePosition(
+  id: number,
+  scene: THREE.Scene
+): THREE.Vector3 | undefined {
+  let position = undefined;
+  scene.traverse((child) => {
+    if (child.userData.tileId == id) {
+      position = child.position;
+    }
+  });
+  return position;
 }
 
 /**
@@ -101,6 +113,7 @@ function getNextPosition(
 
 export function useLabyrinthFactory() {
   return {
-    createLabyrinth,
+    updateLabyrinth,
+    getTilePosition,
   };
 }

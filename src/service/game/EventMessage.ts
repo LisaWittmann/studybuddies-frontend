@@ -1,4 +1,3 @@
-
 /**
  * EventMessage: independant interface to recieving the EventMessage Object from the messagebroker as independent Object
  * @param operation: to clarify which Operation Object can be used and which process can be started
@@ -23,22 +22,15 @@ export enum Operation {
 /**
  * MoveOperation: Respond object to be used for specifiying the EventMessage Object from the messagebroker
  * @param data: { "NORTH", "EAST", "SOUTH", "WEST" } to send
- * @param data: { "0"    , "1"   , "2"    , "3" } to recieve  
- *  
+ * @param data: { "0"    , "1"   , "2"    , "3" } to recieve
  */
 export class MoveOperation implements EventMessage {
-  operation: string;
+  operation = "MOVEMENT";
   lobbykey: string;
   username: string;
   data: string;
 
-  constructor(
-    operation: string,
-    lobbykey: string,
-    username: string,
-    data: string
-  ) {
-    this.operation = operation;
+  constructor(lobbykey: string, username: string, data: string) {
     this.lobbykey = lobbykey;
     this.username = username;
     this.data = data;

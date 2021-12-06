@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
-import { Tile } from "@/service/Tile";
+import { Tile } from "@/service/labyrinth/Tile";
 import { settings } from "@/service/scene/helper/SceneConstants";
 
 /**
@@ -18,6 +18,7 @@ function createTile(
   const { createFloor, createCeiling, createArrow, createWall, createItem } =
     useObjectFactory();
   const tile = new THREE.Group();
+  tile.userData = model;
 
   //LIGHT-----------------
   tile.add(createLight(position));

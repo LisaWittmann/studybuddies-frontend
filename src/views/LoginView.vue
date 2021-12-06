@@ -30,8 +30,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { useLoginStore } from "@/service/LoginStore";
-import { User } from "@/service/User";
+import { useLoginStore } from "@/service/login/LoginStore";
+import { User } from "@/service/login/User";
 
 export default defineComponent({
   name: "LoginView",

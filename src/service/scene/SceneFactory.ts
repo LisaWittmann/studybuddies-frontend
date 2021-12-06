@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Orientation } from "@/service/Tile";
+import { Orientation } from "@/service/labyrinth/Tile";
 import { Vector3 } from "three";
 import { settings, direction } from "@/service/scene/helper/SceneConstants";
 import { EmitsOptions, SetupContext } from "vue";
@@ -14,14 +14,10 @@ let orbitControls: OrbitControls;
 
 /**
  * creates new threejs 3D scene
- * @param cameraPosition: position of camera / player in scene
  * @param debug: activates grid helper
  * @returns initialized scene with simple lightning
  */
-function createScene(
-  cameraPosition: THREE.Vector3,
-  debug = false
-): THREE.Scene {
+function createScene(debug = false): THREE.Scene {
   //RENDERER-----------------
   renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -37,7 +33,7 @@ function createScene(
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
-  camera.position.copy(cameraPosition);
+  camera.position.set(0, settings.cameraHeight, 0);
 
   //SCENE--------------------
   scene = new THREE.Scene();
@@ -48,7 +44,6 @@ function createScene(
   orbitControls.enableZoom = false;
   orbitControls.enablePan = false;
   orbitControls.update();
-  updateCameraTarget(Orientation.NORTH);
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
   });

@@ -1,4 +1,4 @@
-import { Item } from "./Item";
+import { Item } from "@/service/labyrinth/Item";
 
 export interface Player {
   username: string;
@@ -11,7 +11,7 @@ export interface Player {
   setPosition(position: number): void;
 }
 
-export class activePlayer implements Player {
+export class MainPlayer implements Player {
   username: string;
   active: boolean;
   position: number;
@@ -50,7 +50,7 @@ export class activePlayer implements Player {
   }
 }
 
-export class inactivePlayer implements Player {
+export class PartnerPlayer implements Player {
   username: string;
   active: boolean;
   position: number;

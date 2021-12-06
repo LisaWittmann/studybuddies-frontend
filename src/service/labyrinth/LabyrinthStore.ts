@@ -1,15 +1,14 @@
-import { reactive } from "vue";
-import { Tile, Orientation } from "@/service/Tile";
-import { Labyrinth } from "@/service/Labyrinth";
+import { reactive, readonly } from "vue";
+import { Tile, Orientation } from "@/service/labyrinth/Tile";
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 
 /**
  * constant to keep the tiles or store an errormessage
  */
-const labyrinthState = reactive({
+const labyrinthState: Labyrinth = reactive<Labyrinth>({
   tileMap: new Map<number, Tile>([]),
   endTileId: 0,
   playerStartTileIds: new Array<number>(),
-  errormessage: "",
 });
 
 /**
@@ -80,7 +79,7 @@ async function updateLabyrinth() {
       labyrinthState.playerStartTileIds = labyrinth.playerStartTileIds;
     })
     .catch((error) => {
-      labyrinthState.errormessage = error;
+      console.error(error);
     });
 }
 

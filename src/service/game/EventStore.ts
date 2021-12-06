@@ -1,12 +1,9 @@
-import { reactive, readonly } from "@vue/reactivity";
 import { Client } from "@stomp/stompjs";
-import { useLabyrinthStore } from "./LabyrinthStore";
-import { EventMessage, Operation } from "./EventMessage";
-import { useGameStore } from "./GameStore";
-import { Player } from "./Player";
-import { Orientation } from "./Tile";
+import { Player } from "@/service/game/Player";
+import { EventMessage } from "@/service/game/EventMessage";
+import { useGameStore } from "@/service/game/GameStore";
 
-const { gameState, updateGame, updatePlayer } = useGameStore();
+const { gameState, updatePlayer } = useGameStore();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -16,11 +13,11 @@ const stompclient = new Client({ brokerURL: wsurl });
 /**
  * Connection Error Feedback for the Stompclient
  */
-stompclient.onWebSocketError = (/*event*/) => {
+stompclient.onWebSocketError = () => {
   console.log("websocketerror");
   gameState.errormessage = "WS-Fehler";
 };
-stompclient.onStompError = (/*frame*/) => {
+stompclient.onStompError = () => {
   console.log("Stomperror");
   gameState.errormessage = "STOMP-Fehler";
 };
@@ -28,12 +25,11 @@ stompclient.onStompError = (/*frame*/) => {
 /**
  * Stompclient Methode to subscribe the Backend Messages on successful Connection and work with it
  */
-stompclient.onConnect = (/*frame*/) => {
+stompclient.onConnect = () => {
   console.log("stomp verbindet");
 
   stompclient.subscribe(DEST, (message) => {
     console.log("Message ist angekommen");
-
     console.log(JSON.parse(message.body));
 
     const eventMessage: EventMessage = JSON.parse(message.body);
@@ -41,28 +37,26 @@ stompclient.onConnect = (/*frame*/) => {
     /**
      * Checks whether the user exists in the Game
      */
-    const movePlayer: Player | undefined = gameState.playerMap.get(
+    const playerToMove: Player | undefined = gameState.playerMap.get(
       eventMessage.username
     );
     switch (eventMessage.operation) {
       case "MOVEMENT":
-        if (movePlayer != undefined) {
-
+        if (playerToMove) {
           const destTileID: number = Number.parseInt(eventMessage.data);
 
           if (destTileID) {
-            movePlayer.setPosition(destTileID);
-            updatePlayer(movePlayer);
+            playerToMove.setPosition(destTileID);
+            updatePlayer(playerToMove);
             // -> now the watcher can update the 3D Room
             // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
-
           } else {
             gameState.errormessage =
               "There is no Tilereference for this definition of data";
           }
         } else {
           gameState.errormessage = "No existing User";
-        } 
+        }
 
         break;
       case "CLICK":

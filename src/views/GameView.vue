@@ -1,75 +1,48 @@
 <template>
   <SceneComponent
+    :labyrinth="labyrinth"
     :mainPlayer="mainPlayer"
-    @click-object="sendItemId"
+    @click-object="itemSelection"
     @move-player="movePlayer"
   />
-  <InstructionComponent v-if="showInstructions" :instructions="instructions" />
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent } from "vue";
+import { useGameStore } from "@/service/game/GameStore";
+import { useGameService } from "@/service/game/GameService";
+
+import { Orientation } from "@/service/labyrinth/Tile";
+import { MoveOperation } from "@/service/game/EventMessage";
+import { MainPlayer } from "@/service/game/Player";
+
 import SceneComponent from "@/components/SceneComponent.vue";
-import InstructionComponent from "@/components/InstructionComponent.vue";
-import { useGameStore } from "@/service/GameStore";
-import { Orientation } from "@/service/Tile";
-import { activePlayer } from "@/service/Player";
-import { useMoveOperation } from "@/service/MoveService";
-import { MoveOperation, Operation } from "@/service/EventMessage";
-import "@/service/EventStore";
+import "@/service/game/EventStore";
 
 export default defineComponent({
   name: "GameView",
-  components: { SceneComponent, InstructionComponent },
+  components: { SceneComponent },
   setup() {
-    // activate to test instructions
-    const showInstructions = ref(false);
-
     const { gameState, updateGame } = useGameStore();
-    console.log(gameState);
+    const { playerMovement, itemSelection } = useGameService();
+
     const mainPlayer = gameState.playerMap.get("TestUser");
-    const { sendMove } = useMoveOperation();
-
-    // test data
-    const instructions = [
-      "Willkommen unter den Eichen",
-      "Deine erste Aufgabe erwartet dich",
-      "Finde zur Semester Einführungsveranstaltung",
-    ];
-
-    // send the clicked item id to backend
-    async function sendItemId(itemId: number): Promise<void> {
-      try {
-        await fetch("/api/click/" + itemId, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(itemId),
-        });
-      } catch (reason) {
-        console.error(`Fehler: ${reason}`);
-      }
-    }
 
     function movePlayer(orientation: Orientation) {
-      sendMove(
+      playerMovement(
         new MoveOperation(
-          "MOVEMENT",
           "lobbykey",
-          (mainPlayer as activePlayer).username,
+          (mainPlayer as MainPlayer).username,
           Orientation[orientation].toString()
         )
       );
-      console.log("move player to", orientation);
     }
 
     return {
-      instructions,
-      showInstructions,
-      sendItemId,
+      itemSelection,
       movePlayer,
       mainPlayer,
+      labyrinth: gameState.labyrinth,
     };
   },
 });
