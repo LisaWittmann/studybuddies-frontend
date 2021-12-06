@@ -11,6 +11,7 @@ const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
  * Errormessage: To display all kind of Errors in the according scene
  */
 const gameState = reactive({
+  labyrinthId: 1,
   labyrinth: labyrinthState,
   playerMap: new Map<string, Player>(),
   errormessage: "",
@@ -27,9 +28,14 @@ async function updateGame() {
       gameState.labyrinth.playerStartTileIds[0]
     )
   );
-  updateLabyrinth();
+  updateLabyrinth(gameState.labyrinthId);
 }
 
+function setLabyrinth(labyrinthId: number) {
+  gameState.labyrinthId = labyrinthId;
+  updateLabyrinth(gameState.labyrinthId);
+  console.log(gameState);
+}
 /**
  * Updates the Player so, the watcher can build the changes
  * @param player: the new (changed) player object
@@ -43,5 +49,6 @@ export function useGameStore() {
     gameState,
     updateGame,
     updatePlayer,
+    setLabyrinth,
   };
 }

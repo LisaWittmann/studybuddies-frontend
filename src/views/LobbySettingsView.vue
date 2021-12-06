@@ -6,18 +6,28 @@
   <section>
     <h2>Labyrinth hochladen:</h2>
     <label class="file-upload">
-      <input type="file" ref="data" accept=".json" @change="dataUpload" />
+      <input
+        type="file"
+        ref="upload"
+        accept=".json"
+        @change="uploadLabyrinth"
+      />
       Hochladen
     </label>
   </section>
   <section>
     <h2>Labyrinth auswählen:</h2>
-    <DropdownComponent />
+    <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
   </section>
   <section>
     <div class="button-wrapper">
-      <button @click="confirmSettings">Bereit</button>
-      <button @click="exitLobby(lobbyKey)">Verlassen</button>
+      <button class="button button--confirm" @click="readyCheck">Bereit</button>
+      <button
+        class="button button--exit"
+        @click="exitLobby(lobbyKey, username)"
+      >
+        Verlassen
+      </button>
     </div>
   </section>
 </template>
@@ -25,6 +35,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
+import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
@@ -33,29 +44,50 @@ export default defineComponent({
   name: "LobbySettingsView",
   components: { UserListComponent, DropdownComponent },
   setup() {
-    const { uploadJsonFiles, selectLabyrinth, confirmSettings, exitLobby } =
-      useLobbyService();
+    const { loginState } = useLoginStore();
+    const {
+      uploadJsonFiles,
+      updateUsers,
+      updateLabyrinths,
+      readyCheck,
+      exitLobby,
+      setupGame,
+    } = useLobbyService();
+    const upload = ref({} as HTMLInputElement);
 
     const route = router.currentRoute.value;
-    const lobbyKey = route.params.key;
+    const lobbyKey = route.params.key as string;
+
     const users = ref(new Array<string>());
+    const labyrinthOptions = ref(new Array<number>());
+    const selectedLabyrinth = ref();
 
-    fetch("/api/lobby/users/" + lobbyKey, {
-      method: "GET",
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error(response.statusText);
-        return response.json();
-      })
-      .then((jsonData) => {
-        users.value = jsonData;
-        console.log(users);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    updateUsers(lobbyKey).then((data) => (users.value = data));
+    updateLabyrinths().then((data) => (labyrinthOptions.value = data));
 
-    return { uploadJsonFiles, confirmSettings, exitLobby, lobbyKey, users };
+    function selectLabyrinth(id: number) {
+      selectedLabyrinth.value = id;
+    }
+
+    async function uploadLabyrinth() {
+      if (upload.value.files != null) {
+        await uploadJsonFiles(upload.value.files);
+      }
+    }
+
+    return {
+      readyCheck,
+      uploadLabyrinth,
+      selectLabyrinth,
+      exitLobby,
+      setupGame,
+      users,
+      upload,
+      lobbyKey,
+      labyrinthOptions,
+      selectedLabyrinth,
+      username: loginState.username,
+    };
   },
 });
 </script>
@@ -70,11 +102,29 @@ h1 {
   flex-direction: column;
 }
 
-button {
+.button {
   margin: 10px;
   min-height: 35px;
   background: transparent;
   font-size: 16px;
+
+  &:hover {
+    font-weight: 400;
+  }
+
+  &--exit {
+    &:hover,
+    &:active {
+      color: darkred;
+    }
+  }
+
+  &--confirm {
+    &:hover,
+    &:active {
+      color: $color-green;
+    }
+  }
 }
 
 input[type="file"] {
@@ -82,7 +132,7 @@ input[type="file"] {
 }
 
 .file-upload,
-button {
+.button {
   border: 1px solid $color-grey;
   border-radius: 8px;
   font-weight: 300;
@@ -91,5 +141,10 @@ button {
   width: 80%;
   max-width: 200px;
   cursor: pointer;
+}
+
+.file-upload:hover {
+  color: $color-beige;
+  font-weight: 400;
 }
 </style>

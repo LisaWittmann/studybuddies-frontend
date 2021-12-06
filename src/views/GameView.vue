@@ -23,11 +23,13 @@ import "@/service/game/EventStore";
 export default defineComponent({
   name: "GameView",
   components: { SceneComponent },
-  setup() {
+  props: {
+    key: {type: String, required: true}
+  },
+  setup(props) {
     const { gameState, updateGame } = useGameStore();
     const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();
-
     updateGame();
 
     const mainPlayer = gameState.playerMap.get(loginState.username);
