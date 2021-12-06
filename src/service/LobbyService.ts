@@ -1,4 +1,6 @@
 import router from "@/router";
+import { useGameStore } from "@/service/game/GameStore";
+import { MainPlayer, PartnerPlayer } from "./game/Player";
 
 /**
  * post selected json file to api to read in labyrinth model
@@ -61,12 +63,26 @@ function confirmSettings() {
   alert("Game should start now!");
 }
 
+function setupGame(users: string[], labyrinthId: number, username: string) {
+  const { updatePlayer, setLabyrinth } = useGameStore();
+  for (const user of users) {
+    if (user == username) {
+      updatePlayer(new MainPlayer(username, true, 0));
+    } else {
+      updatePlayer(new PartnerPlayer(user, true, 1));
+    }
+  }
+  setLabyrinth(labyrinthId);
+  router.push("/");
+}
+
 export function useLobbyService() {
   return {
     uploadJsonFiles,
     updateUsers,
     updateLabyrinths,
     confirmSettings,
+    setupGame,
     exitLobby,
   };
 }

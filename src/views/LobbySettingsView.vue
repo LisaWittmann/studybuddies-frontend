@@ -21,7 +21,10 @@
   </section>
   <section>
     <div class="button-wrapper">
-      <button class="button button--confirm" @click="confirmSettings">
+      <button
+        class="button button--confirm"
+        @click="setupGame(users, selectedLabyrinth, username)"
+      >
         Bereit
       </button>
       <button
@@ -53,6 +56,7 @@ export default defineComponent({
       updateLabyrinths,
       confirmSettings,
       exitLobby,
+      setupGame,
     } = useLobbyService();
     const upload = ref({} as HTMLInputElement);
 
@@ -81,6 +85,7 @@ export default defineComponent({
       selectLabyrinth,
       confirmSettings,
       exitLobby,
+      setupGame,
       users,
       upload,
       lobbyKey,

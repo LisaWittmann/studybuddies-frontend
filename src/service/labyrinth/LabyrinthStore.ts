@@ -16,8 +16,8 @@ const labyrinthState: Labyrinth = reactive<Labyrinth>({
  * fetches labyrnith object of api and converts response into labyrinth data
  * creates simple fallback labyrinth if fetch fails
  */
-async function updateLabyrinth() {
-  await fetch("/api/labyrinth/1", {
+async function updateLabyrinth(labyrinthId: number) {
+  await fetch(`/api/labyrinth/${labyrinthId}`, {
     method: "GET",
   })
     .then((response) => {
