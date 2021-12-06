@@ -144,7 +144,10 @@ function getIntersections(
   // testing intersections
   for (const intersection of intersects) {
     const object = intersection.object;
-    if (object.userData.clickable) context.emit("click");
+    // if parent object is a 'valid' object (no tile)
+    if (object.parent?.userData.id != null) {
+      context.emit("click-object", object.parent.userData.id);
+    }
   }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <SceneComponent />
+  <SceneComponent @click-object="sendItemId" />
   <!--warning and errormessages-->
   <OverlayTerminalComponent
     :opened="showTerminal"
@@ -49,8 +49,24 @@ export default defineComponent({
     const closeInstructions = () => (showInstructions.value = false);
     const closeTerminal = () => (showTerminal.value = false);
 
+    // send the clicked item id to backend
+    async function sendItemId(itemId: number): Promise<void> {
+      try {
+        await fetch("/api/click/" + itemId, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(itemId),
+        });
+      } catch (reason) {
+        console.error(`Fehler: ${reason}`);
+      }
+    }
+
     return {
       message,
+      sendItemId,
       messageState,
       instructions,
       showTerminal,
