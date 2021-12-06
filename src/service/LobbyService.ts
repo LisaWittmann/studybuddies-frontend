@@ -1,8 +1,6 @@
 import router from "@/router";
 import { useLoginStore } from "@/service/login/LoginStore";
 
-const { loginState } = useLoginStore();
-
 /**
  * post selected json file to api to read in labyrinth model
  * @param filelist: list of selected labyrinth for upload
@@ -35,6 +33,7 @@ function selectLabyrinth() {
 }
 
 function exitLobby(lobbyKey: number) {
+  const { loginState } = useLoginStore();
   fetch("/api/lobby/leave/" + lobbyKey, {
     method: "POST",
     headers: {
