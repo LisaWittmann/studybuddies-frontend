@@ -1,7 +1,7 @@
 <template>
   <section class="dropdown-menu-wrapper">
     <button class="dropdown-menu-button" @click="openClose">
-      <span v-if="selectedItem">{{ selectedItem }}</span>
+      <span v-if="selectedItem">Labyrinth {{ selectedItem }}</span>
       <span v-else>Labyrinth auswählen</span>
     </button>
 
@@ -36,7 +36,7 @@ export default defineComponent({
     },
   },
   name: "DropdownComponent",
-  setup() {
+  setup(props, context) {
     let isOpen = ref(false);
     let selectedItem = ref("");
 
@@ -48,6 +48,7 @@ export default defineComponent({
     function selectItem(item: string) {
       selectedItem.value = item;
       isOpen.value = false;
+      context.emit("select", selectedItem.value);
     }
 
     return { isOpen, openClose, selectItem, selectedItem };

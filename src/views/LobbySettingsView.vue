@@ -17,7 +17,7 @@
   </section>
   <section>
     <h2>Labyrinth auswählen:</h2>
-    <DropdownComponent :items="labyrinths" />
+    <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
   </section>
   <section>
     <div class="button-wrapper">
@@ -58,10 +58,17 @@ export default defineComponent({
 
     const route = router.currentRoute.value;
     const lobbyKey = route.params.key as string;
+
     const users = ref(new Array<string>());
-    const labyrinths = ref(new Array<number>());
+    const labyrinthOptions = ref(new Array<number>());
+    const selectedLabyrinth = ref();
+
     updateUsers(lobbyKey).then((data) => (users.value = data));
-    updateLabyrinths().then((data) => (labyrinths.value = data));
+    updateLabyrinths().then((data) => (labyrinthOptions.value = data));
+
+    function selectLabyrinth(id: number) {
+      selectedLabyrinth.value = id;
+    }
 
     async function uploadLabyrinth() {
       if (upload.value.files != null) {
@@ -71,12 +78,14 @@ export default defineComponent({
 
     return {
       uploadLabyrinth,
+      selectLabyrinth,
       confirmSettings,
       exitLobby,
-      labyrinths,
+      users,
       upload,
       lobbyKey,
-      users,
+      labyrinthOptions,
+      selectedLabyrinth,
       username: loginState.username,
     };
   },

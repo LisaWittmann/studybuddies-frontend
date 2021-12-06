@@ -1,5 +1,4 @@
 import router from "@/router";
-import { useLoginStore } from "@/service/login/LoginStore";
 
 /**
  * post selected json file to api to read in labyrinth model
@@ -42,12 +41,6 @@ async function updateLabyrinths() {
   });
 }
 
-function selectLabyrinth() {
-  //TODO: functionality to confirm selected Labyrinth in dropdown menu
-  // button shown and hidden depending on clicked item in dropdown
-  alert("Confirm button clicked!");
-}
-
 function exitLobby(lobbyKey: string, username: string) {
   fetch("/api/lobby/leave/" + lobbyKey, {
     method: "POST",
@@ -73,7 +66,6 @@ export function useLobbyService() {
     uploadJsonFiles,
     updateUsers,
     updateLabyrinths,
-    selectLabyrinth,
     confirmSettings,
     exitLobby,
   };
