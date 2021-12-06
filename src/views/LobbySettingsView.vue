@@ -64,9 +64,6 @@ export default defineComponent({
 h1 {
   margin: $spacing-l 0;
 }
-section {
-  margin: $spacing-l 0;
-}
 
 .button-wrapper {
   @include flex-center();

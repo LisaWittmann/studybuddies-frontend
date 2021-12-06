@@ -1,17 +1,16 @@
 <template>
   <h1>Platzhalter Logo</h1>
-  <form class="login__form">
-    <ul>
-      <li>
-        Spiel finden <input type="text" v-model="lobbyKey" />
-        <button type="button" @click="joinGame">OK</button>
-      </li>
-      <li>
-        Spiel erstellen
-        <button type="button" @click="createGame">Spiel erstellen</button>
-      </li>
-    </ul>
-  </form>
+  <section>
+    <h2>Spiel finden</h2>
+    <div class="button-wrapper">
+      <input type="text" v-model="lobbyKey" />
+      <button type="button--small" @click="joinGame">Spiel beitreten</button>
+    </div>
+  </section>
+  <section>
+    <h2>Spiel erstellen</h2>
+    <button @click="createGame">Spiel erstellen</button>
+  </section>
 </template>
 
 <script lang="ts">
@@ -68,15 +67,36 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 h1 {
-  border: 1px solid black;
-  padding: 1em;
+  margin: $spacing-l 0;
 }
 
-ul {
-  list-style-type: none;
+button {
+  margin: 10px;
+  min-height: 35px;
+  max-width: 200px;
+  background: transparent;
+  font-size: 16px;
 }
 
-li {
-  margin: 1em;
+input,
+button {
+  border: 1px solid $color-grey;
+  border-radius: 8px;
+  font-weight: 300;
+  width: 80%;
+  display: inline-block;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+input {
+  min-height: 20px;
+  max-width: 300px;
+  margin-bottom: $spacing-xs;
+}
+
+.button-wrapper {
+  @include flex-center();
+  flex-direction: column;
 }
 </style>
