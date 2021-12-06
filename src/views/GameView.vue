@@ -1,5 +1,5 @@
 <template>
-  <SceneComponent @click-object="sendItemId" />
+  <SceneComponent @click-object="sendItemId" @click-disabled="openTerminal" />
   <!--warning and errormessages-->
   <OverlayTerminalComponent
     :opened="showTerminal"
@@ -30,7 +30,7 @@ export default defineComponent({
   },
   setup() {
     const showInstructions = ref(false);
-    const showTerminal = ref(true);
+    const showTerminal = ref(false);
 
     // instructions for current game quest e.g. finding partner player
     const instructions = [
@@ -46,6 +46,7 @@ export default defineComponent({
     // state options: neutral, warning, error
     const messageState = "warning";
 
+    const openTerminal = () => (showTerminal.value = true);
     const closeInstructions = () => (showInstructions.value = false);
     const closeTerminal = () => (showTerminal.value = false);
 
@@ -71,6 +72,7 @@ export default defineComponent({
       instructions,
       showTerminal,
       showInstructions,
+      openTerminal,
       closeTerminal,
       closeInstructions,
     };
