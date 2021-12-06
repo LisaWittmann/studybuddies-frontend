@@ -1,5 +1,5 @@
 <template>
-  <h1>Platzhalter Logo</h1>
+  <h1>Lobby {{ lobbyKey }}</h1>
   <section>
     <UserListComponent :users="users" />
   </section>
@@ -62,10 +62,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 h1 {
-  border: 1px solid black;
-  padding: 1em;
+  margin: $spacing-l 0;
 }
-
 section {
   margin: $spacing-l 0;
 }
@@ -79,6 +77,7 @@ button {
   margin: 10px;
   min-height: 35px;
   background: transparent;
+  font-size: 16px;
 }
 
 input[type="file"] {
@@ -87,10 +86,11 @@ input[type="file"] {
 
 .file-upload,
 button {
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1px solid $color-grey;
+  border-radius: 8px;
+  font-weight: 300;
   display: inline-block;
-  padding: 6px 12px;
+  padding: 10px 12px;
   width: 80%;
   max-width: 200px;
   cursor: pointer;

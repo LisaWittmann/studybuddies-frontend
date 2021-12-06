@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
-import LobbyView from "@/views/LobbyView.vue";
 import GameView from "@/views/GameView.vue";
 import LobbySettingsView from "@/views/LobbySettingsView.vue";
 import FindLobbyView from "@/views/FindLobbyView.vue";
