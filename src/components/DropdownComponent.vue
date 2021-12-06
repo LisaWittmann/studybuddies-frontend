@@ -19,8 +19,9 @@
         :key="index"
         @click="selectItem(item)"
       >
-        <div>{{ item }}</div>
+        <div>Labyrinth {{ item }}</div>
       </div>
+      <div v-if="!items">Noch keine Labyrinthe verfügbar</div>
     </div>
   </section>
 </template>
@@ -32,7 +33,6 @@ export default defineComponent({
   props: {
     items: {
       type: [],
-      default: ["Labyrinth 1", "Labyrinth 2", "Labyrinth 3"],
     },
   },
   name: "DropdownComponent",
@@ -179,6 +179,10 @@ export default defineComponent({
 
       &:last-child {
         border-bottom: 0;
+      }
+
+      &:hover {
+        color: $color-green;
       }
 
       * {

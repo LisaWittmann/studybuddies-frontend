@@ -26,20 +26,35 @@ async function uploadJsonFiles(filelist: FileList) {
   }
 }
 
+async function updateUsers(lobbyKey: string) {
+  return fetch("/api/lobby/users/" + lobbyKey, {
+    method: "GET",
+  }).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  });
+}
+
+async function updateLabyrinths() {
+  return fetch("/api/labyrinth/keys").then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  });
+}
+
 function selectLabyrinth() {
   //TODO: functionality to confirm selected Labyrinth in dropdown menu
   // button shown and hidden depending on clicked item in dropdown
   alert("Confirm button clicked!");
 }
 
-function exitLobby(lobbyKey: number) {
-  const { loginState } = useLoginStore();
+function exitLobby(lobbyKey: string, username: string) {
   fetch("/api/lobby/leave/" + lobbyKey, {
     method: "POST",
     headers: {
       "Content-Type": "html/text;charset=utf-8",
     },
-    body: loginState.username,
+    body: username,
   })
     .then((response) => {
       if (response.ok) router.push("/find");
@@ -56,6 +71,8 @@ function confirmSettings() {
 export function useLobbyService() {
   return {
     uploadJsonFiles,
+    updateUsers,
+    updateLabyrinths,
     selectLabyrinth,
     confirmSettings,
     exitLobby,
