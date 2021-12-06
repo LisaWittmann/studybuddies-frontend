@@ -56,6 +56,6 @@ export function useLoginStore() {
     loginState: readonly(loginState),
     login,
     logout,
-    fetchLocalStorage
+    fetchLocalStorage,
   };
 }

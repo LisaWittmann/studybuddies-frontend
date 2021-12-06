@@ -3,7 +3,7 @@
   <form class="login__form">
     <ul>
       <li>
-        Spiel finden <input type="text" v-model="lobbyKey"/>
+        Spiel finden <input type="text" v-model="lobbyKey" />
         <button type="button" @click="joinGame">OK</button>
       </li>
       <li>
@@ -15,14 +15,14 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
+import { defineComponent, ref } from "vue";
 import router from "@/router";
-import {useLoginStore} from "@/service/login/LoginStore";
+import { useLoginStore } from "@/service/login/LoginStore";
 
 export default defineComponent({
   name: "FindLobby",
   setup() {
-    const loginState = useLoginStore();
+    const { loginState } = useLoginStore();
     const lobbyKey = ref("");
 
     function joinGame() {
@@ -32,7 +32,7 @@ export default defineComponent({
         headers: {
           "Content-Type": "html/text;charset=utf-8",
         },
-        body: loginState.loginState.username,
+        body: loginState.username,
       }).then((response) => {
         if (response.ok) {
           router.push("/lobby/" + key);
@@ -43,26 +43,26 @@ export default defineComponent({
     }
 
     function createGame() {
-      console.log(loginState.loginState.username);
+      console.log(loginState.username);
       fetch("/api/lobby/create", {
         method: "POST",
         headers: {
           "Content-Type": "html/text;charset=utf-8",
         },
-        body: loginState.loginState.username,
+        body: loginState.username,
       })
-          .then((response) => {
-            if (response.ok) {
-              return response.json();
-            }
-          })
-          .then((jsonData) => {
-            router.push("/lobby/" + jsonData.key);
-          })
-          .catch((err) => console.log(err));
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+        })
+        .then((jsonData) => {
+          router.push("/lobby/" + jsonData.key);
+        })
+        .catch((err) => console.log(err));
     }
 
-    return {lobbyKey, createGame, joinGame};
+    return { lobbyKey, createGame, joinGame };
   },
 });
 </script>
