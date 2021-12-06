@@ -6,7 +6,7 @@
   <section>
     <h2>Labyrinth hochladen:</h2>
     <label class="file-upload">
-      <input type="file" ref="data" accept=".json" @change="dataUpload" />
+      <input type="file" ref="upload" accept=".json" @change="dataUpload" />
       Hochladen
     </label>
   </section>
@@ -36,6 +36,14 @@ export default defineComponent({
     const { uploadJsonFiles, selectLabyrinth, confirmSettings, exitLobby } =
       useLobbyService();
 
+    const upload = ref({} as HTMLInputElement);
+
+    async function dataUpload() {
+      if (upload.value.files != null) {
+        await uploadJsonFiles(upload.value.files);
+      }
+    }
+
     const route = router.currentRoute.value;
     const lobbyKey = route.params.key;
     const users = ref(new Array<string>());
@@ -55,7 +63,7 @@ export default defineComponent({
         console.error(error);
       });
 
-    return { uploadJsonFiles, confirmSettings, exitLobby, lobbyKey, users };
+    return { dataUpload, confirmSettings, exitLobby, upload, lobbyKey, users };
   },
 });
 </script>
