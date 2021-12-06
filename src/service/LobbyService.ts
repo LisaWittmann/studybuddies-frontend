@@ -37,7 +37,7 @@ async function updateUsers(lobbyKey: string) {
 }
 
 async function updateLabyrinths() {
-  return fetch("/api/labyrinth/keys").then((response) => {
+  return fetch("/api/labyrinth/ids").then((response) => {
     if (!response.ok) throw new Error(response.statusText);
     return response.json();
   });
