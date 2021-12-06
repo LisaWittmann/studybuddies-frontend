@@ -73,6 +73,7 @@ export default defineComponent({
       if (upload.value.files != null) {
         await uploadJsonFiles(upload.value.files);
       }
+      updateLabyrinths().then((data) => (labyrinthOptions.value = data));
     }
 
     return {
