@@ -12,6 +12,7 @@ function logout() {
   loginState.username = "";
   loginState.errormessage = "";
   loginState.isLoggedIn = false;
+  localStorage.removeItem("username");
 }
 
 async function login(user: User) {
@@ -30,6 +31,7 @@ async function login(user: User) {
       loginState.username = jsondata.username;
       loginState.errormessage = "";
       loginState.isLoggedIn = true;
+      localStorage.setItem("username", loginState.username);
       router.push("/find");
       console.log(loginState);
     })
@@ -41,10 +43,19 @@ async function login(user: User) {
     });
 }
 
+function fetchLocalStorage() {
+  const lastSession = localStorage.getItem("username");
+  if (lastSession) {
+    loginState.isLoggedIn = true;
+    loginState.username = lastSession;
+  }
+}
+
 export function useLoginStore() {
   return {
     loginState: readonly(loginState),
     login,
     logout,
+    fetchLocalStorage
   };
 }

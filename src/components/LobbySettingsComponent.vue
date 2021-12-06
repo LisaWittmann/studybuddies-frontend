@@ -33,7 +33,7 @@ import { defineComponent, ref } from "vue";
 import { useLabyrinthService } from "@/service/labyrinth/LabyrinthService";
 import DropdownMenu from "@/components/DropdownMenu.vue";
 import router from "@/router";
-import { useLoginStore } from "@/service/LoginStore.ts";
+import { useLoginStore } from "@/service/login/LoginStore";
 
 export default defineComponent({
   name: "LobbySettingsComponent",
@@ -60,7 +60,6 @@ export default defineComponent({
     }
 
     const loginState = useLoginStore();
-    const lobbyKey = ref("");
 
     function exitLobby() {
       const route = router.currentRoute.value;

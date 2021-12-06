@@ -17,7 +17,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import router from "@/router";
-import { useLoginStore } from "@/service/LoginStore";
+import { useLoginStore } from "@/service/login/LoginStore";
 
 export default defineComponent({
   name: "FindLobby",
