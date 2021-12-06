@@ -6,16 +6,16 @@
         <h2>Labyrinth hochladen:</h2>
       </li>
       <li class="upload-labyrinth">
-        <input type="file" ref="data" id="file-input" @change="dataUpload" />
+        <input type="file" ref="data" id="file-input" @change="dataUpload"/>
       </li>
       <li class="headline-elements">
         <h2>Labyrinth auswählen:</h2>
       </li>
       <li class="select-labyrinth">
-        <DropdownMenu />
+        <DropdownMenu/>
         <button
-          class="confirm-labyrinth-button"
-          v-on:click="confirmSelectedLabyrinth"
+            class="confirm-labyrinth-button"
+            v-on:click="confirmSelectedLabyrinth"
         >
           Bestätigen
         </button>
@@ -29,17 +29,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import { useLabyrinthService } from "@/service/labyrinth/LabyrinthService";
+import {defineComponent, ref} from "vue";
+import {useLabyrinthService} from "@/service/labyrinth/LabyrinthService";
 import DropdownMenu from "@/components/DropdownMenu.vue";
 import router from "@/router";
-import { useLoginStore } from "@/service/login/LoginStore";
+import {useLoginStore} from "@/service/login/LoginStore";
 
 export default defineComponent({
   name: "LobbySettingsComponent",
-  components: { DropdownMenu },
+  components: {DropdownMenu},
   setup() {
-    const { uploadJsonFiles } = useLabyrinthService();
+    const {uploadJsonFiles} = useLabyrinthService();
     const data = ref({} as HTMLInputElement);
 
     async function dataUpload() {
