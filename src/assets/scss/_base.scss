@@ -1,0 +1,23 @@
+body {
+    margin: 0;
+    font-family: $font-outfit;
+    color: $color-black;
+}
+
+input, button {
+    font-family: $font-outfit;
+    font-weight: 300;
+}
+
+p, span, a {
+    font-family: $font-outfit;
+    font-weight: 300;
+}
+
+h1, h2 {
+    font-weight: 500;
+}
+
+section {
+    margin: $spacing-l 0;
+}

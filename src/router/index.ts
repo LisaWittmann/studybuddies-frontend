@@ -1,15 +1,17 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import LoginView from "@/views/LoginView.vue";
-import LobbyView from "@/views/LobbyView.vue";
+import RegisterView from "@/views/RegisterView.vue";
 import GameView from "@/views/GameView.vue";
 import LobbySettingsView from "@/views/LobbySettingsView.vue";
+import FindLobbyView from "@/views/FindLobbyView.vue";
 
 // TODO: set routes properly after testing game
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
+    path: "/game/:key",
     name: "GameView",
     component: GameView,
+    props: true
   },
   {
     path: "/login",
@@ -17,14 +19,20 @@ const routes: Array<RouteRecordRaw> = [
     component: LoginView,
   },
   {
-    path: "/lobby",
-    name: "LobbyView",
-    component: LobbyView,
+    path: "/register",
+    name: "RegisterView",
+    component: RegisterView,
   },
   {
-    path: "/lobby/code",
+    path: "/lobby/:key",
     name: "LobbySettingsView",
     component: LobbySettingsView,
+    props: true,
+  },
+  {
+    path: "/find",
+    name: "FindLobby",
+    component: FindLobbyView,
   },
 ];
 

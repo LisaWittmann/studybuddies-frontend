@@ -1,27 +1,71 @@
 <template>
-  <SceneComponent />
-  <InstructionComponent v-if="showInstructions" :instructions="instructions" />
+  <SceneComponent
+    :labyrinth="labyrinth"
+    :mainPlayer="mainPlayer"
+    @click-object="itemSelection"
+    @move-player="movePlayer"
+  />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
+import { useGameService } from "@/service/game/GameService";
+import { useLoginStore } from "@/service/login/LoginStore";
+import { useGameStore } from "@/service/game/GameStore";
+
+import { Orientation } from "@/service/labyrinth/Tile";
+import { MoveOperation } from "@/service/game/EventMessage";
+import { MainPlayer } from "@/service/game/Player";
+
 import SceneComponent from "@/components/SceneComponent.vue";
-import InstructionComponent from "@/components/InstructionComponent.vue";
+import "@/service/game/EventStore";
 
 export default defineComponent({
   name: "GameView",
-  components: { SceneComponent, InstructionComponent },
-  setup() {
-    // activate to test instructions
-    const showInstructions = ref(false);
+  components: { SceneComponent },
+  props: {
+    key: {type: String, required: true}
+  },
+  setup(props) {
+    const { gameState, updateGame } = useGameStore();
+    const { playerMovement, itemSelection } = useGameService();
+    const { loginState } = useLoginStore();
+    updateGame();
 
-    // test data
-    const instructions = [
-      "Willkommen unter den Eichen",
-      "Deine erste Aufgabe erwartet dich",
-      "Finde zur Semester Einführungsveranstaltung",
-    ];
-    return { instructions, showInstructions };
+    const mainPlayer = gameState.playerMap.get(loginState.username);
+
+    //TODO: remove this temporary operation after showing GameView with key in URL
+    let temporaryCode: string;
+
+    fetch("/api/lobby/random", {
+      method: "GET",
+      headers: {
+        "Content-Type": "html/text;charset=utf-8",
+      },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        temporaryCode = json.key;
+      });
+
+    function movePlayer(orientation: Orientation) {
+      playerMovement(
+        new MoveOperation(
+          temporaryCode,
+          (mainPlayer as MainPlayer).username,
+          Orientation[orientation].toString()
+        )
+      );
+    }
+
+    return {
+      itemSelection,
+      movePlayer,
+      mainPlayer,
+      labyrinth: gameState.labyrinth,
+    };
   },
 });
 </script>
