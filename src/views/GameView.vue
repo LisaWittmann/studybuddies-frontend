@@ -47,7 +47,7 @@ export default defineComponent({
   props: {
     key: { type: String, required: true },
   },
-  setup(props) {
+  setup() {
     const { gameState, updateGame } = useGameStore();
     const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();

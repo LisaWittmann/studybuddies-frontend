@@ -1,4 +1,4 @@
-import { reactive, readonly } from "vue";
+import { reactive } from "vue";
 import { MainPlayer, Player } from "@/service/game/Player";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";

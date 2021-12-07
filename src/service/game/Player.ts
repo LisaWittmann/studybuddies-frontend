@@ -45,7 +45,7 @@ export class MainPlayer implements Player {
     return this.inventar;
   }
 
-  setPosition(position: number) {
+  setPosition(position: number): void {
     this.position = position;
   }
 }
@@ -73,7 +73,7 @@ export class PartnerPlayer implements Player {
     return this.position;
   }
 
-  setPosition(position: number) {
+  setPosition(position: number): void {
     this.position = position;
   }
 }

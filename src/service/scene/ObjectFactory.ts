@@ -20,28 +20,17 @@ materialLoader.setPath("/models/");
  * @param item: item that should be loaded and added to scene
  * @param parent: group or scene object will be added to after loading
  */
-async function createItem(
-  item: Item,
-  parent: THREE.Group | THREE.Scene,
-) {
+async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
   const model = item.modelName.toLowerCase();
   await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
       object.position.copy(item.calcPositionInRoom());
-      //rotation already calculated to radians
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
-
-      //BoundingBox------
-      const box = new THREE.Box3().setFromObject(object);
-      const boundingBoxHelper = new THREE.BoxHelper(object, 0xff0000);
-      boundingBoxHelper.update();
-
-      parent.add(object, boundingBoxHelper);
-
+      parent.add(object);
     });
   });
 }

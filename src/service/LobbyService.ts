@@ -21,7 +21,8 @@ async function uploadJsonFiles(filelist: FileList) {
             throw new Error(response.statusText);
           }
           return response.json();
-        }).catch((error) => {
+        })
+        .catch((error) => {
           console.error(error);
         });
     }

@@ -25,7 +25,7 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
     if (!tile) {
       placeTile(position, value, key, scene);
     } else if (value.objectsInRoom != tile.userData.objectsInRoom) {
-      updateTile(tile, value, key);
+      updateTile();
     }
   }
 }
@@ -53,7 +53,7 @@ async function placeTile(
   scene.add(createTile(tileKey, tile, position));
 }
 
-async function updateTile(tile: THREE.Object3D, model: Tile, tileKey: number) {
+async function updateTile() {
   console.log("updating tile");
 }
 
