@@ -143,8 +143,12 @@ function getIntersections(
     const object = intersection.object;
     // if parent object is a 'valid' object (no tile)
     if (object.parent?.userData.id != null) {
+      // mock disabled objects
+      if (object.parent.userData.modelName == "COMPUTER") {
+        context.emit("click-disabled");
+      }
       //object dissapears per click (optically)
-      if(object.parent.visible) {
+      else if (object.parent.visible) {
         object.parent.visible = false;
       }
       context.emit("click-object", object.parent.userData.id);
