@@ -17,9 +17,8 @@ materialLoader.setPath("/models/");
 
 /**
  * creates item by loading its obj representation from models directory
- * @param model: model that should be loaded and added to scene
+ * @param item: item that should be loaded and added to scene
  * @param parent: group or scene object will be added to after loading
- * @param position: position to place the model in the 3D Scene
  */
 async function createItem(
   item: Item,
