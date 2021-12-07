@@ -1,17 +1,16 @@
 import { reactive } from "vue";
-import { Tile, Orientation } from "@/service/Tile";
-import { Labyrinth } from "@/service/Labyrinth";
+import { Tile, Orientation } from "@/service/labyrinth/Tile";
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Item } from "./Item";
 import { Vector3 } from "three";
 
 /**
  * constant to keep the tiles or store an errormessage
  */
-const labyrinthState = reactive({
+const labyrinthState: Labyrinth = reactive<Labyrinth>({
   tileMap: new Map<number, Tile>([]),
   endTileId: 0,
   playerStartTileIds: new Array<number>(),
-  errormessage: "",
 });
 
 /**
@@ -19,23 +18,24 @@ const labyrinthState = reactive({
  * fetches labyrnith object of api and converts response into labyrinth data
  * creates simple fallback labyrinth if fetch fails
  */
-async function updateLabyrinth() {
-  await fetch("/api/labyrinth/1", {
+async function updateLabyrinth(labyrinthId: number) {
+  console.log(labyrinthId);
+  await fetch(`/api/labyrinth/${labyrinthId}`, {
     method: "GET",
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
-    .then((jsondata) => {
+    .then((jsonData) => {
       const labyrinth = new Labyrinth(
-        jsondata.endTileId,
-        jsondata.playerStartTileIds
+        jsonData.endTileId,
+        jsonData.playerStartTileIds
       );
 
       //iterate over the tiles in the jsondata tileMap to create tiles for every tile in jsonobject
-      for (const key in jsondata.tileMap) {
-        const tile = jsondata.tileMap[key];
+      for (const key in jsonData.tileMap) {
+        const tile = jsonData.tileMap[key];
         const id = parseInt(key);
         const objectsInRoom = new Array<Item>();
         for (const item of tile.objectsInRoom) {
@@ -55,27 +55,8 @@ async function updateLabyrinth() {
         //workaround to parse json list in map
         const tileRelationMap = new Map<Orientation, number | undefined>();
         for (const orientationKey in tile.tileRelationMap) {
-          let orientation: Orientation;
-          switch (orientationKey) {
-            case "NORTH":
-              orientation = Orientation.NORTH;
-              break;
-            case "EAST":
-              orientation = Orientation.EAST;
-              break;
-            case "SOUTH":
-              orientation = Orientation.SOUTH;
-              break;
-            case "WEST":
-              orientation = Orientation.WEST;
-              break;
-            default:
-              orientation = Orientation.EAST;
-              break;
-          }
-
           tileRelationMap.set(
-            orientation,
+            (<any>Orientation)[orientationKey],
             parseInt(tile.tileRelationMap[orientationKey])
           );
         }
@@ -96,7 +77,7 @@ async function updateLabyrinth() {
       labyrinthState.playerStartTileIds = labyrinth.playerStartTileIds;
     })
     .catch((error) => {
-      labyrinthState.errormessage = error;
+      console.error(error);
     });
 }
 

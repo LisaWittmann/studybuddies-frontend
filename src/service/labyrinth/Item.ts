@@ -1,7 +1,7 @@
 import { Vector3 } from "three";
-import { Orientation } from "@/service/Tile";
-import { direction, position, settings } from "./scene/helper/SceneConstants";
-import { radians } from "./scene/helper/GeometryHelper";
+import { Orientation } from "@/service/labyrinth/Tile";
+import { direction, position, settings } from "@/service/scene/helper/SceneConstants";
+import { radians } from "@/service/scene/helper/GeometryHelper";
 
 /**
  * enumeration of vertical object position in tile

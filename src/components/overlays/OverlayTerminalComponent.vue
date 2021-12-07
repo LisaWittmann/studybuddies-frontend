@@ -16,7 +16,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import OverlayComponent from "@/components/overlays/OverlayComponent.vue";
-import { useLoginStore } from "@/service/LoginStore";
+import { useLoginStore } from "@/service/login/LoginStore";
 
 export default defineComponent({
   name: "OverlayTerminalComponent",
