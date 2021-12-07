@@ -2,6 +2,7 @@ import { Client } from "@stomp/stompjs";
 import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
+import router from "@/router";
 
 const { gameState, updatePlayer } = useGameStore();
 
@@ -64,6 +65,13 @@ stompclient.onConnect = () => {
       case "CHAT":
         break;
       case "TRADE":
+        break;
+      case "READY":
+        if (eventMessage.data === "READY") {
+          const route = router.currentRoute.value;
+          const lobbyKey = route.params.key;
+          router.push(`/game/${lobbyKey}`);
+        }
         break;
       default:
         break;

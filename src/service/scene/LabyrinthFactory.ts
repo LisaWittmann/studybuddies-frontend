@@ -22,12 +22,13 @@ const storedTiles = new Map<number, THREE.Vector3>();
  */
 async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
   const position = vector(0, 0, 0);
-  for (const [, value] of labyrinth.tileMap) {
+  for (const [key, value] of labyrinth.tileMap) {
     const tile = getTile(value.tileId, scene);
+    console.log(tile);
     if (!tile) {
-      placeTile(position, value, scene);
+      placeTile(position, value, key, scene);
     } else if (value.objectsInRoom != tile.userData.objectsInRoom) {
-      updateTile(tile, value);
+      updateTile();
     }
   }
 }
@@ -50,11 +51,6 @@ async function updatePlayer(player: Player, scene: THREE.Scene) {
   }
 }
 
-// TODO: implement tile updating (deleting/ adding objects)
-async function updateTile(tile: THREE.Object3D, model: Tile) {
-  console.log("updating tile");
-}
-
 /**
  * adds tile of labyrinth to scene without recursion
  * @param position: starting position of first tile
@@ -64,6 +60,7 @@ async function updateTile(tile: THREE.Object3D, model: Tile) {
 async function placeTile(
   position: THREE.Vector3,
   tile: Tile,
+  tileKey: number,
   scene: THREE.Scene
 ) {
   for (const [key, value] of tile.tileRelationMap) {
@@ -73,8 +70,12 @@ async function placeTile(
     }
   }
   // store placed tile with position to calculate position of next tiles
-  storedTiles.set(tile.getId(), position);
-  scene.add(createTile(tile, position));
+  storedTiles.set(tileKey, position);
+  scene.add(createTile(tileKey, tile, position));
+}
+
+async function updateTile() {
+  console.log("updating tile");
 }
 
 /**
@@ -87,10 +88,11 @@ function getTile(
   tileId: number,
   scene: THREE.Scene
 ): THREE.Object3D | undefined {
+  let tile = undefined;
   for (const child of scene.children) {
-    if (child.userData.tileId == tileId) return child;
+    if (child.userData.tileId == tileId) tile = child;
   }
-  return undefined;
+  return tile;
 }
 
 /**

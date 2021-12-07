@@ -7,7 +7,7 @@
  */
 export interface EventMessage {
   operation: string;
-  lobbykey: string;
+  lobbyKey: string;
   username: string;
   data: string;
 }
@@ -26,12 +26,12 @@ export enum Operation {
  */
 export class MoveOperation implements EventMessage {
   operation = "MOVEMENT";
-  lobbykey: string;
+  lobbyKey: string;
   username: string;
   data: string;
 
-  constructor(lobbykey: string, username: string, data: string) {
-    this.lobbykey = lobbykey;
+  constructor(lobbyKey: string, username: string, data: string) {
+    this.lobbyKey = lobbyKey;
     this.username = username;
     this.data = data;
   }

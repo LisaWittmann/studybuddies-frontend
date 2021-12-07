@@ -32,7 +32,7 @@ export const direction = {
  * vertical positions of objects in room
  */
 export const position = {
-  bottom: readonly(vector(0, 0, 0)),
+  floor: readonly(vector(0, 0, 0)),
   wall: readonly(vector(0, settings.tileSize / 2, 0)),
   ceiling: readonly(vector(0, settings.tileSize, 0)),
 };

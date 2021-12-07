@@ -25,7 +25,7 @@ export class MainPlayer implements Player {
     this.inventar = new Map<number, Item>();
   }
 
-  addItem(item: Item) {
+  addItem(item: Item): void {
     this.inventar.set(item.id, item);
   }
 
@@ -45,7 +45,7 @@ export class MainPlayer implements Player {
     return this.inventar;
   }
 
-  setPosition(position: number) {
+  setPosition(position: number): void {
     this.position = position;
   }
 }
