@@ -143,6 +143,10 @@ function getIntersections(
     const object = intersection.object;
     // if parent object is a 'valid' object (no tile)
     if (object.parent?.userData.id != null) {
+      //object dissapears per click (optically)
+      if(object.parent.visible) {
+        object.parent.visible = false;
+      }
       context.emit("click-object", object.parent.userData.id);
     } else if (object.parent?.userData.showInView) {
       context.emit("move-player", object.parent.userData.orientation);

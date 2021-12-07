@@ -21,28 +21,27 @@ materialLoader.setPath("/models/");
  * @param parent: group or scene object will be added to after loading
  */
 async function createItem(
-  model: Item | Arrow,
+  item: Item,
   parent: THREE.Group | THREE.Scene,
-  position: THREE.Vector3
 ) {
-  const path = model.modelName.toLowerCase();
-  await materialLoader.loadAsync(`${path}.mtl`).then((materials) => {
+  const model = item.modelName.toLowerCase();
+  await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
-    objectLoader.loadAsync(`${path}.obj`).then((object) => {
-      object.position.copy(position);
-      object.userData = model;
+    objectLoader.loadAsync(`${model}.obj`).then((object) => {
+      object.position.copy(item.calcPositionInRoom());
+      //rotation already calculated to radians
+      object.rotateY(item.rotationY());
+      object.userData = item;
       object.userData.clickable = true;
-      if (model instanceof Arrow) {
-        object.rotateOnAxis(axis.y, radians(model.rotationY()));
-        object.visible = false;
-        object.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            child.material.color.setHex(model.color);
-          }
-        });
-      }
-      parent.add(object);
+
+      //BoundingBox------
+      const box = new THREE.Box3().setFromObject(object);
+      const boundingBoxHelper = new THREE.BoxHelper(object, 0xff0000);
+      boundingBoxHelper.update();
+
+      parent.add(object, boundingBoxHelper);
+
     });
   });
 }
@@ -117,7 +116,19 @@ function createArrow(
   parent: THREE.Group
 ) {
   const arrow = new Arrow(orientation, tilePosition);
-  createItem(arrow, parent, arrow.position());
+  objectLoader.loadAsync("arrow.obj").then((object) => {
+    object.position.copy(arrow.position());
+    object.userData = arrow;
+    object.userData.clickable = true;
+    object.rotateOnAxis(axis.y, radians(arrow.rotationY()));
+    object.visible = false;
+    object.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.material.color.setHex(arrow.color);
+      }
+    });
+    parent.add(object);
+  });
 }
 
 export function useObjectFactory() {
