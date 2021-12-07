@@ -1,7 +1,7 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/Tile";
-import { direction, position, settings } from "./scene/helper/SceneConstants";
-import { radians } from "./scene/helper/GeometryHelper";
+import { direction, position, settings } from "@/service/scene/helper/SceneConstants";
+import { radians } from "@/service/scene/helper/GeometryHelper";
 
 /**
  * enumeration of vertical object position in tile
@@ -34,7 +34,7 @@ export class Item {
   ) {
     this.id = id;
     this.modelName = modelName;
-    this.positionInRoom = (<any>Position)[positionInRoom]; //convert string from JSON to Enum
+    this.positionInRoom = (<any>Position)[positionInRoom];
     this.orientations = orientations;
     this.calcPosition = calcPosition;
   }
@@ -59,12 +59,12 @@ export class Item {
 
     //calculation for object positioning
     //set horizontal position
-    this.orientations.forEach((o) => {
+    this.orientations.forEach((orientation) => {
       //cast string from array to enum for simple use of enum in switch
-      const eO: Orientation = (<any>Orientation)[o];
+      const currentOrientation: Orientation = (<any>Orientation)[orientation];
       const directionVector = new Vector3();
 
-      switch (eO) {
+      switch (currentOrientation) {
         case Orientation.NORTH:
           directionVector.copy(direction.north);
           this.calcPosition = this.calcPosition.add(directionVector);
@@ -97,9 +97,9 @@ export class Item {
    */
   rotationY = (): number => {
     let viewdirection = 0;
-    this.orientations.forEach((o) => {
-      const eO: Orientation = (<any>Orientation)[o];
-      switch (eO) {
+    this.orientations.forEach((orientation) => {
+      const currentOrientation: Orientation = (<any>Orientation)[orientation];
+      switch (currentOrientation) {
         case Orientation.NORTH:
           viewdirection += 0;
           break;

@@ -1,9 +1,8 @@
-import { reactive, readonly } from "@vue/reactivity";
 import { Client } from "@stomp/stompjs";
-import { useLabyrinthStore } from "./LabyrinthStore";
-import { EventMessage, Operation } from "./EventMessage";
+import { useLabyrinthStore } from "@/service/LabyrinthStore";
+import { EventMessage, Operation } from "@/service/EventMessage";
 
-const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
+const { labyrinthState } = useLabyrinthStore();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -13,11 +12,11 @@ const stompclient = new Client({ brokerURL: wsurl });
 /**
  * Connection Error Feedback for the Stompclient
  */
-stompclient.onWebSocketError = (/*event*/) => {
+stompclient.onWebSocketError = () => {
   console.log("websocketerror");
   labyrinthState.errormessage = "WS-Fehler";
 };
-stompclient.onStompError = (/*frame*/) => {
+stompclient.onStompError = () => {
   console.log("Stomperror");
   labyrinthState.errormessage = "STOMP-Fehler";
 };
@@ -25,7 +24,7 @@ stompclient.onStompError = (/*frame*/) => {
 /**
  * Stompclient Methode to subscribe the Backend Messages on successful Connection and work with it
  */
-stompclient.onConnect = (/*frame*/) => {
+stompclient.onConnect = () => {
   console.log("stomp verbindet");
 
   stompclient.subscribe(DEST, (message) => {
@@ -37,19 +36,6 @@ stompclient.onConnect = (/*frame*/) => {
 
     switch (EventMessage.operation) {
       case Operation.MOVEMENT:
-        /**
-         * @todo: use it when gameState exists and new FE structure is finished
-         */
-        /*const movePlayer =  gameState.playerMap.get(EventMessage.username);
-                const startTileID: number = movePlayer.getPosition();
-                const destTileID = gameState.labyrinth.tileMap.get(startTileID).getTileRelationMap.get(eventMessage.data);
-                if(destTileID) {
-                    movePlayer.setPosition(destTileID);
-                }*/
-
-        // -> now UpdateManager (which should be watching after new FE structure is finished) should see a change in gameState
-        //    and should move the right Player to the corresponding Tile (in the 3D-Room)
-
         break;
       case Operation.CLICK:
         break;
@@ -69,7 +55,7 @@ stompclient.onConnect = (/*frame*/) => {
  * Methode to handle the Disconnection
  */
 stompclient.onDisconnect = () => {
-  /* Verbindung abgebaut*/
+  console.log("disconnected");
 };
 
 stompclient.activate();

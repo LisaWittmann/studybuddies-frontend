@@ -147,7 +147,7 @@ function getIntersections(
     // if parent object is a 'valid' object (no tile)
     if (object.parent?.userData.id != null) {
       //object dissapears per click (optically)
-      if(object.parent.visible) {
+      if (object.parent.visible) {
         object.parent.visible = false;
       }
       context.emit("click-object", object.parent.userData.id);

@@ -44,13 +44,10 @@ export default defineComponent({
     }
 
     function readyClicked() {
-      //TODO: functionality if both players clicked on ready button
       alert("Game should start now!");
     }
 
     function confirmSelectedLabyrinth() {
-      //TODO: functionality to confirm selected Labyrinth in dropdown menu
-      // button shown and hidden depending on clicked item in dropdown
       alert("Confirm button clicked!");
     }
 
