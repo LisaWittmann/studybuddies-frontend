@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
-import { Orientation, Tile } from "@/service/Tile";
+import { Tile } from "@/service/labyrinth/Tile";
 import { settings } from "@/service/scene/helper/SceneConstants";
 
 /**
@@ -11,52 +11,33 @@ import { settings } from "@/service/scene/helper/SceneConstants";
  * @returns initialized group of scene objects
  */
 function createTile(
+  tileKey: number,
   model: Tile,
   position: THREE.Vector3,
   color = 0xa9a9a9
 ): THREE.Group {
-  const { createFloor, createCeiling, createItem } = useObjectFactory();
+  const { createFloor, createCeiling, createArrow, createWall, createItem } =
+    useObjectFactory();
   const tile = new THREE.Group();
   tile.userData = model;
+  tile.userData.tileId = tileKey;
 
   //LIGHT-----------------
   tile.add(createLight(position));
 
   //STATIC-ITEMS----------
-  tile.add(createFloor(position, color));
+  tile.add(createFloor(position, color, model));
   tile.add(createCeiling(position, color));
   model.tileRelationMap.forEach((value, key) => {
-    const object = createFixedObject(position, key, value, color);
-    tile.add(object);
+    if (value) createArrow(key, position, tile);
+    else tile.add(createWall(key, position, color));
   });
 
   //ITEMS-----------------
   for (const item of model.objectsInRoom) {
-    createItem(item, tile);
+    createItem(item, tile, item.positionInRoom);
   }
-
   return tile;
-}
-
-/**
- * creates static tile object based on given relation
- * creates arrow to naviagte to next tile if relation exists
- * creates wall if no relation exists
- * @param position: position of tile
- * @param orientation: orientation of tile relation
- * @param tile: tile of tile relation
- * @param color: color of walls
- * @returns wall or navigation arrow object
- */
-function createFixedObject(
-  position: THREE.Vector3,
-  orientation: Orientation,
-  tile: number | undefined,
-  color = 0xa9a9a9
-): THREE.Mesh {
-  const { createArrow, createWall } = useObjectFactory();
-  if (tile) return createArrow(orientation, position);
-  return createWall(orientation, position, color);
 }
 
 /**

@@ -3,14 +3,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted } from "vue";
+import { defineComponent, onBeforeUnmount, onMounted, watch } from "vue";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
-import { useLabyrinthStore } from "@/service/LabyrinthStore";
-import { vector } from "@/service/scene/helper/GeometryHelper";
+import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 
 export default defineComponent({
   name: "SceneComponent",
+  props: {
+    labyrinth: {
+      type: Object,
+      required: true,
+    },
+    mainPlayer: {
+      type: MainPlayer,
+      required: true,
+    },
+  },
   setup(props, context) {
     const {
       createScene,
@@ -18,17 +27,21 @@ export default defineComponent({
       insertCanvas,
       updateScene,
       getIntersections,
+      updateCameraPosition,
     } = useSceneFactory();
-    const { createLabyrinth } = useLabyrinthFactory();
+    const { updateLabyrinth, getTilePosition } = useLabyrinthFactory();
 
-    // testing data
-    const scene = createScene(vector(0, 0, 0));
-    const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
-    updateLabyrinth().then(() => createLabyrinth(labyrinthState, scene));
-
-    function render() {
+    const scene = createScene();
+    const render = () => {
       renderScene();
       requestAnimationFrame(render);
+    };
+
+    function updatePlayer() {
+      if (props.mainPlayer.position) {
+        const position = getTilePosition(props.mainPlayer.position, scene);
+        if (position) updateCameraPosition(position);
+      }
     }
 
     function onMouseDown(event: MouseEvent) {
@@ -50,6 +63,12 @@ export default defineComponent({
     onBeforeUnmount(() => {
       removeEventListener("resize", updateScene);
       removeEventListener("mousedown", onMouseDown);
+    });
+
+    watch([props.labyrinth, props.mainPlayer], () => {
+      console.log("updating scene");
+      updateLabyrinth(props.labyrinth, scene);
+      updatePlayer();
     });
   },
 });
