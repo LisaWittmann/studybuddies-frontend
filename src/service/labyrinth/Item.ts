@@ -1,6 +1,10 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
-import { direction, position, settings } from "@/service/scene/helper/SceneConstants";
+import {
+  direction,
+  position,
+  settings,
+} from "@/service/scene/helper/SceneConstants";
 import { radians } from "@/service/scene/helper/GeometryHelper";
 
 /**

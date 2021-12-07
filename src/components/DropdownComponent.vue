@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import {useGameStore} from "@/service/game/GameStore";
+import { useGameStore } from "@/service/game/GameStore";
 
 export default defineComponent({
   props: {

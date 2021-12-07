@@ -39,7 +39,7 @@ export default defineComponent({
       default: "neutral",
     },
   },
-  setup(props, { emit }) {
+  setup(_, { emit }) {
     const { loginState } = useLoginStore();
     const username = loginState.username;
     const close = () => emit("close");
@@ -53,6 +53,7 @@ export default defineComponent({
 .terminal {
   max-width: 500px;
   width: 80%;
+  pointer-events: none;
 
   &__header {
     @include flex-center();
@@ -66,6 +67,7 @@ export default defineComponent({
     height: 25px;
 
     & i {
+      pointer-events: all;
       position: absolute;
       color: $color-black;
       cursor: pointer;
