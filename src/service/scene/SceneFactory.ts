@@ -189,8 +189,8 @@ function updateObjectsInView() {
 function isInInteractionRadius(position: THREE.Vector3) {
   const radius = settings.tileSize / 2;
   return (
-    Math.abs(position.x - Math.floor(camera.position.x)) < radius &&
-    Math.abs(position.z - Math.floor(camera.position.z)) < radius
+    Math.abs(position.x - Math.floor(camera.position.x)) <= radius &&
+    Math.abs(position.z - Math.floor(camera.position.z)) <= radius
   );
 }
 
