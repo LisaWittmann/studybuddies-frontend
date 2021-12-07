@@ -1,54 +1,103 @@
 <template>
   <h1>Platzhalter Logo</h1>
-  <form class="login__form">
-    <ul>
-      <li>
-        Spiel finden <input type="text" /> <button type="submit">OK</button>
-      </li>
-      <li>
-        Spiel erstellen
-        <button type="button" @click="createGame">Spiel erstellen</button>
-      </li>
-    </ul>
-  </form>
+  <section>
+    <h2>Spiel finden</h2>
+    <div class="button-wrapper">
+      <input type="text" v-model="lobbyKey" />
+      <button @click="joinGame">Spiel beitreten</button>
+    </div>
+  </section>
+  <section>
+    <h2>Spiel erstellen</h2>
+    <button @click="createGame">Spiel erstellen</button>
+  </section>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import router from "@/router";
+import { useLoginStore } from "@/service/login/LoginStore";
 
 export default defineComponent({
   name: "FindLobby",
   setup() {
+    const { loginState } = useLoginStore();
+    const lobbyKey = ref("");
+
+    function joinGame() {
+      let key = lobbyKey.value;
+      fetch("/api/lobby/join/" + key, {
+        method: "POST",
+        headers: {
+          "Content-Type": "html/text;charset=utf-8",
+        },
+        body: loginState.username,
+      }).then((response) => {
+        if (response.ok) {
+          router.push("/lobby/" + key);
+        } else {
+          console.log(response.statusText);
+        }
+      });
+    }
+
     function createGame() {
+      console.log(loginState.username);
       fetch("/api/lobby/create", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json;charset=utf-8",
+          "Content-Type": "html/text;charset=utf-8",
         },
+        body: loginState.username,
       })
         .then((response) => {
-          if (response.ok) router.push("/");
+          if (response.ok) {
+            return response.json();
+          }
+        })
+        .then((jsonData) => {
+          router.push("/lobby/" + jsonData.key);
         })
         .catch((err) => console.log(err));
     }
 
-    return { createGame };
+    return { lobbyKey, createGame, joinGame };
   },
 });
 </script>
 
 <style lang="scss" scoped>
 h1 {
-  border: 1px solid black;
-  padding: 1em;
+  margin: $spacing-l 0;
 }
 
-ul {
-  list-style-type: none;
+button {
+  margin: 10px;
+  min-height: 35px;
+  max-width: 200px;
+  background: transparent;
+  font-size: 16px;
 }
 
-li {
-  margin: 1em;
+input,
+button {
+  border: 1px solid $color-grey;
+  border-radius: 8px;
+  font-weight: 300;
+  width: 80%;
+  display: inline-block;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+input {
+  min-height: 20px;
+  max-width: 300px;
+  margin-bottom: $spacing-xs;
+}
+
+.button-wrapper {
+  @include flex-center();
+  flex-direction: column;
 }
 </style>

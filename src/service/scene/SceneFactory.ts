@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Orientation } from "@/service/Tile";
+import { Orientation } from "@/service/labyrinth/Tile";
 import { Vector3 } from "three";
 import { settings, direction } from "@/service/scene/helper/SceneConstants";
 import { EmitsOptions, SetupContext } from "vue";
@@ -14,14 +14,10 @@ let orbitControls: OrbitControls;
 
 /**
  * creates new threejs 3D scene
- * @param cameraPosition: position of camera / player in scene
  * @param debug: activates grid helper
  * @returns initialized scene with simple lightning
  */
-function createScene(
-  cameraPosition: THREE.Vector3,
-  debug = false
-): THREE.Scene {
+function createScene(debug = false): THREE.Scene {
   //RENDERER-----------------
   renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -37,7 +33,7 @@ function createScene(
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
   camera = new THREE.PerspectiveCamera(75, ratio, 0.1, 1000);
-  updateCameraPosition(cameraPosition, Orientation.NORTH);
+  camera.position.set(0, settings.cameraHeight, 0);
 
   //SCENE--------------------
   scene = new THREE.Scene();
@@ -48,7 +44,6 @@ function createScene(
   orbitControls.enableZoom = false;
   orbitControls.enablePan = false;
   orbitControls.update();
-  updateCameraTarget(Orientation.NORTH);
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
   });
@@ -98,6 +93,7 @@ function updateCameraPosition(
     position.z
   );
   if (orientation) updateCameraTarget(orientation);
+  else updateCameraOrbit();
 }
 
 function updateCameraTarget(orientation: Orientation) {
@@ -125,6 +121,7 @@ function updateCameraOrbit() {
   const forward = new THREE.Vector3();
   camera.getWorldDirection(forward);
   orbitControls.target.copy(camera.position).add(forward);
+  updateObjectsInView();
 }
 
 /**
@@ -151,8 +148,46 @@ function getIntersections(
         object.parent.visible = false;
       }
       context.emit("click-object", object.parent.userData.id);
+    } else if (object.parent?.userData.showInView) {
+      context.emit("move-player", object.parent.userData.orientation);
     }
   }
+}
+
+/**
+ * get all scene objects that are faced by camera in interaction radius
+ * and update visibility of scene objects that should only be visible in view
+ */
+function updateObjectsInView() {
+  camera.updateMatrix();
+  camera.updateMatrixWorld();
+  const frustum = new THREE.Frustum();
+  frustum.setFromProjectionMatrix(
+    new THREE.Matrix4().multiplyMatrices(
+      camera.projectionMatrix,
+      camera.matrixWorldInverse
+    )
+  );
+
+  scene.traverse((object) => {
+    if (object.userData.showInView) {
+      object.visible =
+        isInInteractionRadius(object.position) &&
+        frustum.containsPoint(object.position);
+    }
+  });
+}
+
+/**
+ * check if object is in interaction radius
+ * @param position: position of object
+ */
+function isInInteractionRadius(position: THREE.Vector3) {
+  const radius = settings.tileSize / 2;
+  return (
+    Math.abs(position.x - Math.floor(camera.position.x)) < radius &&
+    Math.abs(position.z - Math.floor(camera.position.z)) < radius
+  );
 }
 
 /**
