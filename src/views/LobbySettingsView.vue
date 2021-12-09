@@ -1,5 +1,5 @@
 <template>
-  <h1>Lobby {{ lobbyKey }}</h1>
+  <h1>Lobby <span class="lobby-code">{{ lobbyKey }}</span></h1>
   <section>
     <UserListComponent :users="users" />
   </section>

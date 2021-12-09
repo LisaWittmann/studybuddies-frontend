@@ -3,7 +3,7 @@
   <section>
     <h2>Spiel finden</h2>
     <div class="button-wrapper">
-      <input type="text" v-model="lobbyKey" />
+      <input type="text" class="lobby-code" v-model="lobbyKey" />
       <button @click="joinGame">Spiel beitreten</button>
     </div>
   </section>
