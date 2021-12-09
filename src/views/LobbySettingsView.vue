@@ -21,7 +21,12 @@
   </section>
   <section>
     <div class="button-wrapper">
-      <button class="button button--confirm" @click="readyCheck">Bereit</button>
+      <button
+        class="button button--confirm"
+        @click="readyCheck(lobbyKey, username)"
+      >
+        Bereit
+      </button>
       <button
         class="button button--exit"
         @click="exitLobby(lobbyKey, username)"
@@ -51,7 +56,6 @@ export default defineComponent({
       updateLabyrinths,
       readyCheck,
       exitLobby,
-      setupGame,
     } = useLobbyService();
     const upload = ref({} as HTMLInputElement);
 
@@ -81,7 +85,6 @@ export default defineComponent({
       uploadLabyrinth,
       selectLabyrinth,
       exitLobby,
-      setupGame,
       users,
       upload,
       lobbyKey,

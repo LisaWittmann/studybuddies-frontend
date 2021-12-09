@@ -1,51 +1,59 @@
 import router from "@/router";
-import { useGameStore } from "@/service/game/GameStore";
-import { MainPlayer, PartnerPlayer } from "./game/Player";
-import { useLoginStore } from "@/service/login/LoginStore";
 
 /**
- * post selected json file to api to read in labyrinth model
- * @param filelist: list of selected labyrinth for upload
+ * send request to join lobby with given lobby key
+ * redirects to lobby settings view of lobby if joining was sucessfull
+ * @param lobbyKey: identifying key of lobby that sould be joined
+ * @param username: identifying name of user that should join lobby
  */
-async function uploadJsonFiles(filelist: FileList) {
-  if (filelist) {
-    for (const file of filelist) {
-      const data = new FormData();
-      data.append("labFile", file);
-      await fetch("/api/labyrinth/read", {
-        method: "POST",
-        body: data,
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(response.statusText);
-          }
-          return response.json();
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-}
-
-async function updateUsers(lobbyKey: string) {
-  return fetch("/api/lobby/users/" + lobbyKey, {
-    method: "GET",
+async function joinLobby(lobbyKey: string, username: string) {
+  return fetch("/api/lobby/join/" + lobbyKey, {
+    method: "POST",
+    headers: {
+      "Content-Type": "html/text;charset=utf-8",
+    },
+    body: username,
   }).then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
+    if (response.status == 409) {
+      throw new Error("In der Lobby halten sich zu viele User auf");
+    } else if (response.status == 404) {
+      throw new Error("Die Lobby konnte nicht gefunden werden.");
+    } else if (response.status == 400) {
+      throw new Error("Der Code enthält ungültige Zeichen.");
+    } else if (response.ok) router.push("/lobby/" + lobbyKey);
   });
 }
 
-async function updateLabyrinths() {
-  return fetch("/api/labyrinth/ids").then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  });
+/**
+ * send request to create new lobby and joins creating user automaticly
+ * redirects to lobby settings view of created lobby
+ * @param username: identifying name of user that creates new lobby
+ */
+async function createLobby(username: string) {
+  fetch("/api/lobby/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "html/text;charset=utf-8",
+    },
+    body: username,
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      router.push("/lobby/" + jsonData.key);
+    })
+    .catch((error) => console.error(error));
 }
 
-function exitLobby(lobbyKey: string, username: string) {
+/**
+ * send request to remove user with given username from lobby
+ * redirects back to find lobby view if request was successfull
+ * @param lobbyKey: identifying key of lobby from which user should be removed
+ * @param username: identifying name of user that should be removed
+ */
+async function exitLobby(lobbyKey: string, username: string) {
   fetch("/api/lobby/leave/" + lobbyKey, {
     method: "POST",
     headers: {
@@ -60,46 +68,81 @@ function exitLobby(lobbyKey: string, username: string) {
     .catch((error) => console.error(error));
 }
 
-function readyCheck() {
-  const route = router.currentRoute.value;
-  const lobbyKey = route.params.key;
-  const { loginState } = useLoginStore();
-  fetch(`/api/lobby/${lobbyKey}/ready`, {
-    method: "POST",
-    body: loginState.username,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Error during ready check");
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-}
-
-function setupGame(users: string[], labyrinthId: number, username: string) {
-  const { updatePlayer, setLabyrinth } = useGameStore();
-  for (const user of users) {
-    if (user == username) {
-      updatePlayer(new MainPlayer(username, true, 0));
-    } else {
-      updatePlayer(new PartnerPlayer(user, false, 1));
+/**
+ * post selected json file to api to read in labyrinth model
+ * @param filelist: list of selected labyrinth for upload
+ */
+async function uploadJsonFiles(filelist: FileList) {
+  if (filelist) {
+    for (const file of filelist) {
+      const data = new FormData();
+      data.append("labFile", file);
+      fetch("/api/labyrinth/read", {
+        method: "POST",
+        body: data,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(response.statusText);
+          }
+          return response.json();
+        })
+        .catch((error) => console.error(error));
     }
   }
-  setLabyrinth(labyrinthId);
-  const route = router.currentRoute.value;
-  const lobbyKey = route.params.key as string;
-  router.replace(`/game/${lobbyKey}`);
+}
+
+/**
+ * send request to get all current users by username in lobby
+ * @param lobbyKey: indentifying key of lobby which users should be requested
+ * @returns promise containing the list of users if request was successfull
+ * @throws error if request was not successfull
+ */
+async function updateUsers(lobbyKey: string) {
+  return fetch("/api/lobby/users/" + lobbyKey, {
+    method: "GET",
+  }).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  });
+}
+
+/**
+ * send request to get all labyrinths in database that can be selected for game
+ * @returns promise containing list of all labyrinth ids if request was successfull
+ * @throws error if request was not successfull
+ */
+async function updateLabyrinths() {
+  return fetch("/api/labyrinth/ids").then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  });
+}
+
+/**
+ * send request to set ready status of user in lobby
+ * @param lobbyKey: identifying key of the lobby
+ * @param username: identifying name of the user which status should be set
+ */
+async function readyCheck(lobbyKey: string, username: string) {
+  fetch(`/api/lobby/${lobbyKey}/ready`, {
+    method: "POST",
+    body: username,
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+    })
+    .catch((error) => console.error(error));
 }
 
 export function useLobbyService() {
   return {
+    joinLobby,
+    createLobby,
+    exitLobby,
     uploadJsonFiles,
     updateUsers,
     updateLabyrinths,
     readyCheck,
-    setupGame,
-    exitLobby,
   };
 }
