@@ -28,7 +28,6 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import {useGameStore} from "@/service/game/GameStore";
 
 export default defineComponent({
   props: {
@@ -37,7 +36,7 @@ export default defineComponent({
     },
   },
   name: "DropdownComponent",
-  setup(props, context) {
+  setup(_, context) {
     let isOpen = ref(false);
     let selectedItem = ref("");
 

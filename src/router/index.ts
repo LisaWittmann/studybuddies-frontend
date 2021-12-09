@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/game/:key",
     name: "GameView",
     component: GameView,
-    props: true
+    props: true,
   },
   {
     path: "/login",

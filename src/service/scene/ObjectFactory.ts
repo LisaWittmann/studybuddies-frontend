@@ -8,6 +8,7 @@ import { Arrow, Wall } from "@/service/labyrinth/FixedObject";
 
 import { axis, settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
+import { PartnerPlayer } from "../game/Player";
 
 const objectLoader = new OBJLoader();
 const materialLoader = new MTLLoader();
@@ -20,28 +21,17 @@ materialLoader.setPath("/models/");
  * @param item: item that should be loaded and added to scene
  * @param parent: group or scene object will be added to after loading
  */
-async function createItem(
-  model: Item | Arrow,
-  parent: THREE.Group | THREE.Scene,
-  position: THREE.Vector3
-) {
-  const path = model.modelName.toLowerCase();
-  await materialLoader.loadAsync(`${path}.mtl`).then((materials) => {
+async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
+  const model = item.modelName.toLowerCase();
+  await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
-    objectLoader.loadAsync(`${path}.obj`).then((object) => {
-      object.position.copy(position);
-      object.userData = model;
+    objectLoader.loadAsync(`${model}.obj`).then((object) => {
+      object.position.copy(item.calcPositionInRoom());
+      //rotation already calculated to radians
+      object.rotateY(item.rotationY());
+      object.userData = item;
       object.userData.clickable = true;
-      if (model instanceof Arrow) {
-        object.rotateOnAxis(axis.y, radians(model.rotationY()));
-        object.visible = false;
-        object.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            child.material.color.setHex(model.color);
-          }
-        });
-      }
       parent.add(object);
     });
   });
@@ -117,9 +107,36 @@ function createArrow(
   parent: THREE.Group
 ) {
   const arrow = new Arrow(orientation, tilePosition);
-  createItem(arrow, parent, arrow.position());
+  objectLoader.loadAsync("arrow.obj").then((object) => {
+    object.position.copy(arrow.position());
+    object.userData = arrow;
+    object.userData.clickable = true;
+    object.rotateOnAxis(axis.y, radians(arrow.rotationY()));
+    object.visible = false;
+    object.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.material.color.setHex(arrow.color);
+      }
+    });
+    parent.add(object);
+  });
+}
+
+function createPlayer(
+  model: PartnerPlayer,
+  position: THREE.Vector3
+): THREE.Object3D | undefined {
+  console.log("creating partner player");
+  return undefined;
 }
 
 export function useObjectFactory() {
-  return { createArrow, createWall, createCeiling, createFloor, createItem };
+  return {
+    createArrow,
+    createWall,
+    createCeiling,
+    createFloor,
+    createItem,
+    createPlayer,
+  };
 }
