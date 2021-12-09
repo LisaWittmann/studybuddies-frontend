@@ -1,18 +1,21 @@
 import * as THREE from "three";
 import { useTileFactory } from "@/service/scene/TileFactory";
+import { usePlayerFactory } from "@/service/scene/PlayerFactory";
 
 import { Orientation, Tile } from "@/service/labyrinth/Tile";
 
 import { vector } from "@/service/scene/helper/GeometryHelper";
+import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 import { direction, settings } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
+const { updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
 
 /**
  * gets map of all tiles of a Labyrinth
- * creates them using TileFactory
+ * creates or updates them using TileFactory
  * adds Tiles to scene
  * @param labyrinthState
  * @param scene
@@ -26,6 +29,24 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
       placeTile(position, value, key, scene);
     } else if (value.objectsInRoom != tile.userData.objectsInRoom) {
       updateTile();
+    }
+  }
+}
+
+/**
+ * updates player position of main or partner player
+ * or initially creates partner player
+ * @param player: main or partner player
+ * @param scene: scene that contains player
+ */
+async function updatePlayer(player: Player, scene: THREE.Scene) {
+  const tilePosition = getTilePosition(player.position, scene);
+  if (tilePosition) {
+    if (player instanceof MainPlayer) {
+      updateMainPlayer(tilePosition);
+    }
+    if (player instanceof PartnerPlayer) {
+      updatePartnerPlayer(player, tilePosition, scene);
     }
   }
 }
@@ -117,6 +138,6 @@ function getNextPosition(
 export function useLabyrinthFactory() {
   return {
     updateLabyrinth,
-    getTilePosition,
+    updatePlayer,
   };
 }
