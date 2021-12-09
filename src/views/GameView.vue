@@ -4,25 +4,32 @@
     :mainPlayer="mainPlayer"
     @click-object="itemSelection"
     @move-player="movePlayer"
-    @click-disabled="openTerminal"
+    @click-disabled="toggleTerminal"
   />
   <!--warning and errormessages-->
   <OverlayTerminalComponent
-    :opened="showTerminal"
-    :message="message"
-    :state="messageState"
-    @close="closeTerminal"
+    :opened="eventMessage.visible"
+    :message="eventMessage.message"
+    :state="eventMessage.state"
+    @close="toggleTerminal"
   />
   <!--instructions for current game quest-->
   <OverlayInstructionComponent
-    :opened="showInstructions"
-    :instructions="instructions"
+    :opened="instructions.visible"
+    :instructions="instructions.content"
     @close="closeInstructions"
+  />
+  <!--conversations with interactive characters-->
+  <OverlayConversationComponent
+    :opened="conversation.visible"
+    :text="conversation.text"
+    :options="conversation.options"
+    @select-option="selectConversationOption"
   />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, reactive } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
@@ -34,6 +41,7 @@ import { MainPlayer } from "@/service/game/Player";
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
 import OverlayInstructionComponent from "@/components/overlays/OverlayInstructionComponent.vue";
+import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import "@/service/game/EventStore";
 
@@ -41,6 +49,7 @@ export default defineComponent({
   name: "GameView",
   components: {
     SceneComponent,
+    OverlayConversationComponent,
     OverlayInstructionComponent,
     OverlayTerminalComponent,
   },
@@ -54,22 +63,30 @@ export default defineComponent({
     updateGame();
 
     const mainPlayer = gameState.playerMap.get(loginState.username);
-    const showInstructions = ref(false);
-    const showTerminal = ref(false);
 
     // instructions for current game quest e.g. finding partner player
-    const instructions = [
-      "Willkommen unter den Eichen",
-      "Deine erste Aufgabe erwartet dich",
-      "Finde zur Semester Einführungsveranstaltung",
-    ];
+    const instructions = reactive({
+      content: [
+        "Willkommen unter den Eichen",
+        "Deine erste Aufgabe erwartet dich",
+        "Finde zur Semester Einführungsveranstaltung",
+      ],
+      visible: false,
+    });
 
     // in-game messages like warnings, errors, hints ...
-    const message =
-      "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!";
-    // state of message that sets text color in terminal
-    // state options: neutral, warning, error
-    const messageState = "warning";
+    const eventMessage = reactive({
+      message: "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!",
+      state: "warning",
+      visible: false,
+    });
+
+    // conversations with interactive game characters
+    const conversation = reactive({
+      text: "Magst du die Zahl 17?",
+      options: ["Ja, find ich super!", "Nein, ich bin großer Fan vond der 18"],
+      visible: false,
+    });
 
     //TODO: remove this temporary operation after showing GameView with key in URL
     let temporaryCode: string;
@@ -87,9 +104,8 @@ export default defineComponent({
         temporaryCode = json.key;
       });
 
-    const openTerminal = () => (showTerminal.value = true);
-    const closeInstructions = () => (showInstructions.value = false);
-    const closeTerminal = () => (showTerminal.value = false);
+    const toggleTerminal = () => (eventMessage.visible = !eventMessage.visible);
+    const closeInstructions = () => (instructions.visible = false);
 
     function movePlayer(orientation: Orientation) {
       playerMovement(
@@ -101,18 +117,22 @@ export default defineComponent({
       );
     }
 
+    function selectConversationOption(option: string) {
+      //only for testing:
+      conversation.visible = false;
+      console.log(option);
+    }
+
     return {
-      message,
-      messageState,
-      instructions,
-      showTerminal,
-      showInstructions,
-      openTerminal,
-      closeTerminal,
-      closeInstructions,
-      itemSelection,
       movePlayer,
+      itemSelection,
+      toggleTerminal,
+      closeInstructions,
+      selectConversationOption,
       mainPlayer,
+      conversation,
+      instructions,
+      eventMessage,
       labyrinth: gameState.labyrinth,
     };
   },
