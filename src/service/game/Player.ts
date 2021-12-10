@@ -16,11 +16,11 @@ export enum Role {
 export interface Player {
   username: string;
   position: number;
-  role: Role;
+  role: Role | undefined;
 
   getUsername(): string;
   getPosition(): number;
-  getRole(): Role;
+  getRole(): Role | undefined;
   setPosition(position: number): void;
 }
 
@@ -33,13 +33,13 @@ export interface Player {
 export class MainPlayer implements Player {
   username: string;
   position: number;
-  role: Role;
+  role: Role | undefined;
   inventory: Map<number, Item>;
 
-  constructor(username: string, role: Role, playerPosition: number) {
+  constructor(username: string, playerPosition: number) {
     this.username = username;
     this.position = playerPosition;
-    this.role = role;
+    this.role = undefined;
     this.inventory = new Map<number, Item>();
   }
 
@@ -59,7 +59,7 @@ export class MainPlayer implements Player {
     return this.position;
   }
 
-  getRole(): Role {
+  getRole(): Role | undefined {
     return this.role;
   }
 
@@ -79,11 +79,11 @@ export class MainPlayer implements Player {
 export class PartnerPlayer implements Player {
   username: string;
   position: number;
-  role: Role;
+  role: Role | undefined;
 
-  constructor(username: string, role: Role, playerPosition: number) {
+  constructor(username: string, playerPosition: number) {
     this.username = username;
-    this.role = role;
+    this.role = undefined;
     this.position = playerPosition;
   }
 
@@ -95,7 +95,7 @@ export class PartnerPlayer implements Player {
     return this.position;
   }
 
-  getRole(): Role {
+  getRole(): Role | undefined {
     return this.role;
   }
 

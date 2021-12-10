@@ -20,11 +20,11 @@ const gameState = reactive({
 
 async function updateGame() {
   const { loginState } = useLoginStore();
+  // for testing:
   gameState.playerMap.set(
     loginState.username,
     new MainPlayer(
       loginState.username,
-      true,
       gameState.labyrinth.playerStartTileIds[0]
     )
   );
