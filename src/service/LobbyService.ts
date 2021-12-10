@@ -14,13 +14,11 @@ async function joinLobby(lobbyKey: string, username: string) {
     },
     body: username,
   }).then((response) => {
-    if (response.status == 409) {
-      throw new Error("In der Lobby halten sich zu viele User auf");
-    } else if (response.status == 404) {
-      throw new Error("Die Lobby konnte nicht gefunden werden.");
-    } else if (response.status == 400) {
-      throw new Error("Der Code enthält ungültige Zeichen.");
-    } else if (response.ok) router.push("/lobby/" + lobbyKey);
+    if (!response.ok) {
+      if (response.status == 409) throw new Error("Diese Lobby ist voll.");
+      else throw new Error("Diese Lobby konnte nicht gefunden werden.");
+    }
+    router.push("/lobby/" + lobbyKey);
   });
 }
 
