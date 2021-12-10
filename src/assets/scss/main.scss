@@ -1,2 +1,7 @@
-@import "layout";
-@import "variables";
+@import "variables/main";
+@import "form";
+
+body {
+    margin: 0;
+    overflow: hidden;
+}

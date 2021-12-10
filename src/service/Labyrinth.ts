@@ -7,16 +7,12 @@ import { Tile } from "@/service/Tile";
  */
 export class Labyrinth {
   tileMap: Map<number, Tile>;
-  startPosition: number[];
-  endpoint: number;
+  endTileId: number;
+  playerStartTileIds: number[];
 
-  constructor(
-    tileMap: Map<number, Tile>,
-    startPosition: number[],
-    endpoint: number
-  ) {
-    this.startPosition = startPosition;
-    this.endpoint = endpoint;
-    this.tileMap = tileMap;
+  constructor(endTileId: number, playerStartTileIds: number[]) {
+    this.tileMap = new Map<number, Tile>();
+    this.endTileId = endTileId;
+    this.playerStartTileIds = playerStartTileIds;
   }
 }
