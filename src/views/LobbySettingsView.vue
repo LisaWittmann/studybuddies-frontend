@@ -27,6 +27,7 @@ import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
+import {useGameStore} from "@/service/game/GameStore";
 
 export default defineComponent({
   name: "LobbySettingsView",
@@ -41,15 +42,15 @@ export default defineComponent({
       setupGame,
     } = useLobbyService();
     const upload = ref({} as HTMLInputElement);
-
+    const { gameState } = useGameStore();
     const route = router.currentRoute.value;
-    const lobbyKey = route.params.key as string;
+    gameState.lobbyKey = route.params.key as string;
 
     const users = ref(new Array<string>());
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
-    updateUsers(lobbyKey).then((data) => (users.value = data));
+    updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
     updateLabyrinths().then((data) => (labyrinthOptions.value = data));
 
     function selectLabyrinth(id: number) {
@@ -63,7 +64,6 @@ export default defineComponent({
       setupGame,
       users,
       upload,
-      lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
       username: loginState.username,

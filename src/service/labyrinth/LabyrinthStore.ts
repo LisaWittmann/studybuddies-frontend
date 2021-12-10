@@ -3,6 +3,7 @@ import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Item } from "./Item";
 import { Vector3 } from "three";
+import {useGameStore} from "@/service/game/GameStore";
 
 /**
  * constant to keep the tiles or store an errormessage
@@ -13,14 +14,17 @@ const labyrinthState: Labyrinth = reactive<Labyrinth>({
   playerStartTileIds: new Array<number>(),
 });
 
+const { gameState } = useGameStore();
 /**
  * update the tiles for getting them initially and every time something changes
- * fetches labyrnith object of api and converts response into labyrinth data
+ * fetches labyrinth object of api and converts response into labyrinth data
  * creates simple fallback labyrinth if fetch fails
  */
 async function updateLabyrinth(labyrinthId: number) {
-  console.log(labyrinthId);
-  await fetch(`/api/labyrinth/${labyrinthId}`, {
+  //TODO replace labyrinthId with gameState.labyrinthId
+  console.log("Requested labId: " + labyrinthId);
+  //TODO change this to the game api
+  await fetch(`/api/lobby/${gameState.lobbyKey}`, {
     method: "GET",
   })
     .then((response) => {
@@ -28,6 +32,8 @@ async function updateLabyrinth(labyrinthId: number) {
       return response.json();
     })
     .then((jsonData) => {
+      console.log("Just for testing");
+      console.log(jsonData);
       const labyrinth = new Labyrinth(
         jsonData.endTileId,
         jsonData.playerStartTileIds

@@ -48,6 +48,7 @@ stompclient.onConnect = () => {
 
           if (destTileID) {
             playerToMove.setPosition(destTileID);
+            console.log(playerToMove.getPosition())
             updatePlayer(playerToMove);
             // -> now the watcher can update the 3D Room
             // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
@@ -68,9 +69,15 @@ stompclient.onConnect = () => {
         break;
       case "READY":
         if (eventMessage.data === "READY") {
-          const route = router.currentRoute.value;
-          const lobbyKey = route.params.key;
-          router.push(`/game/${lobbyKey}`);
+          fetch(`api/lobby/${gameState.lobbyKey}/id`, {
+            method: "GET"
+          }).then((response) => {
+            return response.json();
+          }).then((json) => {
+            gameState.labyrinthId = json;
+            console.log("Labyrinth id for this lobby is: " + gameState.labyrinthId);
+          })
+          router.push(`/game/${gameState.lobbyKey}`);
         }
         break;
       default:
