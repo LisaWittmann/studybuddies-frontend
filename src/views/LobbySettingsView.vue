@@ -4,18 +4,6 @@
     <UserListComponent :users="users" />
   </section>
   <section>
-    <h2>Labyrinth hochladen:</h2>
-    <label class="file-upload">
-      <input
-        type="file"
-        ref="upload"
-        accept=".json"
-        @change="uploadLabyrinth"
-      />
-      Hochladen
-    </label>
-  </section>
-  <section>
     <h2>Labyrinth auswählen:</h2>
     <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
   </section>
@@ -46,7 +34,6 @@ export default defineComponent({
   setup() {
     const { loginState } = useLoginStore();
     const {
-      uploadJsonFiles,
       updateUsers,
       updateLabyrinths,
       readyCheck,
@@ -69,16 +56,8 @@ export default defineComponent({
       selectedLabyrinth.value = id;
     }
 
-    async function uploadLabyrinth() {
-      if (upload.value.files != null) {
-        await uploadJsonFiles(upload.value.files);
-      }
-      updateLabyrinths().then((data) => (labyrinthOptions.value = data));
-    }
-
     return {
       readyCheck,
-      uploadLabyrinth,
       selectLabyrinth,
       exitLobby,
       setupGame,

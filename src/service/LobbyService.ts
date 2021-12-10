@@ -7,7 +7,8 @@ import { useLoginStore } from "@/service/login/LoginStore";
  * post selected json file to api to read in labyrinth model
  * @param filelist: list of selected labyrinth for upload
  */
-async function uploadJsonFiles(filelist: FileList) {
+async function uploadJsonFiles(filelist: FileList): Promise<string[]> {
+  const responseList = new Array<string>();
   if (filelist) {
     for (const file of filelist) {
       const data = new FormData();
@@ -20,12 +21,18 @@ async function uploadJsonFiles(filelist: FileList) {
           if (!response.ok) {
             throw new Error(response.statusText);
           }
+          responseList.push("Upload von " + file.name + " war erfolgreich");
           return response.json();
         })
         .catch((error) => {
+          responseList.push("Upload von " + file.name + " ist fehlgeschlagen");
           console.error(error);
         });
     }
+    return responseList;
+  } else {
+    responseList.push("Keine File zum Laden gefunden");
+    return responseList;
   }
 }
 
