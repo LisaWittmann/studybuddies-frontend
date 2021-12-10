@@ -68,12 +68,18 @@ function exitLobby(lobbyKey: string, username: string) {
 }
 
 function readyCheck() {
-  const route = router.currentRoute.value;
-  const lobbyKey = route.params.key;
   const { loginState } = useLoginStore();
-  fetch(`/api/lobby/${lobbyKey}/ready`, {
+  const { gameState } = useGameStore();
+  const args: string[] = [];
+  args.push(loginState.username);
+  args.push(String(gameState.labyrinthId));
+
+  fetch(`/api/lobby/${gameState.lobbyKey}/ready`, {
     method: "POST",
-    body: loginState.username,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(args)
   })
     .then((response) => {
       if (!response.ok) {
@@ -86,7 +92,7 @@ function readyCheck() {
 }
 
 function setupGame(users: string[], labyrinthId: number, username: string) {
-  const { updatePlayer, setLabyrinth } = useGameStore();
+  const { updatePlayer, setLabyrinth, gameState } = useGameStore();
   for (const user of users) {
     if (user == username) {
       updatePlayer(new MainPlayer(username, true, 0));
@@ -95,9 +101,8 @@ function setupGame(users: string[], labyrinthId: number, username: string) {
     }
   }
   setLabyrinth(labyrinthId);
-  const route = router.currentRoute.value;
-  const lobbyKey = route.params.key as string;
-  router.replace(`/game/${lobbyKey}`);
+
+  router.replace(`/game/${gameState.lobbyKey}`);
 }
 
 export function useLobbyService() {

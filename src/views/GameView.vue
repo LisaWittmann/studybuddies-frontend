@@ -71,22 +71,6 @@ export default defineComponent({
     // state options: neutral, warning, error
     const messageState = "warning";
 
-    //TODO: remove this temporary operation after showing GameView with key in URL
-    let temporaryCode: string;
-
-    fetch("/api/lobby/random", {
-      method: "GET",
-      headers: {
-        "Content-Type": "html/text;charset=utf-8",
-      },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        temporaryCode = json.key;
-      });
-
     const openTerminal = () => (showTerminal.value = true);
     const closeInstructions = () => (showInstructions.value = false);
     const closeTerminal = () => (showTerminal.value = false);
@@ -94,7 +78,7 @@ export default defineComponent({
     function movePlayer(orientation: Orientation) {
       playerMovement(
         new MoveOperation(
-          temporaryCode,
+          gameState.lobbyKey,
           (mainPlayer as MainPlayer).username,
           Orientation[orientation].toString()
         )

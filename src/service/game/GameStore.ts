@@ -11,6 +11,7 @@ const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
  * Errormessage: To display all kind of Errors in the according scene
  */
 const gameState = reactive({
+  lobbyKey: "",
   labyrinthId: 1,
   labyrinth: labyrinthState,
   playerMap: new Map<string, Player>(),
@@ -20,6 +21,7 @@ const gameState = reactive({
 
 async function updateGame() {
   const { loginState } = useLoginStore();
+  updateLabyrinth(gameState.labyrinthId);
   gameState.playerMap.set(
     loginState.username,
     new MainPlayer(
@@ -28,7 +30,6 @@ async function updateGame() {
       gameState.labyrinth.playerStartTileIds[0]
     )
   );
-  updateLabyrinth(gameState.labyrinthId);
 }
 
 function setLabyrinth(labyrinthId: number) {

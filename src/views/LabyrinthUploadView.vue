@@ -30,7 +30,6 @@
 </template>
 
 <script lang="ts">
-import router from "@/router";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { defineComponent, ref } from "vue";
