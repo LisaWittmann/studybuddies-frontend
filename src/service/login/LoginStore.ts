@@ -8,6 +8,10 @@ const loginState = reactive({
   isLoggedIn: false,
 });
 
+/**
+ * log out current user by setting loginState
+ * to default values
+ */
 function logout() {
   loginState.username = "";
   loginState.errormessage = "";
@@ -15,6 +19,13 @@ function logout() {
   sessionStorage.removeItem("username");
 }
 
+/**
+ * send request to login user with given username and password
+ * updates loginState with user data if request was successfull
+ * ans redirects to lobbyview
+ * sets errorMessage of loginState if request was not successfull
+ * @param user: user object containing username and password
+ */
 async function login(user: User) {
   fetch("/api/login", {
     method: "POST",
@@ -24,7 +35,11 @@ async function login(user: User) {
     body: JSON.stringify(user),
   })
     .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
+      if (!response.ok) {
+        throw new Error(
+          "Dein Passwort war nicht korrekt. Bitte versuche es noch einmal."
+        );
+      }
       return response.json();
     })
     .then((jsondata) => {
@@ -35,15 +50,37 @@ async function login(user: User) {
       router.push("/find");
       console.log(loginState);
     })
-    .catch(() => {
+    .catch((error) => {
       loginState.username = "";
       loginState.isLoggedIn = false;
-      loginState.errormessage =
-        "Dein Passwort war nicht korrekt. Bitte versuche es noch einmal.";
+      loginState.errormessage = error.message;
     });
 }
 
 /**
+ * send request to register user with given username and password
+ * redirects to login view if request was successfull
+ * @param user: user object with username and password
+ * @throws error with error essage
+ */
+async function register(user: User) {
+  return fetch("/api/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+    },
+    body: JSON.stringify(user),
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error(
+        "Deine Registrierung ist fehlgeschlagen. Bitte versuche es noch einmal"
+      );
+    }
+    router.push("/login");
+  });
+}
+
+/*
  * get username from sessionStorage
  * so user won't get logged out on browser refresh
  */
@@ -58,6 +95,7 @@ function fetchSessionStorage() {
 export function useLoginStore() {
   return {
     loginState: readonly(loginState),
+    register,
     login,
     logout,
     fetchSessionStorage,
