@@ -19,6 +19,8 @@
     :instructions="instructions"
     @close="closeInstructions"
   />
+  <!--player inventory-->
+  <InventoryComponent/>
 </template>
 
 <script lang="ts">
@@ -34,6 +36,8 @@ import { MainPlayer } from "@/service/game/Player";
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
 import OverlayInstructionComponent from "@/components/overlays/OverlayInstructionComponent.vue";
+import InventoryComponent from "@/components/InventoryComponent.vue";
+
 
 import "@/service/game/EventStore";
 
@@ -43,6 +47,7 @@ export default defineComponent({
     SceneComponent,
     OverlayInstructionComponent,
     OverlayTerminalComponent,
+    InventoryComponent,
   },
   props: {
     key: { type: String, required: true },
