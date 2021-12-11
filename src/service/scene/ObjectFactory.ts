@@ -50,7 +50,7 @@ function createFloor(position: THREE.Vector3, color = 0x199eb0, key: number) {
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.copy(position);
-  object.userData.tileId = key;
+  object.userData.tileKey = key;
   object.rotateOnAxis(axis.x, radians(90));
   return object;
 }

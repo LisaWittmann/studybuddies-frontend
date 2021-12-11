@@ -41,11 +41,11 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
  */
 async function updatePlayer(player: Player, scene: THREE.Scene) {
   if (player instanceof MainPlayer) {
-    const tilePosition = getTilePosition(player.position, scene);
+    const tilePosition = getTilePosition(player.getPosition(), scene);
     if (tilePosition) updateMainPlayer(tilePosition);
   }
   if (player instanceof PartnerPlayer) {
-    const tilePosition = getTilePosition(player.position, scene);
+    const tilePosition = getTilePosition(player.getPosition(), scene);
     if (tilePosition) updatePartnerPlayer(player, tilePosition, scene);
   }
 }
@@ -103,10 +103,12 @@ function getTilePosition(
   id: number,
   scene: THREE.Scene
 ): THREE.Vector3 | undefined {
+  if (!id) return undefined;
   let position = undefined;
   scene.traverse((child) => {
-    if (child instanceof THREE.Mesh && child.userData.tileId == id) {
+    if (child.userData.tileKey == id) {
       position = child.position;
+      console.log(child);
     }
   });
   return position;
