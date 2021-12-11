@@ -3,9 +3,9 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 
 import { Item } from "@/service/labyrinth/Item";
-import { Orientation, Tile } from "@/service/labyrinth/Tile";
+import { Orientation } from "@/service/labyrinth/Tile";
 import { Arrow, Wall } from "@/service/labyrinth/FixedObject";
-import { PartnerPlayer } from "@/service/game/Player";
+import { PartnerPlayer, Role } from "@/service/game/Player";
 
 import { axis, settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
@@ -134,8 +134,15 @@ function createPlayer(
   position: THREE.Vector3,
   parent: THREE.Scene | THREE.Group
 ) {
-  let model = player.getRole()?.toString().toLowerCase();
-  if (!model) model = "squirrel";
+  let model = "squirrel";
+  switch (player.getRole()) {
+    case Role.DESIGNER:
+      model += "-designer";
+      break;
+    case Role.HACKER:
+      model += "-hacker";
+      break;
+  }
   materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
