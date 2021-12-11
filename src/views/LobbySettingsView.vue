@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
@@ -43,8 +43,11 @@ export default defineComponent({
     } = useLobbyService();
     const upload = ref({} as HTMLInputElement);
     const { gameState } = useGameStore();
-    const route = router.currentRoute.value;
-    gameState.lobbyKey = route.params.key as string;
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      gameState.lobbyKey = route.params.key as string;
+      console.log(gameState.lobbyKey);
+    })
 
     const users = ref(new Array<string>());
     const labyrinthOptions = ref(new Array<number>());
@@ -64,6 +67,7 @@ export default defineComponent({
       setupGame,
       users,
       upload,
+      lobbyKey: gameState.lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
       username: loginState.username,
