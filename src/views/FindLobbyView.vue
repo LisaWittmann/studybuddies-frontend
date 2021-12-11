@@ -1,6 +1,6 @@
 <template>
-  <h1>Platzhalter Logo</h1>
   <section>
+    <img class="logo" src="@/assets/img/logo_header.png" alt="logo" />
     <h2>Spiel finden</h2>
     <div class="button-wrapper">
       <input type="text" v-model="lobbyKey" />
@@ -67,8 +67,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-h1 {
-  margin: $spacing-l 0;
+.logo {
+  width: 80%;
+  max-width: 600px;
 }
 
 button {
