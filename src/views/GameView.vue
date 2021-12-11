@@ -1,7 +1,7 @@
 <template>
   <SceneComponent
     :labyrinth="labyrinth"
-    :mainPlayer="mainPlayer"
+    :player="mainPlayer"
     @click-object="itemSelection"
     @move-player="movePlayer"
     @click-disabled="openTerminal"
