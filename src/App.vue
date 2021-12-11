@@ -13,8 +13,8 @@ import { defineComponent } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 export default defineComponent({
   setup() {
-    const { loginState, fetchLocalStorage } = useLoginStore();
-    fetchLocalStorage();
+    const { loginState, fetchSessionStorage } = useLoginStore();
+    fetchSessionStorage();
     console.log(loginState);
   },
 });

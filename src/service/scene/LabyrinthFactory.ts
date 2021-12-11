@@ -3,9 +3,9 @@ import { useTileFactory } from "@/service/scene/TileFactory";
 import { usePlayerFactory } from "@/service/scene/PlayerFactory";
 
 import { Orientation, Tile } from "@/service/labyrinth/Tile";
+import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 
 import { vector } from "@/service/scene/helper/GeometryHelper";
-import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 import { direction, settings } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
@@ -40,11 +40,11 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
  */
 async function updatePlayer(player: Player, scene: THREE.Scene) {
   if (player instanceof MainPlayer) {
-    const tilePosition = getTilePosition(player.getPosition(), scene);
+    const tilePosition = getTilePosition(player.position, scene);
     if (tilePosition) updateMainPlayer(tilePosition);
   }
   if (player instanceof PartnerPlayer) {
-    const tilePosition = getTilePosition(player.getPosition(), scene);
+    const tilePosition = getTilePosition(player.position, scene);
     if (tilePosition) updatePartnerPlayer(player, tilePosition, scene);
   }
 }
@@ -77,18 +77,18 @@ async function placeTile(
 }
 
 /**
- * get tile 3D object by tileId
- * @param tileId: unique id of tile in scene
+ * get tile 3D object by tileKey
+ * @param tileKey: unique relation key of tile in scene
  * @param scene: scene that might contain tile
- * @returns 3D representation of tile with id
+ * @returns 3D representation of tile with key
  */
 function getTile(
-  tileId: number,
+  tileKey: number,
   scene: THREE.Scene
 ): THREE.Object3D | undefined {
   let tile = undefined;
   for (const child of scene.children) {
-    if (child.userData.tileId == tileId) tile = child;
+    if (child.userData.tileId == tileKey) tile = child;
   }
   return tile;
 }
@@ -106,6 +106,7 @@ function getTiles(scene: THREE.Scene): Array<THREE.Object3D> {
 
 /**
  * get tile position by in scene by tile id
+ * searches scene for tile's bottom plane that contains tile's position
  * @returns position in scene or undefined if tile is not in scene
  */
 function getTilePosition(
@@ -114,7 +115,7 @@ function getTilePosition(
 ): THREE.Vector3 | undefined {
   let position = undefined;
   scene.traverse((child) => {
-    if (child.userData.tileId == id) {
+    if (child instanceof THREE.Mesh && child.userData.tileId == id) {
       position = child.position;
     }
   });
