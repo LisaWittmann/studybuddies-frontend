@@ -15,18 +15,18 @@ export class MainPlayer implements Player {
   username: string;
   active: boolean;
   position: number;
-  inventar: Map<number, Item>;
+  inventory: Map<number, Item>;
 
   constructor(username: string, active: boolean, playerPosition: number) {
     this.username = username;
     this.active = active;
     this.position = playerPosition;
 
-    this.inventar = new Map<number, Item>();
+    this.inventory = new Map<number, Item>();
   }
 
   addItem(item: Item): void {
-    this.inventar.set(item.id, item);
+    this.inventory.set(item.id, item);
   }
 
   getUsername(): string {
@@ -41,8 +41,8 @@ export class MainPlayer implements Player {
     return this.position;
   }
 
-  getInventar(): Map<number, Item> {
-    return this.inventar;
+  getInventory(): Map<number, Item> {
+    return this.inventory;
   }
 
   setPosition(position: number): void {
