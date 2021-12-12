@@ -53,7 +53,6 @@ export default defineComponent({
     const { loginState } = useLoginStore();
     updateGame();
 
-    const mainPlayer = gameState.playerMap.get(loginState.username);
     const showInstructions = ref(false);
     const showTerminal = ref(false);
 
@@ -79,7 +78,7 @@ export default defineComponent({
       playerMovement(
         new MoveOperation(
           gameState.lobbyKey,
-          (mainPlayer as MainPlayer).username,
+          loginState.username,
           Orientation[orientation].toString()
         )
       );
@@ -96,7 +95,7 @@ export default defineComponent({
       closeInstructions,
       itemSelection,
       movePlayer,
-      mainPlayer,
+      mainPlayer: gameState.playerMap.get(loginState.username),
       labyrinth: gameState.labyrinth,
     };
   },

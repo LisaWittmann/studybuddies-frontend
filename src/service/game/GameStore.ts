@@ -1,9 +1,9 @@
-import { reactive } from "vue";
-import { MainPlayer, Player } from "@/service/game/Player";
+import { reactive, readonly } from "vue";
+import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";
 
-const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
+const { labyrinthState, updateLabyrinthData } = useLabyrinthStore();
 
 /**
  * PlayerMap: To hold both Players
@@ -20,16 +20,7 @@ const gameState = reactive({
 });
 
 async function updateGame() {
-  const { loginState } = useLoginStore();
-  updateLabyrinth(gameState.lobbyKey);
-  gameState.playerMap.set(
-    loginState.username,
-    new MainPlayer(
-      loginState.username,
-      true,
-      gameState.labyrinth.playerStartTileIds[0]
-    )
-  );
+  updateLabyrinthData(gameState.lobbyKey);
 }
 
 /**
@@ -40,10 +31,31 @@ async function updatePlayer(player: Player) {
   gameState.playerMap.set(player.username, player);
 }
 
+
+async function setPlayer(username: string, startTileId: number) {
+  const { loginState } = useLoginStore();
+  if (loginState.username == username) {
+    gameState.playerMap.set(username, new MainPlayer(username, true, startTileId));
+  } else {
+    gameState.playerMap.set(username, new PartnerPlayer(username, false, startTileId));
+  }
+}
+
+async function setLobbyKey(lobbyKey: string) {
+  gameState.lobbyKey = lobbyKey;
+}
+
+async function setError(error: string) {
+  gameState.errormessage = error;
+}
+
 export function useGameStore() {
   return {
-    gameState,
+    gameState: readonly(gameState),
     updateGame,
     updatePlayer,
+    setPlayer,
+    setLobbyKey,
+    setError,
   };
 }
