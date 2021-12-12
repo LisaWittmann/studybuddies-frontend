@@ -40,6 +40,9 @@ export default defineComponent({
       }
     }
 
+    /**
+     * creates image url
+     */
     function getImgUrl(imgName : string){
       return require('../assets/img/inventory/'+imgName+'.svg')  
     }
