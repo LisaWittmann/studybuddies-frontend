@@ -44,13 +44,13 @@ async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
  * @param color: floor color in hexa
  * @returns THREE.Mesh representation of floor
  */
-function createFloor(position: THREE.Vector3, color = 0x199eb0, model: Tile) {
+function createFloor(position: THREE.Vector3, color = 0x199eb0, key: number) {
   const object = new THREE.Mesh(
     new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.copy(position);
-  object.userData = model;
+  object.userData.tileKey = key;
   object.rotateOnAxis(axis.x, radians(90));
   return object;
 }
