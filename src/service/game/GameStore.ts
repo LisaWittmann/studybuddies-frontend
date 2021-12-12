@@ -21,7 +21,7 @@ const gameState = reactive({
 
 async function updateGame() {
   const { loginState } = useLoginStore();
-  updateLabyrinth(gameState.labyrinthId);
+  updateLabyrinth(gameState.lobbyKey);
   gameState.playerMap.set(
     loginState.username,
     new MainPlayer(
@@ -32,11 +32,6 @@ async function updateGame() {
   );
 }
 
-function setLabyrinth(labyrinthId: number) {
-  gameState.labyrinthId = labyrinthId;
-  updateLabyrinth(gameState.labyrinthId);
-  console.log(gameState);
-}
 /**
  * Updates the Player so, the watcher can build the changes
  * @param player: the new (changed) player object
@@ -50,6 +45,5 @@ export function useGameStore() {
     gameState,
     updateGame,
     updatePlayer,
-    setLabyrinth,
   };
 }
