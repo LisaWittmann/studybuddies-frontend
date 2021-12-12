@@ -67,12 +67,13 @@ function exitLobby(lobbyKey: string, username: string) {
     .catch((error) => console.error(error));
 }
 
-function readyCheck() {
-  const { loginState } = useLoginStore();
+function readyCheck(username: string, labId: number) {
   const { gameState } = useGameStore();
   const args: string[] = [];
-  args.push(loginState.username);
-  args.push(String(gameState.labyrinthId));
+  args.push(username);
+  args.push(String(labId));
+  console.log("gameState vor ready finish");
+  console.log(gameState);
 
   fetch(`/api/lobby/${gameState.lobbyKey}/ready`, {
     method: "POST",
@@ -92,14 +93,9 @@ function readyCheck() {
 }
 
 function setupGame(users: string[], labyrinthId: number, username: string) {
-  const { updatePlayer, gameState } = useGameStore();
-  for (const user of users) {
-    if (user == username) {
-      updatePlayer(new MainPlayer(username, true, 0));
-    } else {
-      updatePlayer(new PartnerPlayer(user, false, 1));
-    }
-  }
+  const { gameState, setPlayer } = useGameStore();
+  console.log("HIIIIIIIER!")
+  setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
 
   router.replace(`/game/${gameState.lobbyKey}`);
 }

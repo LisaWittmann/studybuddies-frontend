@@ -1,5 +1,5 @@
 <template>
-  <h1>Lobby {{ lobbyKey }}</h1>
+  <h1>Lobby {{ lobbyKey.value }}</h1>
   <section>
     <UserListComponent :users="users" />
   </section>
@@ -9,10 +9,10 @@
   </section>
   <section>
     <div class="button-wrapper">
-      <button class="button button--confirm" @click="readyCheck">Bereit</button>
+      <button class="button button--confirm" @click="readyCheck(loginState.username, selectedLabyrinth)">Bereit</button>
       <button
         class="button button--exit"
-        @click="exitLobby(lobbyKey, username)"
+        @click="exitLobby(lobbyKey.value, username)"
       >
         Verlassen
       </button>
@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
@@ -41,26 +41,25 @@ export default defineComponent({
       exitLobby,
       setupGame,
     } = useLobbyService();
-    const upload = ref({} as HTMLInputElement);
-    const { gameState } = useGameStore();
-    onMounted(() => {
-      const route = router.currentRoute.value;
-      gameState.lobbyKey = route.params.key as string;
-      console.log(gameState.lobbyKey);
-    })
+    const { gameState, setLobbyKey } = useGameStore();
 
     const users = ref(new Array<string>());
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
-    if (gameState.lobbyKey != "") {
-      updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
-    }
     updateLabyrinths().then((data) => (labyrinthOptions.value = data));
 
     function selectLabyrinth(id: number) {
       selectedLabyrinth.value = id;
     }
+
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      setLobbyKey(route.params.key as string);
+      updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
+    })
+
+    const lobbyKey = computed(() => gameState.lobbyKey);
 
     return {
       readyCheck,
@@ -68,11 +67,10 @@ export default defineComponent({
       exitLobby,
       setupGame,
       users,
-      upload,
-      lobbyKey: gameState.lobbyKey,
+      lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
-      username: loginState.username,
+      loginState,
     };
   },
 });

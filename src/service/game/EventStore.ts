@@ -2,9 +2,10 @@ import { Client } from "@stomp/stompjs";
 import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
+import { useLoginStore } from "../login/LoginStore";
 import router from "@/router";
 
-const { gameState, updatePlayer } = useGameStore();
+const { gameState, updatePlayer, setError, setPlayer } = useGameStore();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -16,11 +17,11 @@ const stompclient = new Client({ brokerURL: wsurl });
  */
 stompclient.onWebSocketError = () => {
   console.log("websocketerror");
-  gameState.errormessage = "WS-Fehler";
+  setError("WS-Fehler");
 };
 stompclient.onStompError = () => {
   console.log("Stomperror");
-  gameState.errormessage = "STOMP-Fehler";
+  setError("STOMP-Fehler");
 };
 
 /**
@@ -53,11 +54,11 @@ stompclient.onConnect = () => {
             // -> now the watcher can update the 3D Room
             // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
-            gameState.errormessage =
-              "There is no Tilereference for this definition of data";
+            setError(
+              "There is no Tilereference for this definition of data");
           }
         } else {
-          gameState.errormessage = "No existing User";
+          setError("No existing User");
         }
 
         break;
@@ -69,7 +70,15 @@ stompclient.onConnect = () => {
         break;
       case "READY":
         if (eventMessage.data === "READY") {
+          // NUR TEMPORÄR (Bis nach dem MessageBroker Ticket)
+          // Bitte noch nicht sofort ändern!
+          // @todo: Ändern!
+          const { loginState } = useLoginStore();
+          setPlayer(loginState.username, gameState.labyrinth.playerStartTileIds[0]);
+
           router.push(`/game/${gameState.lobbyKey}`);
+          console.log("gameState nach ready finish");
+          console.log(gameState);
         }
         break;
       default:

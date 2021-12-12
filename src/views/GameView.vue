@@ -62,7 +62,7 @@ export default defineComponent({
       playerMovement(
         new MoveOperation(
           gameState.lobbyKey,
-          (mainPlayer as MainPlayer).username,
+          loginState.username,
           Orientation[orientation].toString()
         )
       );
@@ -76,7 +76,7 @@ export default defineComponent({
       closeTerminal,
       itemSelection,
       movePlayer,
-      mainPlayer,
+      mainPlayer: gameState.playerMap.get(loginState.username),
       labyrinth: gameState.labyrinth,
     };
   },

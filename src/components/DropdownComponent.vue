@@ -34,7 +34,7 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   props: {
     items: {
-      type: [],
+      type: Array,
     },
   },
   name: "DropdownComponent",
