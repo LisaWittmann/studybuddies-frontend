@@ -69,14 +69,6 @@ stompclient.onConnect = () => {
         break;
       case "READY":
         if (eventMessage.data === "READY") {
-          fetch(`api/lobby/${gameState.lobbyKey}/id`, {
-            method: "GET"
-          }).then((response) => {
-            return response.json();
-          }).then((json) => {
-            gameState.labyrinthId = json;
-            console.log("Labyrinth id for this lobby is: " + gameState.labyrinthId);
-          })
           router.push(`/game/${gameState.lobbyKey}`);
         }
         break;

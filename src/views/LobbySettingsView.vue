@@ -53,7 +53,9 @@ export default defineComponent({
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
-    updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
+    if (gameState.lobbyKey != "") {
+      updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
+    }
     updateLabyrinths().then((data) => (labyrinthOptions.value = data));
 
     function selectLabyrinth(id: number) {

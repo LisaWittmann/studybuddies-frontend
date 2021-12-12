@@ -92,7 +92,7 @@ function readyCheck() {
 }
 
 function setupGame(users: string[], labyrinthId: number, username: string) {
-  const { updatePlayer, setLabyrinth, gameState } = useGameStore();
+  const { updatePlayer, gameState } = useGameStore();
   for (const user of users) {
     if (user == username) {
       updatePlayer(new MainPlayer(username, true, 0));
@@ -100,7 +100,6 @@ function setupGame(users: string[], labyrinthId: number, username: string) {
       updatePlayer(new PartnerPlayer(user, false, 1));
     }
   }
-  setLabyrinth(labyrinthId);
 
   router.replace(`/game/${gameState.lobbyKey}`);
 }
