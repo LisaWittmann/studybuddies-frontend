@@ -87,11 +87,7 @@ function updateCameraPosition(
   position: THREE.Vector3,
   orientation?: Orientation
 ) {
-  camera.position.set(
-    position.x,
-    position.y + settings.cameraHeight,
-    position.z
-  );
+  camera.position.set(position.x, position.y + settings.cameraHeight, position.z);
   if (orientation) updateCameraTarget(orientation);
   else updateCameraOrbit();
 }
