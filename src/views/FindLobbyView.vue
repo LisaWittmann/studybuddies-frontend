@@ -4,64 +4,43 @@
     <h2>Spiel finden</h2>
     <div class="button-wrapper">
       <input type="text" v-model="lobbyKey" />
-      <button @click="joinGame">Spiel beitreten</button>
+      <button @click="join">Spiel beitreten</button>
     </div>
+    <span class="error" v-if="errorMessage">{{ errorMessage }}</span>
   </section>
   <section>
     <h2>Spiel erstellen</h2>
-    <button @click="createGame">Spiel erstellen</button>
+    <button @click="createLobby(username)">Spiel erstellen</button>
   </section>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import router from "@/router";
 import { useLoginStore } from "@/service/login/LoginStore";
+import { useLobbyService } from "@/service/LobbyService";
 
 export default defineComponent({
   name: "FindLobby",
   setup() {
     const { loginState } = useLoginStore();
+    const { joinLobby, createLobby } = useLobbyService();
+
+    const errorMessage = ref("");
     const lobbyKey = ref("");
 
-    function joinGame() {
-      let key = lobbyKey.value;
-      fetch("/api/lobby/join/" + key, {
-        method: "POST",
-        headers: {
-          "Content-Type": "html/text;charset=utf-8",
-        },
-        body: loginState.username,
-      }).then((response) => {
-        if (response.ok) {
-          router.push("/lobby/" + key);
-        } else {
-          console.log(response.statusText);
-        }
-      });
+    function join() {
+      joinLobby(lobbyKey.value, loginState.username).catch(
+        (error) => (errorMessage.value = error.message)
+      );
     }
 
-    function createGame() {
-      console.log(loginState.username);
-      fetch("/api/lobby/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "html/text;charset=utf-8",
-        },
-        body: loginState.username,
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          }
-        })
-        .then((jsonData) => {
-          router.push("/lobby/" + jsonData.key);
-        })
-        .catch((err) => console.log(err));
-    }
-
-    return { lobbyKey, createGame, joinGame };
+    return {
+      join,
+      createLobby,
+      lobbyKey,
+      errorMessage,
+      username: loginState.username,
+    };
   },
 });
 </script>
@@ -99,5 +78,9 @@ input {
 .button-wrapper {
   @include flex-center();
   flex-direction: column;
+}
+
+.error {
+  color: darkred;
 }
 </style>
