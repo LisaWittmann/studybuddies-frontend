@@ -1,0 +1,42 @@
+button,
+.button {
+    background: white;
+    border: 1px solid $color-grey;
+    border-radius: 8px;
+    font-size: $text-m;
+    font-weight: 300;
+    display: inline-block;
+    cursor: pointer;
+    min-height: 35px;
+    width: 80%;
+    padding: 10px 12px;
+    box-shadow: 5px 5px 0 0 rgba(black, 0.03);
+
+    &:hover {
+        font-weight: 400;
+    }
+}
+
+.button {
+    &--small {
+        max-width: 200px;
+    }
+
+    &--medium {
+        min-height: 45px;
+        max-width: 350px;
+    }
+
+    &--large {
+        max-width: 500px;
+        min-height: 80px;
+        box-shadow: 10px 10px 0 0 rgba(black, 0.03);
+    }
+
+    &--filled {
+        background: $color-dark-green;
+        color: $color-white;
+        box-shadow: 5px 5px 0 0 rgba(black, 0.04);
+    }
+}
+ 

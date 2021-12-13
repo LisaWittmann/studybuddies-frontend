@@ -18,17 +18,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.overlay {
-  @include flex-center();
-  background-color: rgba(0, 0, 0, 0.6);
-  color: $color-white;
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  z-index: 10;
-  left: 0;
-  top: 0;
-}
-</style>
