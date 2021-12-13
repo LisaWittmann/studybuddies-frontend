@@ -21,7 +21,6 @@ const { gameState } = useGameStore();
  * creates simple fallback labyrinth if fetch fails
  */
 async function updateLabyrinthData(lobbyKey: string) {
-  console.log("Requested lab of lobby " + lobbyKey);
   //TODO change this to the game api
   await fetch(`/api/lobby/${lobbyKey}`, {
     method: "GET",
@@ -31,8 +30,6 @@ async function updateLabyrinthData(lobbyKey: string) {
       return response.json();
     })
     .then((jsonData) => {
-      console.log("Just for testing");
-      console.log(jsonData);
       const labyrinth = new Labyrinth(
         jsonData.endTileId,
         jsonData.playerStartTileIds
