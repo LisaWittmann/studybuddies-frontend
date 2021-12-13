@@ -21,7 +21,9 @@
       >
         <div>Labyrinth {{ item }}</div>
       </div>
-      <div v-if="!items">Noch keine Labyrinthe verfügbar</div>
+      <div class="option--fallback" v-if="items.length < 1">
+        Noch keine Labyrinthe verfügbar
+      </div>
     </div>
   </section>
 </template>
@@ -177,6 +179,11 @@ export default defineComponent({
       cursor: pointer;
       position: relative;
       z-index: 2;
+
+      &--fallback {
+        margin-top: $spacing-s;
+        margin-bottom: $spacing-s;
+      }
 
       &:last-child {
         border-bottom: 0;

@@ -5,7 +5,7 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "../login/LoginStore";
 import router from "@/router";
 
-const { gameState, updatePlayer, setError, setPlayer } = useGameStore();
+const { gameState, updatePlayer, setError, setPlayer, updateGame } = useGameStore();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -32,7 +32,6 @@ stompclient.onConnect = () => {
 
   stompclient.subscribe(DEST, (message) => {
     console.log("Message ist angekommen");
-    console.log(JSON.parse(message.body));
 
     const eventMessage: EventMessage = JSON.parse(message.body);
 
@@ -42,15 +41,14 @@ stompclient.onConnect = () => {
     const playerToMove: Player | undefined = gameState.playerMap.get(
       eventMessage.username
     );
+    console.log("Acting player: " +  playerToMove)
     switch (eventMessage.operation) {
       case "MOVEMENT":
         if (playerToMove) {
           const destTileID: number = Number.parseInt(eventMessage.data);
 
           if (destTileID) {
-            playerToMove.setPosition(destTileID);
-            console.log(playerToMove.getPosition())
-            updatePlayer(playerToMove);
+            updatePlayer(playerToMove, destTileID);
             // -> now the watcher can update the 3D Room
             // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
@@ -74,19 +72,19 @@ stompclient.onConnect = () => {
           // Bitte noch nicht sofort ändern!
           // @todo: Ändern!
           const { loginState } = useLoginStore();
-          setPlayer(loginState.username, gameState.labyrinth.playerStartTileIds[0]);
-
-          router.push(`/game/${gameState.lobbyKey}`);
-          console.log("gameState nach ready finish");
-          console.log(gameState);
+          updateGame().then(() => {
+              setPlayer(loginState.username, gameState.labyrinth.playerStartTileIds[0]);
+          }
+          ).then(() => {
+            router.push(`/game/${gameState.lobbyKey}`);
+            console.log("gameState nach ready finish");
+            console.log(gameState);
+          });
         }
         break;
       default:
         break;
     }
-
-    console.log(eventMessage.operation);
-    console.log(gameState);
   });
 };
 

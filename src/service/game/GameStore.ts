@@ -20,19 +20,25 @@ const gameState = reactive({
 });
 
 async function updateGame() {
-  updateLabyrinthData(gameState.lobbyKey);
+  await updateLabyrinthData(gameState.lobbyKey);
 }
 
 /**
  * Updates the Player so, the watcher can build the changes
  * @param player: the new (changed) player object
+ * @param newPosition: setzt die neue Position des Spielers
  */
-async function updatePlayer(player: Player) {
-  gameState.playerMap.set(player.username, player);
+function updatePlayer(player: Player, newPosition: number) {
+  const foundPlayer = gameState.playerMap.get(player.getUsername());
+  if (foundPlayer) {
+    foundPlayer.setPosition(newPosition);
+    gameState.playerMap.set(player.username, player);
+  }
 }
 
 
 async function setPlayer(username: string, startTileId: number) {
+  console.log("Starttileid is: " + startTileId)
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
     gameState.playerMap.set(username, new MainPlayer(username, true, startTileId));

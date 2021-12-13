@@ -14,7 +14,6 @@ const labyrinthState: Labyrinth = reactive<Labyrinth>({
   playerStartTileIds: new Array<number>(),
 });
 
-const { gameState } = useGameStore();
 /**
  * update the tiles for getting them initially and every time something changes
  * fetches labyrinth object of api and converts response into labyrinth data
@@ -31,8 +30,6 @@ async function updateLabyrinthData(lobbyKey: string) {
       return response.json();
     })
     .then((jsonData) => {
-      console.log("Just for testing");
-      console.log(jsonData);
       const labyrinth = new Labyrinth(
         jsonData.endTileId,
         jsonData.playerStartTileIds

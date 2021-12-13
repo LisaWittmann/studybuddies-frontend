@@ -1,7 +1,7 @@
 <template>
   <SceneComponent
     :labyrinth="labyrinth"
-    :mainPlayer="mainPlayer"
+    :player="mainPlayer"
     @click-object="itemSelection"
     @move-player="movePlayer"
     @click-disabled="openTerminal"
@@ -12,12 +12,6 @@
     :message="message"
     :state="messageState"
     @close="closeTerminal"
-  />
-  <!--instructions for current game quest-->
-  <OverlayInstructionComponent
-    :opened="showInstructions"
-    :instructions="instructions"
-    @close="closeInstructions"
   />
 </template>
 
@@ -33,7 +27,6 @@ import { MainPlayer } from "@/service/game/Player";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
-import OverlayInstructionComponent from "@/components/overlays/OverlayInstructionComponent.vue";
 
 import "@/service/game/EventStore";
 
@@ -41,7 +34,6 @@ export default defineComponent({
   name: "GameView",
   components: {
     SceneComponent,
-    OverlayInstructionComponent,
     OverlayTerminalComponent,
   },
   props: {
@@ -53,15 +45,8 @@ export default defineComponent({
     const { loginState } = useLoginStore();
     updateGame();
 
-    const showInstructions = ref(false);
+    const mainPlayer = gameState.playerMap.get(loginState.username);
     const showTerminal = ref(false);
-
-    // instructions for current game quest e.g. finding partner player
-    const instructions = [
-      "Willkommen unter den Eichen",
-      "Deine erste Aufgabe erwartet dich",
-      "Finde zur Semester Einführungsveranstaltung",
-    ];
 
     // in-game messages like warnings, errors, hints ...
     const message =
@@ -71,7 +56,6 @@ export default defineComponent({
     const messageState = "warning";
 
     const openTerminal = () => (showTerminal.value = true);
-    const closeInstructions = () => (showInstructions.value = false);
     const closeTerminal = () => (showTerminal.value = false);
 
     function movePlayer(orientation: Orientation) {
@@ -87,12 +71,9 @@ export default defineComponent({
     return {
       message,
       messageState,
-      instructions,
       showTerminal,
-      showInstructions,
       openTerminal,
       closeTerminal,
-      closeInstructions,
       itemSelection,
       movePlayer,
       mainPlayer: gameState.playerMap.get(loginState.username),

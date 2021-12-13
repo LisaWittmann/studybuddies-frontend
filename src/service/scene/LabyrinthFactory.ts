@@ -40,7 +40,8 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
  * @param scene: scene that contains player
  */
 async function updatePlayer(player: Player, scene: THREE.Scene) {
-  const tilePosition = getTilePosition(player.position, scene);
+  console.log("Move player: " + player);
+  const tilePosition = getTilePosition(player.getPosition(), scene);
   if (tilePosition) {
     if (player instanceof MainPlayer) {
       updateMainPlayer(tilePosition);
@@ -79,34 +80,37 @@ async function updateTile() {
 }
 
 /**
- * get tile 3D object by tileId
- * @param tileId: unique id of tile in scene
+ * get tile 3D object by tileKey
+ * @param tileKey: unique relation key of tile in scene
  * @param scene: scene that might contain tile
- * @returns 3D representation of tile with id
+ * @returns 3D representation of tile with key
  */
 function getTile(
-  tileId: number,
+  tileKey: number,
   scene: THREE.Scene
 ): THREE.Object3D | undefined {
   let tile = undefined;
   for (const child of scene.children) {
-    if (child.userData.tileId == tileId) tile = child;
+    if (child.userData.tileId == tileKey) tile = child;
   }
   return tile;
 }
 
 /**
  * get tile position by in scene by tile id
+ * searches scene for tile's bottom plane that contains tile's position
  * @returns position in scene or undefined if tile is not in scene
  */
 function getTilePosition(
   id: number,
   scene: THREE.Scene
 ): THREE.Vector3 | undefined {
+  if (!id) return undefined;
   let position = undefined;
   scene.traverse((child) => {
-    if (child.userData.tileId == id) {
+    if (child.userData.tileKey == id) {
       position = child.position;
+      console.log(child);
     }
   });
   return position;
