@@ -22,7 +22,7 @@
         </button>
         <p>
           Noch kein Benutzerkonto?
-          <a href="/register">Jetzt registrieren</a>
+          <router-link to="/register">Jetzt registrieren</router-link>
         </p>
         <span class="error">{{ loginState.errormessage }}</span>
       </form>

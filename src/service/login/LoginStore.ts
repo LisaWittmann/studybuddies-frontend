@@ -76,7 +76,7 @@ async function register(user: User) {
         "Deine Registrierung ist fehlgeschlagen. Bitte versuche es noch einmal"
       );
     }
-    router.push("/login");
+    router.push("/");
   });
 }
 
