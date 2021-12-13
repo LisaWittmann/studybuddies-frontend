@@ -1,22 +1,28 @@
 <template>
-  <section>
-    <img class="logo" src="@/assets/img/logo_header.png" alt="logo" />
-    <h2>Spiel finden</h2>
-    <div class="button-wrapper">
-      <input type="text" v-model="lobbyKey" />
-      <button @click="joinGame">Spiel beitreten</button>
-    </div>
-  </section>
-  <section>
-    <h2>Spiel erstellen</h2>
-    <button @click="createGame">Spiel erstellen</button>
-  </section>
+  <div class="container">
+    <section>
+      <img
+        class="image--header"
+        src="@/assets/img/logo_header.png"
+        alt="logo"
+      />
+      <h2>Spiel finden</h2>
+      <div class="column-wrapper">
+        <input class="input--small" type="text" v-model="lobbyKey" />
+        <button class="button--small" @click="joinGame">Spiel beitreten</button>
+      </div>
+    </section>
+    <section>
+      <h2>Spiel erstellen</h2>
+      <button class="button--small" @click="createGame">Spiel erstellen</button>
+    </section>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import router from "@/router";
 import { useLoginStore } from "@/service/login/LoginStore";
+import router from "@/router";
 
 export default defineComponent({
   name: "FindLobby",
@@ -67,38 +73,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.logo {
+.image--header {
   width: 80%;
   max-width: 600px;
-}
-
-button {
-  margin: 10px;
-  min-height: 35px;
-  max-width: 200px;
-  background: transparent;
-  font-size: 16px;
-}
-
-input,
-button {
-  border: 1px solid $color-grey;
-  border-radius: 8px;
-  font-weight: 300;
-  width: 80%;
-  display: inline-block;
-  padding: 10px 12px;
-  cursor: pointer;
-}
-
-input {
-  min-height: 20px;
-  max-width: 300px;
-  margin-bottom: $spacing-xs;
-}
-
-.button-wrapper {
-  @include flex-center();
-  flex-direction: column;
 }
 </style>
