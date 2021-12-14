@@ -1,4 +1,7 @@
 import router from "@/router";
+import { useGameStore } from "@/service/game/GameStore";
+import { MainPlayer, PartnerPlayer } from "./game/Player";
+import { useLoginStore } from "@/service/login/LoginStore";
 
 /**
  * send request to join lobby with given lobby key
@@ -68,14 +71,15 @@ async function exitLobby(lobbyKey: string, username: string) {
 
 /**
  * post selected json file to api to read in labyrinth model
- * @param filelist: list of selected labyrinth for upload
+ * @param fileList : list of selected labyrinth for upload
  */
-async function uploadJsonFiles(filelist: FileList) {
-  if (filelist) {
-    for (const file of filelist) {
+async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
+  const responseList = new Array<string>();
+  if (fileList) {
+    for (const file of fileList) {
       const data = new FormData();
       data.append("labFile", file);
-      fetch("/api/labyrinth/read", {
+      await fetch("/api/labyrinth/read", {
         method: "POST",
         body: data,
       })
@@ -83,18 +87,26 @@ async function uploadJsonFiles(filelist: FileList) {
           if (!response.ok) {
             throw new Error(response.statusText);
           }
+          responseList.push("Upload von " + file.name + " war erfolgreich");
           return response.json();
         })
-        .catch((error) => console.error(error));
+        .catch((error) => {
+          responseList.push("Upload von " + file.name + " ist fehlgeschlagen");
+          console.error(error);
+        });
     }
+    return responseList;
+  } else {
+    responseList.push("Keine File zum Laden gefunden");
+    return responseList;
   }
 }
 
 /**
  * send request to get all current users by username in lobby
- * @param lobbyKey: indentifying key of lobby which users should be requested
- * @returns promise containing the list of users if request was successfull
- * @throws error if request was not successfull
+ * @param lobbyKey: identifying key for lobby in which users should be requested
+ * @returns promise containing the list of users if request was successful
+ * @throws error if request was not successful
  */
 async function updateUsers(lobbyKey: string) {
   return fetch("/api/lobby/users/" + lobbyKey, {
@@ -107,8 +119,8 @@ async function updateUsers(lobbyKey: string) {
 
 /**
  * send request to get all labyrinths in database that can be selected for game
- * @returns promise containing list of all labyrinth ids if request was successfull
- * @throws error if request was not successfull
+ * @returns promise containing list of all labyrinth ids if request was successful
+ * @throws error if request was not successful
  */
 async function updateLabyrinths() {
   return fetch("/api/labyrinth/ids").then((response) => {
@@ -118,19 +130,45 @@ async function updateLabyrinths() {
 }
 
 /**
- * send request to set ready status of user in lobby
- * @param lobbyKey: identifying key of the lobby
- * @param username: identifying name of the user which status should be set
+ * sends a List of two Arguments to the BE, so there can be checked, wheather every Player is ready or not
+ * (and reacts to a wrong respond after recieving it)
+ * @param username : used to identify the user in the backend, which shall be taken out of the lobby
+ * @param labId : used to identify in the BE which Labyrinth is to be used for the Game Progression
  */
-async function readyCheck(lobbyKey: string, username: string) {
-  fetch(`/api/lobby/${lobbyKey}/ready`, {
+function readyCheck(username: string, labId: number) {
+  const { gameState } = useGameStore();
+  const args: string[] = [];
+  args.push(username);
+  args.push(String(labId));
+  console.log("gameState vor ready finish");
+  console.log(gameState);
+
+  fetch(`/api/lobby/ready/` + gameState.lobbyKey, {
     method: "POST",
-    body: username,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(args)
   })
     .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
+      if (!response.ok) {
+        throw new Error("Error during ready check: " + response.statusText);
+      }
     })
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+/**
+ * @todo: Im Messagebrokertask nutzen
+ * @param users : list with usernames in the lobby
+ */
+function setupGame(users: string[]) {
+  const { gameState, setPlayer } = useGameStore();
+  //setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
+
+  router.replace(`/game/${gameState.lobbyKey}`);
 }
 
 export function useLobbyService() {
