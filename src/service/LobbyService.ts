@@ -1,7 +1,15 @@
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
-import { MainPlayer, PartnerPlayer } from "./game/Player";
+import {MainPlayer, PartnerPlayer, Player} from "./game/Player";
 import { useLoginStore } from "@/service/login/LoginStore";
+import {reactive, readonly} from "vue";
+
+
+const lobbyState = reactive({
+  lobbyKey: "",
+  users: new Array<string>(),
+  errormessage: "",
+});
 
 /**
  * post selected json file to api to read in labyrinth model
@@ -41,7 +49,12 @@ async function updateUsers(lobbyKey: string) {
     method: "GET",
   }).then((response) => {
     if (!response.ok) throw new Error(response.statusText);
-    return response.json();
+    return response.json()
+  }).then((response) => {
+
+    lobbyState.users = response;
+    console.log(lobbyState.users);
+    console.log(response);
   });
 }
 
@@ -94,7 +107,7 @@ function readyCheck(username: string, labId: number) {
 
 function setupGame(users: string[], labyrinthId: number, username: string) {
   const { gameState, setPlayer } = useGameStore();
-  console.log("HIIIIIIIER!")
+
   setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
 
   router.replace(`/game/${gameState.lobbyKey}`);
@@ -108,5 +121,6 @@ export function useLobbyService() {
     readyCheck,
     setupGame,
     exitLobby,
+    lobbyState: readonly(lobbyState),
   };
 }

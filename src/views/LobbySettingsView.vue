@@ -40,10 +40,12 @@ export default defineComponent({
       readyCheck,
       exitLobby,
       setupGame,
+      lobbyState,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
-    const users = ref(new Array<string>());
+
+
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
@@ -56,7 +58,6 @@ export default defineComponent({
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
     })
 
     const lobbyKey = computed(() => gameState.lobbyKey);
@@ -66,7 +67,7 @@ export default defineComponent({
       selectLabyrinth,
       exitLobby,
       setupGame,
-      users,
+      users: lobbyState.users,
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
