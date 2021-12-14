@@ -2,6 +2,7 @@
   <div class="container">
     <h1>Lobby {{ lobbyKey }}</h1>
     <section>
+      <p>{{ users.length }}/2 Spieler verbunden</p>
       <UserListComponent :users="users" />
     </section>
     <section>
