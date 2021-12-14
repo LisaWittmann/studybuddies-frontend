@@ -20,8 +20,12 @@
         <button type="submit">Registrieren</button>
         <p>
           Du bist bereits registriert?
-          <a href="/login">Jetzt anmelden</a>
+          <router-link to="/login">Jetzt anmelden</router-link>
         </p>
+        <span>
+          Lade jetzt dein eigenes Labyrinth hoch:<br/>
+          <router-link to="/upload">Labyrinth hochladen</router-link>
+        </span>
         <span class="error">{{ errorMessage }}</span>
       </form>
     </div>
