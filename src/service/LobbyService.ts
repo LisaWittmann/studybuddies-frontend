@@ -146,9 +146,9 @@ function readyCheck(username: string, labId: number) {
   fetch(`/api/lobby/ready/` + gameState.lobbyKey, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(args)
+    body: JSON.stringify(args),
   })
     .then((response) => {
       if (!response.ok) {

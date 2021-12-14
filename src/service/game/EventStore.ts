@@ -5,7 +5,8 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "../login/LoginStore";
 import router from "@/router";
 
-const { gameState, updatePlayer, setError, setPlayer, updateGame } = useGameStore();
+const { gameState, updatePlayer, setError, setPlayer, updateGame } =
+  useGameStore();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -41,7 +42,7 @@ stompclient.onConnect = () => {
     const playerToMove: Player | undefined = gameState.playerMap.get(
       eventMessage.username
     );
-    console.log("Acting player: " +  playerToMove)
+    console.log("Acting player: " + playerToMove);
     switch (eventMessage.operation) {
       case "MOVEMENT":
         if (playerToMove) {
@@ -52,8 +53,7 @@ stompclient.onConnect = () => {
             // -> now the watcher can update the 3D Room
             // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
-            setError(
-              "There is no Tilereference for this definition of data");
+            setError("There is no Tilereference for this definition of data");
           }
         } else {
           setError("No existing User");
@@ -72,14 +72,18 @@ stompclient.onConnect = () => {
           // Bitte noch nicht sofort ändern!
           // @todo: Ändern!
           const { loginState } = useLoginStore();
-          updateGame().then(() => {
-              setPlayer(loginState.username, gameState.labyrinth.playerStartTileIds[0]);
-          }
-          ).then(() => {
-            router.push(`/game/${gameState.lobbyKey}`);
-            console.log("gameState nach ready finish");
-            console.log(gameState);
-          });
+          updateGame()
+            .then(() => {
+              setPlayer(
+                loginState.username,
+                gameState.labyrinth.playerStartTileIds[0]
+              );
+            })
+            .then(() => {
+              router.push(`/game/${gameState.lobbyKey}`);
+              console.log("gameState nach ready finish");
+              console.log(gameState);
+            });
         }
         break;
       default:

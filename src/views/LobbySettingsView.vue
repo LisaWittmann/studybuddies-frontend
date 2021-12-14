@@ -10,7 +10,10 @@
     </section>
     <section>
       <div class="column-wrapper">
-        <button class="button--small button--filled" @click="readyCheck(loginState.username, selectedLabyrinth)">
+        <button
+          class="button--small button--filled"
+          @click="readyCheck(loginState.username, selectedLabyrinth)"
+        >
           Bereit
         </button>
         <button
@@ -31,19 +34,15 @@ import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
-import {useGameStore} from "@/service/game/GameStore";
+import { useGameStore } from "@/service/game/GameStore";
 
 export default defineComponent({
   name: "LobbySettingsView",
   components: { UserListComponent, DropdownComponent },
   setup() {
     const { loginState } = useLoginStore();
-    const {
-      updateUsers,
-      updateLabyrinths,
-      readyCheck,
-      exitLobby,
-    } = useLobbyService();
+    const { updateUsers, updateLabyrinths, readyCheck, exitLobby } =
+      useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
     const users = ref(new Array<string>());
@@ -60,7 +59,7 @@ export default defineComponent({
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
-    })
+    });
 
     const lobbyKey = computed(() => gameState.lobbyKey);
 

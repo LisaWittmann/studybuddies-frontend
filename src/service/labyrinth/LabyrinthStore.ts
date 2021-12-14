@@ -3,7 +3,7 @@ import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Item } from "./Item";
 import { Vector3 } from "three";
-import {useGameStore} from "@/service/game/GameStore";
+import { useGameStore } from "@/service/game/GameStore";
 
 /**
  * constant to keep the tiles or store an errormessage
