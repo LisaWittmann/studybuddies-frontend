@@ -59,3 +59,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+h1 {
+  margin-bottom: 0;
+}
+</style>
