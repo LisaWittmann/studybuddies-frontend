@@ -14,7 +14,7 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
   {
-    path: "/login",
+    path: "/",
     name: "LoginView",
     component: LoginView,
   },

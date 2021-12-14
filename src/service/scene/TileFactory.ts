@@ -35,7 +35,7 @@ function createTile(
 
   //ITEMS-----------------
   for (const item of model.objectsInRoom) {
-    createItem(item, tile);
+    createItem(item, tile, position);
   }
   return tile;
 }
