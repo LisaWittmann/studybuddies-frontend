@@ -1,5 +1,5 @@
 <template>
-  <h1>Lobby {{ lobbyKey.value }}</h1>
+  <h1>Lobby {{ lobbyKey }}</h1>
   <section>
     <UserListComponent :users="users" />
   </section>
@@ -12,7 +12,7 @@
       <button class="button button--confirm" @click="readyCheck(loginState.username, selectedLabyrinth)">Bereit</button>
       <button
         class="button button--exit"
-        @click="exitLobby(lobbyKey.value, username)"
+        @click="exitLobby(lobbyKey, username)"
       >
         Verlassen
       </button>
