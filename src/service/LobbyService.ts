@@ -180,7 +180,7 @@ function readyCheck(username: string, labId: number) {
 function setupGame(users: string[]) {
   const { gameState, setPlayer } = useGameStore();
 
-  setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
+  //setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
 
   router.replace(`/game/${gameState.lobbyKey}`);
 }
@@ -195,7 +195,6 @@ export function useLobbyService() {
     updateLabyrinths,
     readyCheck,
     setupGame,
-    exitLobby,
     lobbyState: readonly(lobbyState),
   };
 }
