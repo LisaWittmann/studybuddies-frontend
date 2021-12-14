@@ -1,30 +1,36 @@
 <template>
-  <div class="login">
-    <div class="login__content">
-      <div class="login__content-header">
-        <h1>Anmelden</h1>
-      </div>
-      <form @submit.prevent="login(user)" class="form">
+  <div class="flex-container">
+    <section>
+      <h1>Anmelden</h1>
+      <form @submit.prevent="login(user)" class="column-wrapper">
         <input
+          class="input--medium"
           type="username"
           placeholder="Benutzername"
           v-model="user.username"
           required
         />
         <input
+          class="input--medium"
           type="password"
           placeholder="Passwort"
           v-model="user.password"
           required
         />
-        <button type="submit">Anmelden</button>
+        <button class="button--medium button--filled" type="submit">
+          Anmelden
+        </button>
         <p>
           Noch kein Benutzerkonto?
-          <a href="/register">Jetzt registrieren</a>
+          <router-link to="/register">Jetzt registrieren</router-link>
         </p>
+        <span>
+          Lade jetzt dein eigenes Labyrinth hoch:<br/>
+          <router-link to="/upload">Labyrinth hochladen</router-link>
+        </span>
         <span class="error">{{ loginState.errormessage }}</span>
       </form>
-    </div>
+    </section>
   </div>
 </template>
 
@@ -47,21 +53,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.login {
-  width: 100%;
-  height: 100%;
-  @include flex-center();
-
-  &__content {
-    max-width: 400px;
-    width: 70%;
-    margin: auto;
-
-    &-header {
-      margin-bottom: $spacing-m;
-    }
-  }
-}
-</style>

@@ -1,23 +1,27 @@
 <template>
-  <h1>Lobby {{ lobbyKey }}</h1>
-  <section>
-    <UserListComponent :users="users" />
-  </section>
-  <section>
-    <h2>Labyrinth auswählen:</h2>
-    <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
-  </section>
-  <section>
-    <div class="button-wrapper">
-      <button class="button button--confirm" @click="readyCheck(loginState.username, selectedLabyrinth)">Bereit</button>
-      <button
-        class="button button--exit"
-        @click="exitLobby(lobbyKey, username)"
-      >
-        Verlassen
-      </button>
-    </div>
-  </section>
+  <div class="container">
+    <h1>Lobby {{ lobbyKey }}</h1>
+    <section>
+      <UserListComponent :users="users" />
+    </section>
+    <section>
+      <h2>Labyrinth auswählen:</h2>
+      <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
+    </section>
+    <section>
+      <div class="column-wrapper">
+        <button class="button--small button--filled" @click="readyCheck(loginState.username, selectedLabyrinth)">
+          Bereit
+        </button>
+        <button
+          class="button button--small button--exit"
+          @click="exitLobby(lobbyKey, username)"
+        >
+          Verlassen
+        </button>
+      </div>
+    </section>
+  </div>
 </template>
 
 <script lang="ts">
@@ -67,7 +71,6 @@ export default defineComponent({
       readyCheck,
       selectLabyrinth,
       exitLobby,
-      setupGame,
       users,
       lobbyKey,
       labyrinthOptions,
@@ -83,19 +86,13 @@ h1 {
   margin: $spacing-l 0;
 }
 
-.button-wrapper {
-  @include flex-center();
-  flex-direction: column;
-}
-
 .button {
-  margin: 10px;
-  min-height: 35px;
-  background: transparent;
-  font-size: 16px;
+  &--upload {
+    min-height: 0;
 
-  &:hover {
-    font-weight: 400;
+    &:hover {
+      color: $color-beige;
+    }
   }
 
   &--exit {
@@ -115,22 +112,5 @@ h1 {
 
 input[type="file"] {
   display: none;
-}
-
-.file-upload,
-.button {
-  border: 1px solid $color-grey;
-  border-radius: 8px;
-  font-weight: 300;
-  display: inline-block;
-  padding: 10px 12px;
-  width: 80%;
-  max-width: 200px;
-  cursor: pointer;
-}
-
-.file-upload:hover {
-  color: $color-beige;
-  font-weight: 400;
 }
 </style>
