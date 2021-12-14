@@ -22,7 +22,7 @@
         </button>
         <p>
           Du bist bereits registriert?
-          <router-link to="/login">Jetzt anmelden</router-link>
+          <router-link to="/">Jetzt anmelden</router-link>
         </p>
         <span>
           Lade jetzt dein eigenes Labyrinth hoch:<br/>
