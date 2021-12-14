@@ -36,7 +36,11 @@ function updatePlayer(player: Player, newPosition: number) {
   }
 }
 
-
+/**
+ * sets a Player with its username and the startTileId
+ * @param username : used to set as key in the playerMap make Identification between Main and Partnerplayer better
+ * @param startTileId : used to place the Player where they belong in the frontend
+ */
 async function setPlayer(username: string, startTileId: number) {
   console.log("Starttileid is: " + startTileId)
   const { loginState } = useLoginStore();

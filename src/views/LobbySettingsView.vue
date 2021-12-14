@@ -39,7 +39,6 @@ export default defineComponent({
       updateLabyrinths,
       readyCheck,
       exitLobby,
-      setupGame,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
@@ -65,7 +64,6 @@ export default defineComponent({
       readyCheck,
       selectLabyrinth,
       exitLobby,
-      setupGame,
       users,
       lobbyKey,
       labyrinthOptions,

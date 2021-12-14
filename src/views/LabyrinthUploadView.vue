@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h2>Labyrinth hochladen:</h2>
+    <h1>Labyrinth hochladen:</h1>
     <label class="file-upload">
       <input
         type="file"
@@ -13,13 +13,13 @@
   </section>
   <section>
     <p>
-      <a href="/register">Jetzt registrieren</a> / 
-      <a href="/login">Jetzt anmelden</a>
+      <router-link to="/register">Jetzt registrieren</router-link> / 
+      <router-link to="/login">Jetzt anmelden</router-link>
     </p>
   </section>
   <section>
-    <div class="response-wrapper"
-      v-bind:style="{ 'visibility: hidden;': uploadResponse.length <= 0 }">
+    <div v-if="uploadResponse.length > 0"
+        class="response-wrapper">
       <p class="response response--text"
         v-for="(item, index) of uploadResponse"
         :key="index">
@@ -35,7 +35,7 @@ import { useLoginStore } from "@/service/login/LoginStore";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
-  name: "LobbySettingsView",
+  name: "LabyrinthUploadView",
   components: {},
   setup() {
     const { loginState } = useLoginStore();

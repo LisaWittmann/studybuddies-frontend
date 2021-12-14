@@ -5,7 +5,7 @@ import { useLoginStore } from "@/service/login/LoginStore";
 
 /**
  * post selected json file to api to read in labyrinth model
- * @param filelist: list of selected labyrinth for upload
+ * @param filelist : list of selected labyrinth for upload
  */
 async function uploadJsonFiles(filelist: FileList): Promise<string[]> {
   const responseList = new Array<string>();
@@ -36,6 +36,11 @@ async function uploadJsonFiles(filelist: FileList): Promise<string[]> {
   }
 }
 
+/**
+ * gets the list of the users in the lobby
+ * @param lobbyKey : used to identify the lobby in the backend
+ * @returns 
+ */
 async function updateUsers(lobbyKey: string) {
   return fetch("/api/lobby/users/" + lobbyKey, {
     method: "GET",
@@ -45,6 +50,10 @@ async function updateUsers(lobbyKey: string) {
   });
 }
 
+/**
+ * gets a List of all avaliable Labyrinths by their ids
+ * @returns 
+ */
 async function updateLabyrinths() {
   return fetch("/api/labyrinth/ids").then((response) => {
     if (!response.ok) throw new Error(response.statusText);
@@ -52,6 +61,11 @@ async function updateLabyrinths() {
   });
 }
 
+/**
+ * Sends a post Request to the BE so the user can leave the Lobby
+ * @param lobbyKey : used to identify the lobby in the backend
+ * @param username : used to identify the user in the backend, which shall be taken out of the lobby
+ */
 function exitLobby(lobbyKey: string, username: string) {
   fetch("/api/lobby/leave/" + lobbyKey, {
     method: "POST",
@@ -67,6 +81,12 @@ function exitLobby(lobbyKey: string, username: string) {
     .catch((error) => console.error(error));
 }
 
+/**
+ * sends a List of two Arguments to the BE, so there can be checked, wheather every Player is ready or not
+ * (and reacts to a wrong respond after recieving it) 
+ * @param username : used to identify the user in the backend, which shall be taken out of the lobby
+ * @param labId : used to identify in the BE which Labyrinth is to be used for the Game Progression
+ */
 function readyCheck(username: string, labId: number) {
   const { gameState } = useGameStore();
   const args: string[] = [];
@@ -92,10 +112,13 @@ function readyCheck(username: string, labId: number) {
     });
 }
 
-function setupGame(users: string[], labyrinthId: number, username: string) {
+/**
+ * @todo: Im Messagebrokertask nutzen
+ * @param users : list with usernames in the lobby
+ */
+function setupGame(users: string[]) {
   const { gameState, setPlayer } = useGameStore();
-  console.log("HIIIIIIIER!")
-  setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
+  //setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
 
   router.replace(`/game/${gameState.lobbyKey}`);
 }
