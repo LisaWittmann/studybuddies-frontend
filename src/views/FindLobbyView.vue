@@ -17,11 +17,13 @@
 import { defineComponent, ref } from "vue";
 import router from "@/router";
 import { useLoginStore } from "@/service/login/LoginStore";
+import { useLobbyService} from "@/service/LobbyService";
 
 export default defineComponent({
   name: "FindLobby",
   setup() {
     const { loginState } = useLoginStore();
+    const { updateUsers } = useLobbyService();
     const lobbyKey = ref("");
 
     function joinGame() {
@@ -42,7 +44,7 @@ export default defineComponent({
     }
 
     function createGame() {
-      console.log(loginState.username);
+      //console.log(loginState.username);
       fetch("/api/lobby/create", {
         method: "POST",
         headers: {
@@ -56,6 +58,7 @@ export default defineComponent({
           }
         })
         .then((jsonData) => {
+          updateUsers(jsonData.key);
           router.push("/lobby/" + jsonData.key);
         })
         .catch((err) => console.log(err));

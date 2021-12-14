@@ -60,6 +60,7 @@ export default defineComponent({
       setLobbyKey(route.params.key as string);
     })
 
+    const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
     return {
@@ -67,7 +68,7 @@ export default defineComponent({
       selectLabyrinth,
       exitLobby,
       setupGame,
-      users: lobbyState.users,
+      users,
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
