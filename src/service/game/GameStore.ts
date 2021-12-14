@@ -37,7 +37,7 @@ function updatePlayer(player: Player, newPosition: number) {
 }
 
 
-async function setPlayer(username: string, startTileId: number) {
+function setPlayer(username: string, startTileId: number) {
   console.log("Starttileid is: " + startTileId)
   const { loginState } = useLoginStore();
   if (loginState.username == username) {

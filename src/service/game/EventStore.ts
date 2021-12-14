@@ -8,7 +8,7 @@ import router from "@/router";
 import {ref} from "vue";
 
 const { gameState, updatePlayer, setError, setPlayer, updateGame } = useGameStore();
-const { updateUsers } = useLobbyService();
+const { updateUsers, lobbyState } = useLobbyService();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -75,10 +75,16 @@ stompclient.onConnect = () => {
           // Bitte noch nicht sofort ändern!
           // @todo: Ändern!
           const { loginState } = useLoginStore();
+
           updateGame().then(() => {
-              setPlayer(loginState.username, gameState.labyrinth.playerStartTileIds[0]);
-          }
-          ).then(() => {
+
+            updateUsers(gameState.lobbyKey);
+            let index = 0;
+            lobbyState.users.forEach(user => {
+              setPlayer(user, gameState.labyrinth.playerStartTileIds[index]);
+              index++;
+            });
+
             router.push(`/game/${gameState.lobbyKey}`);
             console.log("gameState nach ready finish");
             console.log(gameState);
