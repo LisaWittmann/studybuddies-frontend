@@ -24,15 +24,13 @@ export class MainPlayer implements Player {
     new Item(2, "mouse", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
     new Item(3, "keyboard", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
     new Item(4, "vr-glasses", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    /*
-      7, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-      8, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-      9, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-      10, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-      11, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-      12, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-      */
+    new Item(5, "cap", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    new Item(6, "tablet", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    new Item(7, "touchpen", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    new Item(8, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    new Item(9, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    new Item(10, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    new Item(11, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
   ];
 
   constructor(username: string, active: boolean, playerPosition: number) {
