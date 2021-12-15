@@ -45,7 +45,6 @@ export default defineComponent({
   name: "GameView",
   components: {
     SceneComponent,
-    OverlayInstructionComponent,
     OverlayTerminalComponent,
     InventoryComponent,
   },
@@ -59,15 +58,7 @@ export default defineComponent({
     updateGame();
 
     const mainPlayer = gameState.playerMap.get(loginState.username);
-    const showInstructions = ref(false);
     const showTerminal = ref(false);
-
-    // instructions for current game quest e.g. finding partner player
-    const instructions = [
-      "Willkommen unter den Eichen",
-      "Deine erste Aufgabe erwartet dich",
-      "Finde zur Semester Einführungsveranstaltung",
-    ];
 
     // in-game messages like warnings, errors, hints ...
     const message =
@@ -93,7 +84,6 @@ export default defineComponent({
       });
 
     const openTerminal = () => (showTerminal.value = true);
-    const closeInstructions = () => (showInstructions.value = false);
     const closeTerminal = () => (showTerminal.value = false);
 
     function movePlayer(orientation: Orientation) {
@@ -109,12 +99,9 @@ export default defineComponent({
     return {
       message,
       messageState,
-      instructions,
       showTerminal,
-      showInstructions,
       openTerminal,
       closeTerminal,
-      closeInstructions,
       itemSelection,
       movePlayer,
       mainPlayer,
