@@ -49,10 +49,6 @@ async function updatePlayer(player: Player, scene: THREE.Scene) {
   }
 }
 
-async function updateTile() {
-  console.log("updating tile");
-}
-
 /**
  * adds tile of labyrinth to scene without recursion
  * @param position: starting position of first tile

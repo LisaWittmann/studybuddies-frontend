@@ -1,6 +1,6 @@
 <template>
   <SceneComponent
-    :labyrinth="gameState.labyrinth"
+    :labyrinth="labyrinth"
     :player="mainPlayer"
     @click-object="itemSelection"
     @move-player="movePlayer"
@@ -92,8 +92,8 @@ export default defineComponent({
       closeTerminal,
       itemSelection,
       movePlayer,
-      gameState,
       mainPlayer,
+      labyrinth: gameState.labyrinth,
     };
   },
 });
