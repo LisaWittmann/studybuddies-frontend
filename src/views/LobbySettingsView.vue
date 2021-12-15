@@ -3,7 +3,7 @@
     <h1>Lobby {{ lobbyKey }}</h1>
     <section>
       <p>{{ users.length }}/2 Spieler verbunden</p>
-      <UserListComponent :users="users" />
+      <UserListComponent :users="users" :isReady=isReady />
     </section>
     <section>
       <h2>Labyrinth hochladen:</h2>
@@ -23,7 +23,7 @@
     </section>
     <section>
       <div class="column-wrapper">
-        <button class="button--small button--filled" @click="readyCheck">
+        <button :class="{ 'button--ready': isReady }" class="button--small button--filled" @click="readyCheck">
           Bereit
         </button>
         <button
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
@@ -67,6 +67,11 @@ export default defineComponent({
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
+    // handle button ready-state behaviour
+    const isReady = computed(() => {
+      return loginState.isReady
+    })
+
     updateUsers(lobbyKey).then((data) => (users.value = data));
     updateLabyrinths().then((data) => (labyrinthOptions.value = data));
 
@@ -83,6 +88,7 @@ export default defineComponent({
 
     return {
       readyCheck,
+      isReady,
       uploadLabyrinth,
       selectLabyrinth,
       exitLobby,
@@ -92,7 +98,7 @@ export default defineComponent({
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
-      username: loginState.username,
+      username: loginState.username
     };
   },
 });

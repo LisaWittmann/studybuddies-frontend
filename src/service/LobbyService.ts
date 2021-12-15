@@ -71,6 +71,8 @@ function readyCheck() {
     .then((response) => {
       if (!response.ok) {
         throw new Error("Error during ready check");
+      } else {
+        useLoginStore().toggleReady()
       }
     })
     .catch((error) => {

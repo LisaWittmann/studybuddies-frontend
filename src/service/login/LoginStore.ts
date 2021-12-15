@@ -6,6 +6,7 @@ const loginState = reactive({
   username: "",
   errormessage: "",
   isLoggedIn: false,
+  isReady: false
 });
 
 /**
@@ -17,6 +18,10 @@ function logout() {
   loginState.errormessage = "";
   loginState.isLoggedIn = false;
   sessionStorage.removeItem("username");
+}
+
+function toggleReady() {
+  loginState.isReady = !loginState.isReady
 }
 
 /**
@@ -99,5 +104,6 @@ export function useLoginStore() {
     login,
     logout,
     fetchSessionStorage,
+    toggleReady
   };
 }
