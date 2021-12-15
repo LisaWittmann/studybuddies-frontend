@@ -26,8 +26,6 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
     const tile = getTile(value.tileId, scene);
     if (!tile) {
       placeTile(position, value, key, scene);
-    } else if (value.objectsInRoom != tile.userData.objectsInRoom) {
-      updateTile();
     }
   }
 }
