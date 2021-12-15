@@ -16,59 +16,34 @@ export class MainPlayer implements Player {
   username: string;
   active: boolean;
   position: number;
-  inventory: Map<number, Item>;
+  /*dummydata for development
+    -> wait for Task #100 to be finished
+  */
+  inventory: Item[] = [
+    new Item(1, "usb", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    new Item(2, "mouse", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    new Item(3, "keyboard", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    new Item(4, "vr-glasses", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+    /*
+      7, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+      8, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+      9, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+      10, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+      11, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+      12, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
+      */
+  ];
 
   constructor(username: string, active: boolean, playerPosition: number) {
     this.username = username;
     this.active = active;
     this.position = playerPosition;
-
-    //this.inventory = new Map<number, Item>();
-
-    /*dummydata for development
-    -> wait for Task #100 to be finished
-    */
-    this.inventory = new Map<number, Item>([
-      [1, new Item(1, "usb", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0))],
-      [
-        2,
-        new Item(2, "mouse", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-      ],
-      [
-        3,
-        new Item(
-          3,
-          "keyboard",
-          "EAST",
-          ["NORTH", "WEST"],
-          new Vector3(0, 0, 0)
-        ),
-      ],
-      [
-        4,
-        new Item(
-          4,
-          "vr-glasses",
-          "EAST",
-          ["NORTH", "WEST"],
-          new Vector3(0, 0, 0)
-        ),
-      ],
-
-      [6, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0))],
-      /*
-      [7, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0))],
-      [8, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0))],
-      [9, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0))],
-      [10, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0))],
-      [11, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0))],
-      [12, new Item(5, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0))],
-      */
-    ]);
+    //this.inventory = new Array<Item>();
   }
 
   addItem(item: Item): void {
-    this.inventory.set(item.id, item);
+    this.inventory.push(item);
   }
 
   getUsername(): string {
@@ -83,7 +58,7 @@ export class MainPlayer implements Player {
     return this.position;
   }
 
-  getInventory(): Map<number, Item> {
+  getInventory(): Array<Item> {
     return this.inventory;
   }
 

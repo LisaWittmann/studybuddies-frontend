@@ -1,8 +1,8 @@
 <template>
     <div class="inventory-box">
         <div class="inventory">
-          <div v-for="[key, value] in inventory" :key="key" class="inventory-item-box">
-            <img class="item-img" :src="getImgUrl(value.modelName)" :alt="value.modelName" width="300"/>
+          <div v-for="item in inventory" :key="item" class="inventory-item-box">
+            <img class="item-img" :src="getImgUrl(item.modelName)" :alt="item.modelName" width="300"/>
           </div>
 
         </div>
@@ -29,14 +29,14 @@ export default defineComponent({
 
     //casting because playerMap only holds type Player -> here we only need MainPlayer
     const mainPlayer: MainPlayer | undefined = (gameState.playerMap.get(loginState.username) as MainPlayer);  
-    let inventory: Map<number, Item> = new Map<number, Item>();
+    let inventory: Array<Item> = new Array<Item>();
 
     if (mainPlayer != undefined){
       inventory = reactive(mainPlayer.getInventory());
       //Whats in the inventory -> remove later
       console.log("INVENTAR:");
-      for (let key of inventory.keys()){
-        console.log(inventory.get(key)?.modelName);
+      for (let item of inventory){
+        console.log(item.modelName);
       }
     }
 
