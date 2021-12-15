@@ -53,13 +53,12 @@ export default defineComponent({
 
 .user-list-labels {
   display: flex;
-  width: 100%;
+  width: 80%;
   max-width: 500px;
   justify-content: space-between;
 
   &__item {
-    width: auto;
-    justify-content: space-between;
+    font-size: $text-m;
   }
 }
 
