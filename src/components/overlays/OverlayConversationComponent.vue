@@ -2,16 +2,17 @@
   <OverlayComponent :opened="opened">
     <div class="conversation">
       <div class="conversation__content">
-        <p>{{ text }}</p>
+        <p>{{ node.text }}</p>
       </div>
       <div class="conversation__option-wrapper">
         <div
           class="conversation__option"
-          v-for="(option, index) of options"
-          :key="index"
-          @click="clickOption(option)"
+          v-for="child of children"
+          :key="child.key"
+          :style="{ flexBasis: 100 / children.length + '%' }"
+          @click="clickOption(child)"
         >
-          {{ option }}
+          {{ child.answer }}
         </div>
       </div>
     </div>
@@ -19,8 +20,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import OverlayComponent from "@/components/overlays/OverlayComponent.vue";
+import { ConversationNode } from "@/service/game/ConversationNode";
 
 export default defineComponent({
   namae: "OverlayConversationComponent",
@@ -30,21 +32,23 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    text: {
-      type: String,
-      required: true,
-    },
-    options: {
-      type: [],
+    node: {
+      type: ConversationNode,
       required: true,
     },
   },
-  setup(_, { emit }) {
-    function clickOption(value: string) {
-      emit("select-option", value);
+  setup(props, { emit }) {
+    function clickOption(node: ConversationNode) {
+      emit("select-option", node);
     }
 
-    return { clickOption };
+    const children = computed(() =>
+      [props.node.leftNode, props.node.rightNode].filter(
+        (child) => child instanceof ConversationNode
+      )
+    );
+
+    return { clickOption, children };
   },
 });
 </script>
@@ -52,38 +56,34 @@ export default defineComponent({
 <style lang="scss" scoped>
 .conversation {
   width: 80%;
-  max-width: 500px;
-  color: $color-black;
-  min-height: 60%;
+  max-width: 600px;
   font-size: 18px;
+  color: $color-black;
 
   &__content {
+    @include flex-center();
     background: $color-white;
-    text-align: left;
-    border-radius: 5px;
     min-height: 200px;
+    border-radius: 10px;
     padding: $spacing-xs $spacing-s;
   }
 
   &__option {
+    @include flex-center();
     background: $color-light-green;
-    border-radius: 5px;
+    border-radius: 10px;
     margin-right: $spacing-s;
     padding: $spacing-s;
-    text-align: left;
+    cursor: pointer;
 
     &:last-of-type {
       margin-right: 0;
     }
 
-    &:hover {
-      background: $color-green;
-      cursor: pointer;
-    }
-
     &-wrapper {
-      @include flex-center();
-      margin-top: $spacing-s;
+      display: flex;
+      flex-wrap: nowrap;
+      margin-top: $spacing-m;
     }
   }
 }

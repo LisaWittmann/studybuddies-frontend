@@ -16,8 +16,7 @@
   <!--conversations with interactive characters-->
   <OverlayConversationComponent
     :opened="conversation.visible"
-    :text="conversation.text"
-    :options="conversation.options"
+    :node="conversation.node"
     @select-option="selectConversationOption"
   />
 </template>
@@ -37,6 +36,7 @@ import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalCompo
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import "@/service/game/EventStore";
+import { ConversationNode } from "@/service/game/ConversationNode";
 
 export default defineComponent({
   name: "GameView",
@@ -56,16 +56,6 @@ export default defineComponent({
 
     const mainPlayer = gameState.playerMap.get(loginState.username);
 
-    // instructions for current game quest e.g. finding partner player
-    const instructions = reactive({
-      content: [
-        "Willkommen unter den Eichen",
-        "Deine erste Aufgabe erwartet dich",
-        "Finde zur Semester Einführungsveranstaltung",
-      ],
-      visible: false,
-    });
-
     // in-game messages like warnings, errors, hints ...
     const eventMessage = reactive({
       message: "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!",
@@ -73,11 +63,40 @@ export default defineComponent({
       visible: false,
     });
 
+    const testConversation = new ConversationNode(
+      "1",
+      undefined,
+      "Magst du die Zahl 17?",
+      new ConversationNode(
+        "11",
+        "Ja, finde ich super",
+        "Das ist eine gute Wahl. Möchtest du einen Rat von mir?",
+        new ConversationNode(
+          "111",
+          "Ja, sehr gerne",
+          "Du solltest zusehen, dass du zur Semestereinführungsveranstaltung gelangst. Dort wirst du bestimmt neue Freunde finden.",
+          new ConversationNode("111", "Dann mache ich mich auf den Weg"),
+          new ConversationNode(
+            "1112",
+            "Was soll ich denn da?",
+            "Du bist sehr unhöflich! Stelle nicht alles in Frage, was man dir rät.",
+            new ConversationNode("11121", "Tschüss")
+          )
+        ),
+        new ConversationNode("1112", "Nein, danke")
+      ),
+      new ConversationNode(
+        "12",
+        "Nein, ich bin eher Fan von der 18",
+        "Du musst noch viel lernen...",
+        new ConversationNode("121", "Tschüss")
+      )
+    );
+
     // conversations with interactive game characters
     const conversation = reactive({
-      text: "Magst du die Zahl 17?",
-      options: ["Ja, find ich super!", "Nein, ich bin großer Fan vond der 18"],
-      visible: false,
+      node: testConversation,
+      visible: true,
     });
 
     //TODO: remove this temporary operation after showing GameView with key in URL
@@ -97,7 +116,6 @@ export default defineComponent({
       });
 
     const toggleTerminal = () => (eventMessage.visible = !eventMessage.visible);
-    const closeInstructions = () => (instructions.visible = false);
 
     function movePlayer(orientation: Orientation) {
       playerMovement(
@@ -109,21 +127,21 @@ export default defineComponent({
       );
     }
 
-    function selectConversationOption(option: string) {
-      //only for testing:
-      conversation.visible = false;
-      console.log(option);
+    // testing conversation
+    function selectConversationOption(node: ConversationNode) {
+      if (!node.text) conversation.visible = false;
+      else conversation.node = node;
+      if (node.item) console.log(node.item);
     }
 
     return {
       movePlayer,
       itemSelection,
       toggleTerminal,
-      closeInstructions,
       selectConversationOption,
+      testConversation,
       mainPlayer,
       conversation,
-      instructions,
       eventMessage,
       gameState,
     };
