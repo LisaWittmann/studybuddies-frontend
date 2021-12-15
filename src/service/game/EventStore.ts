@@ -73,7 +73,7 @@ stompclient.onConnect = () => {
           router.push(`/game/${lobbyKey}`);
         }
         break;
-      case "ROLE_SELECT":
+      case "ROLE":
         break;
       default:
         break;

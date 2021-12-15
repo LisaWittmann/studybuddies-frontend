@@ -17,6 +17,7 @@ export enum Operation {
   CLICK,
   TRADE,
   CHAT,
+  ROLE,
 }
 
 /**
