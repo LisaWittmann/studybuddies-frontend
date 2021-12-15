@@ -1,7 +1,7 @@
 <template>
   <SceneComponent
-    :labyrinth="gameState.labyrinth"
-    :mainPlayer="mainPlayer"
+    :labyrinth="labyrinth"
+    :player="mainPlayer"
     @click-object="itemSelection"
     @move-player="movePlayer"
     @click-disabled="toggleTerminal"
@@ -12,12 +12,6 @@
     :message="eventMessage.message"
     :state="eventMessage.state"
     @close="toggleTerminal"
-  />
-  <!--instructions for current game quest-->
-  <OverlayInstructionComponent
-    :opened="instructions.visible"
-    :instructions="instructions.content"
-    @close="closeInstructions"
   />
   <!--conversations with interactive characters-->
   <OverlayConversationComponent
@@ -40,7 +34,6 @@ import { MainPlayer } from "@/service/game/Player";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
-import OverlayInstructionComponent from "@/components/overlays/OverlayInstructionComponent.vue";
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import "@/service/game/EventStore";
@@ -50,7 +43,6 @@ export default defineComponent({
   components: {
     SceneComponent,
     OverlayConversationComponent,
-    OverlayInstructionComponent,
     OverlayTerminalComponent,
   },
   props: {

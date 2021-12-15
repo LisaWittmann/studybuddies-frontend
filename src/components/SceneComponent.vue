@@ -6,7 +6,7 @@
 import { defineComponent, onBeforeUnmount, onMounted, watch } from "vue";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
-import { MainPlayer } from "@/service/game/Player";
+import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 
 export default defineComponent({
   name: "SceneComponent",
@@ -15,9 +15,12 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-    mainPlayer: {
+    player: {
       type: MainPlayer,
       required: true,
+    },
+    partner: {
+      type: PartnerPlayer,
     },
   },
   setup(props, context) {
@@ -27,22 +30,14 @@ export default defineComponent({
       insertCanvas,
       updateScene,
       getIntersections,
-      updateCameraPosition,
     } = useSceneFactory();
-    const { updateLabyrinth, getTilePosition } = useLabyrinthFactory();
+    const { updateLabyrinth, updatePlayer } = useLabyrinthFactory();
 
     const scene = createScene();
     const render = () => {
       renderScene();
       requestAnimationFrame(render);
     };
-
-    function updatePlayer() {
-      if (props.mainPlayer.position) {
-        const position = getTilePosition(props.mainPlayer.position, scene);
-        if (position) updateCameraPosition(position);
-      }
-    }
 
     function onMouseDown(event: MouseEvent) {
       getIntersections(
@@ -65,10 +60,11 @@ export default defineComponent({
       removeEventListener("mousedown", onMouseDown);
     });
 
-    watch([props.labyrinth, props.mainPlayer], () => {
+    watch([props.labyrinth, props.player, props.partner], () => {
       console.log("updating scene");
       updateLabyrinth(props.labyrinth, scene);
-      updatePlayer();
+      updatePlayer(props.player, scene);
+      //updatePlayer(props.partner, scene);
     });
   },
 });
