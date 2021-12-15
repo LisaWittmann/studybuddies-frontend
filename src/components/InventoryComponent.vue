@@ -1,6 +1,6 @@
 <template>
   <button class="inventory-button" v-bind:class="[isOpen?'open':'closed']" @click="toggleInventoryButton"></button> 
-    <div class="inventory-box hidden" >
+    <div class="inventory-box" v-bind:class="[isOpen?'shown':'hidden']">
         <div class="inventory">
           <div v-for="item in inventory" :key="item" class="inventory-item-box">
             <img class="item-img" :src="getImgUrl(item.modelName)" :alt="item.modelName" width="300"/>
@@ -75,6 +75,7 @@ export default defineComponent({
   }  
 
   .inventory-button {
+    box-shadow: none;
     border: none;
     position: absolute;
     left: 0;
@@ -84,6 +85,7 @@ export default defineComponent({
     display: inline-block;
     height: 15%;
     width: 10%;
+    max-width: 120px;
   }
   
     .inventory-box {
@@ -93,13 +95,19 @@ export default defineComponent({
         z-index: 10;
         left: 0;
         top: 0;
-        background-color: $color-black;
-        box-shadow: 0px 0 20px rgba($color-black, .75);
+        max-width: 120px;
+    }
+    .hidden {
+      display: none;
+    }
+
+    .shown {
+      display: block;
     }
 
     .inventory {
-      padding: 1.5rem;
-      margin-top: 7rem;
+      padding: 0 1.5rem 1.5rem 1.5rem;
+      margin-top: 8.5rem;
       overflow-y: scroll;
       max-height: -webkit-fill-available;
       direction: rtl;
@@ -109,9 +117,13 @@ export default defineComponent({
       width: 100%;
       display: flex;
       border: 1.5px dashed $color-beige;
-      background-color: rgba($color-grey, .2);
+      background-color: rgba($color-dark-brown, .5);
       margin: 2rem 0;
       direction: ltr;
+    }
+
+    .inventory-item-box:first-child {
+      margin-top: 0;
     }
 
     .item-img{
@@ -129,6 +141,7 @@ export default defineComponent({
     /*SCROLLBAR----*/
     /* width */
   ::-webkit-scrollbar {
+    display: none;
       width: 5px;
   }
 
