@@ -1,6 +1,7 @@
 <template>
   <button class="inventory-button" v-bind:class="[isOpen?'open':'closed']" @click="toggleInventoryButton"></button> 
-    <div class="inventory-box" v-bind:class="[isOpen?'shown':'hidden']">
+  <transition name="slide-fade">
+    <div class="inventory-box" v-if="isOpen">
         <div class="inventory">
           <div v-for="item in inventory" :key="item" class="inventory-item-box">
             <img class="item-img" :src="getImgUrl(item.modelName)" :alt="item.modelName" width="300"/>
@@ -8,6 +9,7 @@
 
         </div>
     </div>
+  </transition>
 </template>
 
 <script lang="ts">
@@ -101,14 +103,46 @@ export default defineComponent({
         left: 0;
         top: 0;
         max-width: 120px;
+        transform-origin: top;
     }
-    .hidden {
-      display: none;
+    /* Enter and leave animations can use different */
+    /* durations and timing functions.              */
+    .slide-fade-enter-active {
+      animation: fadeInDown .3s;
+    }
+    .slide-fade-leave-active {
+      animation: fadeInDown .3s reverse;
     }
 
-    .shown {
-      display: block;
+    @-webkit-keyframes fadeInDown {
+      0% {
+        opacity: 0;
+        visibility: hidden;
+        -webkit-transform: translateY(-200px);
+        -webkit-transform: scaleY(0.5);
+      }
+      100% {
+        opacity:1;
+        visibility: visible;
+        -webkit-transform: translateY(0);
+        -webkit-transform: scaleY(1);
+      }
     }
+
+    @keyframes fadeInDown {
+      0% {     
+        opacity: 0;
+        visibility: hidden;        
+        -webkit-transform: translateY(-200px);
+        -webkit-transform: scaleY(0.5);        
+      }
+      100% {
+        opacity:1;
+        visibility: visible;        
+        -webkit-transform: translateY(0);
+        -webkit-transform: scaleY(1);        
+      }      
+    }   
 
     .inventory {
       padding: 0 1.5rem 1.5rem 1.5rem;
