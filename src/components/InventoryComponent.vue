@@ -50,7 +50,9 @@ export default defineComponent({
     function getImgUrl(imgName : string){
       return require('../assets/img/inventory/'+imgName+'.svg')  
     }
-
+  /**
+   * shows opened or closed backpack svg (inventory button) 
+   */
     function toggleInventoryButton() {
       isOpen.value = !isOpen.value;
     }
@@ -105,7 +107,7 @@ export default defineComponent({
         max-width: 120px;
         transform-origin: top;
     }
-    /* Enter and leave animations can use different */
+    /* Animation for opening or closing inventory */
     /* durations and timing functions.              */
     .slide-fade-enter-active {
       animation: fadeInDown .3s;
@@ -180,6 +182,7 @@ export default defineComponent({
     /*SCROLLBAR----*/
     /* width */
   ::-webkit-scrollbar {
+    /* Scrollbar hidden at the moment */
     display: none;
       width: 5px;
   }
