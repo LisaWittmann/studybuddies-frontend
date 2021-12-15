@@ -1,6 +1,6 @@
 <template>
-
-    <div class="inventory-box">
+  <button class="inventory-button" v-bind:class="[isOpen?'open':'closed']" @click="toggleInventoryButton"></button> 
+    <div class="inventory-box hidden" >
         <div class="inventory">
           <div v-for="item in inventory" :key="item" class="inventory-item-box">
             <img class="item-img" :src="getImgUrl(item.modelName)" :alt="item.modelName" width="300"/>
@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
+import { defineComponent, reactive, ref } from "vue";
 
 import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "@/service/login/LoginStore";
@@ -27,6 +27,7 @@ export default defineComponent({
   setup() {
     const { gameState} = useGameStore();
     const { loginState } = useLoginStore();
+    let isOpen = ref(false);
 
     //casting because playerMap only holds type Player -> here we only need MainPlayer
     const mainPlayer: MainPlayer | undefined = (gameState.playerMap.get(loginState.username) as MainPlayer);  
@@ -48,17 +49,43 @@ export default defineComponent({
       return require('../assets/img/inventory/'+imgName+'.svg')  
     }
 
+    function toggleInventoryButton() {
+      isOpen.value = !isOpen.value;
+    }
+
 
     return {
       mainPlayer,
       inventory,
-      getImgUrl
+      getImgUrl,
+      toggleInventoryButton,
+      isOpen
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
+  .closed {
+    background: url(../assets/img/inventory/inventory-closed-btn.svg) no-repeat top left;
+  }
+
+  .open {
+    background: url(../assets/img/inventory/inventory-open-btn.svg) no-repeat top left;
+  }  
+
+  .inventory-button {
+    border: none;
+    position: absolute;
+    left: 0;
+    top: 10px;
+    z-index: 11;
+    background-position: bottom;
+    display: inline-block;
+    height: 15%;
+    width: 10%;
+  }
+  
     .inventory-box {
         position: absolute;
         height: 100%;
@@ -72,7 +99,7 @@ export default defineComponent({
 
     .inventory {
       padding: 1.5rem;
-      margin-top: 4rem;
+      margin-top: 7rem;
       overflow-y: scroll;
       max-height: -webkit-fill-available;
       direction: rtl;
