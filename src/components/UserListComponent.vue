@@ -26,7 +26,7 @@ export default defineComponent({
   name: "UserListComponent",
   props: {
     users: {
-      type: [],
+      type: Array,
       required: true,
     }
   }

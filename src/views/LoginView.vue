@@ -24,6 +24,10 @@
           Noch kein Benutzerkonto?
           <router-link to="/register">Jetzt registrieren</router-link>
         </p>
+        <span>
+          Lade jetzt dein eigenes Labyrinth hoch:<br/>
+          <router-link to="/upload">Labyrinth hochladen</router-link>
+        </span>
         <span class="error">{{ loginState.errormessage }}</span>
       </form>
     </section>

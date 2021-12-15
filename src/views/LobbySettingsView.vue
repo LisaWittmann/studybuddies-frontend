@@ -6,24 +6,12 @@
       <UserListComponent :users="users" :isReady=isReady />
     </section>
     <section>
-      <h2>Labyrinth hochladen:</h2>
-      <label class="button button--small button--upload">
-        <input
-          type="file"
-          ref="upload"
-          accept=".json"
-          @change="uploadLabyrinth"
-        />
-        Hochladen
-      </label>
-    </section>
-    <section>
       <h2>Labyrinth auswählen:</h2>
       <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
     </section>
     <section>
       <div class="column-wrapper">
-        <button :class="{ 'button--ready': isReady }" class="button--small button--filled" @click="readyCheck">
+        <button :class="{ 'button--ready': isReady }" class="button--small button--filled" @click="readyCheck(loginState.username, selectedLabyrinth)">
           Bereit
         </button>
         <button
@@ -38,12 +26,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
+import {useGameStore} from "@/service/game/GameStore";
 
 export default defineComponent({
   name: "LobbySettingsView",
@@ -51,19 +40,17 @@ export default defineComponent({
   setup() {
     const { loginState } = useLoginStore();
     const {
-      uploadJsonFiles,
       updateUsers,
       updateLabyrinths,
       readyCheck,
       exitLobby,
       setupGame,
+      lobbyState,
     } = useLobbyService();
-    const upload = ref({} as HTMLInputElement);
+    const { gameState, setLobbyKey } = useGameStore();
 
-    const route = router.currentRoute.value;
-    const lobbyKey = route.params.key as string;
 
-    const users = ref(new Array<string>());
+
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
@@ -72,33 +59,30 @@ export default defineComponent({
       return loginState.isReady
     })
 
-    updateUsers(lobbyKey).then((data) => (users.value = data));
     updateLabyrinths().then((data) => (labyrinthOptions.value = data));
 
     function selectLabyrinth(id: number) {
       selectedLabyrinth.value = id;
     }
 
-    async function uploadLabyrinth() {
-      if (upload.value.files != null) {
-        await uploadJsonFiles(upload.value.files);
-      }
-      updateLabyrinths().then((data) => (labyrinthOptions.value = data));
-    }
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      setLobbyKey(route.params.key as string);
+    })
+
+    const users = computed(() => lobbyState.users);
+    const lobbyKey = computed(() => gameState.lobbyKey);
 
     return {
       readyCheck,
       isReady,
-      uploadLabyrinth,
       selectLabyrinth,
       exitLobby,
-      setupGame,
       users,
-      upload,
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
-      username: loginState.username
+      loginState,
     };
   },
 });

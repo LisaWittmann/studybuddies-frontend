@@ -16,10 +16,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import {defineComponent, onMounted, ref} from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
+import { useLobbyService } from "@/service/LobbyService";
 
 import { Orientation } from "@/service/labyrinth/Tile";
 import { MoveOperation } from "@/service/game/EventMessage";
@@ -29,6 +30,7 @@ import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
 
 import "@/service/game/EventStore";
+import router from "@/router";
 
 export default defineComponent({
   name: "GameView",
@@ -40,13 +42,28 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { gameState, updateGame } = useGameStore();
+    const { gameState, updateGame, setLobbyKey } = useGameStore();
+    const { updateUsers } = useLobbyService();
     const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();
     updateGame();
 
     const mainPlayer = gameState.playerMap.get(loginState.username);
     const showTerminal = ref(false);
+
+    /*
+    // Users Array -> Wird onMounted gefüllt
+    const users = ref(new Array<string>());
+
+
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      setLobbyKey(route.params.key as string);
+      updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
+    })
+    */
+
+
 
     // in-game messages like warnings, errors, hints ...
     const message =
@@ -55,30 +72,19 @@ export default defineComponent({
     // state options: neutral, warning, error
     const messageState = "warning";
 
-    //TODO: remove this temporary operation after showing GameView with key in URL
-    let temporaryCode: string;
-
-    fetch("/api/lobby/random", {
-      method: "GET",
-      headers: {
-        "Content-Type": "html/text;charset=utf-8",
-      },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        temporaryCode = json.key;
-      });
-
     const openTerminal = () => (showTerminal.value = true);
     const closeTerminal = () => (showTerminal.value = false);
 
+    /**
+     * function which is used when clicking the arrow in Interface
+     * By recieving the Orientation it creats a MoveOperation to send it to the BE via GameService Methode
+     * @param orientation : used in the backend to identify the direction to move the player
+     */
     function movePlayer(orientation: Orientation) {
       playerMovement(
         new MoveOperation(
-          temporaryCode,
-          (mainPlayer as MainPlayer).username,
+          gameState.lobbyKey,
+          loginState.username,
           Orientation[orientation].toString()
         )
       );
@@ -92,7 +98,7 @@ export default defineComponent({
       closeTerminal,
       itemSelection,
       movePlayer,
-      mainPlayer,
+      mainPlayer: gameState.playerMap.get(loginState.username),
       labyrinth: gameState.labyrinth,
     };
   },
