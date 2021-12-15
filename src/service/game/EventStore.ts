@@ -5,8 +5,10 @@ import { useGameStore } from "@/service/game/GameStore";
 import router from "@/router";
 
 const { gameState, updatePlayer } = useGameStore();
-
-const wsurl = "ws://localhost:9090/messagebroker";
+let wsurl = `ws://localhost:9090/messagebroker`;
+if (window.location.protocol.startsWith("https")) {
+  wsurl = `wss://${window.location.host}/messagebroker`;
+}
 const DEST = "/event/respond";
 
 const stompclient = new Client({ brokerURL: wsurl });
