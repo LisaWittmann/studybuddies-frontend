@@ -1,4 +1,5 @@
 <template>
+
     <div class="inventory-box">
         <div class="inventory">
           <div v-for="item in inventory" :key="item" class="inventory-item-box">
