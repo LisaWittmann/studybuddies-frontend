@@ -94,17 +94,6 @@ function getTile(
 }
 
 /**
- * get all 3D tile objects in scene
- * @param scene: scene from which tiles should be extracted
- * @returns list of all tiles in scene
- */
-function getTiles(scene: THREE.Scene): Array<THREE.Object3D> {
-  return scene.children.filter((object) => {
-    return object.userData.tileId;
-  });
-}
-
-/**
  * get tile position by in scene by tile id
  * searches scene for tile's bottom plane that contains tile's position
  * @returns position in scene or undefined if tile is not in scene
@@ -143,20 +132,6 @@ function getNextPosition(
     case Orientation.WEST:
       return next.addScaledVector(direction.west, -settings.tileSize);
   }
-}
-
-/**
- * get item representation in scene by item id
- * @param id: id of wanted item
- * @param scene: scene that might contain item
- * @returns representation of item or undefined
- */
-function getItem(id: number, scene: THREE.Scene): THREE.Object3D | undefined {
-  let item = undefined;
-  scene.traverse((child) => {
-    if (child.userData.id == id) item = child;
-  });
-  return item;
 }
 
 export function useLabyrinthFactory() {
