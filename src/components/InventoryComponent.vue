@@ -86,6 +86,11 @@ export default defineComponent({
     height: 15%;
     width: 10%;
     max-width: 120px;
+    transition-duration: .3s;
+  }
+
+  .inventory-button:hover {
+    filter: drop-shadow(0px 0px 10px rgb(255, 205, 42)) brightness(1.75);
   }
   
     .inventory-box {
