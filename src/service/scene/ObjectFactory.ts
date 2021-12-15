@@ -7,7 +7,7 @@ import { Orientation } from "@/service/labyrinth/Tile";
 import { Arrow, Wall } from "@/service/labyrinth/FixedObject";
 import { PartnerPlayer, Role } from "@/service/game/Player";
 
-import { axis, settings } from "@/service/scene/helper/SceneConstants";
+import { settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 
 const objectLoader = new OBJLoader();
@@ -20,15 +20,19 @@ materialLoader.setPath("/models/");
  * creates item by loading its obj representation from models directory
  * @param item: item that should be loaded and added to scene
  * @param parent: group or scene object will be added to after loading
+ * @param position: position of parent object
  */
-async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
+async function createItem(
+  item: Item,
+  parent: THREE.Group | THREE.Scene,
+  position: THREE.Vector3
+) {
   const model = item.modelName.toLowerCase();
   await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
-      object.position.copy(item.calcPositionInRoom());
-      //rotation already calculated to radians
+      object.position.copy(item.calcPositionInRoom().add(position));
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
@@ -50,8 +54,8 @@ function createFloor(position: THREE.Vector3, color = 0x199eb0, key: number) {
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.copy(position);
-  object.userData.tileId = key;
-  object.rotateOnAxis(axis.x, radians(90));
+  object.userData.tileKey = key;
+  object.rotateX(radians(90));
   return object;
 }
 
@@ -67,7 +71,7 @@ function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.set(position.x, position.y + settings.tileSize, position.z);
-  object.rotateOnAxis(axis.x, radians(90));
+  object.rotateX(radians(90));
   return object;
 }
 
@@ -90,7 +94,7 @@ function createWall(
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.copy(position);
-  object.rotateOnAxis(axis.y, radians(wall.rotationY()));
+  object.rotateY(wall.rotationY());
   object.userData = wall;
   return object;
 }
@@ -111,7 +115,7 @@ function createArrow(
     object.position.copy(arrow.position());
     object.userData = arrow;
     object.userData.clickable = true;
-    object.rotateOnAxis(axis.y, radians(arrow.rotationY()));
+    object.rotateY(arrow.rotationY());
     object.visible = false;
     object.traverse((child) => {
       if (child instanceof THREE.Mesh) {

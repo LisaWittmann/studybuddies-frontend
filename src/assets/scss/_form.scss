@@ -1,60 +1,46 @@
-.form {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
+input {
+    border: 1px solid $color-grey;
+    border-radius: 8px;
+    font-weight: 300;
+    font-size: $text-m;
+    width: 80%;
+    display: inline-block;
+    padding: 10px 12px;
+    cursor: pointer;
 
-    input,
-    button {
-        font-size: 16px;
-        border-radius: 15px;
-        padding: 5px 10px;
+    &::placeholder,
+    &::-moz-placeholder {
+        opacity: 1;
+        color: $color-green;
     }
-
-    input {
-        background: transparent;
-        color: $color-dark-green;
-        border: 2px solid $color-dark-green;
-        min-height: 25px;
-        margin-bottom: $spacing-xs;
-
+    
+    &:focus {
         &::placeholder,
         &::-moz-placeholder {
-            opacity: 1;
-            color: $color-green;
-        }
-        
-        &:focus {
-            &::placeholder,
-            &::-moz-placeholder {
-                opacity: 0;
-            }
-        }
-
-        &:focus:invalid {
-            border-color: darkred;
+            opacity: 0;
         }
     }
 
-    button {
-        min-height: 40px;
-        color: $color-white;
-        background: $color-dark-green;
-        margin-top: $spacing-s;
-        border: 2px solid $color-dark-green;
-        cursor: pointer;
+    &:focus:invalid {
+        border-color: darkred;
     }
 
-    a {
-        text-decoration: underline;
-        color: $color-dark-green;
-        cursor: pointer;
+    &.input {
+        &--small {
+        min-height: 20px;
+        max-width: 300px;
 
-        &:hover {
-            color: $color-green;
+        }
+        &--medium {
+            max-width: 350px;
+        }
+        &--large {
+            min-height: 40px;
+            max-width: 500px;
         }
     }
+}
 
-    .error {
-        color: darkred;
-    }
+.error {
+    color: darkred;
 }
