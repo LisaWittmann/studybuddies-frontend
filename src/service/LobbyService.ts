@@ -9,6 +9,7 @@ const lobbyState = reactive({
   lobbyKey: "",
   users: new Array<string>(),
   errormessage: "",
+  readyState: new Array<string>()
 });
 
 /**
@@ -167,7 +168,12 @@ function readyCheck(username: string, labId: number) {
       if (!response.ok) {
         throw new Error("Error during ready check: " + response.statusText);
       } else {
-        useLoginStore().toggleReady()
+        if(lobbyState.readyState.includes(username)) {
+          const itemPos = lobbyState.readyState.indexOf(username)
+          lobbyState.readyState.splice(itemPos, 1)
+        } else {
+          lobbyState.readyState.push(username)
+        }
       }
     })
     .catch((error) => {
