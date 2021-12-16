@@ -55,7 +55,6 @@ export default defineComponent({
       updateLabyrinths,
       readyCheck,
       exitLobby,
-      setupGame,
     } = useLobbyService();
     const upload = ref({} as HTMLInputElement);
 
@@ -85,7 +84,6 @@ export default defineComponent({
       uploadLabyrinth,
       selectLabyrinth,
       exitLobby,
-      setupGame,
       users,
       upload,
       lobbyKey,

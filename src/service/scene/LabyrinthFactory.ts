@@ -3,9 +3,9 @@ import { useTileFactory } from "@/service/scene/TileFactory";
 import { usePlayerFactory } from "@/service/scene/PlayerFactory";
 
 import { Orientation, Tile } from "@/service/labyrinth/Tile";
+import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 
 import { vector } from "@/service/scene/helper/GeometryHelper";
-import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 import { direction, settings } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
@@ -24,11 +24,8 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
   const position = vector(0, 0, 0);
   for (const [key, value] of labyrinth.tileMap) {
     const tile = getTile(value.tileId, scene);
-    console.log(tile);
     if (!tile) {
       placeTile(position, value, key, scene);
-    } else if (value.objectsInRoom != tile.userData.objectsInRoom) {
-      updateTile();
     }
   }
 }
@@ -71,10 +68,6 @@ async function placeTile(
   // store placed tile with position to calculate position of next tiles
   storedTiles.set(tileKey, position);
   scene.add(createTile(tileKey, tile, position));
-}
-
-async function updateTile() {
-  console.log("updating tile");
 }
 
 /**

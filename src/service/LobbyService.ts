@@ -1,6 +1,4 @@
 import router from "@/router";
-import { useGameStore } from "@/service/game/GameStore";
-import { MainPlayer, PartnerPlayer } from "./game/Player";
 import { useLoginStore } from "@/service/login/LoginStore";
 
 /**
@@ -78,28 +76,12 @@ function readyCheck() {
     });
 }
 
-function setupGame(users: string[], labyrinthId: number, username: string) {
-  const { updatePlayer, setLabyrinth } = useGameStore();
-  for (const user of users) {
-    if (user == username) {
-      updatePlayer(new MainPlayer(username, true, 0));
-    } else {
-      updatePlayer(new PartnerPlayer(user, false, 1));
-    }
-  }
-  setLabyrinth(labyrinthId);
-  const route = router.currentRoute.value;
-  const lobbyKey = route.params.key as string;
-  router.replace(`/game/${lobbyKey}`);
-}
-
 export function useLobbyService() {
   return {
     uploadJsonFiles,
     updateUsers,
     updateLabyrinths,
     readyCheck,
-    setupGame,
     exitLobby,
   };
 }
