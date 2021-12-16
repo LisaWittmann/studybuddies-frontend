@@ -1,15 +1,14 @@
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
-import {MainPlayer, PartnerPlayer, Player} from "./game/Player";
+import { MainPlayer, PartnerPlayer, Player } from "./game/Player";
 import { useLoginStore } from "@/service/login/LoginStore";
-import {reactive, readonly} from "vue";
-
+import { reactive, readonly } from "vue";
 
 const lobbyState = reactive({
   lobbyKey: "",
   users: new Array<string>(),
   errormessage: "",
-  readyState: new Array<string>()
+  readyState: new Array<string>(),
 });
 
 /**
@@ -120,15 +119,16 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
 async function updateUsers(lobbyKey: string) {
   return fetch("/api/lobby/users/" + lobbyKey, {
     method: "GET",
-  }).then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json()
-  }).then((response) => {
-
-    lobbyState.users = response;
-    console.log(lobbyState.users);
-    console.log(response);
-  });
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((response) => {
+      lobbyState.users = response;
+      console.log(lobbyState.users);
+      console.log(response);
+    });
 }
 
 /**
@@ -160,19 +160,19 @@ function readyCheck(username: string, labId: number) {
   fetch(`/api/lobby/ready/` + gameState.lobbyKey, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(args)
+    body: JSON.stringify(args),
   })
     .then((response) => {
       if (!response.ok) {
         throw new Error("Error during ready check: " + response.statusText);
       } else {
-        if(lobbyState.readyState.includes(username)) {
-          const itemPos = lobbyState.readyState.indexOf(username)
-          lobbyState.readyState.splice(itemPos, 1)
+        if (lobbyState.readyState.includes(username)) {
+          const itemPos = lobbyState.readyState.indexOf(username);
+          lobbyState.readyState.splice(itemPos, 1);
         } else {
-          lobbyState.readyState.push(username)
+          lobbyState.readyState.push(username);
         }
       }
     })

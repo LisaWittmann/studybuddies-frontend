@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, ref} from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
@@ -62,8 +62,6 @@ export default defineComponent({
       updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
     })
     */
-
-
 
     // in-game messages like warnings, errors, hints ...
     const message =

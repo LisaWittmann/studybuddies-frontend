@@ -4,7 +4,7 @@
       <div class="user-list-labels__item">Spielername</div>
       <div class="user-list-labels__item">Status</div>
     </div>
-    
+
     <div class="user-list">
       <div
         class="user-list__item"
@@ -28,8 +28,8 @@ export default defineComponent({
     users: {
       type: Array,
       required: true,
-    }
-  }
+    },
+  },
 });
 </script>
 

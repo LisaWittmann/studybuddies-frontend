@@ -3,7 +3,7 @@
     <h1>Lobby {{ lobbyKey }}</h1>
     <section>
       <p>{{ users.length }}/2 Spieler verbunden</p>
-      <UserListComponent :users="users" :isReady=isReady />
+      <UserListComponent :users="users" :isReady="isReady" />
     </section>
     <section>
       <h2>Labyrinth auswählen:</h2>
@@ -11,7 +11,11 @@
     </section>
     <section>
       <div class="column-wrapper">
-        <button :class="{ 'button--ready': isReady }" class="button--small button--filled" @click="readyCheck(loginState.username, selectedLabyrinth)">
+        <button
+          :class="{ 'button--ready': isReady }"
+          class="button--small button--filled"
+          @click="readyCheck(loginState.username, selectedLabyrinth)"
+        >
           Bereit
         </button>
         <button
@@ -32,7 +36,7 @@ import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
-import {useGameStore} from "@/service/game/GameStore";
+import { useGameStore } from "@/service/game/GameStore";
 
 export default defineComponent({
   name: "LobbySettingsView",
@@ -49,15 +53,13 @@ export default defineComponent({
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
-
-
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
     // handle button ready-state behaviour
     const isReady = computed(() => {
-      return loginState.isReady
-    })
+      return loginState.isReady;
+    });
 
     updateLabyrinths().then((data) => (labyrinthOptions.value = data));
 
@@ -68,7 +70,7 @@ export default defineComponent({
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-    })
+    });
 
     const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
