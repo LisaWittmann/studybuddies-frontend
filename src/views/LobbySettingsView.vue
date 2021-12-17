@@ -5,6 +5,14 @@
       <UserListComponent :users="users" />
     </section>
     <section>
+      <h2>Rolle auswählen:</h2>      
+        <div class="roles">
+          <span v-if="userPickedHacker" key="hacker">Hacker</span>
+          <span v-else-if="userPickedDesigner" key="designer">Designer</span>
+        </div>
+      <RadioButtonGroup :options="decisions" v-model="selected"/>
+    </section>    
+    <section>
       <h2>Labyrinth auswählen:</h2>
       <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
     </section>
@@ -35,11 +43,22 @@ import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
+import RadioButtonGroup from "@/components/RadioButtonGroup.vue";
 
 export default defineComponent({
   name: "LobbySettingsView",
-  components: { UserListComponent, DropdownComponent },
+  components: { UserListComponent, DropdownComponent, RadioButtonGroup },
   setup() {
+    //Radiobutton data
+    const decisions = ref(["Hacker", "Designer"]);
+    let selected = ref("");
+    const userPickedHacker = computed(()=> {
+      return selected.value === "Hacker";
+    });
+    const userPickedDesigner = computed(() => {
+      return selected.value === "Designer";
+    });
+
     const { loginState } = useLoginStore();
     const { updateUsers, updateLabyrinths, readyCheck, exitLobby } =
       useLobbyService();
@@ -67,6 +86,10 @@ export default defineComponent({
       readyCheck,
       selectLabyrinth,
       exitLobby,
+      decisions,
+      userPickedHacker,
+      userPickedDesigner,
+      selected,
       users,
       lobbyKey,
       labyrinthOptions,
