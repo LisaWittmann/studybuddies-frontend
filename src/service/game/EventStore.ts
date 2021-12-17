@@ -2,9 +2,11 @@ import { Client } from "@stomp/stompjs";
 import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
+import { useLoginStore } from "../login/LoginStore";
 import router from "@/router";
 
-const { gameState, updatePlayer } = useGameStore();
+const { gameState, updatePlayer, setError, setPlayer, updateGame } =
+  useGameStore();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -16,11 +18,11 @@ const stompclient = new Client({ brokerURL: wsurl });
  */
 stompclient.onWebSocketError = () => {
   console.log("websocketerror");
-  gameState.errormessage = "WS-Fehler";
+  setError("WS-Fehler");
 };
 stompclient.onStompError = () => {
   console.log("Stomperror");
-  gameState.errormessage = "STOMP-Fehler";
+  setError("STOMP-Fehler");
 };
 
 /**
@@ -31,7 +33,6 @@ stompclient.onConnect = () => {
 
   stompclient.subscribe(DEST, (message) => {
     console.log("Message ist angekommen");
-    console.log(JSON.parse(message.body));
 
     const eventMessage: EventMessage = JSON.parse(message.body);
 
@@ -41,22 +42,21 @@ stompclient.onConnect = () => {
     const playerToMove: Player | undefined = gameState.playerMap.get(
       eventMessage.username
     );
+    console.log("Acting player: " + playerToMove);
     switch (eventMessage.operation) {
       case "MOVEMENT":
         if (playerToMove) {
           const destTileID: number = Number.parseInt(eventMessage.data);
 
           if (destTileID) {
-            playerToMove.setPosition(destTileID);
-            updatePlayer(playerToMove);
+            updatePlayer(playerToMove, destTileID);
             // -> now the watcher can update the 3D Room
             // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
-            gameState.errormessage =
-              "There is no Tilereference for this definition of data";
+            setError("There is no Tilereference for this definition of data");
           }
         } else {
-          gameState.errormessage = "No existing User";
+          setError("No existing User");
         }
 
         break;
@@ -68,9 +68,22 @@ stompclient.onConnect = () => {
         break;
       case "READY":
         if (eventMessage.data === "READY") {
-          const route = router.currentRoute.value;
-          const lobbyKey = route.params.key;
-          router.push(`/game/${lobbyKey}`);
+          // NUR TEMPORÄR (Bis nach dem MessageBroker Ticket)
+          // Bitte noch nicht sofort ändern!
+          // @todo: Ändern!
+          const { loginState } = useLoginStore();
+          updateGame()
+            .then(() => {
+              setPlayer(
+                loginState.username,
+                gameState.labyrinth.playerStartTileIds[0]
+              );
+            })
+            .then(() => {
+              router.push(`/game/${gameState.lobbyKey}`);
+              console.log("gameState nach ready finish");
+              console.log(gameState);
+            });
         }
         break;
       case "ROLE":
@@ -78,9 +91,6 @@ stompclient.onConnect = () => {
       default:
         break;
     }
-
-    console.log(eventMessage.operation);
-    console.log(gameState);
   });
 };
 
