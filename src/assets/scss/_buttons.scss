@@ -4,6 +4,7 @@ button,
     border-radius: 8px;
     font-size: $text-m;
     font-weight: 300;
+    font-weight: 300;
     display: inline-block;
     border: 1px solid $color-grey;
     cursor: pointer;
@@ -11,22 +12,16 @@ button,
     width: 80%;
     padding: 10px 12px;
 
-    @include color-scheme(light) {
-        font-weight: 300;
-        box-shadow: 5px 5px 0 0 rgba(black, 0.03);
+    &:hover {
+        font-weight: 400;
+    }
 
-        &:hover {
-            font-weight: 400;
-        }
+    @include color-scheme(light) {
+        box-shadow: 5px 5px 0 0 rgba(black, 0.03);
     }
 
     @include color-scheme(dark) {
-        font-weight: 400;
         box-shadow: 5px 5px 0 0 rgba(grey, 0.03);
-
-        &:hover {
-            font-weight: 500;
-        }
     }
 }
 
