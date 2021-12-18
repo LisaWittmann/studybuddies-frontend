@@ -25,7 +25,7 @@ import OverlayComponent from "@/components/overlays/OverlayComponent.vue";
 import { Message, Response } from "@/service/game/Conversation";
 
 export default defineComponent({
-  namae: "OverlayConversationComponent",
+  name: "OverlayConversationComponent",
   components: { OverlayComponent },
   props: {
     opened: {
