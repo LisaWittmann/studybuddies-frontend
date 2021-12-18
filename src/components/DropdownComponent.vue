@@ -1,6 +1,6 @@
 <template>
   <section class="dropdown">
-    <button class="button button--large button--dropdown" @click="openClose">
+    <button class="dropdown__button button button--large" @click="openClose">
       <div class="text-wrapper">
         <span v-if="selectedItem">Labyrinth {{ selectedItem }}</span>
         <span v-else>Labyrinth auswählen</span>
@@ -13,20 +13,23 @@
     </button>
 
     <div
-      class="button button--large button--filled button--dropdown-menu"
+      class="dropdown__menu button button--large button--filled"
       v-if="isOpen"
     >
-      <div class="menu-arrow" />
+      <div class="dropdown__menu-arrow" />
       <div
-        class="option"
+        class="dropdown__menu-option"
         v-for="(item, index) of items"
         :key="index"
         @click="selectItem(item)"
       >
-        <div class="option--content">Labyrinth {{ item }}</div>
+        <div>Labyrinth {{ item }}</div>
       </div>
-      <div class="option" v-if="items.length < 1">
-        <div class="option--content">Noch keine Labyrinthe verfügbar</div>
+      <div
+        class="dropdown__menu-option dropdown__menu-option--disabled"
+        v-if="items.length < 1"
+      >
+        <div>Noch keine Labyrinthe verfügbar</div>
       </div>
     </div>
   </section>
@@ -71,10 +74,13 @@ export default defineComponent({
   position: relative;
 
   .button {
-    display: flex;
+    @include flex-center();
     justify-content: space-between;
-    align-items: center;
     padding: 25px;
+
+    &:hover {
+      font-weight: 300;
+    }
   }
 
   .icon-wrapper {
@@ -97,7 +103,7 @@ export default defineComponent({
       }
 
       @include color-scheme(dark) {
-        background: white;
+        background: $color-white;
       }
     }
 
@@ -127,23 +133,22 @@ export default defineComponent({
     }
   }
 
-  .button--dropdown-menu {
+  &__menu {
     position: absolute;
-    top: 100%;
-    padding: 10px 0px;
     animation: menu 0.3s ease forwards;
-    font-weight: 300;
     flex-direction: column;
     text-align: left;
+    top: 100%;
+
+    &.button {
+      padding: 10px 0px;
+    }
 
     @include color-scheme(light) {
       background: $color-white;
       color: $color-black;
       box-shadow: 10px 10px 0 0 rgba(black, 0.03);
-
-      .menu-arrow {
-        border-left: 1px solid $color-grey;
-        border-top: 1px solid $color-grey;
+      &-arrow {
         background: $color-white;
       }
     }
@@ -152,42 +157,38 @@ export default defineComponent({
       background: $color-black-background;
       color: $color-white;
       box-shadow: 10px 10px 0 0 rgba(grey, 0.03);
-
-      .menu-arrow {
-        border-left: 1px solid $color-grey;
-        border-top: 1px solid $color-grey;
+      &-arrow {
         background: $color-black-background;
       }
     }
 
-    .menu-arrow {
+    &-arrow {
       width: 20px;
       height: 20px;
       position: absolute;
+      border-left: 1px solid $color-grey;
+      border-top: 1px solid $color-grey;
       top: -10px;
       left: 20px;
       transform: rotate(45deg);
       border-radius: 4px 0 0 0;
     }
 
-    .option {
+    &-option {
       width: 100%;
-      cursor: pointer;
-      position: relative;
-      z-index: 2;
 
-      &--content {
-        color: inherit;
+      &--disabled {
+        pointer-events: none;
+      }
+
+      > * {
         margin: 0px 20px;
         padding: 25px 0px;
         border-bottom: 1px solid $color-grey;
-        cursor: pointer;
       }
 
-      &:last-child {
-        .option--content {
-          border-bottom: 0;
-        }
+      &:last-child > * {
+        border-bottom: 0;
       }
 
       &:hover {
