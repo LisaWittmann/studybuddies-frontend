@@ -16,7 +16,7 @@
   <!--conversations with interactive characters-->
   <OverlayConversationComponent
     :opened="conversation.visible"
-    :node="conversation.node"
+    :message="conversation.message"
     @select-option="selectConversationOption"
   />
 </template>
@@ -30,13 +30,13 @@ import { useGameStore } from "@/service/game/GameStore";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { MoveOperation } from "@/service/game/EventMessage";
 import { MainPlayer } from "@/service/game/Player";
+import { Message, Response } from "@/service/game/Conversation";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import "@/service/game/EventStore";
-import { ConversationNode } from "@/service/game/ConversationNode";
 
 export default defineComponent({
   name: "GameView",
@@ -63,39 +63,19 @@ export default defineComponent({
       visible: false,
     });
 
-    const testConversation = new ConversationNode(
+    const testConversation = new Message(
       "1",
-      undefined,
       "Magst du die Zahl 17?",
-      new ConversationNode(
-        "11",
-        "Ja, finde ich super",
-        "Das ist eine gute Wahl. Möchtest du einen Rat von mir?",
-        new ConversationNode(
-          "111",
-          "Ja, sehr gerne",
-          "Du solltest zusehen, dass du zur Semestereinführungsveranstaltung gelangst. Dort wirst du bestimmt neue Freunde finden.",
-          new ConversationNode("111", "Dann mache ich mich auf den Weg"),
-          new ConversationNode(
-            "1112",
-            "Was soll ich denn da?",
-            "Du bist sehr unhöflich! Stelle nicht alles in Frage, was man dir rät.",
-            new ConversationNode("11121", "Tschüss")
-          )
-        ),
-        new ConversationNode("1112", "Nein, danke")
-      ),
-      new ConversationNode(
-        "12",
-        "Nein, ich bin eher Fan von der 18",
-        "Du musst noch viel lernen...",
-        new ConversationNode("121", "Tschüss")
-      )
+      undefined,
+      [
+        new Response("11", "Ja, finde ich super"),
+        new Response("12", "Nein, ich bin eher Fan von der 18"),
+      ]
     );
 
     // conversations with interactive game characters
     const conversation = reactive({
-      node: testConversation,
+      message: testConversation,
       visible: true,
     });
 
@@ -128,10 +108,9 @@ export default defineComponent({
     }
 
     // testing conversation
-    function selectConversationOption(node: ConversationNode) {
-      if (!node.text) conversation.visible = false;
-      else conversation.node = node;
-      if (node.item) console.log(node.item);
+    function selectConversationOption(response: Response) {
+      console.log(response);
+      if (!response.redirect) conversation.visible = false;
     }
 
     return {

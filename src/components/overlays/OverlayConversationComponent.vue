@@ -2,17 +2,17 @@
   <OverlayComponent :opened="opened">
     <div class="conversation">
       <div class="conversation__content">
-        <p>{{ node.text }}</p>
+        <p>{{ message.text }}</p>
       </div>
       <div class="conversation__option-wrapper">
         <div
           class="conversation__option"
-          v-for="child of children"
-          :key="child.key"
-          :style="{ flexBasis: 100 / children.length + '%' }"
-          @click="clickOption(child)"
+          v-for="response of message.responses"
+          :key="response.id"
+          :style="{ flexBasis: 100 / message.responses.length + '%' }"
+          @click="clickOption(response)"
         >
-          {{ child.answer }}
+          {{ response.text }}
         </div>
       </div>
     </div>
@@ -20,9 +20,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { defineComponent } from "vue";
 import OverlayComponent from "@/components/overlays/OverlayComponent.vue";
-import { ConversationNode } from "@/service/game/ConversationNode";
+import { Message, Response } from "@/service/game/Conversation";
 
 export default defineComponent({
   namae: "OverlayConversationComponent",
@@ -32,23 +32,17 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    node: {
-      type: ConversationNode,
+    message: {
+      type: Message,
       required: true,
     },
   },
   setup(props, { emit }) {
-    function clickOption(node: ConversationNode) {
-      emit("select-option", node);
+    function clickOption(response: Response) {
+      emit("select-option", response);
     }
 
-    const children = computed(() =>
-      [props.node.leftNode, props.node.rightNode].filter(
-        (child) => child instanceof ConversationNode
-      )
-    );
-
-    return { clickOption, children };
+    return { clickOption };
   },
 });
 </script>
