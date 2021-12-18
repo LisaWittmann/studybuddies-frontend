@@ -6,7 +6,7 @@
     <div class="flex-container">
       <div class="column-wrapper">
         <img class="header" :src="header" alt="logo" />
-        <router-link to="/login"> Jetzt spielen </router-link>
+        <router-link to="/login" class="link"> Jetzt spielen </router-link>
       </div>
     </div>
   </div>
@@ -56,6 +56,13 @@ export default defineComponent({
   }
 }
 
+a {
+  color: $color-dark-brown;
+  @include color-scheme(dark) {
+    color: $color-grey;
+    font-weight: 300;
+  }
+}
 .flex-container {
   position: absolute;
   z-index: 2;
