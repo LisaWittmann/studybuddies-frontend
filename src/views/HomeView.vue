@@ -1,14 +1,18 @@
 <template>
-  <div class="container">
-    <div class="image-wrapper">
+  <div class="home">
+    <div class="home__background">
       <transition name="slow-fade" appear>
-        <img src="@/assets/img/background.jpg" alt="background" />
+        <img
+          class="home__background-image"
+          src="@/assets/img/background.jpg"
+          alt="background"
+        />
       </transition>
     </div>
     <div class="flex-container">
       <div class="column-wrapper">
-        <transition name="fade" appear leave>
-          <img class="header" :src="header" alt="logo" />
+        <transition name="fade" appear>
+          <img class="home__header" :src="header" alt="logo" />
         </transition>
         <transition name="delay-slow-fade" appear>
           <router-link
@@ -42,54 +46,56 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.image-wrapper {
-  position: relative;
-  overflow: hidden;
-  height: 100vh;
+.home {
+  &__background {
+    position: relative;
+    overflow: hidden;
+    height: 100vh;
 
-  img {
+    &-image {
+      width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      filter: grayscale(20%) brightness(70%);
+      opacity: 0.2;
+
+      @include color-scheme(dark) {
+        opacity: 0.12;
+        filter: grayscale(0%) brightness(90%);
+      }
+    }
+  }
+
+  &__header {
     width: 100%;
-    min-height: 100%;
-    object-fit: cover;
-    filter: grayscale(20%) brightness(70%);
-    opacity: 0.2;
+    max-width: 800px;
 
     @include color-scheme(dark) {
-      opacity: 0.12;
-      filter: grayscale(0%) brightness(90%);
+      filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
     }
   }
-}
 
-a {
-  color: $color-white;
-  font-size: 18px;
-  display: flex;
-  font-weight: 300;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
+  a {
+    color: $color-white;
+    font-size: 18px;
+    display: flex;
+    font-weight: 300;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 
-  @include color-scheme(dark) {
-    color: $color-black;
-    &:hover {
-      color: $color-green;
+    @include color-scheme(dark) {
+      color: $color-black;
+      &:hover {
+        color: $color-green;
+      }
     }
   }
-}
 
-.flex-container {
-  position: absolute;
-  z-index: 2;
-  top: 0;
-}
-
-.header {
-  width: 80%;
-  max-width: 800px;
-
-  @include color-scheme(dark) {
-    filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
+  .flex-container {
+    position: absolute;
+    z-index: 2;
+    top: 0;
   }
 }
 </style>
