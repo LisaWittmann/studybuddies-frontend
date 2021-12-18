@@ -1,32 +1,34 @@
 <template>
   <div class="flex-container">
-    <section>
-      <h1>Registrieren</h1>
-      <form @submit.prevent="registerUser" class="column-wrapper">
-        <input
-          class="input--medium"
-          type="username"
-          placeholder="Benutzername"
-          v-model="user.username"
-          required
-        />
-        <input
-          class="input--medium"
-          type="password"
-          placeholder="Passwort"
-          v-model="user.password"
-          required
-        />
-        <button class="button--filled button--medium" type="submit">
-          Registrieren
-        </button>
-        <p>
-          Du bist bereits registriert?
-          <router-link to="/login">Jetzt anmelden</router-link>
-        </p>
-        <span class="error">{{ errorMessage }}</span>
-      </form>
-    </section>
+    <transition name="fade" appear>
+      <section>
+        <h1>Registrieren</h1>
+        <form @submit.prevent="registerUser" class="column-wrapper">
+          <input
+            class="input--medium"
+            type="username"
+            placeholder="Benutzername"
+            v-model="user.username"
+            required
+          />
+          <input
+            class="input--medium"
+            type="password"
+            placeholder="Passwort"
+            v-model="user.password"
+            required
+          />
+          <button class="button--filled button--medium" type="submit">
+            Registrieren
+          </button>
+          <p>
+            Du bist bereits registriert?
+            <router-link to="/login">Jetzt anmelden</router-link>
+          </p>
+          <span class="error">{{ errorMessage }}</span>
+        </form>
+      </section>
+    </transition>
   </div>
 </template>
 
@@ -55,3 +57,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.fade-enter-active {
+  transition: opacity 0.9s ease;
+}
+</style>

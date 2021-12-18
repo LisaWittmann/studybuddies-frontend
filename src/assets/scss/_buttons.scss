@@ -41,6 +41,13 @@ button,
         min-height: 70px;
     }
 
+    &--pulse {
+        @include button-pulse-animation($color-dark-green);
+        @include color-scheme(dark) {
+            @include button-pulse-animation($color-white, 0.3);
+        }
+    }
+
     &__upload {
         min-height: 0;
     

@@ -1,24 +1,34 @@
 <template>
   <div class="container">
     <div class="image-wrapper">
-      <img src="@/assets/img/background.jpg" alt="background" />
+      <transition name="slow-fade" appear>
+        <img src="@/assets/img/background.jpg" alt="background" />
+      </transition>
     </div>
     <div class="flex-container">
       <div class="column-wrapper">
-        <img class="header" :src="header" alt="logo" />
-        <router-link to="/login" class="link"> Jetzt spielen </router-link>
+        <transition name="fade" appear leave>
+          <img class="header" :src="header" alt="logo" />
+        </transition>
+        <transition name="delay-slow-fade" appear>
+          <router-link
+            to="/find"
+            class="button button--small button--pulse button--filled"
+          >
+            Jetzt spielen
+          </router-link>
+        </transition>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, onMounted, ref } from "vue";
+import { computed, defineComponent } from "vue";
 
 export default defineComponent({
   name: "HomeView",
   setup() {
-    const inView = ref(false);
     const header = computed(() => {
       if (matchMedia("(prefers-color-scheme: dark)").matches) {
         return require("@/assets/img/logo_header_dark.png");
@@ -26,13 +36,7 @@ export default defineComponent({
       return require("@/assets/img/logo_header.png");
     });
 
-    onMounted(() => {
-      inView.value = true;
-    });
-    onBeforeMount(() => {
-      inView.value = false;
-    });
-    return { header, inView };
+    return { header };
   },
 });
 </script>
@@ -51,26 +55,41 @@ export default defineComponent({
     opacity: 0.2;
 
     @include color-scheme(dark) {
-      opacity: 0.1;
+      opacity: 0.12;
+      filter: grayscale(0%) brightness(90%);
     }
   }
 }
 
 a {
-  color: $color-dark-brown;
+  color: $color-white;
+  font-size: 18px;
+  display: flex;
+  font-weight: 300;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+
   @include color-scheme(dark) {
-    color: $color-grey;
-    font-weight: 300;
+    color: $color-black;
+    &:hover {
+      color: $color-green;
+    }
   }
 }
+
 .flex-container {
   position: absolute;
   z-index: 2;
   top: 0;
+}
 
-  img {
-    width: 80%;
-    max-width: 800px;
+.header {
+  width: 80%;
+  max-width: 800px;
+
+  @include color-scheme(dark) {
+    filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
   }
 }
 </style>

@@ -134,8 +134,8 @@ export default defineComponent({
   }
 
   &__menu {
+    @include float-animation();
     position: absolute;
-    animation: menu 0.3s ease forwards;
     flex-direction: column;
     text-align: left;
     top: 100%;
@@ -194,15 +194,6 @@ export default defineComponent({
       &:hover {
         color: $color-beige;
       }
-    }
-  }
-
-  @keyframes menu {
-    from {
-      transform: translate3d(0, 30px, 0);
-    }
-    to {
-      transform: translate3d(0, 20px, 0);
     }
   }
 }

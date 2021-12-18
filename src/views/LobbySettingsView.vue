@@ -22,15 +22,19 @@
     </section>
     <section>
       <div class="column-wrapper">
-        <button class="button__confirm button--small" @click="readyCheck">
-          Bereit
-        </button>
-        <button
-          class="button__exit button--small"
-          @click="exitLobby(lobbyKey, username)"
-        >
-          Verlassen
-        </button>
+        <transition name="fade" appear>
+          <button class="button__confirm button--small" @click="readyCheck">
+            Bereit
+          </button>
+        </transition>
+        <transition name="delay-fade" appear>
+          <button
+            class="button__exit button--small"
+            @click="exitLobby(lobbyKey, username)"
+          >
+            Verlassen
+          </button>
+        </transition>
       </div>
     </section>
   </div>
