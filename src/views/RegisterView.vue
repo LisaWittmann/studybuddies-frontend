@@ -22,7 +22,7 @@
         </button>
         <p>
           Du bist bereits registriert?
-          <router-link to="/">Jetzt anmelden</router-link>
+          <router-link to="/login">Jetzt anmelden</router-link>
         </p>
         <span class="error">{{ errorMessage }}</span>
       </form>

@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
+import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import GameView from "@/views/GameView.vue";
@@ -8,13 +9,18 @@ import FindLobbyView from "@/views/FindLobbyView.vue";
 // TODO: set routes properly after testing game
 const routes: Array<RouteRecordRaw> = [
   {
+    path: "/",
+    name: "HomeView",
+    component: HomeView,
+  },
+  {
     path: "/game/:key",
     name: "GameView",
     component: GameView,
     props: true,
   },
   {
-    path: "/",
+    path: "/login",
     name: "LoginView",
     component: LoginView,
   },
