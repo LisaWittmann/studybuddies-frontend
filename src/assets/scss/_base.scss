@@ -1,7 +1,16 @@
 body {
     margin: 0;
     font-family: $font-outfit;
-    color: $color-black;
+
+    @include color-scheme(light) {
+        background: $color-white;
+        color: $color-black;
+    }
+
+    @include color-scheme(dark) {
+        background: $color-black-background;
+        color: $color-white;
+    }
 }
 
 #app {
@@ -35,12 +44,25 @@ section {
     width: 100%;
 }
 
+i {
+    cursor: pointer;
+}
+
 a {
     text-decoration: underline;
-    color: $color-dark-green;
     cursor: pointer;
 
-    &:hover {
-        color: $color-green;
+    @include color-scheme(dark) {
+        color: $color-dark-green;
+         &:hover {
+             color: $color-light-green;
+         }
+     }
+   
+   @include color-scheme(dark) {
+       color: $color-grey;
+        &:hover {
+            color: $color-white;
+        }
     }
 }
