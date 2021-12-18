@@ -1,19 +1,32 @@
 button,
 .button {
-    background: white;
-    border: 1px solid $color-grey;
+    background: transparent;
     border-radius: 8px;
     font-size: $text-m;
     font-weight: 300;
     display: inline-block;
+    border: 1px solid $color-grey;
     cursor: pointer;
     min-height: 35px;
     width: 80%;
     padding: 10px 12px;
-    box-shadow: 5px 5px 0 0 rgba(black, 0.03);
 
-    &:hover {
+    @include color-scheme(light) {
+        font-weight: 300;
+        box-shadow: 5px 5px 0 0 rgba(black, 0.03);
+
+        &:hover {
+            font-weight: 400;
+        }
+    }
+
+    @include color-scheme(dark) {
         font-weight: 400;
+        box-shadow: 5px 5px 0 0 rgba(grey, 0.03);
+
+        &:hover {
+            font-weight: 500;
+        }
     }
 }
 
@@ -28,15 +41,54 @@ button,
     }
 
     &--large {
+        width: 80%;
         max-width: 500px;
-        min-height: 80px;
-        box-shadow: 10px 10px 0 0 rgba(black, 0.03);
+        min-height: 70px;
     }
 
-    &--filled {
-        background: $color-dark-green;
-        color: $color-white;
-        box-shadow: 5px 5px 0 0 rgba(black, 0.04);
+    &--upload {
+        min-height: 0;
+    
+        &:hover {
+          color: $color-beige;
+        }
+      }
+    
+    &--exit {
+        &:hover,
+        &:active {
+            color: darkred;
+        }
+    }
+    
+    &--confirm {
+        &:hover,
+        &:active {
+            color: $color-green;
+        }
+    }
+
+    @include color-scheme(light) {
+        &--large {
+            box-shadow: 10px 10px 0 0 rgba(black, 0.03);
+        }
+
+        &--filled {
+            background: $color-dark-green;
+            color: $color-white;
+            box-shadow: 5px 5px 0 0 rgba(black, 0.04);
+        }
+    }
+
+    @include color-scheme(dark) {
+        &--large {
+            box-shadow: 10px 10px 0 0 rgba(grey, 0.03);
+        }
+        
+        &--filled {
+            background: $color-white;
+            color: $color-black;
+            box-shadow: 5px 5px 0 0 rgba(grey, 0.04);
+        }
     }
 }
- 

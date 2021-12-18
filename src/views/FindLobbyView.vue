@@ -1,11 +1,7 @@
 <template>
   <div class="container">
     <section>
-      <img
-        class="image--header"
-        src="@/assets/img/logo_header.png"
-        alt="logo"
-      />
+      <img class="image--header" :src="header" alt="logo" />
       <h2>Spiel finden</h2>
       <div class="column-wrapper">
         <input class="input--small" type="text" v-model="lobbyKey" />
@@ -20,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 import router from "@/router";
 
@@ -29,6 +25,13 @@ export default defineComponent({
   setup() {
     const { loginState } = useLoginStore();
     const lobbyKey = ref("");
+
+    const header = computed(() => {
+      if (matchMedia("(prefers-color-scheme: dark)").matches) {
+        return require("@/assets/img/logo_header_dark.png");
+      }
+      return require("@/assets/img/logo_header.png");
+    });
 
     function joinGame() {
       let key = lobbyKey.value;
@@ -67,7 +70,7 @@ export default defineComponent({
         .catch((err) => console.log(err));
     }
 
-    return { lobbyKey, createGame, joinGame };
+    return { lobbyKey, createGame, joinGame, header };
   },
 });
 </script>

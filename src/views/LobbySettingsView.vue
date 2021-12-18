@@ -102,30 +102,6 @@ h1 {
   margin: $spacing-l 0;
 }
 
-.button {
-  &--upload {
-    min-height: 0;
-
-    &:hover {
-      color: $color-beige;
-    }
-  }
-
-  &--exit {
-    &:hover,
-    &:active {
-      color: darkred;
-    }
-  }
-
-  &--confirm {
-    &:hover,
-    &:active {
-      color: $color-green;
-    }
-  }
-}
-
 input[type="file"] {
   display: none;
 }
