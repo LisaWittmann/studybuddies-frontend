@@ -6,7 +6,7 @@
     </section>
     <section>
       <h2>Labyrinth hochladen:</h2>
-      <label class="button button--small button--upload">
+      <label class="button button__upload button--small">
         <input
           type="file"
           ref="upload"
@@ -22,11 +22,11 @@
     </section>
     <section>
       <div class="column-wrapper">
-        <button class="button--small button--filled" @click="readyCheck">
+        <button class="button__confirm button--small" @click="readyCheck">
           Bereit
         </button>
         <button
-          class="button button--small button--exit"
+          class="button__exit button--small"
           @click="exitLobby(lobbyKey, username)"
         >
           Verlassen

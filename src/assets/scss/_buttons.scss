@@ -41,7 +41,7 @@ button,
         min-height: 70px;
     }
 
-    &--upload {
+    &__upload {
         min-height: 0;
     
         &:hover {
@@ -49,14 +49,14 @@ button,
         }
       }
     
-    &--exit {
+    &__exit {
         &:hover,
         &:active {
             color: darkred;
         }
     }
     
-    &--confirm {
+    &__confirm {
         &:hover,
         &:active {
             color: $color-green;

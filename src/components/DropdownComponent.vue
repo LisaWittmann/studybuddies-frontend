@@ -1,6 +1,6 @@
 <template>
   <section class="dropdown">
-    <button class="dropdown__button button button--large" @click="openClose">
+    <button class="dropdown__button button--large" @click="openClose">
       <div class="text-wrapper">
         <span v-if="selectedItem">Labyrinth {{ selectedItem }}</span>
         <span v-else>Labyrinth auswählen</span>
@@ -73,7 +73,7 @@ export default defineComponent({
   @include flex-center();
   position: relative;
 
-  .button {
+  button {
     @include flex-center();
     justify-content: space-between;
     padding: 25px;
