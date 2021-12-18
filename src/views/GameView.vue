@@ -4,19 +4,25 @@
     :player="mainPlayer"
     @click-object="itemSelection"
     @move-player="movePlayer"
-    @click-disabled="openTerminal"
+    @click-disabled="toggleTerminal"
   />
   <!--warning and errormessages-->
   <OverlayTerminalComponent
-    :opened="showTerminal"
-    :message="message"
-    :state="messageState"
-    @close="closeTerminal"
+    :opened="eventMessage.visible"
+    :message="eventMessage.message"
+    :state="eventMessage.state"
+    @close="toggleTerminal"
+  />
+  <!--conversations with interactive characters-->
+  <OverlayConversationComponent
+    :opened="conversation.visible"
+    :message="conversation.message"
+    @select-option="selectConversationOption"
   />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, reactive } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
@@ -24,9 +30,11 @@ import { useGameStore } from "@/service/game/GameStore";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { MoveOperation } from "@/service/game/EventMessage";
 import { MainPlayer } from "@/service/game/Player";
+import { Message, Response } from "@/service/game/Conversation";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
+import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import "@/service/game/EventStore";
 
@@ -34,6 +42,7 @@ export default defineComponent({
   name: "GameView",
   components: {
     SceneComponent,
+    OverlayConversationComponent,
     OverlayTerminalComponent,
   },
   props: {
@@ -46,14 +55,29 @@ export default defineComponent({
     updateGame();
 
     const mainPlayer = gameState.playerMap.get(loginState.username);
-    const showTerminal = ref(false);
 
     // in-game messages like warnings, errors, hints ...
-    const message =
-      "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!";
-    // state of message that sets text color in terminal
-    // state options: neutral, warning, error
-    const messageState = "warning";
+    const eventMessage = reactive({
+      message: "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!",
+      state: "warning",
+      visible: false,
+    });
+
+    const testConversation = new Message(
+      "1",
+      "Magst du die Zahl 17?",
+      undefined,
+      [
+        new Response("11", "Ja, finde ich super"),
+        new Response("12", "Nein, ich bin eher Fan von der 18"),
+      ]
+    );
+
+    // conversations with interactive game characters
+    const conversation = reactive({
+      message: testConversation,
+      visible: true,
+    });
 
     //TODO: remove this temporary operation after showing GameView with key in URL
     let temporaryCode: string;
@@ -71,8 +95,7 @@ export default defineComponent({
         temporaryCode = json.key;
       });
 
-    const openTerminal = () => (showTerminal.value = true);
-    const closeTerminal = () => (showTerminal.value = false);
+    const toggleTerminal = () => (eventMessage.visible = !eventMessage.visible);
 
     function movePlayer(orientation: Orientation) {
       playerMovement(
@@ -84,16 +107,22 @@ export default defineComponent({
       );
     }
 
+    // testing conversation
+    function selectConversationOption(response: Response) {
+      console.log(response);
+      if (!response.redirect) conversation.visible = false;
+    }
+
     return {
-      message,
-      messageState,
-      showTerminal,
-      openTerminal,
-      closeTerminal,
-      itemSelection,
       movePlayer,
+      itemSelection,
+      toggleTerminal,
+      selectConversationOption,
+      testConversation,
       mainPlayer,
-      labyrinth: gameState.labyrinth,
+      conversation,
+      eventMessage,
+      gameState,
     };
   },
 });
