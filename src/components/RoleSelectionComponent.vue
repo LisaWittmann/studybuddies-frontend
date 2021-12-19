@@ -4,6 +4,7 @@
       type="radio"
       :value="option"
       :id="option"
+      :disabled="disabled"
       @change="onClick(option)"
       name="radio-input"
     />
@@ -17,7 +18,8 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
     props: {
-        option: {type: String, required: true}
+        option: {type: String, required: true},
+        disabled: { type: Boolean, default: false }
     },
     setup(_, {emit}) {
       /**
@@ -50,7 +52,13 @@ input + img {
     cursor: pointer;
 }
 
-input:checked + img {
+input:disabled + img {
     opacity: 0.5;
 }
+
+input:checked + img {
+    opacity: 1;
+    border: solid salmon;
+}
+
 </style>

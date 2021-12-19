@@ -9,7 +9,7 @@
         <div class="roles">
           <span v-if="selected">{{ selected }}</span>
         </div>
-      <RadioButtonGroup :options="decisions" v-model="selected" @clicked="selectedRole"/>
+      <RadioButtonGroup :options="roles" v-model="selected" @clicked="selectedRole" :selectable="roleOptions"/>
     </section>    
     <section>
       <h2>Labyrinth auswählen:</h2>
@@ -50,11 +50,12 @@ export default defineComponent({
   components: { UserListComponent, DropdownComponent, RadioButtonGroup },
   setup() {
     //Radiobutton data
-    const decisions = ref([]);
+    const roles = ref([]);
+    const roleOptions = ref([]);
     let selected = ref("");
 
     const { loginState } = useLoginStore();
-    const { updateUsers, updateLabyrinths, readyCheck, exitLobby, selectRole, getRoleOptions } =
+    const { updateUsers, updateLabyrinths, readyCheck, exitLobby, selectRole, getRoles, getRoleOptions } =
       useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
@@ -70,10 +71,10 @@ export default defineComponent({
 
     function selectedRole(name : string) {
       selected.value = name;
-      selectRole(name, gameState.lobbyKey, loginState.username);
-      getRoleOptions(gameState.lobbyKey).then((data) => {
-        decisions.value = data;
-        console.log(decisions.value);
+      selectRole(name, gameState.lobbyKey, loginState.username).then(() => {
+        getRoleOptions(gameState.lobbyKey).then((data) => {
+          roleOptions.value = data;
+        });
       });      
     }
 
@@ -81,7 +82,8 @@ export default defineComponent({
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
-      getRoleOptions(gameState.lobbyKey).then((data) => (decisions.value = data));
+      getRoles(gameState.lobbyKey).then((data) => (roles.value = data));
+      getRoleOptions(gameState.lobbyKey).then((data) => (roleOptions.value = data));
     });
 
     const lobbyKey = computed(() => gameState.lobbyKey);
@@ -92,7 +94,8 @@ export default defineComponent({
       selectLabyrinth,
       exitLobby,
       selectedRole,
-      decisions,
+      roles,
+      roleOptions,
       users,
       lobbyKey,
       labyrinthOptions,

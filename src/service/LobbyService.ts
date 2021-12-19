@@ -19,7 +19,7 @@ async function selectRole(role: string, lobbyKey: string, username: string) {
   });
 }
 
-async function getRoleOptions(lobbyKey: string) {
+async function getRoles(lobbyKey: string) {
   return fetch("/api/lobby/roles/" + lobbyKey, {
     method: "GET",
   }).then((response) => {
@@ -28,6 +28,19 @@ async function getRoleOptions(lobbyKey: string) {
   }); 
 
 }
+
+async function getRoleOptions(lobbyKey: string) {
+  return fetch("/api/lobby/selectable-roles/" + lobbyKey, {
+    method: "GET",
+  }).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  }); 
+
+}
+
+
+
 
 /**
  * send request to join lobby with given lobby key
@@ -200,6 +213,7 @@ function setupGame(users: string[]) {
 export function useLobbyService() {
   return {
     selectRole,
+    getRoles,
     getRoleOptions,
     joinLobby,
     createLobby,
