@@ -1,6 +1,7 @@
 button,
 .button {
     background: transparent;
+    box-shadow: 5px 5px 0 0 rgba(black, 0.03);
     border-radius: 8px;
     font-size: $text-m;
     font-weight: 300;
@@ -12,16 +13,12 @@ button,
     width: 80%;
     padding: 10px 12px;
 
-    &:hover {
-        font-weight: 400;
-    }
-
-    @include color-scheme(light) {
-        box-shadow: 5px 5px 0 0 rgba(black, 0.03);
-    }
-
     @include color-scheme(dark) {
         box-shadow: 5px 5px 0 0 rgba(grey, 0.03);
+    }
+
+    &:hover {
+        font-weight: 400;
     }
 }
 
@@ -39,12 +36,29 @@ button,
         width: 80%;
         max-width: 500px;
         min-height: 70px;
+        box-shadow: 10px 10px 0 0 rgba(black, 0.03);
+        
+        @include color-scheme(dark) {
+            box-shadow: 10px 10px 0 0 rgba(grey, 0.03);
+        }
     }
 
     &--pulse {
         @include button-pulse-animation($color-dark-green);
         @include color-scheme(dark) {
             @include button-pulse-animation($color-white, 0.3);
+        }
+    }
+
+    &--filled {
+        background: $color-dark-green;
+        color: $color-white;
+        box-shadow: 5px 5px 0 0 rgba(black, 0.04);
+
+        @include color-scheme(dark) {
+            background: $color-white;
+            color: $color-black;
+            box-shadow: 5px 5px 0 0 rgba(grey, 0.04);
         }
     }
 
@@ -67,30 +81,6 @@ button,
         &:hover,
         &:active {
             color: $color-green;
-        }
-    }
-
-    @include color-scheme(light) {
-        &--large {
-            box-shadow: 10px 10px 0 0 rgba(black, 0.03);
-        }
-
-        &--filled {
-            background: $color-dark-green;
-            color: $color-white;
-            box-shadow: 5px 5px 0 0 rgba(black, 0.04);
-        }
-    }
-
-    @include color-scheme(dark) {
-        &--large {
-            box-shadow: 10px 10px 0 0 rgba(grey, 0.03);
-        }
-        
-        &--filled {
-            background: $color-white;
-            color: $color-black;
-            box-shadow: 5px 5px 0 0 rgba(grey, 0.04);
         }
     }
 }
