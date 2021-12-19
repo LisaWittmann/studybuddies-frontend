@@ -117,7 +117,7 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
  * @throws error if request was not successful
  */
 async function updateUsers(lobbyKey: string) {
-  return fetch("/api/lobby/users/" + lobbyKey, {
+  fetch("/api/lobby/users/" + lobbyKey, {
     method: "GET",
   })
     .then((response) => {
@@ -186,7 +186,7 @@ function readyCheck(username: string, labId: number) {
  * @param users : list with usernames in the lobby
  */
 function setupGame(users: string[]) {
-  const { gameState, setPlayer } = useGameStore();
+  const { gameState, setPlayerData } = useGameStore();
 
   //setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
 

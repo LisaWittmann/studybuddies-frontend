@@ -2,6 +2,7 @@
   <SceneComponent
     :labyrinth="labyrinth"
     :player="mainPlayer"
+    :partner="partnerPlayer"
     @click-object="itemSelection"
     @move-player="movePlayer"
     @click-disabled="openTerminal"
@@ -16,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import {computed, defineComponent, onMounted, ref} from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
@@ -42,26 +43,38 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { gameState, updateGame, setLobbyKey } = useGameStore();
+    const { gameState, updateGameData, setLobbyKey } = useGameStore();
     const { updateUsers } = useLobbyService();
     const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();
-    updateGame();
+    updateGameData();
 
-    const mainPlayer = gameState.playerMap.get(loginState.username);
     const showTerminal = ref(false);
 
     /*
     // Users Array -> Wird onMounted gefüllt
     const users = ref(new Array<string>());
+    */
 
-
-    onMounted(() => {
+    onMounted(async () => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
+      await updateUsers(gameState.lobbyKey);
+      updateGameData();
     })
-    */
+
+
+    let mainPlayer;
+    let partnerPlayer;
+    gameState.playerMap.forEach((player, key) => {
+      if(key == loginState.username) {
+        mainPlayer = computed(() => player);
+      } else {
+        partnerPlayer = computed(() => player);
+      }
+    })
+
+
 
     // in-game messages like warnings, errors, hints ...
     const message =
@@ -96,7 +109,8 @@ export default defineComponent({
       closeTerminal,
       itemSelection,
       movePlayer,
-      mainPlayer: gameState.playerMap.get(loginState.username),
+      mainPlayer,
+      partnerPlayer,
       labyrinth: gameState.labyrinth,
     };
   },
