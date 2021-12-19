@@ -20,7 +20,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import router from "@/router";
+import { useLobbyService } from "@/service/LobbyService";
+import { defineComponent, onMounted } from "vue";
 
 export default defineComponent({
   name: "UserListComponent",
@@ -30,6 +32,12 @@ export default defineComponent({
       required: true,
     },
   },
+  setup(props) {
+    onMounted(async() => {
+      const route = router.currentRoute.value;
+      useLobbyService().updateUsers(route.params.key as string)
+    })
+  }
 });
 </script>
 
