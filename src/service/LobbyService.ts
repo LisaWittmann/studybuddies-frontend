@@ -1,6 +1,33 @@
 import router from "@/router";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
+import { Role } from "./game/Player";
+import { EventMessage } from "@/service/game/EventMessage";
+
+
+async function selectRole(role: string, lobbyKey: string, username: string) {
+  const eventMessage:EventMessage = {operation: "ROLE", lobbyKey: lobbyKey, username: username, data: role};
+  return fetch("/api/lobby/select-role", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(eventMessage),
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status == 409) throw new Error("Diese Rolle ist bereits vergeben.");
+      else throw new Error("Die Rolle konnte nicht gefunden werden.");
+    }
+  });
+}
+
+async function getRoleOptions(lobbyKey: string) {
+  return fetch("/api/lobby/roles/" + lobbyKey, {
+    method: "GET",
+  }).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  }); 
+
+}
 
 /**
  * send request to join lobby with given lobby key
@@ -172,6 +199,8 @@ function setupGame(users: string[]) {
 
 export function useLobbyService() {
   return {
+    selectRole,
+    getRoleOptions,
     joinLobby,
     createLobby,
     exitLobby,

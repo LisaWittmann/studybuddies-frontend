@@ -4,7 +4,7 @@
       type="radio"
       :value="option"
       :id="option"
-      @change="$parent.$emit('input', $event.target.value)"
+      @change="onClick(option)"
       name="radio-input"
     />
     <img :src="getImgUrl(option)" :alt="option" width="100" />   
@@ -19,16 +19,20 @@ export default defineComponent({
     props: {
         option: {type: String, required: true}
     },
-    setup() {
+    setup(_, {emit}) {
       /**
        * creates image url
        */
       function getImgUrl(imgName : string){
-        return require('../assets/img/roles/'+imgName+'-role.svg'); 
+        return require('../assets/img/roles/'+imgName.toLowerCase()+'-role.svg'); 
+      }
+      function onClick(option : string) {
+        emit("clicked", option);
       }
 
       return {
         getImgUrl,
+        onClick
       };            
     }
 });

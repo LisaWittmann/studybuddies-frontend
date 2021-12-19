@@ -7,10 +7,9 @@
     <section>
       <h2>Rolle auswählen:</h2>      
         <div class="roles">
-          <span v-if="userPickedHacker" key="hacker">Hacker</span>
-          <span v-else-if="userPickedDesigner" key="designer">Designer</span>
+          <span v-if="selected">{{ selected }}</span>
         </div>
-      <RadioButtonGroup :options="decisions" v-model="selected"/>
+      <RadioButtonGroup :options="decisions" v-model="selected" @clicked="selectedRole"/>
     </section>    
     <section>
       <h2>Labyrinth auswählen:</h2>
@@ -44,23 +43,18 @@ import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
 import RadioButtonGroup from "@/components/RadioButtonGroup.vue";
+import { Role } from "@/service/game/Player";
 
 export default defineComponent({
   name: "LobbySettingsView",
   components: { UserListComponent, DropdownComponent, RadioButtonGroup },
   setup() {
     //Radiobutton data
-    const decisions = ref(["Hacker", "Designer"]);
+    const decisions = ref([]);
     let selected = ref("");
-    const userPickedHacker = computed(()=> {
-      return selected.value === "Hacker";
-    });
-    const userPickedDesigner = computed(() => {
-      return selected.value === "Designer";
-    });
 
     const { loginState } = useLoginStore();
-    const { updateUsers, updateLabyrinths, readyCheck, exitLobby } =
+    const { updateUsers, updateLabyrinths, readyCheck, exitLobby, selectRole, getRoleOptions } =
       useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
@@ -74,22 +68,31 @@ export default defineComponent({
       selectedLabyrinth.value = id;
     }
 
+    function selectedRole(name : string) {
+      selected.value = name;
+      selectRole(name, gameState.lobbyKey, loginState.username);
+      getRoleOptions(gameState.lobbyKey).then((data) => {
+        decisions.value = data;
+        console.log(decisions.value);
+      });      
+    }
+
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
+      getRoleOptions(gameState.lobbyKey).then((data) => (decisions.value = data));
     });
 
     const lobbyKey = computed(() => gameState.lobbyKey);
 
     return {
+      selected,
       readyCheck,
       selectLabyrinth,
       exitLobby,
+      selectedRole,
       decisions,
-      userPickedHacker,
-      userPickedDesigner,
-      selected,
       users,
       lobbyKey,
       labyrinthOptions,

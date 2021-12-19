@@ -1,6 +1,6 @@
 <template>
   <div class="input-group">
-    <RoleSelectionComponent v-for="option in options" :option="option" :key="option" />
+    <RoleSelectionComponent v-for="option in options" :option="option" :key="option" @clicked="onClick" />
   </div>
 </template>
 
@@ -15,6 +15,15 @@ export default defineComponent({
         options: {
             type: Array, 
             required: true}
+     },
+     setup(_,{emit}){
+      function onClick(option : string) {
+        emit("clicked", option);
+      }
+
+      return{ 
+        onClick
+       }
      }
 });
 </script>
@@ -25,7 +34,7 @@ export default defineComponent({
   margin: 20px auto;
   padding: 15px 20px;
   border: none;
-  
+
   display: flex;
   justify-content: space-between;
 }
