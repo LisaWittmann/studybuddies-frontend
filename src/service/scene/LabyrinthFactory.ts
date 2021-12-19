@@ -24,7 +24,7 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
   const position = vector(0, 0, 0);
   for (const [key, value] of labyrinth.tileMap) {
     const tile = getTile(value.tileId, scene);
-    console.log(tile);
+    // -> console.log(tile);
     if (!tile) {
       placeTile(position, value, key, scene);
     } else if (value.objectsInRoom != tile.userData.objectsInRoom) {
@@ -40,7 +40,8 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
  * @param scene: scene that contains player
  */
 async function updatePlayer(player: Player, scene: THREE.Scene) {
-  console.log("Move player: " + player);
+  console.log("Move player: ");
+  console.log(player);
   const tilePosition = getTilePosition(player.getPosition(), scene);
   if (tilePosition) {
     if (player instanceof MainPlayer) {

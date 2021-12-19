@@ -7,7 +7,7 @@ import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
 import {ref} from "vue";
 
-const { gameState, updatePlayer, setError, setPlayer, updateGame } = useGameStore();
+const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } = useGameStore();
 const { updateUsers, lobbyState } = useLobbyService();
 
 const wsurl = "ws://localhost:9090/messagebroker";
@@ -44,14 +44,14 @@ stompclient.onConnect = () => {
     const playerToMove: Player | undefined = gameState.playerMap.get(
       eventMessage.username
     );
-    console.log("Acting player: " +  playerToMove)
+    console.log(gameState.playerMap)
     switch (eventMessage.operation) {
       case "MOVEMENT":
         if (playerToMove) {
           const destTileID: number = Number.parseInt(eventMessage.data);
 
           if (destTileID) {
-            updatePlayer(playerToMove, destTileID);
+            updatePlayerData(playerToMove, destTileID);
             // -> now the watcher can update the 3D Room
             // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
@@ -76,13 +76,12 @@ stompclient.onConnect = () => {
           // @todo: Ändern!
           const { loginState } = useLoginStore();
 
-          updateGame().then(() => {
+          updateGameData().then(() => {
 
             updateUsers(gameState.lobbyKey);
-            let index = 0;
-            lobbyState.users.forEach(user => {
-              setPlayer(user, gameState.labyrinth.playerStartTileIds[index]);
-              index++;
+            //let index = 0;
+            lobbyState.users.forEach((user,index) => {
+              setPlayerData(user, gameState.labyrinth.playerStartTileIds[index]);
             });
 
             router.push(`/game/${gameState.lobbyKey}`);
