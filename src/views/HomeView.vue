@@ -11,7 +11,7 @@
     </div>
     <div class="flex-container">
       <div class="column-wrapper">
-        <transition name="slow-fade" appear leave>
+        <transition name="slow-fade" appear>
           <img class="home__header" :src="header" alt="logo" />
         </transition>
         <transition name="delay-slow-fade" appear>

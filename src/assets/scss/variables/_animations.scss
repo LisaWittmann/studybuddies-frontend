@@ -1,6 +1,4 @@
-@mixin button-pulse-animation($color: $color-dark-green, $opacity: 0.4) {
-    border: 0;
-    background: $color;
+@mixin pulse-animation($color: $color-dark-green, $opacity: 0.4) {
     animation: pulse 3s infinite;
 
     @keyframes pulse {

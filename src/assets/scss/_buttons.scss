@@ -44,9 +44,12 @@ button,
     }
 
     &--pulse {
-        @include button-pulse-animation($color-dark-green);
+        border: 0;
+        background: $color-dark-green;
+        @include pulse-animation($color-dark-green);
         @include color-scheme(dark) {
-            @include button-pulse-animation($color-white, 0.3);
+            background: $color-white;
+            @include pulse-animation($color-white, 0.3);
         }
     }
 
