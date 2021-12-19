@@ -29,7 +29,7 @@ async function uploadJsonFiles(filelist: FileList) {
   }
 }
 
-async function updateUsers(lobbyKey: string) {
+async function updateUsers(lobbyKey: string): Promise<string[]> {
   return fetch("/api/lobby/users/" + lobbyKey, {
     method: "GET",
   }).then((response) => {

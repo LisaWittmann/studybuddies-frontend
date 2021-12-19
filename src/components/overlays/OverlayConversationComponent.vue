@@ -40,7 +40,7 @@ export default defineComponent({
   setup(props, { emit }) {
     function clickOption(id: string) {
       console.log(id);
-      emit("select-option", id);
+      emit("respond", id);
     }
 
     return { clickOption };

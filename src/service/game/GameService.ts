@@ -1,5 +1,47 @@
 import { MoveOperation } from "@/service/game/EventMessage";
 import { Message, Response } from "@/service/game/Conversation";
+import { reactive } from "vue";
+
+// in-game messages like warnings, errors, hints ...
+const eventMessage = reactive({
+  message: "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!",
+  state: "warning",
+  visible: false,
+});
+
+const toggleEventMessage = () => (eventMessage.visible = !eventMessage.visible);
+
+// conversations with interactive game characters
+const conversation = reactive({
+  character: "",
+  message: new Message("", "", undefined, []),
+  visible: false,
+});
+
+async function startConversation(character: string) {
+  conversation.character = character;
+  conversation.visible = true;
+  getConversationMessage("1.1");
+}
+
+async function getConversationMessage(id: string) {
+  fetch(`/api/npc/${conversation.character}/${id}`, {
+    method: "GET",
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      console.log(jsonData);
+      conversation.message = jsonData as Message;
+    })
+    .catch(() => {
+      conversation.visible = false;
+      conversation.message = new Message("", "", undefined, []);
+      conversation.character = "";
+    });
+}
 
 async function playerMovement(moveOperation: MoveOperation) {
   fetch("/api/lobby/move", {
@@ -16,7 +58,7 @@ async function playerMovement(moveOperation: MoveOperation) {
 }
 
 // send the clicked item id to backend
-async function itemSelection(itemId: number) {
+async function selectItem(itemId: number) {
   fetch("/api/click/" + itemId, {
     method: "POST",
     headers: {
@@ -29,5 +71,13 @@ async function itemSelection(itemId: number) {
 }
 
 export function useGameService() {
-  return { playerMovement, itemSelection };
+  return {
+    eventMessage,
+    toggleEventMessage,
+    playerMovement,
+    selectItem,
+    conversation,
+    startConversation,
+    getConversationMessage,
+  };
 }
