@@ -4,11 +4,11 @@
       type="radio"
       :value="option"
       :id="option"
-      :class="option"
       @change="$parent.$emit('input', $event.target.value)"
       name="radio-input"
     />
-    {{ option }}
+    <img :src="getImgUrl(option)" :alt="option" width="100" />   
+    {{ option }} 
   </label>
 </template>
 
@@ -18,13 +18,35 @@ import { defineComponent } from 'vue'
 export default defineComponent({
     props: {
         option: {type: String, required: true}
+    },
+    setup() {
+      /**
+       * creates image url
+       */
+      function getImgUrl(imgName : string){
+        return require('../assets/img/roles/'+imgName+'-role.svg'); 
+      }
+
+      return {
+        getImgUrl,
+      };            
     }
 });
 </script>
 
 
 <style scoped>
-.designer {
-  background: url(../assets/img/roles/designer-role.svg) no-repeat;
+
+input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+input + img {
+    cursor: pointer;
+}
+
+input:checked + img {
+    opacity: 0.5;
 }
 </style>

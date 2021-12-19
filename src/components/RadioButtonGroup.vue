@@ -24,9 +24,8 @@ export default defineComponent({
   width: 20%;
   margin: 20px auto;
   padding: 15px 20px;
-  border: 1px solid black;
-  border-radius: 8px;
-
+  border: none;
+  
   display: flex;
   justify-content: space-between;
 }
