@@ -11,7 +11,7 @@
     </div>
     <div class="flex-container">
       <div class="column-wrapper">
-        <transition name="fade" appear>
+        <transition name="slow-fade" appear leave>
           <img class="home__header" :src="header" alt="logo" />
         </transition>
         <transition name="delay-slow-fade" appear>
@@ -60,7 +60,7 @@ export default defineComponent({
       opacity: 0.2;
 
       @include color-scheme(dark) {
-        opacity: 0.12;
+        opacity: 0.15;
         filter: grayscale(0%) brightness(90%);
       }
     }

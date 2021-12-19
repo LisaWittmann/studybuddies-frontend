@@ -1,6 +1,6 @@
 <template>
   <div class="flex-container">
-    <transition name="fade" appear>
+    <transition name="slow-fade" appear>
       <section>
         <h1>Anmelden</h1>
         <form @submit.prevent="login(user)" class="column-wrapper">
@@ -51,9 +51,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.fade-enter-active {
-  transition: opacity 0.9s ease;
-}
-</style>

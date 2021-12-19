@@ -5,12 +5,12 @@
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 1s ease;
+  transition: opacity 0.5s ease;
 }
 
 .delay-fade-enter-active,
 .delay-fade-leave-active {
-  transition: opacity 2s ease;
+  transition: opacity 1.2s ease;
 }
 
 .slow-fade-enter-active,
