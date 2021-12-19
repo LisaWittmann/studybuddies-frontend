@@ -21,7 +21,7 @@ export default defineComponent({
 
 <style scoped>
 .input-group {
-  width: 35%;
+  width: 20%;
   margin: 20px auto;
   padding: 15px 20px;
   border: 1px solid black;

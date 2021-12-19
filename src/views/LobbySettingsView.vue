@@ -50,7 +50,7 @@ export default defineComponent({
   components: { UserListComponent, DropdownComponent, RadioButtonGroup },
   setup() {
     //Radiobutton data
-    const decisions = ref(["Hacker", "Designer"]);
+    const decisions = ref(["hacker", "designer"]);
     let selected = ref("");
     const userPickedHacker = computed(()=> {
       return selected.value === "Hacker";

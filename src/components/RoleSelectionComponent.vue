@@ -4,6 +4,7 @@
       type="radio"
       :value="option"
       :id="option"
+      :class="option"
       @change="$parent.$emit('input', $event.target.value)"
       name="radio-input"
     />
@@ -23,5 +24,7 @@ export default defineComponent({
 
 
 <style scoped>
-
+.designer {
+  background: url(../assets/img/roles/designer-role.svg) no-repeat;
+}
 </style>
