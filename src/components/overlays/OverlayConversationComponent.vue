@@ -8,9 +8,9 @@
         <div
           class="conversation__option"
           v-for="response of message.responses"
-          :key="response.id"
+          :key="response.redirect"
           :style="{ flexBasis: 100 / message.responses.length + '%' }"
-          @click="clickOption(response)"
+          @click="clickOption(response.redirect)"
         >
           {{ response.text }}
         </div>
@@ -22,7 +22,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import OverlayComponent from "@/components/overlays/OverlayComponent.vue";
-import { Message, Response } from "@/service/game/Conversation";
+import { Message } from "@/service/game/Conversation";
 
 export default defineComponent({
   name: "OverlayConversationComponent",
@@ -38,8 +38,9 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    function clickOption(response: Response) {
-      emit("select-option", response);
+    function clickOption(id: string) {
+      console.log(id);
+      emit("select-option", id);
     }
 
     return { clickOption };

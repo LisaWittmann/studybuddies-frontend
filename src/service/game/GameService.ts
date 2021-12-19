@@ -1,4 +1,5 @@
 import { MoveOperation } from "@/service/game/EventMessage";
+import { Message, Response } from "@/service/game/Conversation";
 
 async function playerMovement(moveOperation: MoveOperation) {
   fetch("/api/lobby/move", {

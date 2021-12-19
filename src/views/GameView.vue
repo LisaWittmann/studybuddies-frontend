@@ -17,12 +17,12 @@
   <OverlayConversationComponent
     :opened="conversation.visible"
     :message="conversation.message"
-    @select-option="selectConversationOption"
+    @select-option="getConversationMessage"
   />
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
+import { defineComponent, onMounted, reactive } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
@@ -63,19 +63,10 @@ export default defineComponent({
       visible: false,
     });
 
-    const testConversation = new Message(
-      "1",
-      "Magst du die Zahl 17?",
-      undefined,
-      [
-        new Response("11", "Ja, finde ich super"),
-        new Response("12", "Nein, ich bin eher Fan von der 18"),
-      ]
-    );
-
     // conversations with interactive game characters
     const conversation = reactive({
-      message: testConversation,
+      character: "",
+      message: new Message("", "", undefined, []),
       visible: true,
     });
 
@@ -113,12 +104,53 @@ export default defineComponent({
       if (!response.redirect) conversation.visible = false;
     }
 
+    async function getConversationMessage(id: string): Promise<Message> {
+      console.log(conversation.character, id);
+      return fetch(`/api/npc/${conversation.character}/${id}`, {
+        method: "GET",
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error(response.statusText);
+          console.log(response);
+          if(response.body) return response.json();
+        })
+        .then((jsonData) => {
+          console.log(jsonData);
+          if (!jsonData) conversation.visible = false;
+          const message = new Message(
+            jsonData.id,
+            jsonData.text,
+            jsonData.itemName,
+            []
+          );
+          for (const key in jsonData.responses) {
+            const response = jsonData.responses[key];
+            message.responses.push(
+              new Response(response.id, response.text, response.redirect)
+            );
+          }
+          return message;
+        });
+    }
+
+    async function startConversation(character: string) {
+      conversation.character = character;
+      getConversationMessage("1.1").then(
+        (message) => (conversation.message = message)
+      );
+      conversation.visible = true;
+    }
+
+    onMounted(() => {
+      startConversation("tupel");
+    });
+
     return {
       movePlayer,
       itemSelection,
       toggleTerminal,
       selectConversationOption,
-      testConversation,
+      getConversationMessage,
       mainPlayer,
       conversation,
       eventMessage,
