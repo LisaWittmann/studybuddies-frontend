@@ -14,6 +14,25 @@ async function playerMovement(moveOperation: MoveOperation) {
     });
 }
 
+// fetches the current tileId of both players
+async function updatePlayerPositions(lobbyKey: string) {
+  return fetch("/api/lobby/players/" + lobbyKey, {
+    method: "GET",
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      console.log("PLAYER POSITIONS");
+      return response.json();
+    })
+    .then((jsondata) => {
+      const playerPosition = new Map<string, number>();
+      for (const key in jsondata) {
+        playerPosition.set(key, Number(jsondata[key]));
+      }
+      return playerPosition;
+    });
+}
+
 // send the clicked item id to backend
 async function itemSelection(itemId: number) {
   fetch("/api/click/" + itemId, {
@@ -28,5 +47,5 @@ async function itemSelection(itemId: number) {
 }
 
 export function useGameService() {
-  return { playerMovement, itemSelection };
+  return { playerMovement, itemSelection, updatePlayerPositions };
 }

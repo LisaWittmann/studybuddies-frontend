@@ -43,9 +43,9 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { gameState, updateGameData, setLobbyKey } = useGameStore();
-    const { updateUsers } = useLobbyService();
-    const { playerMovement, itemSelection } = useGameService();
+    const { gameState, updateGameData, setLobbyKey, setPlayerData } = useGameStore();
+    const { updateUsers} = useLobbyService();
+    const { playerMovement, itemSelection, updatePlayerPositions } = useGameService();
     const { loginState } = useLoginStore();
     updateGameData();
 
@@ -60,7 +60,17 @@ export default defineComponent({
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       await updateUsers(gameState.lobbyKey);
+      const playerPositions =  await updatePlayerPositions(gameState.lobbyKey);
+      
+      console.log(playerPositions);
+      playerPositions.forEach((value, key) => {
+        setPlayerData(key, value);
+      });
+
+    
+
       updateGameData();
+
     })
     
 

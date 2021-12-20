@@ -130,6 +130,7 @@ async function updateUsers(lobbyKey: string) {
   });
 }
 
+
 /**
  * send request to get all labyrinths in database that can be selected for game
  * @returns promise containing list of all labyrinth ids if request was successful
@@ -159,9 +160,9 @@ function readyCheck(username: string, labId: number) {
   fetch(`/api/lobby/ready/` + gameState.lobbyKey, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(args)
+    body: JSON.stringify(args),
   })
     .then((response) => {
       if (!response.ok) {
