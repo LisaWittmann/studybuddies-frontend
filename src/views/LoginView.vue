@@ -43,7 +43,7 @@ export default defineComponent({
   name: "LoginView",
   setup() {
     const { loginState, login } = useLoginStore();
-    const user = new User();
+    const user = new User(loginState.username);
 
     return {
       user,

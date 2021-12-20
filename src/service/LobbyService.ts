@@ -3,12 +3,13 @@ import { useGameStore } from "@/service/game/GameStore";
 import { MainPlayer, PartnerPlayer, Player } from "./game/Player";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { reactive, readonly } from "vue";
+import { User } from "./login/User";
 
 const lobbyState = reactive({
   lobbyKey: "",
-  users: new Array<string>(),
+  users: new Array<User>(),
   errormessage: "",
-  readyState: new Array<string>(),
+  // readyState: new Array<string>(),
 });
 
 /**
@@ -125,9 +126,17 @@ async function updateUsers(lobbyKey: string) {
       return response.json();
     })
     .then((response) => {
-      lobbyState.users = response;
-      console.log(lobbyState.users);
-      console.log(response);
+    const userArr = new Array<User>()
+    
+    for(const user in response) {
+      const tempUser = new User(response[user])
+      console.log('for loop: ', tempUser)
+      userArr.push(tempUser)
+      lobbyState.users = userArr
+    }
+    
+    console.log(lobbyState.users);
+    console.log(`Response: ${response}`);
     });
 }
 
@@ -168,12 +177,12 @@ function readyCheck(username: string, labId: number) {
       if (!response.ok) {
         throw new Error("Error during ready check: " + response.statusText);
       } else {
-        if (lobbyState.readyState.includes(username)) {
-          const itemPos = lobbyState.readyState.indexOf(username);
-          lobbyState.readyState.splice(itemPos, 1);
-        } else {
-          lobbyState.readyState.push(username);
-        }
+        lobbyState.users.forEach(e => {
+          if(e.username == username) {
+            e.isReadyToggle()
+            console.log(`${e.username} is Ready? ${e.isReady}`)
+          }
+        });
       }
     })
     .catch((error) => {

@@ -81,13 +81,15 @@ stompclient.onConnect = () => {
             updateUsers(gameState.lobbyKey);
             //let index = 0;
             lobbyState.users.forEach((user,index) => {
-              setPlayerData(user, gameState.labyrinth.playerStartTileIds[index]);
+              setPlayerData(user.username, gameState.labyrinth.playerStartTileIds[index]);
             });
 
             router.push(`/game/${gameState.lobbyKey}`);
             console.log("gameState nach ready finish");
             console.log(gameState);
           });
+        } else {
+          // One player ready
         }
         break;
       case "JOIN":

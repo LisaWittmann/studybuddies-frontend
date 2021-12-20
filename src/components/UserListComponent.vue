@@ -8,12 +8,12 @@
     <div class="user-list">
       <div
         class="user-list__item"
-        v-for="(username, index) of users"
+        v-for="(user, index) of userArr"
         :key="index"
       >
-        <span>{{ username }}</span>
-        <span v-if="isReady" class="fa fa-circle ready-indicator"></span>
-        <span v-else class="fa fa-circle ready-indicator-inactive"></span>
+        <span>{{ user.username }}</span>
+        <span class="fa fa-circle" :class="{ 'ready-indicator': user.isReady, 'ready-indicator-inactive': !user.isReady }"></span>
+        <!-- <span class="fa fa-circle"></span> -->
       </div>
     </div>
   </div>
@@ -22,7 +22,7 @@
 <script lang="ts">
 import router from "@/router";
 import { useLobbyService } from "@/service/LobbyService";
-import { defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onMounted } from "vue";
 
 export default defineComponent({
   name: "UserListComponent",
@@ -33,12 +33,19 @@ export default defineComponent({
     },
   },
   setup(props) {
+    // update display of players in lobby
     onMounted(async() => {
       const route = router.currentRoute.value;
-      useLobbyService().updateUsers(route.params.key as string)
+      await useLobbyService().updateUsers(route.params.key as string)
     })
+
+    let userArr = computed(() => useLobbyService().lobbyState.users)
+
+    return {
+      userArr
+    }
   }
-});
+})
 </script>
 
 <style lang="scss" scoped>

@@ -37,6 +37,7 @@ import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
+import { User } from "@/service/login/User";
 
 export default defineComponent({
   name: "LobbySettingsView",
@@ -56,11 +57,6 @@ export default defineComponent({
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
-    // handle button ready-state behaviour
-    const isReady = computed(() => {
-      return loginState.isReady;
-    });
-
     updateLabyrinths().then((data) => (labyrinthOptions.value = data));
 
     function selectLabyrinth(id: number) {
@@ -75,9 +71,19 @@ export default defineComponent({
     const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
+
+    // toggle ready button
+    const isReady = computed(() => {
+      lobbyState.users.forEach(e => {
+        return(e.isReady && loginState.username == e.username) ? true : false
+      });
+
+      return false
+    })
+
     return {
-      readyCheck,
       isReady,
+      readyCheck,
       selectLabyrinth,
       exitLobby,
       users,
