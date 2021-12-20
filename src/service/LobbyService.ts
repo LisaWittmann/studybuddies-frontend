@@ -4,7 +4,12 @@ import { useGameStore } from "@/service/game/GameStore";
 import { Role } from "./game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 
-
+/**
+ * send request to pick a available role
+ * @param role: the role which was picked from the user
+ * @param lobbyKey: identifying key of lobby that sould be joined
+ * @param username: identifying name of user that should join lobby
+ */
 async function selectRole(role: string, lobbyKey: string, username: string) {
   const eventMessage:EventMessage = {operation: "ROLE", lobbyKey: lobbyKey, username: username, data: role};
   return fetch("/api/lobby/select-role", {
@@ -19,6 +24,10 @@ async function selectRole(role: string, lobbyKey: string, username: string) {
   });
 }
 
+/**
+ * send request to get every role which exists
+ * @param lobbyKey: identifying key of lobby that sould be joined
+ */
 async function getRoles(lobbyKey: string) {
   return fetch("/api/lobby/roles/" + lobbyKey, {
     method: "GET",
@@ -29,6 +38,10 @@ async function getRoles(lobbyKey: string) {
 
 }
 
+/**
+ * send request to get every role that can be picked, without the roles that picked already
+ * @param lobbyKey: identifying key of lobby that sould be joined
+ */
 async function getRoleOptions(lobbyKey: string) {
   return fetch("/api/lobby/selectable-roles/" + lobbyKey, {
     method: "GET",
@@ -38,9 +51,6 @@ async function getRoleOptions(lobbyKey: string) {
   }); 
 
 }
-
-
-
 
 /**
  * send request to join lobby with given lobby key
