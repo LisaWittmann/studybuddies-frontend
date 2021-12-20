@@ -1,15 +1,26 @@
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
-import {MainPlayer, PartnerPlayer, Player} from "./game/Player";
+import { MainPlayer, PartnerPlayer, Player } from "./game/Player";
 import { useLoginStore } from "@/service/login/LoginStore";
-import {reactive, readonly} from "vue";
+import { reactive, readonly } from "vue";
+import { PickOperation } from "./game/EventMessage";
 
 
 const lobbyState = reactive({
-  lobbyKey: "",
   users: new Array<string>(),
+  selectedLabyrinth: 0,
+  labyrinthOptions: new Array<number>(),
   errormessage: "",
 });
+
+function setLobbyState(users: string | null, selectedLabyrinth: string | null, labyrinthOptions: string | null, errormessage: string | null) {
+  if(users) lobbyState.users = JSON.parse(users);
+  console.log(selectedLabyrinth);
+  if(selectedLabyrinth) lobbyState.selectedLabyrinth = JSON.parse(selectedLabyrinth) as number;
+  console.log(lobbyState.selectedLabyrinth);
+  if(labyrinthOptions) lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
+  if(errormessage) lobbyState.errormessage = JSON.parse(errormessage);
+}
 
 /**
  * send request to join lobby with given lobby key
@@ -133,14 +144,46 @@ async function updateUsers(lobbyKey: string) {
 
 /**
  * send request to get all labyrinths in database that can be selected for game
- * @returns promise containing list of all labyrinth ids if request was successful
+ * sets the labyrinthOtions in the lobbyState with all labyrinth ids if request was successful
  * @throws error if request was not successful
  */
 async function updateLabyrinths() {
-  return fetch("/api/labyrinth/ids").then((response) => {
+  fetch("/api/labyrinth/ids").then((response) => {
     if (!response.ok) throw new Error(response.statusText);
     return response.json();
-  });
+  }).then((response) =>{
+    console.log(response);
+    lobbyState.labyrinthOptions = response;
+  })
+}
+
+/**
+ * send the selected Labyrinth to the BE
+ * @returns promise containing evenMessage with selectedLabyrinth
+ * @throws error if request was not successful
+ */
+async function updateLabyrinthPick(labId: number, lobbykey: string) {
+  const { loginState } = useLoginStore();
+  const eventMessage = new PickOperation(lobbykey, loginState.username, labId.toString());
+  fetch("/api/lobby/labyrinthpick/" + lobbykey, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(eventMessage),
+  }).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  })
+  .catch((error) => console.error(error));
+}
+
+/**
+ * sets the new Labyrinth in the Dropdownmenu
+ * @param selectedLabyrinth : the id of the new selected Labyrinth
+ */
+function setLabyrinthSelection(selectedLabyrinth: number) {
+  lobbyState.selectedLabyrinth = selectedLabyrinth;
 }
 
 /**
@@ -178,22 +221,30 @@ function readyCheck(username: string, labId: number) {
  * @todo: Im Messagebrokertask nutzen
  * @param users : list with usernames in the lobby
  */
-function setupGame(users: string[]) {
-  const { gameState, setPlayerData } = useGameStore();
+function setupGame() {
+  const { updateGameData, gameState, setPlayerData } = useGameStore();
+  updateGameData().then(() => {
 
-  //setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
+    updateUsers(gameState.lobbyKey);
+    lobbyState.users.forEach((user,index) => {
+      setPlayerData(user, gameState.labyrinth.playerStartTileIds[index]);
+    });
 
-  router.replace(`/game/${gameState.lobbyKey}`);
+    router.replace(`/game/${gameState.lobbyKey}`);
+  });
 }
 
 export function useLobbyService() {
   return {
+    setLobbyState,
     joinLobby,
     createLobby,
     exitLobby,
     uploadJsonFiles,
     updateUsers,
     updateLabyrinths,
+    setLabyrinthSelection,
+    updateLabyrinthPick,
     readyCheck,
     setupGame,
     lobbyState: readonly(lobbyState),

@@ -8,7 +8,7 @@ import router from "@/router";
 import {ref} from "vue";
 
 const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } = useGameStore();
-const { updateUsers, lobbyState } = useLobbyService();
+const { updateUsers, lobbyState, setupGame, setLabyrinthSelection, updateLabyrinths } = useLobbyService();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -34,68 +34,64 @@ stompclient.onConnect = () => {
   console.log("stomp verbindet");
 
   stompclient.subscribe(DEST, (message) => {
-    console.log("Message ist angekommen");
+    console.log("Message recieved");
 
     const eventMessage: EventMessage = JSON.parse(message.body);
 
-    /**
-     * Checks whether the user exists in the Game
-     */
-    const playerToMove: Player | undefined = gameState.playerMap.get(
-      eventMessage.username
-    );
-    console.log(gameState.playerMap)
-    switch (eventMessage.operation) {
-      case "MOVEMENT":
-        if (playerToMove) {
-          const destTileID: number = Number.parseInt(eventMessage.data);
+    if(eventMessage.lobbyKey == gameState.lobbyKey || eventMessage.lobbyKey == "*"){
+      console.log("Message in the right Lobby");
 
-          if (destTileID) {
-            updatePlayerData(playerToMove, destTileID);
-            // -> now the watcher can update the 3D Room
-            // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
+
+      /**
+       * Checks whether the user exists in the Game
+       */
+      const playerToMove: Player | undefined = gameState.playerMap.get(
+        eventMessage.username
+      );
+      switch (eventMessage.operation) {
+        case "MOVEMENT":
+          if (playerToMove) {
+            const destTileID: number = Number.parseInt(eventMessage.data);
+
+            if (destTileID) {
+              updatePlayerData(playerToMove, destTileID);
+              // -> now the watcher can update the 3D Room
+              // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
+            } else {
+              setError(
+                "There is no Tilereference for this definition of data");
+            }
           } else {
-            setError(
-              "There is no Tilereference for this definition of data");
+            setError("No existing User");
           }
-        } else {
-          setError("No existing User");
-        }
 
-        break;
-      case "CLICK":
-        break;
-      case "CHAT":
-        break;
-      case "TRADE":
-        break;
-      case "READY":
-        if (eventMessage.data === "READY") {
-          // NUR TEMPORÄR (Bis nach dem MessageBroker Ticket)
-          // Bitte noch nicht sofort ändern!
-          // @todo: Ändern!
-          const { loginState } = useLoginStore();
-
-          updateGameData().then(() => {
-
-            updateUsers(gameState.lobbyKey);
-            //let index = 0;
-            lobbyState.users.forEach((user,index) => {
-              setPlayerData(user, gameState.labyrinth.playerStartTileIds[index]);
-            });
-
-            router.push(`/game/${gameState.lobbyKey}`);
-            console.log("gameState nach ready finish");
-            console.log(gameState);
-          });
-        }
-        break;
-      case "JOIN":
-        updateUsers(eventMessage.lobbyKey);
-        break;
-      default:
-        break;
+          break;
+        case "CLICK":
+          break;
+        case "CHAT":
+          break;
+        case "TRADE":
+          break;
+        case "READY":
+          if (eventMessage.data === "READY") {
+            setupGame();
+          }
+          break;
+        case "JOIN":
+          updateUsers(eventMessage.lobbyKey);
+          break;
+        case "LABYRINTHPICK":
+          console.log(Number(eventMessage.data));
+          setLabyrinthSelection(Number(eventMessage.data));
+          break;
+        case "UPLOAD":
+          updateLabyrinths();
+          break;
+        default:
+          break;
+      }
     }
+    
   });
 };
 

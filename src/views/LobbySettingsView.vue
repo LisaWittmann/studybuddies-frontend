@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onBeforeUnmount, onMounted, onUnmounted, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
@@ -40,32 +40,50 @@ export default defineComponent({
     const { loginState } = useLoginStore();
     const {
       updateUsers,
-      updateLabyrinths,
       readyCheck,
       exitLobby,
-      setupGame,
+      updateLabyrinthPick,
+      updateLabyrinths,
+      setLobbyState,
       lobbyState,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
 
 
-    const labyrinthOptions = ref(new Array<number>());
-    const selectedLabyrinth = ref();
-
-    updateLabyrinths().then((data) => (labyrinthOptions.value = data));
+    const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
+    const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinth);
+    const users = computed(() => lobbyState.users);
+    const lobbyKey = computed(() => gameState.lobbyKey);
 
     function selectLabyrinth(id: number) {
-      selectedLabyrinth.value = id;
+      updateLabyrinthPick(id, lobbyKey.value);
     }
+
+    onBeforeUnmount(() => {
+      sessionStorage.setItem("lobbyKey", lobbyKey.value);
+      sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(lobbyState.selectedLabyrinth));
+      console.log(lobbyState.selectedLabyrinth);
+      console.log(JSON.stringify(lobbyState.selectedLabyrinth));
+      sessionStorage.setItem("labyrinthOptions", JSON.stringify(lobbyState.labyrinthOptions));
+      sessionStorage.setItem("errormessage", JSON.stringify(lobbyState.errormessage));
+    })
 
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
+      if(sessionStorage.getItem("lobbyKey") == lobbyKey.value){
+        setLobbyState(
+          sessionStorage.getItem("users"),
+          sessionStorage.getItem("selectedLabyrinth"),
+          sessionStorage.getItem("labyrinthOptions"),
+          sessionStorage.getItem("errormessage"),
+          );
+      }
+      updateLabyrinths();
+      updateUsers(gameState.lobbyKey);
     })
-
-    const users = computed(() => lobbyState.users);
-    const lobbyKey = computed(() => gameState.lobbyKey);
 
     return {
       readyCheck,

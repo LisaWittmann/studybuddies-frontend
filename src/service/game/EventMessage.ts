@@ -36,3 +36,20 @@ export class MoveOperation implements EventMessage {
     this.data = data;
   }
 }
+
+/**
+ * MoveOperation: Respond object to be used for specifiying the EventMessage Object from the messagebroker
+ * 
+ */
+ export class PickOperation implements EventMessage {
+  operation = "LABYRINTHPICK";
+  lobbyKey: string;
+  username: string;
+  data: string;
+
+  constructor(lobbyKey: string, username: string, data: string) {
+    this.lobbyKey = lobbyKey;
+    this.username = username;
+    this.data = data;
+  }
+}

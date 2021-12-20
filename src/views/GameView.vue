@@ -54,7 +54,7 @@ export default defineComponent({
     /*
     // Users Array -> Wird onMounted gefüllt
     const users = ref(new Array<string>());
-    */
+    
 
     onMounted(async () => {
       const route = router.currentRoute.value;
@@ -72,7 +72,7 @@ export default defineComponent({
       updateGameData();
 
     })
-    
+    */
 
     let mainPlayer;
     let partnerPlayer;
