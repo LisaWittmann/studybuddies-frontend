@@ -1,7 +1,6 @@
 import router from "@/router";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
-import { Role } from "./game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { reactive, readonly } from "vue";
 import { PickOperation } from "./game/EventMessage";
@@ -13,7 +12,7 @@ import { PickOperation } from "./game/EventMessage";
  * @param lobbyKey: identifying key of lobby that sould be joined
  * @param username: identifying name of user that should join lobby
  */
-async function selectRole(role: string, lobbyKey: string, username: string) {
+async function updateRole(role: string, lobbyKey: string, username: string) {
   const eventMessage: EventMessage = {
     operation: "ROLE_PICK",
     lobbyKey: lobbyKey,
@@ -187,10 +186,10 @@ async function updateUsers(lobbyKey: string) {
     if (!response.ok) throw new Error(response.statusText);
     return response.json()
   }).then((response) => {
-
     lobbyState.users = response;
     console.log(lobbyState.users);
     console.log(response);
+    sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
   });
 }
 
@@ -206,6 +205,7 @@ async function updateLabyrinths() {
   }).then((response) =>{
     console.log(response);
     lobbyState.labyrinthOptions = response;
+    sessionStorage.setItem("labyrinthOptions", JSON.stringify(lobbyState.labyrinthOptions));
   })
 }
 
@@ -283,7 +283,7 @@ function setupGame() {
 
 export function useLobbyService() {
   return {
-    selectRole,
+    updateRole,
     getRoles,
     getRoleOptions,
     setLobbyState,

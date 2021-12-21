@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref} from "vue";
+import { computed, defineComponent, onMounted, ref} from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
@@ -48,16 +48,15 @@ import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
 import RadioButtonGroup from "@/components/RadioButtonGroup.vue";
-import { Role } from "@/service/game/Player";
 
 export default defineComponent({
   name: "LobbySettingsView",
   components: { UserListComponent, DropdownComponent, RadioButtonGroup },
   setup() {
     //Radiobutton data
-    const roles = ref([]);
-    const roleOptions = ref([]);
-    let selected = ref("");
+    const allRoles = ref([]);
+    const openRoles = ref([]);
+    let selectedRole = ref("");
 
     const { loginState } = useLoginStore();
     const {
@@ -68,67 +67,61 @@ export default defineComponent({
       updateLabyrinths,
       setLobbyState,
       lobbyState,
-      selectRole,
+      updateRole,
       getRoles,
       getRoleOptions,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
-
-
-
     const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
     const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinth);
     const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
     function selectLabyrinth(id: number) {
+      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
       updateLabyrinthPick(id, lobbyKey.value);
     }
 
-    function selectedRole(name: string) {
-      selected.value = name;
-      selectRole(name, gameState.lobbyKey, loginState.username).then(() => {
+    function selectRole(name: string) {
+      sessionStorage.setItem("chosenRole", JSON.stringify(name))
+      selectedRole.value = name;
+      updateRole(name, gameState.lobbyKey, loginState.username).then(() => {
         getRoleOptions(gameState.lobbyKey).then((data) => {
-          roleOptions.value = data;
+          openRoles.value = data;
         });
       });
     }
 
-    onBeforeUnmount(() => {
-      sessionStorage.setItem("lobbyKey", lobbyKey.value);
-      sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
-      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(lobbyState.selectedLabyrinth));
-      sessionStorage.setItem("labyrinthOptions", JSON.stringify(lobbyState.labyrinthOptions));
-      sessionStorage.setItem("errormessage", JSON.stringify(lobbyState.errormessage));
-    })
-
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      if(sessionStorage.getItem("lobbyKey") == lobbyKey.value){
+      if(sessionStorage.getItem("lobbyKey") == lobbyKey.value) {
         setLobbyState(
           sessionStorage.getItem("users"),
           sessionStorage.getItem("selectedLabyrinth"),
           sessionStorage.getItem("labyrinthOptions"),
           sessionStorage.getItem("errormessage"),
           );
+        selectedRole.value = sessionStorage.getItem("chosenRole") as string;
+      } else {
+        sessionStorage.setItem("lobbyKey", lobbyKey.value);
       }
       updateLabyrinths();
       updateUsers(gameState.lobbyKey);
-      getRoles(gameState.lobbyKey).then((data) => (roles.value = data));
+      getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
       getRoleOptions(gameState.lobbyKey).then(
-          (data) => (roleOptions.value = data)
+          (data) => (openRoles.value = data)
       );
     });
 
     return {
-      selected,
+      selected: selectedRole,
       readyCheck,
       selectLabyrinth,
       exitLobby,
-      selectedRole,
-      roles,
-      roleOptions,
+      selectRole,
+      roles: allRoles,
+      roleOptions: openRoles,
       users,
       lobbyKey,
       labyrinthOptions,
