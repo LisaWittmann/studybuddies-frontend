@@ -1,9 +1,63 @@
 import router from "@/router";
-import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "@/service/login/LoginStore";
+import { useGameStore } from "@/service/game/GameStore";
+import { Role } from "./game/Player";
+import { EventMessage } from "@/service/game/EventMessage";
 import { reactive, readonly } from "vue";
 import { PickOperation } from "./game/EventMessage";
 
+
+/**
+ * send request to pick a available role
+ * @param role: the role which was picked from the user
+ * @param lobbyKey: identifying key of lobby that sould be joined
+ * @param username: identifying name of user that should join lobby
+ */
+async function selectRole(role: string, lobbyKey: string, username: string) {
+  const eventMessage: EventMessage = {
+    operation: "ROLE_PICK",
+    lobbyKey: lobbyKey,
+    username: username,
+    data: role,
+  };
+  return fetch("/api/lobby/select-role", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(eventMessage),
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status == 409)
+        throw new Error("Diese Rolle ist bereits vergeben.");
+      else throw new Error("Die Rolle konnte nicht gefunden werden.");
+    }
+  });
+}
+
+/**
+ * send request to get every role which exists
+ * @param lobbyKey: identifying key of lobby that sould be joined
+ */
+async function getRoles(lobbyKey: string) {
+  return fetch("/api/lobby/roles/" + lobbyKey, {
+    method: "GET",
+  }).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  });
+}
+
+/**
+ * send request to get every role that can be picked, without the roles that picked already
+ * @param lobbyKey: identifying key of lobby that sould be joined
+ */
+async function getRoleOptions(lobbyKey: string) {
+  return fetch("/api/lobby/selectable-roles/" + lobbyKey, {
+    method: "GET",
+  }).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  });
+}
 
 const lobbyState = reactive({
   users: new Array<string>(),
@@ -200,9 +254,9 @@ function readyCheck(username: string, labId: number) {
   fetch(`/api/lobby/ready/${gameState.lobbyKey}`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(args)
+    body: JSON.stringify(args),
   })
     .then((response) => {
       if (!response.ok) {
@@ -214,9 +268,6 @@ function readyCheck(username: string, labId: number) {
     });
 }
 
-/**
- * @todo: Im Messagebrokertask nutzen
- */
 function setupGame() {
   const { updateGameData, gameState, setPlayerData } = useGameStore();
   updateGameData().then(() => {
@@ -232,6 +283,9 @@ function setupGame() {
 
 export function useLobbyService() {
   return {
+    selectRole,
+    getRoles,
+    getRoleOptions,
     setLobbyState,
     joinLobby,
     createLobby,

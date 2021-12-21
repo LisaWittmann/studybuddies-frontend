@@ -34,7 +34,7 @@ stompclient.onConnect = () => {
   console.log("stomp verbindet");
 
   stompclient.subscribe(DEST, (message) => {
-    console.log("Message recieved");
+    console.log("Message received");
 
     const eventMessage: EventMessage = JSON.parse(message.body);
 
@@ -87,11 +87,13 @@ stompclient.onConnect = () => {
         case "UPLOAD":
           updateLabyrinths();
           break;
+        case "ROLE_PICK":
+          break;
         default:
           break;
       }
     }
-    
+
   });
 };
 

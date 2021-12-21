@@ -5,12 +5,27 @@
       <UserListComponent :users="users" />
     </section>
     <section>
+      <h2>Rolle auswählen:</h2>
+      <div class="roles">
+        <span v-if="selected">{{ selected }}</span>
+      </div>
+      <RadioButtonGroup
+        :options="roles"
+        v-model="selected"
+        @clicked="selectedRole"
+        :selectable="roleOptions"
+      />
+    </section>
+    <section>
       <h2>Labyrinth auswählen:</h2>
       <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
     </section>
     <section>
       <div class="column-wrapper">
-        <button class="button--small button--filled" @click="readyCheck(loginState.username, selectedLabyrinth)">
+        <button
+          class="button--small button--filled"
+          @click="readyCheck(loginState.username, selectedLabyrinth)"
+        >
           Bereit
         </button>
         <button
@@ -25,18 +40,25 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, onMounted} from "vue";
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref} from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
-import {useGameStore} from "@/service/game/GameStore";
+import { useGameStore } from "@/service/game/GameStore";
+import RadioButtonGroup from "@/components/RadioButtonGroup.vue";
+import { Role } from "@/service/game/Player";
 
 export default defineComponent({
   name: "LobbySettingsView",
-  components: { UserListComponent, DropdownComponent },
+  components: { UserListComponent, DropdownComponent, RadioButtonGroup },
   setup() {
+    //Radiobutton data
+    const roles = ref([]);
+    const roleOptions = ref([]);
+    let selected = ref("");
+
     const { loginState } = useLoginStore();
     const {
       updateUsers,
@@ -46,6 +68,9 @@ export default defineComponent({
       updateLabyrinths,
       setLobbyState,
       lobbyState,
+      selectRole,
+      getRoles,
+      getRoleOptions,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
@@ -58,6 +83,15 @@ export default defineComponent({
 
     function selectLabyrinth(id: number) {
       updateLabyrinthPick(id, lobbyKey.value);
+    }
+
+    function selectedRole(name: string) {
+      selected.value = name;
+      selectRole(name, gameState.lobbyKey, loginState.username).then(() => {
+        getRoleOptions(gameState.lobbyKey).then((data) => {
+          roleOptions.value = data;
+        });
+      });
     }
 
     onBeforeUnmount(() => {
@@ -81,12 +115,20 @@ export default defineComponent({
       }
       updateLabyrinths();
       updateUsers(gameState.lobbyKey);
-    })
+      getRoles(gameState.lobbyKey).then((data) => (roles.value = data));
+      getRoleOptions(gameState.lobbyKey).then(
+          (data) => (roleOptions.value = data)
+      );
+    });
 
     return {
+      selected,
       readyCheck,
       selectLabyrinth,
       exitLobby,
+      selectedRole,
+      roles,
+      roleOptions,
       users,
       lobbyKey,
       labyrinthOptions,

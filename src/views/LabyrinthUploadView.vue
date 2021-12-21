@@ -13,16 +13,17 @@
   </section>
   <section>
     <p>
-      <router-link to="/register">Jetzt registrieren</router-link> / 
+      <router-link to="/register">Jetzt registrieren</router-link> /
       <router-link to="/">Jetzt anmelden</router-link>
     </p>
   </section>
   <section>
-    <div v-if="uploadResponse.length > 0"
-        class="response-wrapper">
-      <p class="response response--text"
+    <div v-if="uploadResponse.length > 0" class="response-wrapper">
+      <p
+        class="response response--text"
         v-for="(item, index) of uploadResponse"
-        :key="index">
+        :key="index"
+      >
         {{ item }}
       </p>
     </div>
@@ -39,16 +40,14 @@ export default defineComponent({
   components: {},
   setup() {
     const { loginState } = useLoginStore();
-    const { uploadJsonFiles } =
-      useLobbyService();
+    const { uploadJsonFiles } = useLobbyService();
     const upload = ref({} as HTMLInputElement);
 
     const uploadResponse = ref(new Array<string>());
 
     async function uploadLabyrinth() {
       if (upload.value.files != null) {
-        await uploadJsonFiles(upload.value.files)
-        .then((response) => {
+        await uploadJsonFiles(upload.value.files).then((response) => {
           uploadResponse.value = response;
         });
       }
@@ -58,19 +57,18 @@ export default defineComponent({
       uploadLabyrinth,
       upload,
       username: loginState.username,
-      uploadResponse
+      uploadResponse,
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-
 input[type="file"] {
   display: none;
 }
 
-.file-upload, 
+.file-upload,
 .response-wrapper {
   border: 1px solid $color-grey;
   border-radius: 8px;

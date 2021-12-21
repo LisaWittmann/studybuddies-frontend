@@ -41,14 +41,14 @@ function updatePlayerData(player: Player, newPosition: number) {
  * @param username : name of the user in the playerMap to improve identification between Main- and Partnerplayer
  * @param startTileId : start position of the player at the start of the game
  */
-function setPlayerData(username: string, startTileId: number) {
-  
+async function setPlayerData(username: string, startTileId: number) {
+
   console.log("Starttileid is: " + startTileId)
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
-    gameState.playerMap.set(username, new MainPlayer(username, true, startTileId));
+    gameState.playerMap.set(username, new MainPlayer(username, startTileId));
   } else {
-    gameState.playerMap.set(username, new PartnerPlayer(username, false, startTileId));
+    gameState.playerMap.set(username, new PartnerPlayer(username, startTileId));
   }
 }
 
