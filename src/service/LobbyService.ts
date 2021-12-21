@@ -12,7 +12,7 @@ import { EventMessage } from "@/service/game/EventMessage";
  */
 async function selectRole(role: string, lobbyKey: string, username: string) {
   const eventMessage: EventMessage = {
-    operation: "ROLE",
+    operation: "ROLE_PICK",
     lobbyKey: lobbyKey,
     username: username,
     data: role,

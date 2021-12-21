@@ -86,7 +86,7 @@ stompclient.onConnect = () => {
             });
         }
         break;
-      case "ROLE":
+      case "ROLE_PICK":
         break;
       default:
         break;
