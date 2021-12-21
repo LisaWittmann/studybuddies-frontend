@@ -15,7 +15,7 @@
         </button>
         <button
           class="button button--small button--exit"
-          @click="exitLobby(lobbyKey, username)"
+          @click="exitLobby(lobbyKey, loginState.username)"
         >
           Verlassen
         </button>
@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, onMounted, onUnmounted, ref } from "vue";
+import { computed, defineComponent, onBeforeUnmount, onMounted} from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";

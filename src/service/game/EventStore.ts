@@ -80,7 +80,7 @@ stompclient.onConnect = () => {
         case "JOIN":
           updateUsers(eventMessage.lobbyKey);
           break;
-        case "LABYRINTHPICK":
+        case "LABYRINTH_PICK":
           console.log(Number(eventMessage.data));
           setLabyrinthSelection(Number(eventMessage.data));
           break;

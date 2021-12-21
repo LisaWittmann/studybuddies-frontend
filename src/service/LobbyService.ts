@@ -1,6 +1,5 @@
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
-import { MainPlayer, PartnerPlayer, Player } from "./game/Player";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { reactive, readonly } from "vue";
 import { PickOperation } from "./game/EventMessage";
@@ -83,7 +82,7 @@ async function exitLobby(lobbyKey: string, username: string) {
   })
     .then((response) => {
       if (response.ok) router.push("/find");
-      else new Error(response.statusText);
+      else throw new Error(response.statusText);
     })
     .catch((error) => console.error(error));
 }
@@ -116,7 +115,7 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
     }
     return responseList;
   } else {
-    responseList.push("Keine File zum Laden gefunden");
+    responseList.push("Kein File zum Laden gefunden");
     return responseList;
   }
 }
@@ -161,10 +160,10 @@ async function updateLabyrinths() {
  * @returns promise containing evenMessage with selectedLabyrinth
  * @throws error if request was not successful
  */
-async function updateLabyrinthPick(labId: number, lobbykey: string) {
+async function updateLabyrinthPick(labId: number, lobbyKey: string) {
   const { loginState } = useLoginStore();
-  const eventMessage = new PickOperation(lobbykey, loginState.username, labId.toString());
-  fetch("/api/lobby/labyrinthpick/" + lobbykey, {
+  const eventMessage = new PickOperation(lobbyKey, loginState.username, labId.toString());
+  fetch("/api/lobby/labyrinth-pick", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -172,24 +171,23 @@ async function updateLabyrinthPick(labId: number, lobbykey: string) {
     body: JSON.stringify(eventMessage),
   }).then((response) => {
     if (!response.ok) throw new Error(response.statusText);
-    return response.json();
   })
   .catch((error) => console.error(error));
 }
 
 /**
  * sets the new Labyrinth in the Dropdownmenu
- * @param selectedLabyrinth : the id of the new selected Labyrinth
+ * @param selectedLabyrinth : id of the new selected Labyrinth
  */
 function setLabyrinthSelection(selectedLabyrinth: number) {
   lobbyState.selectedLabyrinth = selectedLabyrinth;
 }
 
 /**
- * sends a List of two Arguments to the BE, so there can be checked, wheather every Player is ready or not
+ * sends a List of two Arguments to the BE, so there can be checked, whether every Player is ready or not
  * (and reacts to a wrong respond after recieving it)
- * @param username : used to identify the user in the backend, which shall be taken out of the lobby
- * @param labId : used to identify in the BE which Labyrinth is to be used for the Game Progression
+ * @param username: name of the user in the backend, which shall be taken out of the lobby
+ * @param labId : id of the blueprint labyrinth, used for the Game Progression
  */
 function readyCheck(username: string, labId: number) {
   const { gameState } = useGameStore();
@@ -199,7 +197,7 @@ function readyCheck(username: string, labId: number) {
   console.log("gameState vor ready finish");
   console.log(gameState);
 
-  fetch(`/api/lobby/ready/` + gameState.lobbyKey, {
+  fetch(`/api/lobby/ready/${gameState.lobbyKey}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -218,7 +216,6 @@ function readyCheck(username: string, labId: number) {
 
 /**
  * @todo: Im Messagebrokertask nutzen
- * @param users : list with usernames in the lobby
  */
 function setupGame() {
   const { updateGameData, gameState, setPlayerData } = useGameStore();

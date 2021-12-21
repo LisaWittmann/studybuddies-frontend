@@ -80,7 +80,7 @@ async function register(user: User) {
   });
 }
 
-/*
+/**
  * get username from sessionStorage
  * so user won't get logged out on browser refresh
  */

@@ -38,8 +38,8 @@ function updatePlayerData(player: Player, newPosition: number) {
 
 /**
  * sets a Player with its username and the startTileId
- * @param username : used to set as key in the playerMap make Identification between Main and Partnerplayer better
- * @param startTileId : used to place the Player where they belong in the frontend
+ * @param username : name of the user in the playerMap to improve identification between Main- and Partnerplayer
+ * @param startTileId : start position of the player at the start of the game
  */
 function setPlayerData(username: string, startTileId: number) {
   
