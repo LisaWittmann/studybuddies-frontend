@@ -64,8 +64,6 @@ export default defineComponent({
       sessionStorage.setItem("lobbyKey", lobbyKey.value);
       sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
       sessionStorage.setItem("selectedLabyrinth", JSON.stringify(lobbyState.selectedLabyrinth));
-      console.log(lobbyState.selectedLabyrinth);
-      console.log(JSON.stringify(lobbyState.selectedLabyrinth));
       sessionStorage.setItem("labyrinthOptions", JSON.stringify(lobbyState.labyrinthOptions));
       sessionStorage.setItem("errormessage", JSON.stringify(lobbyState.errormessage));
     })

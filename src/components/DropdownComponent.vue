@@ -53,9 +53,11 @@ export default defineComponent({
     const labItems = computed(() => lobbyState.labyrinthOptions);
 
     function selectItem(item: number) {
-      setLabyrinthSelection(item);
+      if (item != lobbyState.selectedLabyrinth) {
+        setLabyrinthSelection(item);
+        context.emit("select", selectedItem.value);
+      }
       isOpen.value = false;
-      context.emit("select", selectedItem.value);
     }
 
     return { isOpen, openClose, selectItem, selectedItem, labItems };
