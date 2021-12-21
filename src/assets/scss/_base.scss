@@ -1,11 +1,8 @@
 body {
     margin: 0;
     font-family: $font-outfit;
-
-    @include color-scheme(light) {
-        background: $color-white;
-        color: $color-black;
-    }
+    background: $color-white;
+    color: $color-black;
 
     @include color-scheme(dark) {
         background: $color-black-background;
@@ -56,13 +53,10 @@ i {
 a {
     text-decoration: underline;
     cursor: pointer;
-
-    @include color-scheme(dark) {
-        color: $color-dark-green;
-         &:hover {
-             color: $color-light-green;
-         }
-     }
+    color: $color-dark-green;
+    &:hover {
+        color: $color-light-green;
+    }
    
    @include color-scheme(dark) {
        color: $color-grey;

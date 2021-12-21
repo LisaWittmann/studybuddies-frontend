@@ -12,10 +12,7 @@ input {
     &::placeholder,
     &::-moz-placeholder {
         opacity: 1;
-        
-        @include color-scheme(light) {
-            color: $color-green;
-        }
+        color: $color-green;
 
         @include color-scheme(dark) {
             color: $color-grey;
@@ -30,9 +27,7 @@ input {
     }
 
     &:focus:invalid {
-        @include color-scheme(light) {
-            border-color: darkred;
-        }
+        border-color: darkred;
     
         @include color-scheme(dark) {
             border-color: hotpink;
@@ -56,9 +51,7 @@ input {
 }
 
 .error {
-    @include color-scheme(light) {
-        color: darkred;
-    }
+    color: darkred;
 
     @include color-scheme(dark) {
         color: hotpink;
