@@ -1,0 +1,67 @@
+<template>
+  <OverlayComponent :opened="opened">
+    <transition name="fade" appear>
+      <div class="flex-container">
+        <section>
+          <div class="column-wrapper">
+            <h1>{{ headline }}</h1>
+            <p>{{ subline }}</p>
+            <transition name="delay-slow-fade" appear>
+              <router-link
+                :to="link"
+                class="button button--small button--pulse button--filled"
+              >
+                {{ linkText }}
+              </router-link>
+            </transition>
+          </div>
+        </section>
+      </div>
+    </transition>
+  </OverlayComponent>
+</template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import OverlayComponent from "@/components/overlays/OverlayComponent.vue";
+
+export default defineComponent({
+  name: "OverlayFeedbackComponent",
+  components: { OverlayComponent },
+  props: {
+    opened: {
+      type: Boolean,
+      required: true,
+    },
+    headline: {
+      type: String,
+      required: true,
+    },
+    subline: {
+      type: String,
+      required: true,
+    },
+    link: {
+      type: String,
+      default: "/find",
+    },
+    linkText: {
+      type: String,
+      default: "Jetzt spielen",
+    },
+  },
+});
+</script>
+
+<style lang="scss" scoped>
+.overlay {
+  background: $color-white;
+  @include color-scheme(dark) {
+    background: $color-black-background;
+  }
+}
+
+a {
+  margin-top: 40px;
+}
+</style>

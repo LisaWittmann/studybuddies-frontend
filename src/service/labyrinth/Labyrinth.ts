@@ -1,7 +1,7 @@
 import { Tile } from "@/service/labyrinth/Tile";
 
 /**
- * labyrinth map:
+ * labyrinth class:
  * contains all tiles with relations
  * contains start and endposition of labyrinth
  */

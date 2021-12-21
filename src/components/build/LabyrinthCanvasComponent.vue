@@ -19,7 +19,6 @@ import { defineComponent, computed } from "vue";
 import { useBuildService } from "@/service/labyrinth/build/BuildService";
 import { TileModel } from "@/service/labyrinth/build/TileModel";
 import { Mode } from "@/service/labyrinth/build/BuildMode";
-
 import TileCanvasComponent from "@/components/build/TileCanvasComponent.vue";
 
 export default defineComponent({
@@ -53,9 +52,14 @@ export default defineComponent({
     addEventListener("mousedown", () => (mousedown = true));
     addEventListener("mouseup", () => (mousedown = false));
 
-    const gutter = computed(() => props.mode == Mode.CREATE);
     const rows = computed(() => buildState.rows);
     const columns = computed(() => buildState.columns);
+    const gutter = computed(() => props.mode == Mode.CREATE);
+
+    function onEnter(model: TileModel) {
+      if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTIONS) return;
+      if (mousedown) onClick(model);
+    }
 
     function onClick(model: TileModel) {
       switch (props.mode) {
@@ -75,15 +79,6 @@ export default defineComponent({
           setRestriction(model, props.role);
           break;
         }
-      }
-    }
-
-    function onEnter(model: TileModel) {
-      if (
-        (props.mode == Mode.CREATE || props.mode == Mode.RESTRICTIONS) &&
-        mousedown
-      ) {
-        onClick(model);
       }
     }
 

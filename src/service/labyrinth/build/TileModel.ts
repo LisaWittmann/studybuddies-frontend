@@ -2,6 +2,9 @@ import { Orientation } from "@/service/labyrinth/Tile";
 import { Item } from "@/service/labyrinth/Item";
 import { Role } from "@/service/labyrinth/build/BuildMode";
 
+/**
+ * two dimensional vector
+ */
 export class Vector2 {
   x: number;
   y: number;
@@ -28,6 +31,11 @@ export class Vector2 {
   }
 }
 
+/**
+ * model of a tile
+ * contains all attributes of a tile and additional data
+ * for creation and representation
+ */
 export class TileModel {
   position: Vector2;
   isSelectable: boolean;
@@ -60,7 +68,7 @@ export class TileModel {
     return this.position.x == x && this.position.y == y;
   }
 
-  getNeighbour(orientation: Orientation): Vector2 {
+  getNeighbor(orientation: Orientation): Vector2 {
     switch (orientation) {
       case Orientation.NORTH:
         return this.position.getNorth();

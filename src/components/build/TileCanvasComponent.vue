@@ -47,11 +47,9 @@ export default defineComponent({
     // TODO: better style binding
     const color = computed(() => {
       if (props.model.restrictions?.length == 2) return "brown";
-      else {
-        if (props.model.restrictions?.includes(Role.DESIGNER)) return "beige";
-        if (props.model.restrictions?.includes(Role.HACKER)) return "green";
-        else return "default";
-      }
+      if (props.model.restrictions?.includes(Role.DESIGNER)) return "beige";
+      if (props.model.restrictions?.includes(Role.HACKER)) return "green";
+      else return "default";
     });
 
     const onClick = () => emit("click", props.model);

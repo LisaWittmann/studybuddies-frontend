@@ -75,23 +75,6 @@ export default defineComponent({
     }
   }
 
-  a {
-    color: $color-white;
-    font-size: 18px;
-    display: flex;
-    font-weight: 300;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-
-    @include color-scheme(dark) {
-      color: $color-black;
-      &:hover {
-        color: $color-green;
-      }
-    }
-  }
-
   .flex-container {
     position: absolute;
     z-index: 2;

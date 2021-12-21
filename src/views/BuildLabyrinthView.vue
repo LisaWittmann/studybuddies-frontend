@@ -44,18 +44,22 @@
       </div>
     </transition>
   </div>
+  <OverlayFeedbackComponent
+    :opened="feedback.active"
+    :headline="feedback.headline"
+    :subline="feedback.subline"
+  />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref, computed, reactive, onUnmounted } from "vue";
 import { useBuildService } from "@/service/labyrinth/build/BuildService";
 import { Mode, Role } from "@/service/labyrinth/build/BuildMode";
 
+import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
 import LabyrinthCanvasComponent from "@/components/build/LabyrinthCanvasComponent.vue";
 import BuildToolComponent from "@/components/build/BuildToolComponent.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
-
-import router from "@/router";
 
 export default defineComponent({
   name: "LabyrinthBuildView",
@@ -63,26 +67,33 @@ export default defineComponent({
     LabyrinthCanvasComponent,
     PaginationComponent,
     BuildToolComponent,
+    OverlayFeedbackComponent,
   },
   setup() {
-    const { hasErrors, convert, save } = useBuildService();
+    const { hasErrors, convert, save, reset } = useBuildService();
 
-    const modes = ref(
-      new Array<Mode>(Mode.CREATE, Mode.START, Mode.END, Mode.RESTRICTIONS)
+    const modes = new Array<Mode>(
+      Mode.CREATE,
+      Mode.START,
+      Mode.END,
+      Mode.RESTRICTIONS
     );
     const currentMode = ref(Mode.CREATE);
     const changeMode = (mode: Mode) => (currentMode.value = mode);
 
     const tileSize = ref(100);
+    const minZoom = 50;
+    const maxZoom = 150;
+    const zoomFactor = 10;
 
-    const zoomOutDisabled = computed(() => tileSize.value == 50);
-    const zoomInDisabled = computed(() => tileSize.value == 150);
+    const zoomOutDisabled = computed(() => tileSize.value == minZoom);
+    const zoomInDisabled = computed(() => tileSize.value == maxZoom);
 
     const zoomIn = () => {
-      if (!zoomInDisabled.value) tileSize.value += 10;
+      if (!zoomInDisabled.value) tileSize.value += zoomFactor;
     };
     const zoomOut = () => {
-      if (!zoomOutDisabled.value) tileSize.value -= 10;
+      if (!zoomOutDisabled.value) tileSize.value -= zoomFactor;
     };
 
     const restrictionMode = computed(
@@ -93,16 +104,29 @@ export default defineComponent({
     const selectedRole = ref(0);
     const selectRole = (role: Role) => (selectedRole.value = role);
 
+    const labyrinthId = ref(0);
+    const feedback = reactive({
+      active: false,
+      headline: "",
+      subline: "",
+    });
+
     function onComplete() {
       const rollback = hasErrors();
       if (rollback) {
         currentMode.value = rollback;
       } else {
         const labyrinth = convert();
-        save(labyrinth);
-        router.push("/build/success");
+        save(labyrinth).then((id) => {
+          labyrinthId.value = id;
+          feedback.active = true;
+          feedback.headline = "Gespeichert";
+          feedback.subline = `Dein Labyrinth wurde gespeichert unter der ID ${labyrinthId.value}`;
+        });
       }
     }
+
+    onUnmounted(() => reset());
 
     return {
       modes,
@@ -118,6 +142,7 @@ export default defineComponent({
       selectRole,
       selectedRole,
       onComplete,
+      feedback,
     };
   },
 });

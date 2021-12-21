@@ -45,37 +45,29 @@ export default defineComponent({
     const reachedLastItem = computed(
       () => props.activeIndex == props.items.length - 1
     );
-
-    function selectPrev() {
+    const isActive = (index: number) => {
+      return props.activeIndex == index;
+    };
+    const selectPrev = () => {
       if (props.activeIndex - 1 >= 0) {
         select(props.activeIndex - 1);
       }
-    }
-
-    function selectNext() {
+    };
+    const selectNext = () => {
       if (props.activeIndex + 1 < props.items.length) {
         select(props.activeIndex + 1);
       }
-    }
+    };
 
-    function select(index: number) {
-      emit("select", props.items[index]);
-    }
-
-    function isActive(index: number) {
-      return props.activeIndex == index;
-    }
-
-    function onComplete() {
-      emit("complete");
-    }
+    const select = (index: number) => emit("select", props.items[index]);
+    const onComplete = () => emit("complete");
 
     return {
+      reachedLastItem,
       isActive,
       selectPrev,
       selectNext,
       select,
-      reachedLastItem,
       onComplete,
     };
   },

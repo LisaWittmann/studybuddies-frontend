@@ -40,13 +40,12 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const showOptions = ref(false);
-
     const toggleOptions = () => (showOptions.value = !showOptions.value);
 
-    function select(index: number) {
+    const select = (index: number) => {
       emit("select", props.options[index]);
       showOptions.value = false;
-    }
+    };
 
     return { showOptions, toggleOptions, select };
   },
@@ -59,6 +58,7 @@ export default defineComponent({
 
   &__options {
     margin-bottom: 20px;
+
     > * {
       margin: 5px 0px;
     }

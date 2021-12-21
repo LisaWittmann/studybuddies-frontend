@@ -6,7 +6,6 @@ import GameView from "@/views/GameView.vue";
 import LobbySettingsView from "@/views/LobbySettingsView.vue";
 import FindLobbyView from "@/views/FindLobbyView.vue";
 import BuildLabyrinthView from "@/views/BuildLabyrinthView.vue";
-import SaveLabyrinthView from "@/views/SaveLabyrinthView.vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 
 const routes: Array<RouteRecordRaw> = [
@@ -46,11 +45,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/build",
     name: "BuildLabyrinthView",
     component: BuildLabyrinthView,
-  },
-  {
-    path: "/build/success",
-    name: "SaveLabyrinthView",
-    component: SaveLabyrinthView,
   },
 ];
 

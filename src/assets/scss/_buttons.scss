@@ -45,11 +45,19 @@ button,
 
     &--pulse {
         border: 0;
+        font-size: 18px;
         background: $color-dark-green;
+        color: $color-white;
         @include pulse-animation($color-dark-green);
+
         @include color-scheme(dark) {
+            color: $color-black;
             background: $color-white;
             @include pulse-animation($color-white, 0.3);
+
+            &:hover {
+                color: $color-green;
+            }
         }
     }
 
