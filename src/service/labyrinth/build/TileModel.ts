@@ -1,5 +1,6 @@
 import { Orientation } from "@/service/labyrinth/Tile";
 import { Item } from "@/service/labyrinth/Item";
+import { Role } from "@/service/labyrinth/build/BuildMode";
 
 export class Vector2 {
   x: number;
@@ -30,31 +31,29 @@ export class Vector2 {
 export class TileModel {
   position: Vector2;
   isSelectable: boolean;
-  isSelected: boolean;
   isStart: boolean;
   isEnd: boolean;
   relationKey: number | undefined;
   tileRelationMap: Map<Orientation, TileModel | undefined>;
   objectsInRoom: Array<Item>;
+  restrictions: Array<Role>;
 
   constructor(position: Vector2) {
     this.position = position;
+
+    this.relationKey = undefined;
     this.isSelectable = true;
-    this.isSelected = false;
     this.isEnd = false;
     this.isStart = false;
-    this.relationKey = undefined;
+
     this.tileRelationMap = new Map<Orientation, TileModel | undefined>();
     this.tileRelationMap.set(Orientation.NORTH, undefined);
     this.tileRelationMap.set(Orientation.EAST, undefined);
     this.tileRelationMap.set(Orientation.SOUTH, undefined);
     this.tileRelationMap.set(Orientation.WEST, undefined);
-    this.objectsInRoom = new Array<Item>();
-  }
 
-  select(): void {
-    this.isSelected = true;
-    this.isSelectable = false;
+    this.objectsInRoom = new Array<Item>();
+    this.restrictions = new Array<Role>();
   }
 
   hasPosition(x: number, y: number): boolean {

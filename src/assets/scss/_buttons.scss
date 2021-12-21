@@ -63,6 +63,26 @@ button,
         }
     }
 
+    &__icon {
+        background: transparent;
+        font-size: $headline-xl;
+        border: none;
+        width: auto;
+        min-height: auto;
+        box-shadow: none;
+
+        &--circle {
+            @include flex-center();
+            border: none;
+            border-radius: 100%;
+            width: 80px;
+            height: 80px;
+            min-height: auto;
+            padding: 20px;
+            font-size: $headline-xl;
+        }
+    }
+
     @include color-scheme(light) {
         &--large {
             box-shadow: 10px 10px 0 0 rgba(black, 0.03);
