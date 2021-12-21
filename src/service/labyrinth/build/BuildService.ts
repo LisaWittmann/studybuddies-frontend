@@ -17,7 +17,10 @@ updateTileModels();
 let counter = 1;
 
 const selectedTiles = computed(() => {
-  return buildState.tileModels.filter((model) => model.relationKey);
+  const selected = buildState.tileModels.filter((model) => model.relationKey);
+  return selected.sort((a, b) => {
+    return (a.relationKey as number) - (b.relationKey as number);
+  });
 });
 
 function setDimension(rows: number, columns: number) {
@@ -119,7 +122,7 @@ function hasErrors(): Mode | undefined {
   if (selectedTiles.value.length < 10) {
     return Mode.CREATE;
   }
-  if (buildState.startPositions.length < 1) {
+  if (buildState.startPositions.length != 2) {
     return Mode.START;
   }
   if (!buildState.endposiiton) {
@@ -149,7 +152,7 @@ function save(labyrinth: Labyrinth) {
   fetch("/api/labyrinth/save", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(labyrinth),
+    body: parseLabyrinth(labyrinth),
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
@@ -159,6 +162,22 @@ function save(labyrinth: Labyrinth) {
       console.log(jsondata);
       buildState.id = jsondata as number;
     });
+}
+
+function parseLabyrinth(labyrinth: Labyrinth): string {
+  const tileMapJson = new Map<number, any>();
+  for (const [key, tile] of labyrinth.tileMap) {
+    tileMapJson.set(key, {
+      tileId: tile.tileId,
+      objectsInRoom: tile.objectsInRoom,
+      tileRelationMap: Object.fromEntries(tile.tileRelationMap),
+    });
+  }
+  return JSON.stringify({
+    endTileId: labyrinth.endTileId,
+    playerStartTileIds: labyrinth.playerStartTileIds,
+    tileMap: Object.fromEntries(tileMapJson),
+  });
 }
 
 export function useBuildService() {

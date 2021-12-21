@@ -83,7 +83,7 @@ export default defineComponent({
     const { hasErrors, convert, save } = useBuildService();
 
     const modes = ref(
-      new Array<Mode>(Mode.CREATE, Mode.START, Mode.END, Mode.ZONES, Mode.ITEMS)
+      new Array<Mode>(Mode.CREATE, Mode.START, Mode.END, Mode.ZONES)
     );
 
     const currentMode = ref(Mode.CREATE);
@@ -226,9 +226,7 @@ export default defineComponent({
     }
 
     &-wrapper {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
+      @include flex-center();
       flex-wrap: nowrap;
       overflow-x: scroll;
       width: 70%;
