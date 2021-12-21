@@ -44,11 +44,11 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/build",
-    name: "BuildLabyrinth",
+    name: "BuildLabyrinthView",
     component: BuildLabyrinthView,
   },
   {
-    path: "/save",
+    path: "/build/success",
     name: "SaveLabyrinthView",
     component: SaveLabyrinthView,
   },

@@ -8,6 +8,7 @@
         :gutter="gutter"
         :model="getTileModel(column, row)"
         @click="onClick"
+        @enter="onEnter"
       />
     </div>
   </div>
@@ -48,6 +49,10 @@ export default defineComponent({
       setRestriction,
     } = useBuildService();
 
+    let mousedown = false;
+    addEventListener("mousedown", () => (mousedown = true));
+    addEventListener("mouseup", () => (mousedown = false));
+
     const gutter = computed(() => props.mode == Mode.CREATE);
     const rows = computed(() => buildState.rows);
     const columns = computed(() => buildState.columns);
@@ -66,14 +71,23 @@ export default defineComponent({
           setEndTile(model);
           break;
         }
-        case Mode.ZONES: {
+        case Mode.RESTRICTIONS: {
           setRestriction(model, props.role);
           break;
         }
       }
     }
 
-    return { rows, columns, gutter, getTileModel, onClick };
+    function onEnter(model: TileModel) {
+      if (
+        (props.mode == Mode.CREATE || props.mode == Mode.RESTRICTIONS) &&
+        mousedown
+      ) {
+        onClick(model);
+      }
+    }
+
+    return { rows, columns, gutter, getTileModel, onClick, onEnter };
   },
 });
 </script>

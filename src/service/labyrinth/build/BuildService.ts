@@ -1,20 +1,23 @@
 import { reactive, computed } from "vue";
-import { Labyrinth } from "../Labyrinth";
-import { Tile } from "../Tile";
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
+import { Tile } from "@/service/labyrinth/Tile";
 import { Mode, Role } from "./BuildMode";
-import { TileModel, Vector2 } from "./TileModel";
+import { TileModel, Vector2 } from "@/service/labyrinth/build/TileModel";
 
 const buildState = reactive({
-  id: 0,
-  rows: 10,
-  columns: 20,
+  id: 0, // temporary
+  rows: 15,
+  columns: 25,
   tileModels: new Array<TileModel>(),
   startPositions: new Array<number>(),
-  endposiiton: 0,
+  endposition: 0,
 });
 
 updateTileModels();
+
 let counter = 1;
+const maxRows = 20;
+const maxColumns = 30;
 
 const selectedTiles = computed(() => {
   const selected = buildState.tileModels.filter((model) => model.relationKey);
@@ -24,8 +27,8 @@ const selectedTiles = computed(() => {
 });
 
 function setDimension(rows: number, columns: number) {
-  buildState.rows = rows;
-  buildState.columns = columns;
+  if (buildState.rows < maxRows) buildState.rows = rows;
+  if (buildState.columns < maxColumns) buildState.columns = columns;
   updateTileModels();
 }
 
@@ -45,7 +48,6 @@ function updateTileModels() {
       }
     }
   }
-  console.log(buildState);
 }
 
 function setSelectableTiles(): void {
@@ -53,10 +55,7 @@ function setSelectableTiles(): void {
     model.isSelectable = false;
     if (!model.relationKey) {
       const neighbours = [...model.tileRelationMap.values()];
-      if (
-        neighbours.filter((neighbour) => neighbour && neighbour.relationKey)
-          .length > 0
-      ) {
+      if (neighbours.some((neighbour) => neighbour && neighbour.relationKey)) {
         model.isSelectable = true;
       }
     }
@@ -78,37 +77,30 @@ function selectTile(model: TileModel) {
 }
 
 function setStartTile(model: TileModel) {
-  if (model.relationKey) {
-    if (model.isStart) {
-      buildState.startPositions = buildState.startPositions.filter(
-        (key) => key != model.relationKey
-      );
-      model.isStart = false;
-    } else {
-      if (buildState.startPositions.length < 2) {
-        buildState.startPositions.push(model.relationKey);
-        model.isStart = true;
-      }
+  if (!model.relationKey || model.restrictions.length > 0) return;
+  if (model.isStart) {
+    buildState.startPositions = buildState.startPositions.filter(
+      (key) => key != model.relationKey
+    );
+  } else {
+    if (buildState.startPositions.length < 2) {
+      buildState.startPositions.push(model.relationKey);
     }
   }
+  model.isStart = !model.isStart;
 }
 
 function setEndTile(model: TileModel) {
-  if (model.relationKey) {
-    if (model.isEnd) {
-      buildState.endposiiton = 0;
-      model.isEnd = false;
-    } else {
-      if (!buildState.endposiiton) {
-        buildState.endposiiton = model.relationKey;
-        model.isEnd = true;
-      }
-    }
+  if (!model.relationKey || model.restrictions.length > 0) return;
+  if (model.isEnd) buildState.endposition = 0;
+  else {
+    if (!buildState.endposition) buildState.endposition = model.relationKey;
   }
+  model.isEnd = !model.isEnd;
 }
 
 function setRestriction(model: TileModel, role: Role) {
-  if (model.isEnd || model.isStart) return;
+  if (!model.relationKey || model.isEnd || model.isStart) return;
   if (model.restrictions?.includes(role)) {
     model.restrictions = model.restrictions?.filter(
       (element) => element != role
@@ -119,23 +111,18 @@ function setRestriction(model: TileModel, role: Role) {
 }
 
 function hasErrors(): Mode | undefined {
-  if (selectedTiles.value.length < 10) {
-    return Mode.CREATE;
-  }
-  if (buildState.startPositions.length != 2) {
-    return Mode.START;
-  }
-  if (!buildState.endposiiton) {
-    return Mode.END;
-  }
+  if (selectedTiles.value.length < 10) return Mode.CREATE;
+  if (buildState.startPositions.length != 2) return Mode.START;
+  if (!buildState.endposition) return Mode.END;
   return undefined;
 }
 
 function convert(): Labyrinth {
   const labyrinth = new Labyrinth(
-    buildState.endposiiton,
+    buildState.endposition,
     buildState.startPositions
   );
+
   for (const model of selectedTiles.value) {
     const key = model.relationKey as number;
     const tile = new Tile(key, []);
@@ -144,7 +131,6 @@ function convert(): Labyrinth {
     }
     labyrinth.tileMap.set(key, tile);
   }
-  console.log(labyrinth);
   return labyrinth;
 }
 
@@ -158,10 +144,7 @@ function save(labyrinth: Labyrinth) {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
-    .then((jsondata) => {
-      console.log(jsondata);
-      buildState.id = jsondata as number;
-    });
+    .then((jsondata) => (buildState.id = jsondata as number));
 }
 
 function parseLabyrinth(labyrinth: Labyrinth): string {

@@ -19,7 +19,10 @@
       </section>
       <section>
         <h2>Labyrinth auswählen:</h2>
-        <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
+        <DropdownComponent
+          :items="labyrinthOptions"
+          @select="selectLabyrinth"
+        />
       </section>
       <section>
         <div class="column-wrapper">

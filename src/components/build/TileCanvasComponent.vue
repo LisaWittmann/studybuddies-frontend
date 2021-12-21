@@ -3,13 +3,14 @@
     class="tile-canvas"
     :style="{ width: `${size}px`, height: `${size}px` }"
     @click="onClick"
+    @mouseenter="onEnter"
   >
     <div
       class="tile-canvas__inner"
       :class="[
         { selected: selected },
         { selectable: selectable && gutter },
-        `tile-canvas--${color}`,
+        `color--${color}`,
       ]"
     >
       <i v-if="model.isStart" class="fas fa-map-marker"></i>
@@ -43,7 +44,7 @@ export default defineComponent({
     const selected = computed(() => props.model.relationKey);
     const selectable = computed(() => props.model.isSelectable);
 
-    // TODO: besseres binding
+    // TODO: better style binding
     const color = computed(() => {
       if (props.model.restrictions?.length == 2) return "brown";
       else {
@@ -53,10 +54,10 @@ export default defineComponent({
       }
     });
 
-    function onClick() {
-      emit("click", props.model);
-    }
-    return { selected, selectable, color, onClick };
+    const onClick = () => emit("click", props.model);
+    const onEnter = () => emit("enter", props.model);
+
+    return { selected, selectable, color, onClick, onEnter };
   },
 });
 </script>
@@ -79,27 +80,30 @@ export default defineComponent({
     @include flex-center();
     height: 100%;
 
+    &.selectable {
+      background: rgba($color-light-green, 0.3);
+    }
+
     &.selected {
       background: $color-dark-green;
+
       @include color-scheme(dark) {
         background: $color-white;
       }
 
-      &.tile-canvas {
+      &.color {
         &--brown {
           background: $color-dark-brown;
         }
+
         &--green {
           background: $color-green;
         }
+
         &--beige {
           background: $color-beige;
         }
       }
-    }
-
-    &.selectable {
-      background: rgba($color-light-green, 0.3);
     }
   }
 }
