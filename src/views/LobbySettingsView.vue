@@ -51,6 +51,7 @@ export default defineComponent({
       exitLobby,
       setupGame,
       lobbyState,
+      isReady,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
@@ -70,15 +71,6 @@ export default defineComponent({
 
     const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
-
-    // toggle ready button
-    const isReady = computed(() => {
-      return lobbyState.users.some((e) => {
-        if (e.username == loginState.username) {
-          return e.isReady;
-        }
-      });
-    });
 
     return {
       isReady,

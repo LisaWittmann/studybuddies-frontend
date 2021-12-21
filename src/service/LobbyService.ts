@@ -2,14 +2,13 @@ import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
 import { MainPlayer, PartnerPlayer, Player } from "./game/Player";
 import { useLoginStore } from "@/service/login/LoginStore";
-import { reactive, readonly } from "vue";
+import { computed, reactive, readonly } from "vue";
 import { User } from "./login/User";
 
 const lobbyState = reactive({
   lobbyKey: "",
   users: new Array<User>(),
   errormessage: "",
-  // readyState: new Array<string>(),
 });
 
 /**
@@ -127,15 +126,34 @@ async function updateUsers(lobbyKey: string) {
     })
     .then((response) => {
       const userArr = new Array<User>();
+      let tempUser: User;
 
-      for (const user in response) {
-        const tempUser = new User(response[user]);
-        userArr.push(tempUser);
-        lobbyState.users = userArr;
+      // if users are present
+      if (lobbyState.users.length > 1) {
+        /* iterate over lobbyState.users
+        check if user(s) in backend response are already in lobbyState
+        if yes, check and set ready state accordingly */
+        lobbyState.users.forEach((lobbyUser) => {
+          response.forEach((username: string) => {
+            if (username == lobbyUser.username) {
+              tempUser = new User(username);
+              if (lobbyUser.isReady) {
+                tempUser.setReady();
+              }
+              userArr.push(tempUser);
+            }
+          });
+        });
+      } else {
+        // if there are not yet any users, fill up lobbyState.users with plain data from response, without special treatment
+        for (const user in response) {
+          tempUser = new User(response[user]);
+          userArr.push(tempUser);
+        }
       }
 
-      console.log(lobbyState.users);
-      console.log(`Response: ${response}`);
+      // after userArr is prepared, assign it to lobbyState.users
+      lobbyState.users = userArr;
     });
 }
 
@@ -200,6 +218,15 @@ function setupGame(users: string[]) {
   router.replace(`/game/${gameState.lobbyKey}`);
 }
 
+// toggle ready button
+const isReady = computed(() => {
+  return lobbyState.users.some((e) => {
+    if (e.username == useLoginStore().loginState.username) {
+      return e.isReady;
+    }
+  });
+});
+
 export function useLobbyService() {
   return {
     joinLobby,
@@ -210,6 +237,7 @@ export function useLobbyService() {
     updateLabyrinths,
     readyCheck,
     setupGame,
+    isReady,
     lobbyState: readonly(lobbyState),
   };
 }

@@ -5,7 +5,7 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "../login/LoginStore";
 import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
   useGameStore();
@@ -45,7 +45,7 @@ stompclient.onConnect = () => {
     const playerToMove: Player | undefined = gameState.playerMap.get(
       eventMessage.username
     );
-    console.log(gameState.playerMap);
+    console.log(eventMessage);
     switch (eventMessage.operation) {
       case "MOVEMENT":
         if (playerToMove) {
@@ -92,6 +92,14 @@ stompclient.onConnect = () => {
           });
         } else {
           // One player ready
+          const { loginState } = useLoginStore();
+
+          updateUsers(gameState.lobbyKey);
+          const state = computed(() => lobbyState.users);
+
+          // console.log('loginState 1P ready: ', loginState)
+          // console.log('lobbyState 1P ready: ', lobbyState.users)
+          console.log("State: ", state.value);
         }
         break;
       case "JOIN":
