@@ -5,6 +5,7 @@ import { Mode, Role } from "./BuildMode";
 import { TileModel, Vector2 } from "./TileModel";
 
 const buildState = reactive({
+  id: 0,
   rows: 10,
   columns: 20,
   tileModels: new Array<TileModel>(),
@@ -127,7 +128,7 @@ function hasErrors(): Mode | undefined {
   return undefined;
 }
 
-function transform(): Labyrinth {
+function convert(): Labyrinth {
   const labyrinth = new Labyrinth(
     buildState.endposiiton,
     buildState.startPositions
@@ -144,6 +145,22 @@ function transform(): Labyrinth {
   return labyrinth;
 }
 
+function save(labyrinth: Labyrinth) {
+  fetch("/api/labyrinth/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(labyrinth),
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsondata) => {
+      console.log(jsondata);
+      buildState.id = jsondata as number;
+    });
+}
+
 export function useBuildService() {
   return {
     buildState,
@@ -154,6 +171,7 @@ export function useBuildService() {
     setEndTile,
     setRestriction,
     hasErrors,
-    transform,
+    convert,
+    save,
   };
 }

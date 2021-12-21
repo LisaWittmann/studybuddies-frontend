@@ -80,7 +80,7 @@ export default defineComponent({
   name: "LabyrinthBuildView",
   components: { LabyrinthCanvasComponent },
   setup() {
-    const { hasErrors, transform } = useBuildService();
+    const { hasErrors, convert, save } = useBuildService();
 
     const modes = ref(
       new Array<Mode>(Mode.CREATE, Mode.START, Mode.END, Mode.ZONES, Mode.ITEMS)
@@ -129,7 +129,8 @@ export default defineComponent({
       if (rollback) {
         currentMode.value = rollback;
       } else {
-        transform();
+        const labyrinth = convert();
+        save(labyrinth);
         router.push("/save");
       }
     }
