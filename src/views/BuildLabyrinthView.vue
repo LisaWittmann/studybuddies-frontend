@@ -93,7 +93,7 @@ export default defineComponent({
     const { hasErrors, convert, save } = useBuildService();
 
     const modes = ref(
-      new Array<Mode>(Mode.CREATE, Mode.START, Mode.END, Mode.ZONES)
+      new Array<Mode>(Mode.CREATE, Mode.START, Mode.END, Mode.RESTRICTIONS)
     );
 
     const currentMode = ref(Mode.CREATE);
@@ -120,7 +120,8 @@ export default defineComponent({
       if (!zoomOutDisabled.value) tileSize.value -= 10;
     }
 
-    const inZoneMode = computed(() => currentMode.value == Mode.ZONES);
+    const inZoneMode = computed(() => currentMode.value == Mode.RESTRICTIONS);
+
     const roleOptions = ref(new Array<Role>(Role.DESIGNER, Role.HACKER));
     const selectedRole = ref(0);
     const showRoleOptions = ref(false);
