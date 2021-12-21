@@ -5,12 +5,17 @@
       <UserListComponent :users="users" />
     </section>
     <section>
-      <h2>Rolle auswählen:</h2>      
-        <div class="roles">
-          <span v-if="selected">{{ selected }}</span>
-        </div>
-      <RadioButtonGroup :options="roles" v-model="selected" @clicked="selectedRole" :selectable="roleOptions"/>
-    </section>    
+      <h2>Rolle auswählen:</h2>
+      <div class="roles">
+        <span v-if="selected">{{ selected }}</span>
+      </div>
+      <RadioButtonGroup
+        :options="roles"
+        v-model="selected"
+        @clicked="selectedRole"
+        :selectable="roleOptions"
+      />
+    </section>
     <section>
       <h2>Labyrinth auswählen:</h2>
       <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
@@ -55,8 +60,15 @@ export default defineComponent({
     let selected = ref("");
 
     const { loginState } = useLoginStore();
-    const { updateUsers, updateLabyrinths, readyCheck, exitLobby, selectRole, getRoles, getRoleOptions } =
-      useLobbyService();
+    const {
+      updateUsers,
+      updateLabyrinths,
+      readyCheck,
+      exitLobby,
+      selectRole,
+      getRoles,
+      getRoleOptions,
+    } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
     const users = ref(new Array<string>());
@@ -69,13 +81,13 @@ export default defineComponent({
       selectedLabyrinth.value = id;
     }
 
-    function selectedRole(name : string) {
+    function selectedRole(name: string) {
       selected.value = name;
       selectRole(name, gameState.lobbyKey, loginState.username).then(() => {
         getRoleOptions(gameState.lobbyKey).then((data) => {
           roleOptions.value = data;
         });
-      });      
+      });
     }
 
     onMounted(() => {
@@ -83,7 +95,9 @@ export default defineComponent({
       setLobbyKey(route.params.key as string);
       updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
       getRoles(gameState.lobbyKey).then((data) => (roles.value = data));
-      getRoleOptions(gameState.lobbyKey).then((data) => (roleOptions.value = data));
+      getRoleOptions(gameState.lobbyKey).then(
+        (data) => (roleOptions.value = data)
+      );
     });
 
     const lobbyKey = computed(() => gameState.lobbyKey);

@@ -11,14 +11,20 @@ import { EventMessage } from "@/service/game/EventMessage";
  * @param username: identifying name of user that should join lobby
  */
 async function selectRole(role: string, lobbyKey: string, username: string) {
-  const eventMessage:EventMessage = {operation: "ROLE", lobbyKey: lobbyKey, username: username, data: role};
+  const eventMessage: EventMessage = {
+    operation: "ROLE",
+    lobbyKey: lobbyKey,
+    username: username,
+    data: role,
+  };
   return fetch("/api/lobby/select-role", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
   }).then((response) => {
     if (!response.ok) {
-      if (response.status == 409) throw new Error("Diese Rolle ist bereits vergeben.");
+      if (response.status == 409)
+        throw new Error("Diese Rolle ist bereits vergeben.");
       else throw new Error("Die Rolle konnte nicht gefunden werden.");
     }
   });
@@ -34,8 +40,7 @@ async function getRoles(lobbyKey: string) {
   }).then((response) => {
     if (!response.ok) throw new Error(response.statusText);
     return response.json();
-  }); 
-
+  });
 }
 
 /**
@@ -48,8 +53,7 @@ async function getRoleOptions(lobbyKey: string) {
   }).then((response) => {
     if (!response.ok) throw new Error(response.statusText);
     return response.json();
-  }); 
-
+  });
 }
 
 /**

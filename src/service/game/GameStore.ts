@@ -45,15 +45,9 @@ async function setPlayer(username: string, startTileId: number) {
   console.log("Starttileid is: " + startTileId);
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
-    gameState.playerMap.set(
-      username,
-      new MainPlayer(username, startTileId)
-    );
+    gameState.playerMap.set(username, new MainPlayer(username, startTileId));
   } else {
-    gameState.playerMap.set(
-      username,
-      new PartnerPlayer(username, startTileId)
-    );
+    gameState.playerMap.set(username, new PartnerPlayer(username, startTileId));
   }
 }
 
