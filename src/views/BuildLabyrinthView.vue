@@ -1,71 +1,81 @@
 <template>
   <div class="builder">
-    <div class="builder__zoom">
-      <button class="button__icon" :disabled="zoomInDisabled" @click="zoomIn">
-        <i class="fas fa-search-plus"></i>
-      </button>
-      <button class="button__icon" :disabled="zoomOutDisabled" @click="zoomOut">
-        <i class="fas fa-search-minus"></i>
-      </button>
-    </div>
-    <div class="builder__tool">
-      <div v-if="inZoneMode" class="builder__paint">
-        <div v-if="showRoleOptions" class="builder__paint-options">
+    <transition name="delay-fade" appear>
+      <div class="builder__zoom">
+        <button class="button__icon" :disabled="zoomInDisabled" @click="zoomIn">
+          <i class="fas fa-search-plus"></i>
+        </button>
+        <button class="button__icon" :disabled="zoomOutDisabled" @click="zoomOut">
+          <i class="fas fa-search-minus"></i>
+        </button>
+      </div>
+    </transition>
+    <transition name="delay-fade" appear>
+      <div class="builder__tool">
+        <div v-if="inZoneMode" class="builder__paint">
+          <transition name="fade" appear>
+            <div v-if="showRoleOptions" class="builder__paint-options">
+              <button
+                v-for="role in roleOptions"
+                :key="role"
+                class="builder__paint-button button__icon--circle"
+                :class="{ hacker: role }"
+                @click="selectRole(role)"
+              >
+                <i class="fas fa-fill-drip"></i>
+              </button>
+            </div>
+          </transition>
           <button
-            v-for="role in roleOptions"
-            :key="role"
             class="builder__paint-button button__icon--circle"
-            :class="{ hacker: role }"
-            @click="selectRole(role)"
+            @click="toggleRoleOptions"
+            :class="{ hacker: selectedRole, uncolored: showRoleOptions }"
           >
             <i class="fas fa-fill-drip"></i>
           </button>
         </div>
+      </div>
+    </transition>
+    <transition name="fade" appear>
+      <div class="builder__stage">
+        <LabyrinthCanvasComponent
+          :tileSize="tileSize"
+          :mode="currentMode"
+          :role="selectedRole"
+        />
+      </div>
+    </transition>
+    <transition name="delay-fade" appear>
+      <div class="builder__steps">
         <button
-          class="builder__paint-button button__icon--circle"
-          @click="toggleRoleOptions"
-          :class="{ hacker: selectedRole, uncolored: showRoleOptions }"
+          class="button__icon"
+          :disabled="currentIndex == 0"
+          @click="changeMode(currentIndex - 1)"
         >
-          <i class="fas fa-fill-drip"></i>
+          <i class="fas fa-chevron-circle-left"></i>
+        </button>
+        <ul class="builder__steps-wrapper">
+          <li
+            v-for="(mode, index) in modes"
+            :key="index"
+            :class="[{ active: isActiveMode(mode) }]"
+            @click="changeMode(index)"
+          >
+            {{ mode }}
+          </li>
+        </ul>
+        <button
+          v-if="currentIndex != modes.length - 1"
+          class="button__icon"
+          @click="changeMode(currentIndex + 1)"
+        >
+          <i class="fas fa-chevron-circle-right"></i>
+        </button>
+        <button v-else class="button__icon" @click="onComplete">
+          <i class="fas fa-check-circle"></i>
         </button>
       </div>
-    </div>
-    <div class="builder__stage">
-      <LabyrinthCanvasComponent
-        :tileSize="tileSize"
-        :mode="currentMode"
-        :role="selectedRole"
-      />
-    </div>
-    <div class="builder__steps">
-      <button
-        class="button__icon"
-        :disabled="currentIndex == 0"
-        @click="changeMode(currentIndex - 1)"
-      >
-        <i class="fas fa-chevron-circle-left"></i>
-      </button>
-      <ul class="builder__steps-wrapper">
-        <li
-          v-for="(mode, index) in modes"
-          :key="index"
-          :class="[{ active: isActiveMode(mode) }]"
-          @click="changeMode(index)"
-        >
-          {{ mode }}
-        </li>
-      </ul>
-      <button
-        v-if="currentIndex != modes.length - 1"
-        class="button__icon"
-        @click="changeMode(currentIndex + 1)"
-      >
-        <i class="fas fa-chevron-circle-right"></i>
-      </button>
-      <button v-else class="button__icon" @click="onComplete">
-        <i class="fas fa-check-circle"></i>
-      </button>
-    </div>
+    </transition>
   </div>
 </template>
 

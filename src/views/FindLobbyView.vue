@@ -19,6 +19,14 @@
           </button>
         </section>
       </transition>
+      <transition name="delay-slow-fade" appear>
+        <section>
+          <h2>Labyrinth erstellen</h2>
+          <button class="button--small" @click="createLabyrinth">
+            Labyrinth erstellen
+          </button>
+        </section>
+      </transition>
     </div>
   </transition>
 </template>
@@ -77,7 +85,11 @@ export default defineComponent({
         .catch((err) => console.log(err));
     }
 
-    return { lobbyKey, createGame, joinGame, header };
+    function createLabyrinth() {
+      router.push("/build");
+    }
+
+    return { lobbyKey, createGame, createLabyrinth, joinGame, header };
   },
 });
 </script>
