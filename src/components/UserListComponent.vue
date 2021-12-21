@@ -12,7 +12,13 @@
         :key="index"
       >
         <span>{{ user.username }}</span>
-        <span class="fa fa-circle" :class="{ 'ready-indicator': user.isReady, 'ready-indicator-inactive': !user.isReady }"></span>
+        <span
+          class="fa fa-circle"
+          :class="{
+            'ready-indicator': user.isReady,
+            'ready-indicator-inactive': !user.isReady,
+          }"
+        ></span>
         <!-- <span class="fa fa-circle"></span> -->
       </div>
     </div>
@@ -34,18 +40,18 @@ export default defineComponent({
   },
   setup(props) {
     // update display of players in lobby
-    onMounted(async() => {
+    onMounted(async () => {
       const route = router.currentRoute.value;
-      await useLobbyService().updateUsers(route.params.key as string)
-    })
+      await useLobbyService().updateUsers(route.params.key as string);
+    });
 
-    let userArr = computed(() => useLobbyService().lobbyState.users)
+    let userArr = computed(() => useLobbyService().lobbyState.users);
 
     return {
-      userArr
-    }
-  }
-})
+      userArr,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>

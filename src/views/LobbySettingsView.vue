@@ -71,15 +71,14 @@ export default defineComponent({
     const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
-
     // toggle ready button
     const isReady = computed(() => {
-      lobbyState.users.forEach(e => {
-        return(e.isReady && loginState.username == e.username) ? true : false
+      return lobbyState.users.some((e) => {
+        if (e.username == loginState.username) {
+          return e.isReady;
+        }
       });
-
-      return false
-    })
+    });
 
     return {
       isReady,

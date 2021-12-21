@@ -126,17 +126,16 @@ async function updateUsers(lobbyKey: string) {
       return response.json();
     })
     .then((response) => {
-    const userArr = new Array<User>()
-    
-    for(const user in response) {
-      const tempUser = new User(response[user])
-      console.log('for loop: ', tempUser)
-      userArr.push(tempUser)
-      lobbyState.users = userArr
-    }
-    
-    console.log(lobbyState.users);
-    console.log(`Response: ${response}`);
+      const userArr = new Array<User>();
+
+      for (const user in response) {
+        const tempUser = new User(response[user]);
+        userArr.push(tempUser);
+        lobbyState.users = userArr;
+      }
+
+      console.log(lobbyState.users);
+      console.log(`Response: ${response}`);
     });
 }
 
@@ -177,10 +176,9 @@ function readyCheck(username: string, labId: number) {
       if (!response.ok) {
         throw new Error("Error during ready check: " + response.statusText);
       } else {
-        lobbyState.users.forEach(e => {
-          if(e.username == username) {
-            e.isReadyToggle()
-            console.log(`${e.username} is Ready? ${e.isReady}`)
+        lobbyState.users.forEach((e) => {
+          if (e.username == username) {
+            e.isReadyToggle();
           }
         });
       }

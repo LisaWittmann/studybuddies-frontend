@@ -5,9 +5,10 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "../login/LoginStore";
 import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
-import {ref} from "vue";
+import { ref } from "vue";
 
-const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } = useGameStore();
+const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
+  useGameStore();
 const { updateUsers, lobbyState } = useLobbyService();
 
 const wsurl = "ws://localhost:9090/messagebroker";
@@ -44,7 +45,7 @@ stompclient.onConnect = () => {
     const playerToMove: Player | undefined = gameState.playerMap.get(
       eventMessage.username
     );
-    console.log(gameState.playerMap)
+    console.log(gameState.playerMap);
     switch (eventMessage.operation) {
       case "MOVEMENT":
         if (playerToMove) {
@@ -55,8 +56,7 @@ stompclient.onConnect = () => {
             // -> now the watcher can update the 3D Room
             // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
-            setError(
-              "There is no Tilereference for this definition of data");
+            setError("There is no Tilereference for this definition of data");
           }
         } else {
           setError("No existing User");
@@ -77,11 +77,13 @@ stompclient.onConnect = () => {
           const { loginState } = useLoginStore();
 
           updateGameData().then(() => {
-
             updateUsers(gameState.lobbyKey);
             //let index = 0;
-            lobbyState.users.forEach((user,index) => {
-              setPlayerData(user.username, gameState.labyrinth.playerStartTileIds[index]);
+            lobbyState.users.forEach((user, index) => {
+              setPlayerData(
+                user.username,
+                gameState.labyrinth.playerStartTileIds[index]
+              );
             });
 
             router.push(`/game/${gameState.lobbyKey}`);

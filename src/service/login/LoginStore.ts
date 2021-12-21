@@ -5,7 +5,7 @@ import router from "@/router";
 const loginState = reactive({
   username: "",
   errormessage: "",
-  isLoggedIn: false
+  isLoggedIn: false,
 });
 
 /**
@@ -98,6 +98,6 @@ export function useLoginStore() {
     register,
     login,
     logout,
-    fetchSessionStorage
+    fetchSessionStorage,
   };
 }

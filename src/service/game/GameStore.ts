@@ -42,13 +42,18 @@ function updatePlayerData(player: Player, newPosition: number) {
  * @param startTileId : used to place the Player where they belong in the frontend
  */
 function setPlayerData(username: string, startTileId: number) {
-  
-  console.log("Starttileid is: " + startTileId)
+  console.log("Starttileid is: " + startTileId);
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
-    gameState.playerMap.set(username, new MainPlayer(username, true, startTileId));
+    gameState.playerMap.set(
+      username,
+      new MainPlayer(username, true, startTileId)
+    );
   } else {
-    gameState.playerMap.set(username, new PartnerPlayer(username, false, startTileId));
+    gameState.playerMap.set(
+      username,
+      new PartnerPlayer(username, false, startTileId)
+    );
   }
 }
 
