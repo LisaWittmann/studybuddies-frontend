@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, ref} from "vue";
+import {computed, defineComponent, onBeforeUnmount, onMounted, ref} from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
@@ -43,7 +43,7 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { gameState, updateGameData, setLobbyKey, setPlayerData } = useGameStore();
+    const { gameState, updateGameData, setLobbyKey, setPlayerData, setGameState } = useGameStore();
     const { updateUsers} = useLobbyService();
     const { playerMovement, itemSelection, updatePlayerPositions } = useGameService();
     const { loginState } = useLoginStore();
@@ -54,25 +54,49 @@ export default defineComponent({
     /*
     // Users Array -> Wird onMounted gefüllt
     const users = ref(new Array<string>());
-    
+      */
 
+
+    //called before view is closed or reloaded
+    onBeforeUnmount(() => {
+      sessionStorage.setItem("lobbyKey", gameState.lobbyKey);
+      sessionStorage.setItem("labyrinthID", JSON.stringify(gameState.labyrinthId));
+      sessionStorage.setItem("labyrinth", JSON.stringify(gameState.labyrinth));
+      sessionStorage.setItem("playerMap", JSON.stringify(gameState.playerMap));
+      sessionStorage.setItem("errormessage", JSON.stringify(gameState.errormessage));
+      sessionStorage.setItem("score", JSON.stringify(gameState.score));
+    })
+
+
+    //called when view is loaded
     onMounted(async () => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       await updateUsers(gameState.lobbyKey);
-      const playerPositions =  await updatePlayerPositions(gameState.lobbyKey);
-      
-      console.log(playerPositions);
-      playerPositions.forEach((value, key) => {
-        setPlayerData(key, value);
-      });
 
-    
+
+      if(sessionStorage.getItem("lobbyKey") == gameState.lobbyKey){
+        setGameState(
+          sessionStorage.getItem("lobbyKey"),
+          sessionStorage.getItem("labyrinthID"),
+          sessionStorage.getItem("labyrinth"),
+          sessionStorage.getItem("playerMap"),
+          sessionStorage.getItem("errormessage"),
+          sessionStorage.getItem("score")
+          );
+
+        /* const playerPositions =  await updatePlayerPositions(gameState.lobbyKey);
+          playerPositions.forEach((value, key) => {
+          setPlayerData(key, value);
+        }); */
+      }
+
+      
 
       updateGameData();
 
     })
-    */
+  
 
     let mainPlayer;
     let partnerPlayer;

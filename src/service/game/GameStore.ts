@@ -2,6 +2,7 @@ import { reactive, readonly } from "vue";
 import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 
 const { labyrinthState, updateLabyrinthData } = useLabyrinthStore();
 
@@ -18,6 +19,23 @@ const gameState = reactive({
   errormessage: "",
   score: 0,
 });
+
+function setGameState(
+  lobbyKey: string | null,
+  labyrinthId: string | null,
+  labyrinth: string | null,
+  playerMap: string | null,
+  errormessage: string | null,
+  score: string | null
+) {
+  if (lobbyKey) gameState.lobbyKey = lobbyKey;
+  if (labyrinthId) gameState.labyrinthId = JSON.parse(labyrinthId) as number;
+  if (labyrinth) gameState.labyrinth = JSON.parse(labyrinth) as Labyrinth;
+  if (playerMap)
+    gameState.playerMap = JSON.parse(playerMap) as Map<string, Player>;
+  if (errormessage) gameState.errormessage = errormessage;
+  if (score) gameState.score = JSON.parse(score) as number;
+}
 
 async function updateGameData() {
   await updateLabyrinthData(gameState.lobbyKey);
@@ -42,13 +60,18 @@ function updatePlayerData(player: Player, newPosition: number) {
  * @param startTileId : used to place the Player where they belong in the frontend
  */
 function setPlayerData(username: string, startTileId: number) {
-  
-  console.log("Starttileid is: " + startTileId)
+  console.log("Starttileid is: " + startTileId);
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
-    gameState.playerMap.set(username, new MainPlayer(username, true, startTileId));
+    gameState.playerMap.set(
+      username,
+      new MainPlayer(username, true, startTileId)
+    );
   } else {
-    gameState.playerMap.set(username, new PartnerPlayer(username, false, startTileId));
+    gameState.playerMap.set(
+      username,
+      new PartnerPlayer(username, false, startTileId)
+    );
   }
 }
 
@@ -63,6 +86,7 @@ async function setError(error: string) {
 export function useGameStore() {
   return {
     gameState: readonly(gameState),
+    setGameState,
     updateGameData,
     updatePlayerData,
     setPlayerData,
