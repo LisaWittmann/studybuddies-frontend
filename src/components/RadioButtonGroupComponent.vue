@@ -41,16 +41,12 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .input-group {
-  @include flex-center();
+  display: flex;
+  align-items: center;
   justify-content: space-around;
   width: 80%;
-  max-width: 400px;
+  max-width: 350px;
   margin: 20px auto;
   padding: 15px 20px;
-  border: none;
-}
-
-label {
-  cursor: pointer;
 }
 </style>

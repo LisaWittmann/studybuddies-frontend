@@ -5,7 +5,6 @@ import { Item } from "@/service/labyrinth/Item";
 
 import { Role } from "@/service/game/Player";
 import { Vector3 } from "three";
-import { useGameStore } from "@/service/game/GameStore";
 
 /**
  * constant to keep the tiles or store an errormessage

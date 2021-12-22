@@ -17,7 +17,7 @@ export enum Operation {
   CLICK,
   TRADE,
   CHAT,
-  ROLE,
+  ROLE_PICK,
 }
 
 /**
@@ -27,6 +27,23 @@ export enum Operation {
  */
 export class MoveOperation implements EventMessage {
   operation = "MOVEMENT";
+  lobbyKey: string;
+  username: string;
+  data: string;
+
+  constructor(lobbyKey: string, username: string, data: string) {
+    this.lobbyKey = lobbyKey;
+    this.username = username;
+    this.data = data;
+  }
+}
+
+/**
+ * MoveOperation: Respond object to be used for specifiying the EventMessage Object from the messagebroker
+ * 
+ */
+ export class PickOperation implements EventMessage {
+  operation = "LABYRINTH_PICK";
   lobbyKey: string;
   username: string;
   data: string;
