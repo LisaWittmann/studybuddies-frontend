@@ -6,24 +6,25 @@
           v-for="(option, index) in options"
           :key="index"
           class="button__icon--circle button--filled"
-          :class="`button__option-${index}`"
+          :class="optionClass(option)"
           @click="select(option)"
         >
-          <i class="fas fa-fill-drip"></i>
+          <img :src="image(index)" />
         </button>
       </div>
     </transition>
     <button
       class="button__icon--circle button--filled"
-      :class="[{ open: showOptions }, `button__option-${selected}`]"
+      :class="[{ open: showOptions }, optionClass(selected)]"
       @click="toggleOptions"
     >
-      <i class="fas fa-fill-drip"></i>
+      <img :src="image(selected)" />
     </button>
   </div>
 </template>
 
 <script lang="ts">
+import { Role } from "@/service/labyrinth/build/BuildMode";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
@@ -47,7 +48,27 @@ export default defineComponent({
       showOptions.value = false;
     };
 
-    return { showOptions, toggleOptions, select };
+    const image = (index: number) => {
+      switch (props.options[index]) {
+        case Role.DESIGNER:
+          return require("@/assets/img/roles/designer-role.svg");
+        case Role.HACKER:
+          return require("@/assets/img/roles/hacker-role.svg");
+      }
+    };
+
+    const optionClass = (index: number) => {
+      switch (props.options[index]) {
+        case Role.DESIGNER:
+          return "button__option-designer";
+        case Role.HACKER:
+          return "button__option-hacker";
+        default:
+          return "";
+      }
+    };
+
+    return { showOptions, toggleOptions, select, image, optionClass };
   },
 });
 </script>
@@ -64,11 +85,11 @@ export default defineComponent({
     }
   }
 
-  .button__option-0:not(.open) {
+  .button__option-designer:not(.open) {
     background: $color-beige;
   }
 
-  .button__option-1:not(.open) {
+  .button__option-hacker:not(.open) {
     background: $color-green;
   }
 }

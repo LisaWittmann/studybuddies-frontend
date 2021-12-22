@@ -194,12 +194,12 @@ export default defineComponent({
     bottom: 100px;
     right: 0;
     font-size: $headline-xl;
-    margin: 20px;
+    margin: 30px;
   }
 
   &__stage {
-    min-height: 100%;
-    min-width: 100%;
+    height: calc(100% - 100px);
+    width: 100%;
     overflow: scroll;
   }
 

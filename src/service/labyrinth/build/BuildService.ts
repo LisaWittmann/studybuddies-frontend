@@ -126,7 +126,7 @@ function selectTile(model: TileModel): void {
  * @param model tilemodel to set or unset as a starting position
  */
 function setStartTile(model: TileModel): void {
-  if (!model.relationKey || model.restrictions.length > 0) return;
+  if (!model.relationKey || model.isEnd || model.restrictions.length > 0) return;
   if (model.isStart) {
     model.isStart = false;
     buildState.startPositions = buildState.startPositions.filter(
@@ -145,7 +145,7 @@ function setStartTile(model: TileModel): void {
  * @param model tilemodel to set or unset as endtile
  */
 function setEndTile(model: TileModel): void {
-  if (!model.relationKey || model.restrictions.length > 0) return;
+  if (!model.relationKey || model.isStart || model.restrictions.length > 0) return;
   if (model.isEnd) {
     buildState.endposition = 0;
     model.isEnd = false;
