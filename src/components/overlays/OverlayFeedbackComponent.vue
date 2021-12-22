@@ -9,6 +9,7 @@
             <transition name="delay-slow-fade" appear>
               <router-link
                 :to="link"
+                @click="onClick"
                 class="button button--small button--pulse button--filled"
               >
                 {{ linkText }}
@@ -24,6 +25,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import OverlayComponent from "@/components/overlays/OverlayComponent.vue";
+import router from "@/router/index";
 
 export default defineComponent({
   name: "OverlayFeedbackComponent",
@@ -49,6 +51,17 @@ export default defineComponent({
       type: String,
       default: "Jetzt spielen",
     },
+    reload: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
+    const onClick = () => {
+      if (props.reload) history.go();
+      else router.push(props.link);
+    };
+    return { onClick };
   },
 });
 </script>

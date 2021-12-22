@@ -251,6 +251,7 @@ async function save(labyrinth: Labyrinth): Promise<number> {
 export function useBuildService() {
   return {
     buildState: readonly(buildState),
+    updateTileModels,
     setDimension,
     getTileModel,
     selectTile,

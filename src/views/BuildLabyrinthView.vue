@@ -48,6 +48,9 @@
     :opened="feedback.active"
     :headline="feedback.headline"
     :subline="feedback.subline"
+    :link="feedback.link"
+    :linkText="feedback.linkText"
+    :reload="feedback.reload"
   />
 </template>
 
@@ -70,7 +73,8 @@ export default defineComponent({
     OverlayFeedbackComponent,
   },
   setup() {
-    const { hasErrors, convert, save, reset } = useBuildService();
+    const { updateTileModels, hasErrors, convert, save, reset } =
+      useBuildService();
 
     const modes = new Array<Mode>(
       Mode.CREATE,
@@ -86,8 +90,8 @@ export default defineComponent({
     const maxZoom = 150;
     const zoomFactor = 10;
 
-    const zoomOutDisabled = computed(() => tileSize.value == minZoom);
-    const zoomInDisabled = computed(() => tileSize.value == maxZoom);
+    const zoomOutDisabled = computed(() => tileSize.value <= minZoom);
+    const zoomInDisabled = computed(() => tileSize.value >= maxZoom);
 
     const zoomIn = () => {
       if (!zoomInDisabled.value) tileSize.value += zoomFactor;
@@ -100,15 +104,17 @@ export default defineComponent({
       () => currentMode.value == Mode.RESTRICTIONS
     );
 
-    const roleOptions = ref(new Array<Role>(Role.DESIGNER, Role.HACKER));
+    const roleOptions = new Array<Role>(Role.DESIGNER, Role.HACKER);
     const selectedRole = ref(0);
     const selectRole = (role: Role) => (selectedRole.value = role);
 
-    const labyrinthId = ref(0);
     const feedback = reactive({
       active: false,
       headline: "",
       subline: "",
+      link: "",
+      linkText: "",
+      reload: false,
     });
 
     function onComplete() {
@@ -117,16 +123,32 @@ export default defineComponent({
         currentMode.value = rollback;
       } else {
         const labyrinth = convert();
-        save(labyrinth).then((id) => {
-          labyrinthId.value = id;
-          feedback.active = true;
-          feedback.headline = "Gespeichert";
-          feedback.subline = `Dein Labyrinth wurde gespeichert unter der ID ${labyrinthId.value}`;
-        });
+        save(labyrinth)
+          .then((id) => {
+            feedback.active = true;
+            feedback.headline = "Gespeichert";
+            feedback.subline = `Dein Labyrinth wurde gespeichert unter der ID ${id}`;
+            feedback.link = "/find";
+            feedback.linkText = "Jetzt spielen";
+            feedback.reload = false;
+          })
+          .catch(() => {
+            feedback.active = true;
+            feedback.headline = "Fehler";
+            feedback.subline =
+              "Leider ist etwas schief gelaufen. Bitte versuche es noch einmal";
+            feedback.link = "/build";
+            feedback.linkText = "Zurück";
+            feedback.reload = true;
+          });
       }
     }
 
-    onUnmounted(() => reset());
+    onUnmounted(() => {
+      reset();
+      updateTileModels();
+      feedback.active = false;
+    });
 
     return {
       modes,

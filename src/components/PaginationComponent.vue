@@ -3,7 +3,7 @@
     <button
       class="button__icon"
       :disabled="activeIndex == 0"
-      @click="selectNext"
+      @click="selectPrev"
     >
       <i class="fas fa-chevron-circle-left"></i>
     </button>
