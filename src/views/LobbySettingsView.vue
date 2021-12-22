@@ -40,13 +40,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref} from "vue";
-import { useLobbyService } from "@/service/LobbyService";
-import { useLoginStore } from "@/service/login/LoginStore";
+import {computed, defineComponent, onMounted, ref} from "vue";
+import {useLobbyService} from "@/service/LobbyService";
+import {useLoginStore} from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
-import { useGameStore } from "@/service/game/GameStore";
+import {useGameStore} from "@/service/game/GameStore";
 import RadioButtonGroup from "@/components/RadioButtonGroup.vue";
 
 export default defineComponent({
@@ -91,6 +91,19 @@ export default defineComponent({
         });
       });
     }
+
+    window.onbeforeunload = function () {
+      debugger
+      const newURL = document.documentURI;
+      const currentURL = router.currentRoute.value.fullPath as string;
+      //Ask for lobby leave if user closed tab/browser or if new URL is not containing view of same lobby
+      debugger
+      if ((newURL.includes(currentURL) || !newURL.includes(lobbyKey.value)) && lobbyState.users.includes(loginState.username)) {
+        exitLobby(lobbyKey.value, loginState.username, document.documentURI);
+        console.log(`User ${loginState.username} left lobby ${lobbyKey.value} by closing tab or changing URL manually`);
+        return "Sie werden die Lobby nun automatisch verlassen!";
+      }
+    };
 
     onMounted(() => {
       const route = router.currentRoute.value;

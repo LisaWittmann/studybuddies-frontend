@@ -121,11 +121,12 @@ async function createLobby(username: string) {
 
 /**
  * send request to remove user with given username from lobby
- * redirects back to find lobby view if request was successfull
+ * redirects back to find lobby view if request was successful
  * @param lobbyKey: identifying key of lobby from which user should be removed
  * @param username: identifying name of user that should be removed
+ * @param destination: identifying the ongoing URL
  */
-async function exitLobby(lobbyKey: string, username: string) {
+async function exitLobby(lobbyKey: string, username: string, destination = "") {
   fetch("/api/lobby/leave/" + lobbyKey, {
     method: "POST",
     headers: {
@@ -134,7 +135,12 @@ async function exitLobby(lobbyKey: string, username: string) {
     body: username,
   })
     .then((response) => {
-      if (response.ok) router.push("/find");
+      if (response.ok) {
+        lobbyState.users.splice(lobbyState.users.indexOf(username), 1);
+        sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+        if (destination === "") router.push("/find");
+        else if (destination != undefined) console.log("Routing by requested URL: " + destination);
+      }
       else throw new Error(response.statusText);
     })
     .catch((error) => console.error(error));
