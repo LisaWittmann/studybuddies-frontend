@@ -1,7 +1,9 @@
 import { reactive } from "vue";
 import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
-import { Item } from "./Item";
+import { Item } from "@/service/labyrinth/Item";
+
+import { Role } from "@/service/game/Player";
 import { Vector3 } from "three";
 
 /**
@@ -49,8 +51,14 @@ async function updateLabyrinth(labyrinthId: number) {
             )
           );
         }
-
-        labyrinth.tileMap.set(id, new Tile(tile.tileId, objectsInRoom));
+        const restrictions = new Array<Role>();
+        for (const role of tile.restrictions) {
+          restrictions.push((<any>Role)[role]);
+        }
+        labyrinth.tileMap.set(
+          id,
+          new Tile(tile.tileId, objectsInRoom, restrictions)
+        );
 
         //workaround to parse json list in map
         const tileRelationMap = new Map<Orientation, number | undefined>();
