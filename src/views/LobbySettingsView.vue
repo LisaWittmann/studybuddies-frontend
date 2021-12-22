@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <h1>Lobby {{ lobbyKey }}</h1>
+    <h1>Lobby
+      <span class="uppercase"> {{ lobbyKey }}</span>
+    </h1>
     <section>
       <UserListComponent :users="users" />
     </section>
@@ -80,6 +82,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 h1 {
   margin: $spacing-l 0;
+
+  span {
+    font-weight: inherit;
+  }
 }
 
 .button {
