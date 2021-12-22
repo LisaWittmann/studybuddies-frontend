@@ -1,13 +1,13 @@
 <template>
-  <div>
+  <div class="radio-input__wrapper">
     <input
-        type="radio"
-        :value="option"
-        :id="option"
-        :disabled="disabled"
-        @change="onClick(option)"
-        name="radio-input"
-      />
+      type="radio"
+      :value="option"
+      :id="option"
+      :disabled="disabled"
+      @change="onClick(option)"
+      name="radio-input"
+    />
     <label :for="option" class="button" :class="{ disabled: disabled }">
       <img :src="getImgUrl(option)" :alt="option" />
       {{ capitalize(option) }}
@@ -50,34 +50,40 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.radio-input__wrapper {
+  width: 40%;
+  position: relative;
 
-input[type="radio"] {
-  height: 100%;
-  opacity: 0;
+  input[type="radio"] {
+    height: 100%;
+    opacity: 0;
 
-  & + label {
-    @include flex-center();
-    flex-direction: column;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    width: 30%;
-    position: relative;
-    
-    img {
-      cursor: pointer;
-      width: 80%;
-      margin-bottom: 10px;
+    & + label {
+      @include flex-center();
+      flex-direction: column;
+      padding-top: 20px;
+      padding-bottom: 20px;
+
+      img {
+        width: 80%;
+        margin-bottom: 10px;
+      }
     }
-  }
 
-  &:disabled + label {
-    pointer-events: none;
-    opacity: 0.5;
-  }
+    &:checked + label {
+      border: solid $color-beige;
+    }
 
-  &:checked + label {
-    opacity: 1 !important;
-    border: solid $color-beige;
+    &:disabled {
+      & + label {
+        pointer-events: none;
+        opacity: 0.5;
+      }
+
+      &:checked + label {
+        opacity: 1;
+      }
+    }
   }
 }
 </style>
