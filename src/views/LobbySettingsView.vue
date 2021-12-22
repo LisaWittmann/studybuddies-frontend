@@ -12,7 +12,7 @@
       <RadioButtonGroupComponent
         :options="roles"
         v-model="selected"
-        @clicked="selectedRole"
+        @clicked="selectRole"
         :selectable="roleOptions"
       />
     </section>
@@ -57,11 +57,6 @@ export default defineComponent({
     RadioButtonGroupComponent,
   },
   setup() {
-    //Radiobutton data
-    const allRoles = ref([]);
-    const openRoles = ref([]);
-    let selectedRole = ref("");
-
     const { loginState } = useLoginStore();
     const {
       updateUsers,
@@ -81,41 +76,40 @@ export default defineComponent({
     const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
+    //Radiobutton data
+    const allRoles = ref([]);
+    const openRoles = computed(() => lobbyState.openRoles);
+    let selectedRole = computed(() => lobbyState.selectedRole);
+
+
     function selectLabyrinth(id: number) {
       sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
-      updateLabyrinthPick(id, lobbyKey.value);
+      updateLabyrinthPick(id, gameState.lobbyKey);
     }
 
     function selectRole(name: string) {
       sessionStorage.setItem("chosenRole", JSON.stringify(name))
-      selectedRole.value = name;
-      updateRole(name, gameState.lobbyKey, loginState.username).then(() => {
-        getRoleOptions(gameState.lobbyKey).then((data) => {
-          openRoles.value = data;
-        });
-      });
+      updateRole(name, gameState.lobbyKey, loginState.username);
     }
 
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      if(sessionStorage.getItem("lobbyKey") == lobbyKey.value) {
+      if(sessionStorage.getItem("lobbyKey") == gameState.lobbyKey) {
         setLobbyState(
           sessionStorage.getItem("users"),
           sessionStorage.getItem("selectedLabyrinth"),
           sessionStorage.getItem("labyrinthOptions"),
           sessionStorage.getItem("errormessage"),
+          sessionStorage.getItem("chosenRole"),
           );
-        selectedRole.value = sessionStorage.getItem("chosenRole") as string;
       } else {
-        sessionStorage.setItem("lobbyKey", lobbyKey.value);
+        sessionStorage.setItem("lobbyKey", gameState.lobbyKey);
       }
       updateLabyrinths();
       updateUsers(gameState.lobbyKey);
       getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
-      getRoleOptions(gameState.lobbyKey).then(
-          (data) => (openRoles.value = data)
-      );
+      getRoleOptions(gameState.lobbyKey);
     });
 
     return {

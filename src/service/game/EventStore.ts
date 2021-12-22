@@ -5,10 +5,17 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "../login/LoginStore";
 import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
-import {ref} from "vue";
+import { ref } from "vue";
 
-const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } = useGameStore();
-const { updateUsers, lobbyState, setupGame, setLabyrinthSelection, updateLabyrinths } = useLobbyService();
+const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
+  useGameStore();
+const {
+  updateUsers,
+  setupGame,
+  setLabyrinthSelection,
+  updateLabyrinths,
+  getRoleOptions,
+} = useLobbyService();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -38,9 +45,11 @@ stompclient.onConnect = () => {
 
     const eventMessage: EventMessage = JSON.parse(message.body);
 
-    if(eventMessage.lobbyKey == gameState.lobbyKey || eventMessage.lobbyKey == "*"){
+    if (
+      eventMessage.lobbyKey == gameState.lobbyKey ||
+      eventMessage.lobbyKey == "*"
+    ) {
       console.log("Message in the right Lobby");
-
 
       /**
        * Checks whether the user exists in the Game
@@ -58,8 +67,7 @@ stompclient.onConnect = () => {
               // -> now the watcher can update the 3D Room
               // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
             } else {
-              setError(
-                "There is no Tilereference for this definition of data");
+              setError("There is no Tilereference for this definition of data");
             }
           } else {
             setError("No existing User");
@@ -77,23 +85,37 @@ stompclient.onConnect = () => {
             setupGame();
           }
           break;
-        case "JOIN":
-          updateUsers(eventMessage.lobbyKey);
-          break;
         case "LABYRINTH_PICK":
           console.log(Number(eventMessage.data));
           setLabyrinthSelection(Number(eventMessage.data));
           break;
-        case "UPLOAD":
-          updateLabyrinths();
-          break;
-        case "ROLE_PICK":
+        case "UPDATE":
+          switch (eventMessage.data) {
+            case "LABYRINTHS":
+              updateLabyrinths();
+              break;
+            case "USERS":
+              updateUsers(eventMessage.lobbyKey);
+              break;
+            case "ROLE":
+              console.log("RoleOptions holen");
+              getRoleOptions(eventMessage.lobbyKey);
+              break;
+            default:
+              console.info(
+                "No List was updated with Data: " +
+                eventMessage.data
+              );
+              break;
+          }
           break;
         default:
+          console.error(
+            eventMessage.operation + " is no valid EventMessage Operation."
+          );
           break;
       }
     }
-
   });
 };
 

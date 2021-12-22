@@ -6,6 +6,23 @@ import { reactive, readonly } from "vue";
 import { PickOperation } from "./game/EventMessage";
 
 
+const lobbyState = reactive({
+  users: new Array<string>(),
+  selectedRole: "",
+  openRoles: new Array<string>(),
+  selectedLabyrinth: 0,
+  labyrinthOptions: new Array<number>(),
+  errormessage: "",
+});
+
+function setLobbyState(users: string | null, selectedLabyrinth: string | null, labyrinthOptions: string | null, errormessage: string | null, selectedRole: string | null) {
+  if(users) lobbyState.users = JSON.parse(users);
+  if(selectedLabyrinth) lobbyState.selectedLabyrinth = JSON.parse(selectedLabyrinth) as number;
+  if(labyrinthOptions) lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
+  if(errormessage) lobbyState.errormessage = JSON.parse(errormessage);
+  if(selectedRole) lobbyState.selectedRole = JSON.parse(selectedRole);
+}
+
 /**
  * send request to pick a available role
  * @param role: the role which was picked from the user
@@ -13,6 +30,7 @@ import { PickOperation } from "./game/EventMessage";
  * @param username: identifying name of user that should join lobby
  */
 async function updateRole(role: string, lobbyKey: string, username: string) {
+  lobbyState.selectedRole = role;
   const eventMessage: EventMessage = {
     operation: "ROLE_PICK",
     lobbyKey: lobbyKey,
@@ -37,7 +55,7 @@ async function updateRole(role: string, lobbyKey: string, username: string) {
  * @param lobbyKey: identifying key of lobby that sould be joined
  */
 async function getRoles(lobbyKey: string) {
-  return fetch("/api/lobby/roles/" + lobbyKey, {
+   return fetch("/api/lobby/roles/" + lobbyKey, {
     method: "GET",
   }).then((response) => {
     if (!response.ok) throw new Error(response.statusText);
@@ -55,23 +73,9 @@ async function getRoleOptions(lobbyKey: string) {
   }).then((response) => {
     if (!response.ok) throw new Error(response.statusText);
     return response.json();
+  }).then((data) => {
+    lobbyState.openRoles = data;
   });
-}
-
-const lobbyState = reactive({
-  users: new Array<string>(),
-  selectedLabyrinth: 0,
-  labyrinthOptions: new Array<number>(),
-  errormessage: "",
-});
-
-function setLobbyState(users: string | null, selectedLabyrinth: string | null, labyrinthOptions: string | null, errormessage: string | null) {
-  if(users) lobbyState.users = JSON.parse(users);
-  console.log(selectedLabyrinth);
-  if(selectedLabyrinth) lobbyState.selectedLabyrinth = JSON.parse(selectedLabyrinth) as number;
-  console.log(lobbyState.selectedLabyrinth);
-  if(labyrinthOptions) lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
-  if(errormessage) lobbyState.errormessage = JSON.parse(errormessage);
 }
 
 /**
@@ -187,8 +191,6 @@ async function updateUsers(lobbyKey: string) {
     return response.json()
   }).then((response) => {
     lobbyState.users = response;
-    console.log(lobbyState.users);
-    console.log(response);
     sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
   });
 }

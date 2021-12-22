@@ -44,7 +44,6 @@ export default defineComponent({
   },
   setup() {
     const { gameState, updateGameData, setLobbyKey } = useGameStore();
-    const { updateUsers } = useLobbyService();
     const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();
     updateGameData();
