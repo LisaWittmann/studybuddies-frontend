@@ -92,14 +92,6 @@ stompclient.onConnect = () => {
           });
         } else {
           // One player ready
-          const { loginState } = useLoginStore();
-
-          updateUsers(gameState.lobbyKey);
-          const state = computed(() => lobbyState.users);
-
-          // console.log('loginState 1P ready: ', loginState)
-          // console.log('lobbyState 1P ready: ', lobbyState.users)
-          console.log("State: ", state.value);
         }
         break;
       case "JOIN":
