@@ -5,16 +5,16 @@
       <UserListComponent :users="users" />
     </section>
     <section>
-      <h2>Labyrinth hochladen:</h2>
-      <label class="button button--small button--upload">
-        <input
-          type="file"
-          ref="upload"
-          accept=".json"
-          @change="uploadLabyrinth"
-        />
-        Hochladen
-      </label>
+      <h2>Rolle auswählen:</h2>
+      <div class="roles">
+        <span v-if="selected">{{ selected }}</span>
+      </div>
+      <RadioButtonGroupComponent
+        :options="roles"
+        v-model="selected"
+        @clicked="selectedRole"
+        :selectable="roleOptions"
+      />
     </section>
     <section>
       <h2>Labyrinth auswählen:</h2>
@@ -22,7 +22,10 @@
     </section>
     <section>
       <div class="column-wrapper">
-        <button class="button--small button--filled" @click="readyCheck">
+        <button
+          class="button--small button--filled"
+          @click="readyCheck(loginState.username, selectedLabyrinth)"
+        >
           Bereit
         </button>
         <button
@@ -37,59 +40,84 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
+import { useGameStore } from "@/service/game/GameStore";
+import RadioButtonGroupComponent from "@/components/RadioButtonGroupComponent.vue";
 
 export default defineComponent({
   name: "LobbySettingsView",
-  components: { UserListComponent, DropdownComponent },
+  components: {
+    UserListComponent,
+    DropdownComponent,
+    RadioButtonGroupComponent,
+  },
   setup() {
+    //Radiobutton data
+    const roles = ref([]);
+    const roleOptions = ref([]);
+    let selected = ref("");
+
     const { loginState } = useLoginStore();
     const {
-      uploadJsonFiles,
       updateUsers,
       updateLabyrinths,
       readyCheck,
       exitLobby,
+      selectRole,
+      getRoles,
+      getRoleOptions,
     } = useLobbyService();
-    const upload = ref({} as HTMLInputElement);
-
-    const route = router.currentRoute.value;
-    const lobbyKey = route.params.key as string;
+    const { gameState, setLobbyKey } = useGameStore();
 
     const users = ref(new Array<string>());
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
-    updateUsers(lobbyKey).then((data) => (users.value = data));
     updateLabyrinths().then((data) => (labyrinthOptions.value = data));
 
     function selectLabyrinth(id: number) {
       selectedLabyrinth.value = id;
     }
 
-    async function uploadLabyrinth() {
-      if (upload.value.files != null) {
-        await uploadJsonFiles(upload.value.files);
-      }
-      updateLabyrinths().then((data) => (labyrinthOptions.value = data));
+    function selectedRole(name: string) {
+      selected.value = name;
+      selectRole(name, gameState.lobbyKey, loginState.username).then(() => {
+        getRoleOptions(gameState.lobbyKey).then((data) => {
+          roleOptions.value = data;
+        });
+      });
     }
 
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      setLobbyKey(route.params.key as string);
+      updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
+      getRoles(gameState.lobbyKey).then((data) => (roles.value = data));
+      getRoleOptions(gameState.lobbyKey).then(
+        (data) => (roleOptions.value = data)
+      );
+    });
+
+    const lobbyKey = computed(() => gameState.lobbyKey);
+
     return {
+      selected,
       readyCheck,
-      uploadLabyrinth,
       selectLabyrinth,
       exitLobby,
+      selectedRole,
+      roles,
+      roleOptions,
       users,
-      upload,
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
-      username: loginState.username,
+      loginState,
     };
   },
 });
