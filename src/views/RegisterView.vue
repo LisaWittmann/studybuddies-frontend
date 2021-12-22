@@ -25,7 +25,7 @@
           <router-link to="/">Jetzt anmelden</router-link>
         </p>
         <span>
-          Lade jetzt dein eigenes Labyrinth hoch:<br/>
+          Lade jetzt dein eigenes Labyrinth hoch:<br />
           <router-link to="/upload">Labyrinth hochladen</router-link>
         </span>
         <span class="error">{{ errorMessage }}</span>
@@ -59,3 +59,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+h1 {
+  margin-bottom: 0;
+}
+</style>

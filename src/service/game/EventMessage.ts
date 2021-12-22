@@ -17,6 +17,7 @@ export enum Operation {
   CLICK,
   TRADE,
   CHAT,
+  ROLE_PICK,
 }
 
 /**
@@ -42,7 +43,7 @@ export class MoveOperation implements EventMessage {
  * 
  */
  export class PickOperation implements EventMessage {
-  operation = "LABYRINTHPICK";
+  operation = "LABYRINTH_PICK";
   lobbyKey: string;
   username: string;
   data: string;
