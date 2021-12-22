@@ -31,7 +31,7 @@ export default defineComponent({
         "-role.svg");
     }
     function onClick(option: string) {
-      emit("clicked", capitalize(option));
+      emit("clicked", option);
     }
 
     const capitalize = (name: string) => {
