@@ -55,30 +55,19 @@ export default defineComponent({
     // state options: neutral, warning, error
     const messageState = "warning";
 
-    //TODO: remove this temporary operation after showing GameView with key in URL
-    let temporaryCode: string;
-
-    fetch("/api/lobby/random", {
-      method: "GET",
-      headers: {
-        "Content-Type": "html/text;charset=utf-8",
-      },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        temporaryCode = json.key;
-      });
-
     const openTerminal = () => (showTerminal.value = true);
     const closeTerminal = () => (showTerminal.value = false);
 
+    /**
+     * function which is used when clicking the arrow in Interface
+     * By recieving the Orientation it creats a MoveOperation to send it to the BE via GameService Methode
+     * @param orientation : used in the backend to identify the direction to move the player
+     */
     function movePlayer(orientation: Orientation) {
       playerMovement(
         new MoveOperation(
-          temporaryCode,
-          (mainPlayer as MainPlayer).username,
+          gameState.lobbyKey,
+          loginState.username,
           Orientation[orientation].toString()
         )
       );
@@ -92,7 +81,7 @@ export default defineComponent({
       closeTerminal,
       itemSelection,
       movePlayer,
-      mainPlayer,
+      mainPlayer: gameState.playerMap.get(loginState.username),
       labyrinth: gameState.labyrinth,
     };
   },
