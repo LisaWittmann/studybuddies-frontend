@@ -1,13 +1,15 @@
 import * as THREE from "three";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
-import { Tile } from "@/service/labyrinth/Tile";
+import { Orientation, Tile } from "@/service/labyrinth/Tile";
+import { Role } from "@/service/game/Player";
 import { settings } from "@/service/scene/helper/SceneConstants";
-import { useGameStore } from "../game/GameStore";
 
 /**
  * creates a group of objects representing a tile
  * @param model: representing tile data
  * @param position: position in scene
+ * @param role: role of main player
+ * @param neighbors: neighbor tiles with orientations
  * @param color: color of all walls
  * @returns initialized group of scene objects
  */
@@ -15,9 +17,10 @@ function createTile(
   tileKey: number,
   model: Tile,
   position: THREE.Vector3,
+  role: Role | undefined,
+  neighbors: Map<Orientation, Tile | undefined>,
   color = 0xa9a9a9
 ): THREE.Group {
-  const { gameState } = useGameStore();
   const { createFloor, createCeiling, createArrow, createWall, createItem } =
     useObjectFactory();
   const tile = new THREE.Group();
@@ -30,13 +33,12 @@ function createTile(
   //STATIC-ITEMS----------
   tile.add(createFloor(position, color, tileKey));
   tile.add(createCeiling(position, color));
-  model.tileRelationMap.forEach((value, key) => {
-    if (value) {
-      createArrow(key, position, tile);
-      if (model.getRestrictions().length > 0) {
-        tile.add(createWall(key, position, color, 0.5));
-      }
-    } else tile.add(createWall(key, position, color));
+  neighbors.forEach((neighbor, orientation) => {
+    if (neighbor) {
+      if (role && neighbor.getRestrictions().includes(role)) {
+        createWall(orientation, position, color, 0.5);
+      } else createArrow(orientation, position, tile);
+    } else tile.add(createWall(orientation, position, color));
   });
 
   //ITEMS-----------------

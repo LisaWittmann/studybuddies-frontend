@@ -24,12 +24,18 @@ const storedTiles = new Map<number, THREE.Vector3>();
  * @param labyrinthState
  * @param scene
  */
-async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
+async function updateLabyrinth(
+  labyrinth: any,
+  player: MainPlayer,
+  scene: THREE.Scene
+) {
   const position = vector(0, 0, 0);
   for (const [key, value] of labyrinth.tileMap) {
     const tile = getTile(value.tileId, scene);
     if (!tile) {
-      placeTile(position, value, key, scene);
+      const neighbors = getNeighbors(value, labyrinth.tileMap);
+      const role = player.getRole()
+      placeTile(position, value, key, role, neighbors, scene);
     }
   }
 }
@@ -63,6 +69,8 @@ async function placeTile(
   position: THREE.Vector3,
   tile: Tile,
   tileKey: number,
+  role: Role | undefined,
+  neighbors: Map<Orientation, Tile | undefined>,
   scene: THREE.Scene
 ) {
   for (const [key, value] of tile.tileRelationMap) {
@@ -73,7 +81,8 @@ async function placeTile(
   }
   // store placed tile with position to calculate position of next tiles
   storedTiles.set(tileKey, position);
-  scene.add(createTile(tileKey, tile, position, getTileColor(tile)));
+  const color = getTileColor(tile);
+  scene.add(createTile(tileKey, tile, position, role, neighbors, color));
 }
 
 function getTileColor(tile: Tile) {
@@ -141,6 +150,15 @@ function getNextPosition(
     case Orientation.WEST:
       return next.addScaledVector(direction.west, -settings.tileSize);
   }
+}
+
+function getNeighbors(tile: Tile, tileMap: Map<number, Tile>) {
+  const neighbors = new Map<Orientation, Tile | undefined>();
+  for (const [orientation, relationKey] of tile.getTileRelationMap()) {
+    if (relationKey) neighbors.set(orientation, tileMap.get(relationKey));
+    else neighbors.set(orientation, undefined);
+  }
+  return neighbors;
 }
 
 export function useLabyrinthFactory() {
