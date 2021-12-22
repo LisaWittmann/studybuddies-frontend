@@ -1,5 +1,5 @@
 <template>
-  <div class="user-list__wrapper">
+  <div class="column-wrapper">
     <div class="user-list">
       <div
         class="user-list__item"
@@ -20,7 +20,7 @@ export default defineComponent({
   name: "UserListComponent",
   props: {
     users: {
-      type: [],
+      type: Array,
       required: true,
     },
   },
@@ -31,11 +31,6 @@ export default defineComponent({
 .user-list {
   width: 80%;
   max-width: 500px;
-
-  &__wrapper {
-    width: 100%;
-    @include flex-center();
-  }
 
   &__item {
     width: 100%;

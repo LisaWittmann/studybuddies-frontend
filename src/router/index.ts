@@ -3,9 +3,9 @@ import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import GameView from "@/views/GameView.vue";
 import LobbySettingsView from "@/views/LobbySettingsView.vue";
+import LabyrinthUploadView from "@/views/LabyrinthUploadView.vue";
 import FindLobbyView from "@/views/FindLobbyView.vue";
 
-// TODO: set routes properly after testing game
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/game/:key",
@@ -14,7 +14,7 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
   {
-    path: "/login",
+    path: "/",
     name: "LoginView",
     component: LoginView,
   },
@@ -33,6 +33,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/find",
     name: "FindLobby",
     component: FindLobbyView,
+  },
+  {
+    path: "/upload",
+    name: "LabyrinthUploadView",
+    component: LabyrinthUploadView,
   },
 ];
 

@@ -1,93 +1,79 @@
 <template>
-  <h1>Lobby <span class="lobby-code">{{ lobbyKey }}</span></h1>
-  <section>
-    <UserListComponent :users="users" />
-  </section>
-  <section>
-    <h2>Labyrinth hochladen:</h2>
-    <label class="file-upload">
-      <input
-        type="file"
-        ref="upload"
-        accept=".json"
-        @change="uploadLabyrinth"
-      />
-      Hochladen
-    </label>
-  </section>
-  <section>
-    <h2>Labyrinth auswählen:</h2>
-    <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
-  </section>
-  <section>
-    <div class="button-wrapper">
-      <button class="button button--confirm" @click="readyCheck">Bereit</button>
-      <button
-        class="button button--exit"
-        @click="exitLobby(lobbyKey, username)"
-      >
-        Verlassen
-      </button>
-    </div>
-  </section>
+  <div class="container">
+    <h1>Lobby
+      <span class="uppercase"> {{ lobbyKey }}</span>
+    </h1>
+    <section>
+      <UserListComponent :users="users" />
+    </section>
+    <section>
+      <h2>Labyrinth auswählen:</h2>
+      <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
+    </section>
+    <section>
+      <div class="column-wrapper">
+        <button
+          class="button--small button--filled"
+          @click="readyCheck(loginState.username, selectedLabyrinth)"
+        >
+          Bereit
+        </button>
+        <button
+          class="button button--small button--exit"
+          @click="exitLobby(lobbyKey, username)"
+        >
+          Verlassen
+        </button>
+      </div>
+    </section>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
+import { useGameStore } from "@/service/game/GameStore";
 
 export default defineComponent({
   name: "LobbySettingsView",
   components: { UserListComponent, DropdownComponent },
   setup() {
     const { loginState } = useLoginStore();
-    const {
-      uploadJsonFiles,
-      updateUsers,
-      updateLabyrinths,
-      readyCheck,
-      exitLobby,
-      setupGame,
-    } = useLobbyService();
-    const upload = ref({} as HTMLInputElement);
-
-    const route = router.currentRoute.value;
-    const lobbyKey = route.params.key as string;
+    const { updateUsers, updateLabyrinths, readyCheck, exitLobby } =
+      useLobbyService();
+    const { gameState, setLobbyKey } = useGameStore();
 
     const users = ref(new Array<string>());
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
-    updateUsers(lobbyKey).then((data) => (users.value = data));
     updateLabyrinths().then((data) => (labyrinthOptions.value = data));
 
     function selectLabyrinth(id: number) {
       selectedLabyrinth.value = id;
     }
 
-    async function uploadLabyrinth() {
-      if (upload.value.files != null) {
-        await uploadJsonFiles(upload.value.files);
-      }
-      updateLabyrinths().then((data) => (labyrinthOptions.value = data));
-    }
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      setLobbyKey(route.params.key as string);
+      updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
+    });
+
+    const lobbyKey = computed(() => gameState.lobbyKey);
 
     return {
       readyCheck,
-      uploadLabyrinth,
       selectLabyrinth,
       exitLobby,
-      setupGame,
       users,
-      upload,
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
-      username: loginState.username,
+      loginState,
     };
   },
 });
@@ -96,21 +82,19 @@ export default defineComponent({
 <style lang="scss" scoped>
 h1 {
   margin: $spacing-l 0;
-}
 
-.button-wrapper {
-  @include flex-center();
-  flex-direction: column;
+  span {
+    font-weight: inherit;
+  }
 }
 
 .button {
-  margin: 10px;
-  min-height: 35px;
-  background: transparent;
-  font-size: 16px;
+  &--upload {
+    min-height: 0;
 
-  &:hover {
-    font-weight: 400;
+    &:hover {
+      color: $color-beige;
+    }
   }
 
   &--exit {
@@ -130,22 +114,5 @@ h1 {
 
 input[type="file"] {
   display: none;
-}
-
-.file-upload,
-.button {
-  border: 1px solid $color-grey;
-  border-radius: 8px;
-  font-weight: 300;
-  display: inline-block;
-  padding: 10px 12px;
-  width: 80%;
-  max-width: 200px;
-  cursor: pointer;
-}
-
-.file-upload:hover {
-  color: $color-beige;
-  font-weight: 400;
 }
 </style>
