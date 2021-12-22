@@ -21,12 +21,15 @@ export class Tile {
   objectsInRoom: Array<Item>;
   restrictions: Array<Role>;
 
-  constructor(tileId: number, objectsInRoom: Array<Item>, restrictions: Array<Role>) {
+  constructor(
+    tileId: number,
+    objectsInRoom: Array<Item>,
+    restrictions: Array<Role>
+  ) {
     this.tileId = tileId;
     this.objectsInRoom = objectsInRoom;
     this.restrictions = restrictions;
     this.tileRelationMap = new Map<Orientation, number | undefined>();
-    console.log(this);
   }
 
   getId(): number {

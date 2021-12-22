@@ -85,13 +85,19 @@ function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
 function createWall(
   orientation: Orientation,
   tilePosition: THREE.Vector3,
-  color = 0x199eb0
+  color = 0x199eb0,
+  opacity = 1
 ): THREE.Mesh {
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const object = new THREE.Mesh(
     new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-    new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
+    new THREE.MeshStandardMaterial({
+      color: color,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: opacity,
+    })
   );
   object.position.copy(position);
   object.rotateY(wall.rotationY());

@@ -3,10 +3,14 @@ import { useTileFactory } from "@/service/scene/TileFactory";
 import { usePlayerFactory } from "@/service/scene/PlayerFactory";
 
 import { Orientation, Tile } from "@/service/labyrinth/Tile";
-import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
+import { MainPlayer, PartnerPlayer, Player, Role } from "@/service/game/Player";
 
 import { vector } from "@/service/scene/helper/GeometryHelper";
-import { direction, settings } from "@/service/scene/helper/SceneConstants";
+import {
+  colors,
+  direction,
+  settings,
+} from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
 const { updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
@@ -69,7 +73,14 @@ async function placeTile(
   }
   // store placed tile with position to calculate position of next tiles
   storedTiles.set(tileKey, position);
-  scene.add(createTile(tileKey, tile, position));
+  scene.add(createTile(tileKey, tile, position, getTileColor(tile)));
+}
+
+function getTileColor(tile: Tile) {
+  if (tile.getRestrictions().length == 2) return colors.brown;
+  if (tile.getRestrictions().includes(Role.DESIGNER)) return colors.beige;
+  if (tile.getRestrictions().includes(Role.HACKER)) return colors.green;
+  return colors.grey;
 }
 
 /**

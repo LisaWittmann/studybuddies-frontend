@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { Tile } from "@/service/labyrinth/Tile";
 import { settings } from "@/service/scene/helper/SceneConstants";
+import { useGameStore } from "../game/GameStore";
 
 /**
  * creates a group of objects representing a tile
@@ -16,6 +17,7 @@ function createTile(
   position: THREE.Vector3,
   color = 0xa9a9a9
 ): THREE.Group {
+  const { gameState } = useGameStore();
   const { createFloor, createCeiling, createArrow, createWall, createItem } =
     useObjectFactory();
   const tile = new THREE.Group();
@@ -29,8 +31,12 @@ function createTile(
   tile.add(createFloor(position, color, tileKey));
   tile.add(createCeiling(position, color));
   model.tileRelationMap.forEach((value, key) => {
-    if (value) createArrow(key, position, tile);
-    else tile.add(createWall(key, position, color));
+    if (value) {
+      createArrow(key, position, tile);
+      if (model.getRestrictions().length > 0) {
+        tile.add(createWall(key, position, color, 0.5));
+      }
+    } else tile.add(createWall(key, position, color));
   });
 
   //ITEMS-----------------
