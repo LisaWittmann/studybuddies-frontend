@@ -15,7 +15,7 @@ import { defineComponent } from "vue";
 import RoleSelectionComponent from "./RoleSelectionComponent.vue";
 
 export default defineComponent({
-  name: "RadioButtonGroup",
+  name: "RadioButtonGroupComponent",
   components: { RoleSelectionComponent },
   props: {
     options: {
@@ -39,15 +39,15 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .input-group {
-  width: 20%;
+  @include flex-center();
+  justify-content: space-around;
+  width: 80%;
+  max-width: 400px;
   margin: 20px auto;
   padding: 15px 20px;
   border: none;
-
-  display: flex;
-  justify-content: space-between;
 }
 
 label {

@@ -9,7 +9,7 @@
       <div class="roles">
         <span v-if="selected">{{ selected }}</span>
       </div>
-      <RadioButtonGroup
+      <RadioButtonGroupComponent
         :options="roles"
         v-model="selected"
         @clicked="selectedRole"
@@ -47,11 +47,15 @@ import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
-import RadioButtonGroup from "@/components/RadioButtonGroup.vue";
+import RadioButtonGroupComponent from "@/components/RadioButtonGroupComponent.vue";
 
 export default defineComponent({
   name: "LobbySettingsView",
-  components: { UserListComponent, DropdownComponent, RadioButtonGroup },
+  components: {
+    UserListComponent,
+    DropdownComponent,
+    RadioButtonGroupComponent,
+  },
   setup() {
     //Radiobutton data
     const allRoles = ref([]);

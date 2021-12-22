@@ -1,15 +1,15 @@
 <template>
-  <label :for="option">
-    <input
-      type="radio"
-      :value="option"
-      :id="option"
-      :disabled="disabled"
-      @change="onClick(option)"
-      name="radio-input"
-    />
-    <img :src="getImgUrl(option)" :alt="option" width="100" />
-    {{ option }}
+  <input
+    type="radio"
+    :value="option"
+    :id="option"
+    :disabled="disabled"
+    @change="onClick(option)"
+    name="radio-input"
+  />
+  <label :for="option" class="button">
+    <img :src="getImgUrl(option)" :alt="option" />
+    {{ capitalize(option) }}
   </label>
 </template>
 
@@ -31,33 +31,49 @@ export default defineComponent({
         "-role.svg");
     }
     function onClick(option: string) {
-      emit("clicked", option);
+      emit("clicked", capitalize(option));
     }
+
+    const capitalize = (name: string) => {
+      return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    };
 
     return {
       getImgUrl,
       onClick,
+      capitalize,
     };
   },
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 input[type="radio"] {
   position: absolute;
   opacity: 0;
-}
 
-input + img {
-  cursor: pointer;
-}
+  + label {
+    @include flex-center();
+    flex-direction: column;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 30%;
 
-input:disabled + img {
-  opacity: 0.5;
-}
+    img {
+      cursor: pointer;
+      width: 80%;
+      margin-bottom: 10px;
+    }
+  }
 
-input:checked + img {
-  opacity: 1;
-  border: solid salmon;
+  &:disabled + label {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &:checked + label {
+    opacity: 1;
+    border: solid $color-beige;
+  }
 }
 </style>
