@@ -25,7 +25,7 @@ async function startConversation(character: string) {
 }
 
 async function getConversationMessage(id: string) {
-  fetch(`/api/npc/${conversation.character}/${id}`, {
+  fetch(`/api/body/npc/${conversation.character}/${id}`, {
     method: "GET",
   })
     .then((response) => {
