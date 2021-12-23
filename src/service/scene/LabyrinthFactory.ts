@@ -35,7 +35,7 @@ async function updateLabyrinth(
     const tile = getTile(value.tileId, scene);
     if (!tile) {
       const neighbors = getNeighbors(value, labyrinth.tileMap);
-      const role = player.getRole()
+      const role = player.getRole();
       placeTile(position, value, key, role, neighbors, scene);
     }
   }
@@ -93,8 +93,8 @@ async function placeTile(
  */
 function getTileColor(tile: Tile) {
   if (tile.getRestrictions().length == 2) return colors.darkBrown;
-  if (tile.getRestrictions().includes(Role.DESIGNER)) return colors.beige;
-  if (tile.getRestrictions().includes(Role.HACKER)) return colors.green;
+  if (tile.isRestricedFor(Role.DESIGNER)) return colors.beige;
+  if (tile.isRestricedFor(Role.HACKER)) return colors.green;
   return colors.grey;
 }
 

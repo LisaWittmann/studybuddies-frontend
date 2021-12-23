@@ -56,7 +56,8 @@ export class Tile {
     this.restrictions = restrictions;
   }
 
-  isRestricedFor(role: Role): boolean {
+  isRestricedFor(role: Role | undefined): boolean {
+    if (role == undefined) return false;
     return this.restrictions.includes(role);
   }
 }

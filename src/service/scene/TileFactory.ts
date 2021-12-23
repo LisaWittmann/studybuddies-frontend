@@ -37,7 +37,7 @@ function createTile(
     if (neighbor) {
       // dont add navigation arrow if neighbor has restriction for main players role
       // mark restricted tile with transparent wall
-      if (role != undefined && neighbor.getRestrictions().includes(role)) {
+      if (neighbor.isRestricedFor(role)) {
         tile.add(createWall(orientation, position, color, 0.5));
       } else {
         createArrow(orientation, position, tile);
