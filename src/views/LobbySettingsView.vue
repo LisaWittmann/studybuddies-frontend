@@ -40,14 +40,15 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, ref} from "vue";
-import {useLobbyService} from "@/service/LobbyService";
-import {useLoginStore} from "@/service/login/LoginStore";
+import { computed, defineComponent, onDeactivated, onMounted, ref } from "vue";
+import { useLobbyService } from "@/service/LobbyService";
+import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
-import {useGameStore} from "@/service/game/GameStore";
+import { useGameStore } from "@/service/game/GameStore";
 import RadioButtonGroup from "@/components/RadioButtonGroup.vue";
+import { onBeforeRouteLeave } from "vue-router";
 
 export default defineComponent({
   name: "LobbySettingsView",
@@ -83,7 +84,7 @@ export default defineComponent({
     }
 
     function selectRole(name: string) {
-      sessionStorage.setItem("chosenRole", JSON.stringify(name))
+      sessionStorage.setItem("chosenRole", JSON.stringify(name));
       selectedRole.value = name;
       updateRole(name, gameState.lobbyKey, loginState.username).then(() => {
         getRoleOptions(gameState.lobbyKey).then((data) => {
@@ -92,38 +93,47 @@ export default defineComponent({
       });
     }
 
-    window.onbeforeunload = function () {
-      debugger
-      const newURL = document.documentURI;
-      const currentURL = router.currentRoute.value.fullPath as string;
-      //Ask for lobby leave if user closed tab/browser or if new URL is not containing view of same lobby
-      debugger
-      if ((newURL.includes(currentURL) || !newURL.includes(lobbyKey.value)) && lobbyState.users.includes(loginState.username)) {
-        exitLobby(lobbyKey.value, loginState.username, document.documentURI);
-        console.log(`User ${loginState.username} left lobby ${lobbyKey.value} by closing tab or changing URL manually`);
-        return "Sie werden die Lobby nun automatisch verlassen!";
-      }
+    // open dialog before unlod
+    onbeforeunload = () => {
+      return "Leaving Lobby";
     };
+    // exit lobby on unload
+    onunload = () => {
+      exitLobby(lobbyKey.value, loginState.username);
+    };
+
+    // exit lobby if any other page than game is opened
+    onBeforeRouteLeave((to) => {
+      const nextKey = to.params.key as string;
+      if (nextKey != gameState.lobbyKey) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
+    });
 
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      if(sessionStorage.getItem("lobbyKey") == lobbyKey.value) {
+      if (sessionStorage.getItem("lobbyKey") == lobbyKey.value) {
         setLobbyState(
           sessionStorage.getItem("users"),
           sessionStorage.getItem("selectedLabyrinth"),
           sessionStorage.getItem("labyrinthOptions"),
-          sessionStorage.getItem("errormessage"),
-          );
+          sessionStorage.getItem("errormessage")
+        );
         selectedRole.value = sessionStorage.getItem("chosenRole") as string;
       } else {
         sessionStorage.setItem("lobbyKey", lobbyKey.value);
       }
       updateLabyrinths();
-      updateUsers(gameState.lobbyKey);
+      updateUsers(gameState.lobbyKey).then(() => {
+        // redirect to lobby find view if user is not in lobby
+        if (lobbyState.users.includes(loginState.username)) {
+          router.push("/find");
+        }
+      });
       getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
       getRoleOptions(gameState.lobbyKey).then(
-          (data) => (openRoles.value = data)
+        (data) => (openRoles.value = data)
       );
     });
 
