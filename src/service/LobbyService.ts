@@ -4,7 +4,7 @@ import { useGameStore } from "@/service/game/GameStore";
 import { EventMessage } from "@/service/game/EventMessage";
 import { reactive, readonly } from "vue";
 import { PickOperation } from "./game/EventMessage";
-
+import { Role } from "./game/Player";
 
 const lobbyState = reactive({
   users: new Array<string>(),
@@ -15,12 +15,20 @@ const lobbyState = reactive({
   errormessage: "",
 });
 
-function setLobbyState(users: string | null, selectedLabyrinth: string | null, labyrinthOptions: string | null, errormessage: string | null, selectedRole: string | null) {
-  if(users) lobbyState.users = JSON.parse(users);
-  if(selectedLabyrinth) lobbyState.selectedLabyrinth = JSON.parse(selectedLabyrinth) as number;
-  if(labyrinthOptions) lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
-  if(errormessage) lobbyState.errormessage = JSON.parse(errormessage);
-  if(selectedRole) lobbyState.selectedRole = JSON.parse(selectedRole);
+function setLobbyState(
+  users: string | null,
+  selectedLabyrinth: string | null,
+  labyrinthOptions: string | null,
+  errormessage: string | null,
+  selectedRole: string | null
+) {
+  if (users) lobbyState.users = JSON.parse(users);
+  if (selectedLabyrinth)
+    lobbyState.selectedLabyrinth = JSON.parse(selectedLabyrinth) as number;
+  if (labyrinthOptions)
+    lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
+  if (errormessage) lobbyState.errormessage = JSON.parse(errormessage);
+  if (selectedRole) lobbyState.selectedRole = JSON.parse(selectedRole);
 }
 
 /**
@@ -55,7 +63,7 @@ async function updateRole(role: string, lobbyKey: string, username: string) {
  * @param lobbyKey: identifying key of lobby that sould be joined
  */
 async function getRoles(lobbyKey: string) {
-   return fetch("/api/lobby/roles/" + lobbyKey, {
+  return fetch("/api/lobby/roles/" + lobbyKey, {
     method: "GET",
   }).then((response) => {
     if (!response.ok) throw new Error(response.statusText);
@@ -70,12 +78,14 @@ async function getRoles(lobbyKey: string) {
 async function getRoleOptions(lobbyKey: string) {
   return fetch("/api/lobby/selectable-roles/" + lobbyKey, {
     method: "GET",
-  }).then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  }).then((data) => {
-    lobbyState.openRoles = data;
-  });
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((data) => {
+      lobbyState.openRoles = data;
+    });
 }
 
 /**
@@ -186,13 +196,15 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
 async function updateUsers(lobbyKey: string) {
   fetch("/api/lobby/users/" + lobbyKey, {
     method: "GET",
-  }).then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json()
-  }).then((response) => {
-    lobbyState.users = response;
-    sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
-  });
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((response) => {
+      lobbyState.users = response;
+      sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+    });
 }
 
 /**
@@ -201,14 +213,19 @@ async function updateUsers(lobbyKey: string) {
  * @throws error if request was not successful
  */
 async function updateLabyrinths() {
-  fetch("/api/labyrinth/ids").then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  }).then((response) =>{
-    console.log(response);
-    lobbyState.labyrinthOptions = response;
-    sessionStorage.setItem("labyrinthOptions", JSON.stringify(lobbyState.labyrinthOptions));
-  })
+  fetch("/api/labyrinth/ids")
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((response) => {
+      console.log(response);
+      lobbyState.labyrinthOptions = response;
+      sessionStorage.setItem(
+        "labyrinthOptions",
+        JSON.stringify(lobbyState.labyrinthOptions)
+      );
+    });
 }
 
 /**
@@ -218,17 +235,22 @@ async function updateLabyrinths() {
  */
 async function updateLabyrinthPick(labId: number, lobbyKey: string) {
   const { loginState } = useLoginStore();
-  const eventMessage = new PickOperation(lobbyKey, loginState.username, labId.toString());
+  const eventMessage = new PickOperation(
+    lobbyKey,
+    loginState.username,
+    labId.toString()
+  );
   fetch("/api/lobby/labyrinth-pick", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(eventMessage),
-  }).then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
   })
-  .catch((error) => console.error(error));
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+    })
+    .catch((error) => console.error(error));
 }
 
 /**
@@ -272,15 +294,22 @@ function readyCheck(username: string, labId: number) {
 
 function setupGame() {
   const { updateGameData, gameState, setPlayerData } = useGameStore();
-  updateGameData().then(() => {
-
-    updateUsers(gameState.lobbyKey);
-    lobbyState.users.forEach((user,index) => {
-      setPlayerData(user, gameState.labyrinth.playerStartTileIds[index]);
-    });
-
-    router.replace(`/game/${gameState.lobbyKey}`);
-  });
+  updateUsers(gameState.lobbyKey)
+    .then(() => {
+      lobbyState.users.forEach((user, index) => {
+        // for testing roles
+        fetch(`/api/lobby/role/${gameState.lobbyKey}/${user}`)
+          .then((response) => response.json())
+          .then((jsonData) => {
+            const role = (<any>Role)[jsonData];
+            const startTile = gameState.labyrinth.playerStartTileIds[index];
+            setPlayerData(user, role, startTile);
+          });
+      });
+    })
+    .then(() =>
+      updateGameData().then(() => router.push(`/game/${gameState.lobbyKey}`))
+    );
 }
 
 export function useLobbyService() {

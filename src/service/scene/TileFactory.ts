@@ -35,10 +35,16 @@ function createTile(
   tile.add(createCeiling(position, color));
   neighbors.forEach((neighbor, orientation) => {
     if (neighbor) {
-      if (role && neighbor.getRestrictions().includes(role)) {
-        createWall(orientation, position, color, 0.5);
-      } else createArrow(orientation, position, tile);
-    } else tile.add(createWall(orientation, position, color));
+      // dont add navigation arrow if neighbor has restriction for main players role
+      // mark restricted tile with transparent wall
+      if (role != undefined && neighbor.getRestrictions().includes(role)) {
+        tile.add(createWall(orientation, position, color, 0.5));
+      } else {
+        createArrow(orientation, position, tile);
+      }
+    } else {
+      tile.add(createWall(orientation, position, color));
+    }
   });
 
   //ITEMS-----------------

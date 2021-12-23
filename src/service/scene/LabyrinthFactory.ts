@@ -21,8 +21,9 @@ const storedTiles = new Map<number, THREE.Vector3>();
  * gets map of all tiles of a Labyrinth
  * creates or updates them using TileFactory
  * adds Tiles to scene
- * @param labyrinthState
- * @param scene
+ * @param labyrinth: reactive labyrinth object
+ * @param player: main player
+ * @param scene: scene that contains labyrinth
  */
 async function updateLabyrinth(
   labyrinth: any,
@@ -85,8 +86,13 @@ async function placeTile(
   scene.add(createTile(tileKey, tile, position, role, neighbors, color));
 }
 
+/**
+ * get color of tile according to role restrictions
+ * @param tile: tile to get color for
+ * @returns color of tile as hexadecimal number
+ */
 function getTileColor(tile: Tile) {
-  if (tile.getRestrictions().length == 2) return colors.brown;
+  if (tile.getRestrictions().length == 2) return colors.darkBrown;
   if (tile.getRestrictions().includes(Role.DESIGNER)) return colors.beige;
   if (tile.getRestrictions().includes(Role.HACKER)) return colors.green;
   return colors.grey;
@@ -152,6 +158,12 @@ function getNextPosition(
   }
 }
 
+/**
+ * convert tile relations of tile to actual tile objects
+ * @param tile tile to get neighbors for
+ * @param tileMap tilemap containing relationkeys and tiles
+ * @returns map of orientation and tiles
+ */
 function getNeighbors(tile: Tile, tileMap: Map<number, Tile>) {
   const neighbors = new Map<Orientation, Tile | undefined>();
   for (const [orientation, relationKey] of tile.getTileRelationMap()) {

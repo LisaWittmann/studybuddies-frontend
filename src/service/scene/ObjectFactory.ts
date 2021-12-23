@@ -80,6 +80,7 @@ function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
  * @param orientation: orientaion which wall should be placed and aligned on
  * @param tilePosition: position of parent tile
  * @param color: wall color in hexa
+ * @param opacity: opacity as decimal of mesh
  * @returns THREE.Mesh representation of wall
  */
 function createWall(

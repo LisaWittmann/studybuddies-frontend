@@ -1,5 +1,5 @@
 import { reactive, readonly } from "vue";
-import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
+import { MainPlayer, PartnerPlayer, Player, Role } from "@/service/game/Player";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";
 
@@ -19,8 +19,8 @@ const gameState = reactive({
   score: 0,
 });
 
-async function updateGameData() {
-  await updateLabyrinthData(gameState.lobbyKey);
+function updateGameData() {
+  return updateLabyrinthData(gameState.lobbyKey);
 }
 
 /**
@@ -41,14 +41,23 @@ function updatePlayerData(player: Player, newPosition: number) {
  * @param username : name of the user in the playerMap to improve identification between Main- and Partnerplayer
  * @param startTileId : start position of the player at the start of the game
  */
-async function setPlayerData(username: string, startTileId: number) {
-
-  console.log("Starttileid is: " + startTileId)
+async function setPlayerData(
+  username: string,
+  role: Role,
+  startTileId: number
+) {
+  console.log("Starttileid is: " + startTileId);
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
-    gameState.playerMap.set(username, new MainPlayer(username, startTileId));
+    gameState.playerMap.set(
+      username,
+      new MainPlayer(username, role, startTileId)
+    );
   } else {
-    gameState.playerMap.set(username, new PartnerPlayer(username, startTileId));
+    gameState.playerMap.set(
+      username,
+      new PartnerPlayer(username, role, startTileId)
+    );
   }
 }
 
