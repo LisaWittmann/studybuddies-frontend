@@ -1,7 +1,7 @@
 <template>
   <div class="labyrinth-canvas">
     <div class="labyrinth-canvas__row" v-for="row in rows" :key="row">
-      <TileCanvasComponent
+      <BuildTileComponent
         v-for="column in columns"
         :key="column"
         :size="tileSize"
@@ -17,13 +17,13 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
 import { useBuildService } from "@/service/labyrinth/build/BuildService";
-import { TileModel } from "@/service/labyrinth/build/TileModel";
+import { ItemModel, TileModel } from "@/service/labyrinth/build/TileModel";
 import { Mode } from "@/service/labyrinth/build/BuildMode";
-import TileCanvasComponent from "@/components/build/TileCanvasComponent.vue";
+import BuildTileComponent from "@/components/build/BuildTileComponent.vue";
 
 export default defineComponent({
-  name: "LabyrinthCanvasComponent",
-  components: { TileCanvasComponent },
+  name: "BuildLabyrinthComponent",
+  components: { BuildTileComponent },
   props: {
     tileSize: {
       type: Number,
@@ -37,6 +37,10 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    item: {
+      type: ItemModel,
+      required: true,
+    },
   },
   setup(props) {
     const {
@@ -46,6 +50,7 @@ export default defineComponent({
       setEndTile,
       selectTile,
       setRestriction,
+      setItem,
     } = useBuildService();
 
     let mousedown = false;
@@ -78,6 +83,9 @@ export default defineComponent({
         case Mode.RESTRICTIONS: {
           setRestriction(model, props.role);
           break;
+        }
+        case Mode.ITEMS: {
+          setItem(model, props.item);
         }
       }
     }

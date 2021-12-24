@@ -43,7 +43,7 @@ export class TileModel {
   isEnd: boolean;
   relationKey: number | undefined;
   tileRelationMap: Map<Orientation, TileModel | undefined>;
-  objectsInRoom: Array<Item>;
+  objectsInRoom: Array<ItemModel>;
   restrictions: Array<Role>;
 
   constructor(position: Vector2) {
@@ -60,7 +60,7 @@ export class TileModel {
     this.tileRelationMap.set(Orientation.SOUTH, undefined);
     this.tileRelationMap.set(Orientation.WEST, undefined);
 
-    this.objectsInRoom = new Array<Item>();
+    this.objectsInRoom = new Array<ItemModel>();
     this.restrictions = new Array<Role>();
   }
 
@@ -79,5 +79,13 @@ export class TileModel {
       case Orientation.WEST:
         return this.position.getWest();
     }
+  }
+}
+
+export class ItemModel {
+  modelName: string;
+
+  constructor(modelName: string) {
+    this.modelName = modelName;
   }
 }

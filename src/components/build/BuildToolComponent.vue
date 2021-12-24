@@ -7,7 +7,7 @@
           :key="index"
           class="button__icon--circle button--filled"
           :class="optionClass(option)"
-          @click="select(option)"
+          @click="select(index)"
         >
           <img :src="image(index)" />
         </button>
@@ -25,6 +25,7 @@
 
 <script lang="ts">
 import { Role } from "@/service/labyrinth/build/BuildMode";
+import { ItemModel } from "@/service/labyrinth/build/TileModel";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
@@ -49,7 +50,11 @@ export default defineComponent({
     };
 
     const image = (index: number) => {
-      switch (props.options[index]) {
+      const option = props.options[index];
+      if (option instanceof ItemModel) {
+        return require(`@/assets/img/items/${option.modelName.toLowerCase()}.svg`);
+      }
+      switch (option) {
         case Role.DESIGNER:
           return require("@/assets/img/roles/designer-role.svg");
         case Role.HACKER:

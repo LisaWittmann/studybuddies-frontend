@@ -19,17 +19,24 @@
         <BuildToolComponent
           v-if="restrictionMode"
           :options="roleOptions"
-          :selected="selectedRole"
-          @select="selectRole"
+          :selected="currentRole"
+          @select="changeRole"
+        />
+        <BuildToolComponent
+          v-if="itemsMode && itemOptions.length > 0"
+          :options="itemOptions"
+          :selected="itemOptions.indexOf(currentItem)"
+          @select="changeItem"
         />
       </div>
     </transition>
     <transition name="fade" appear>
       <div class="builder__stage">
-        <LabyrinthCanvasComponent
-          :tileSize="tileSize"
+        <BuildLabyrinthComponent
+          :tile-size="tileSize"
           :mode="currentMode"
-          :role="selectedRole"
+          :role="currentRole"
+          :item="currentItem"
         />
       </div>
     </transition>
@@ -55,32 +62,48 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, reactive, onUnmounted } from "vue";
+import {
+  defineComponent,
+  ref,
+  computed,
+  reactive,
+  onUnmounted,
+  watch,
+} from "vue";
 import { useBuildService } from "@/service/labyrinth/build/BuildService";
 import { Mode, Role } from "@/service/labyrinth/build/BuildMode";
 
 import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
-import LabyrinthCanvasComponent from "@/components/build/LabyrinthCanvasComponent.vue";
+import BuildLabyrinthComponent from "@/components/build/BuildLabyrinthComponent.vue";
 import BuildToolComponent from "@/components/build/BuildToolComponent.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
+import { ItemModel } from "@/service/labyrinth/build/TileModel";
 
 export default defineComponent({
   name: "LabyrinthBuildView",
   components: {
-    LabyrinthCanvasComponent,
-    PaginationComponent,
+    BuildLabyrinthComponent,
     BuildToolComponent,
+    PaginationComponent,
     OverlayFeedbackComponent,
   },
   setup() {
-    const { updateTileModels, hasErrors, convert, save, reset } =
-      useBuildService();
+    const {
+      buildState,
+      updateTileModels,
+      setItemOptions,
+      hasErrors,
+      convert,
+      save,
+      reset,
+    } = useBuildService();
 
     const modes = new Array<Mode>(
       Mode.CREATE,
       Mode.START,
       Mode.END,
-      Mode.RESTRICTIONS
+      Mode.RESTRICTIONS,
+      Mode.ITEMS
     );
     const currentMode = ref(Mode.CREATE);
     const changeMode = (mode: Mode) => (currentMode.value = mode);
@@ -92,7 +115,6 @@ export default defineComponent({
 
     const zoomOutDisabled = computed(() => tileSize.value <= minZoom);
     const zoomInDisabled = computed(() => tileSize.value >= maxZoom);
-
     const zoomIn = () => {
       if (!zoomInDisabled.value) tileSize.value += zoomFactor;
     };
@@ -103,10 +125,15 @@ export default defineComponent({
     const restrictionMode = computed(
       () => currentMode.value == Mode.RESTRICTIONS
     );
-
     const roleOptions = new Array<Role>(Role.DESIGNER, Role.HACKER);
-    const selectedRole = ref(0);
-    const selectRole = (role: Role) => (selectedRole.value = role);
+    const currentRole = ref(0);
+    const changeRole = (role: Role) => (currentRole.value = role);
+
+    const itemsMode = computed(() => currentMode.value == Mode.ITEMS);
+    const itemOptions = computed(() => buildState.itemOptions);
+    setItemOptions().then(() => (currentItem.value = itemOptions.value[0]));
+    const currentItem = ref(new ItemModel(""));
+    const changeItem = (item: ItemModel) => (currentItem.value = item);
 
     const feedback = reactive({
       active: false,
@@ -144,6 +171,13 @@ export default defineComponent({
       }
     }
 
+    watch(
+      () => buildState.itemOptions,
+      () => {
+        currentItem.value = itemOptions.value[0];
+      }
+    );
+
     onUnmounted(() => {
       reset();
       updateTileModels();
@@ -154,15 +188,19 @@ export default defineComponent({
       modes,
       currentMode,
       changeMode,
+      restrictionMode,
+      itemsMode,
       zoomIn,
       zoomOut,
-      tileSize,
       zoomInDisabled,
       zoomOutDisabled,
-      restrictionMode,
+      tileSize,
       roleOptions,
-      selectRole,
-      selectedRole,
+      currentRole,
+      changeRole,
+      itemOptions,
+      currentItem,
+      changeItem,
       onComplete,
       feedback,
     };

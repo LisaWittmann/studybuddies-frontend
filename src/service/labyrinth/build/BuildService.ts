@@ -2,11 +2,16 @@ import { reactive, computed, readonly } from "vue";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Tile } from "@/service/labyrinth/Tile";
 import { Mode, Role } from "@/service/labyrinth/build/BuildMode";
-import { TileModel, Vector2 } from "@/service/labyrinth/build/TileModel";
+import {
+  ItemModel,
+  TileModel,
+  Vector2,
+} from "@/service/labyrinth/build/TileModel";
 
 const buildState = reactive({
   rows: 15,
   columns: 25,
+  itemOptions: new Array<ItemModel>(),
   tileModels: new Array<TileModel>(),
   startPositions: new Array<number>(),
   endposition: 0,
@@ -18,6 +23,7 @@ let counter = 1;
 const maxRows = 20;
 const maxColumns = 30;
 const minTiles = 10;
+const maxItems = 3;
 const startPositons = 2;
 
 /**
@@ -52,6 +58,18 @@ function setDimension(rows: number, columns: number): void {
   if (buildState.rows < maxRows) buildState.rows = rows;
   if (buildState.columns < maxColumns) buildState.columns = columns;
   updateTileModels();
+}
+
+async function setItemOptions() {
+  await fetch("/api/labyrinth/bodies")
+    .then((response) => response.json())
+    .then((jsonData) => {
+      for (const name of jsonData) {
+        if (!buildState.itemOptions.some((i) => i.modelName == name)) {
+          buildState.itemOptions.push(new ItemModel(name));
+        }
+      }
+    });
 }
 
 /**
@@ -126,7 +144,8 @@ function selectTile(model: TileModel): void {
  * @param model tilemodel to set or unset as a starting position
  */
 function setStartTile(model: TileModel): void {
-  if (!model.relationKey || model.isEnd || model.restrictions.length > 0) return;
+  if (!model.relationKey || model.isEnd || model.restrictions.length > 0)
+    return;
   if (model.isStart) {
     model.isStart = false;
     buildState.startPositions = buildState.startPositions.filter(
@@ -145,7 +164,8 @@ function setStartTile(model: TileModel): void {
  * @param model tilemodel to set or unset as endtile
  */
 function setEndTile(model: TileModel): void {
-  if (!model.relationKey || model.isStart || model.restrictions.length > 0) return;
+  if (!model.relationKey || model.isStart || model.restrictions.length > 0)
+    return;
   if (model.isEnd) {
     buildState.endposition = 0;
     model.isEnd = false;
@@ -173,6 +193,22 @@ function setRestriction(model: TileModel, role: Role): void {
   }
 }
 
+function setItem(model: TileModel, item: ItemModel): void {
+  if (!model.relationKey || model.objectsInRoom.length >= maxItems) return;
+  model.objectsInRoom.push(item);
+  buildState.itemOptions = buildState.itemOptions.filter(
+    (i) => i.modelName != item.modelName
+  );
+}
+
+function removeItem(model: TileModel, item: ItemModel): void {
+  if (!model.relationKey) return;
+  model.objectsInRoom = model.objectsInRoom.filter(
+    (i) => i.modelName != item.modelName
+  );
+  buildState.itemOptions.push(item);
+}
+
 /**
  * validates created labyrinth;
  * min amount of tile models must be selected to save labyrinth
@@ -198,7 +234,7 @@ function convert(): Labyrinth {
 
   for (const model of selectedTiles.value) {
     const key = model.relationKey as number;
-    const tile = new Tile(key, model.objectsInRoom);
+    const tile = new Tile(key, []);
     for (const [orientation, neighbor] of model.tileRelationMap) {
       tile.tileRelationMap.set(orientation, neighbor?.relationKey);
     }
@@ -253,10 +289,12 @@ export function useBuildService() {
     buildState: readonly(buildState),
     updateTileModels,
     setDimension,
+    setItemOptions,
     getTileModel,
     selectTile,
     setStartTile,
     setEndTile,
+    setItem,
     setRestriction,
     hasErrors,
     convert,

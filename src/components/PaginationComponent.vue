@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, watch } from "vue";
 
 export default defineComponent({
   name: "PaginationComponent",
@@ -62,6 +62,16 @@ export default defineComponent({
     const select = (index: number) => emit("select", props.items[index]);
     const onComplete = () => emit("complete");
 
+    watch(
+      () => props.activeIndex,
+      () => {
+        setTimeout(() => {
+          const element = document.querySelector(".active");
+          element?.scrollIntoView({ behavior: "smooth", inline: "center" });
+        }, 100);
+      }
+    );
+
     return {
       reachedLastItem,
       isActive,
@@ -88,9 +98,9 @@ export default defineComponent({
   }
 
   &__item-wrapper {
-    @include flex-center();
-    flex-wrap: nowrap;
+    display: inline-flex;
     overflow-x: scroll;
+    scroll-behavior: smooth;
     width: 70%;
     max-width: 800px;
     scrollbar-width: none;
