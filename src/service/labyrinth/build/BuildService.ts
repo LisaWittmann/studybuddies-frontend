@@ -194,7 +194,7 @@ function setRestriction(model: TileModel, role: Role): void {
 }
 
 function setItem(model: TileModel, item: ItemModel): void {
-  if (!model.relationKey || model.objectsInRoom.length >= maxItems) return;
+  if (!model.relationKey || model.objectsInRoom.length >= maxItems || !item) return;
   model.objectsInRoom.push(item);
   buildState.itemOptions = buildState.itemOptions.filter(
     (i) => i.modelName != item.modelName
@@ -294,8 +294,9 @@ export function useBuildService() {
     selectTile,
     setStartTile,
     setEndTile,
-    setItem,
     setRestriction,
+    setItem,
+    removeItem,
     hasErrors,
     convert,
     save,

@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="tile-canvas"
-    :style="{ width: `${size}px` }"
-    @click="onClick"
-    @mouseenter="onEnter"
-  >
+  <div class="tile-canvas" :style="{ width: `${size}px` }">
     <div
       class="tile-canvas__inner"
       :class="[
@@ -13,23 +8,31 @@
         `color--${color}`,
       ]"
       :style="{ fontSize: `${size / 3}px` }"
+      @click="onClick"
+      @mouseenter="onEnter"
     >
       <i v-if="model.isStart" class="fas fa-map-marker"></i>
       <i v-if="model.isEnd" class="fas fa-map-marker-alt"></i>
       <i
         v-if="model.objectsInRoom.length > 0"
         class="fas fa-box-open"
-        @mouseenter="toggleDetails"
+        @click="toggleDetails"
       ></i>
     </div>
-    <BuildTileDetailComponent v-if="showDetails" :items="model.objectsInRoom" />
   </div>
+  <BuildTileDetailComponent
+    v-if="showDetails"
+    :open="false"
+    :size="size"
+    :items="model.objectsInRoom"
+    @remove="onRemove"
+  />
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
 import { Role } from "@/service/labyrinth/build/BuildMode";
-import { TileModel } from "@/service/labyrinth/build/TileModel";
+import { ItemModel, TileModel } from "@/service/labyrinth/build/TileModel";
 import BuildTileDetailComponent from "@/components/build/BuildTileDetailComponent.vue";
 
 export default defineComponent({
@@ -66,12 +69,15 @@ export default defineComponent({
     const onClick = () => emit("click", props.model);
     const onEnter = () => emit("enter", props.model);
 
+    const onRemove = (item: ItemModel) => emit("remove", props.model, item);
+
     return {
       selected,
       selectable,
       color,
       showDetails,
       toggleDetails,
+      onRemove,
       onClick,
       onEnter,
     };
@@ -121,16 +127,21 @@ export default defineComponent({
       font-size: inherit;
       position: absolute;
       top: 35%;
+      z-index: 3;
 
       @include color-scheme(dark) {
         color: $color-dark-green;
       }
     }
   }
-
-  .tile-detail {
-    position: absolute;
-    z-index: 2;
-  }
+}
+.tile-detail {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  bottom: 100px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 </style>

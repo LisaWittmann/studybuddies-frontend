@@ -1,7 +1,14 @@
 <template>
   <div class="tile-detail">
-    <div class="tile-detail__item" v-for="(item, index) of items" :key="index">
-      <img v-if="image(index)" :src="image(index)" />
+    <div class="tile-detail__content">
+      <div
+        class="tile-detail__item"
+        v-for="(item, index) of items"
+        :key="index"
+      >
+        <img v-if="image(index)" :src="image(index)" />
+        <i class="fas fa-trash" @click="remove(index)"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -17,6 +24,10 @@ export default defineComponent({
       type: Array,
       required: true,
     },
+    open: {
+      type: Boolean,
+      required: true,
+    },
   },
   setup(props, { emit }) {
     const image = (index: number) => {
@@ -25,8 +36,9 @@ export default defineComponent({
         return require(`@/assets/img/items/${item.modelName.toLowerCase()}.svg`);
       }
     };
+    const remove = (index: number) => emit("remove", props.items[index]);
 
-    return { image };
+    return { image, remove };
   },
 });
 </script>
@@ -34,18 +46,42 @@ export default defineComponent({
 <style lang="scss" scoped>
 .tile-detail {
   @include flex-center();
-  flex-direction: row;
-    background: $color-white;
-  border-radius: 8px;
+
+  &__content {
+    @include flex-center();
+    position: relative;
+    flex-direction: column;
+    border-radius: 0 8px 8px 0;
+    background: $color-black-background;
+    box-shadow: 0 0 50px rgba($color-black, 0.6);
+
+    @include color-scheme(dark) {
+      background: $color-white;
+    }
+  }
 
   &__item {
-    margin: 15px;
-    height: 60px;
+    @include flex-center();
+    height: 80px;
     width: auto;
+    margin: 10px;
+    position: relative;
 
     img {
-      height: 100%;
+      height: 80%;
       width: auto;
+    }
+
+    i {
+      font-size: $text-l;
+      color: $color-grey;
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      @include color-scheme(dark) {
+        color: darkred;
+      }
     }
   }
 }

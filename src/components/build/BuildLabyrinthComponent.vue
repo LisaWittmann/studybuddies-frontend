@@ -9,6 +9,7 @@
         :model="getTileModel(column, row)"
         @click="onClick"
         @enter="onEnter"
+        @remove="onRemove"
       />
     </div>
   </div>
@@ -51,6 +52,7 @@ export default defineComponent({
       selectTile,
       setRestriction,
       setItem,
+      removeItem,
     } = useBuildService();
 
     let mousedown = false;
@@ -90,7 +92,10 @@ export default defineComponent({
       }
     }
 
-    return { rows, columns, gutter, getTileModel, onClick, onEnter };
+    const onRemove = (model: TileModel, item: ItemModel) =>
+      removeItem(model, item);
+
+    return { rows, columns, gutter, getTileModel, onClick, onEnter, onRemove };
   },
 });
 </script>

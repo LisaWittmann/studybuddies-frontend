@@ -175,7 +175,8 @@ export default defineComponent({
       () => buildState.itemOptions,
       () => {
         currentItem.value = itemOptions.value[0];
-      }
+      },
+      { deep: true }
     );
 
     onUnmounted(() => {
@@ -218,7 +219,7 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     position: absolute;
-    z-index: 2;
+    z-index: 5;
     right: 0;
     margin: 20px;
     i {
