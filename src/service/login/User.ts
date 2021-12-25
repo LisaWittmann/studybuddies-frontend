@@ -19,11 +19,7 @@ export class User {
     this.password = password;
   }
 
-  setReady(): void {
-    this.isReady = true;
-  }
-
-  isReadyToggle(): void {
-    this.isReady = !this.isReady;
+  setReady(isReady: boolean): void {
+    this.isReady = isReady;
   }
 }

@@ -138,7 +138,7 @@ async function updateUsers(lobbyKey: string) {
             if (username == lobbyUser.username) {
               tempUser = new User(username);
               if (lobbyUser.isReady) {
-                tempUser.setReady();
+                tempUser.setReady(!lobbyUser.isReady);
               }
               userArr.push(tempUser);
             }
@@ -196,7 +196,7 @@ function readyCheck(username: string, labId: number) {
       } else {
         lobbyState.users.forEach((e) => {
           if (e.username == username) {
-            e.isReadyToggle();
+            e.setReady(!e.isReady);
           }
         });
       }
@@ -213,12 +213,9 @@ function readyCheck(username: string, labId: number) {
 function setupGame(users: string[]) {
   const { gameState, setPlayerData } = useGameStore();
 
-  //setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
-
   router.replace(`/game/${gameState.lobbyKey}`);
 }
 
-// toggle ready button
 const isReady = computed(() => {
   return lobbyState.users.some((e) => {
     if (e.username == useLoginStore().loginState.username) {

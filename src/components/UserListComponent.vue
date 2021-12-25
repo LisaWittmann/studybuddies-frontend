@@ -19,7 +19,6 @@
             'ready-indicator-inactive': !user.isReady,
           }"
         ></span>
-        <!-- <span class="fa fa-circle"></span> -->
       </div>
     </div>
   </div>

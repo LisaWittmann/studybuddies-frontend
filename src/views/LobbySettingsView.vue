@@ -13,7 +13,7 @@
       <div class="column-wrapper">
         <button
           :class="{ 'button--ready': isReady }"
-          class="button--small button--filled"
+          class="button--small"
           @click="readyCheck(loginState.username, selectedLabyrinth)"
         >
           Bereit
@@ -37,7 +37,6 @@ import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
-import { User } from "@/service/login/User";
 
 export default defineComponent({
   name: "LobbySettingsView",
