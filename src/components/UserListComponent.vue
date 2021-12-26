@@ -8,7 +8,7 @@
     <div class="user-list">
       <div
         class="user-list__item"
-        v-for="(user, index) of userArr"
+        v-for="(user, index) of users"
         :key="index"
       >
         <span>{{ user.username }}</span>
@@ -25,9 +25,7 @@
 </template>
 
 <script lang="ts">
-import router from "@/router";
-import { useLobbyService } from "@/service/LobbyService";
-import { computed, defineComponent, onMounted } from "vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "UserListComponent",
@@ -35,22 +33,9 @@ export default defineComponent({
     users: {
       type: Array,
       required: true,
-    },
-  },
-  setup(props) {
-    // update display of players in lobby
-    onMounted(async () => {
-      const route = router.currentRoute.value;
-      await useLobbyService().updateUsers(route.params.key as string);
-    });
-
-    let userArr = computed(() => useLobbyService().lobbyState.users);
-
-    return {
-      userArr,
-    };
-  },
-});
+    }
+  }
+})
 </script>
 
 <style lang="scss" scoped>

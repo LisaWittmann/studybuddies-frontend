@@ -51,14 +51,7 @@ export default defineComponent({
 
     const showTerminal = ref(false);
 
-    /*
-    // Users Array -> Wird onMounted gefüllt
-    const users = ref(new Array<string>());
-    */
-
     onMounted(async () => {
-      const route = router.currentRoute.value;
-      setLobbyKey(route.params.key as string);
       await updateUsers(gameState.lobbyKey);
       updateGameData();
     });
