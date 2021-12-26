@@ -126,21 +126,21 @@ async function updateUsers(lobbyKey: string) {
     })
     .then((response) => {
       const connectedUsers = new Array<User>();
-      
-      if(lobbyState.users.length > 1) {
+
+      if (lobbyState.users.length > 1) {
         lobbyState.users.forEach((user: User) => {
-          if(user.username === response[0] || user.username === response[1]) {
-            connectedUsers.push(user)
+          if (user.username === response[0] || user.username === response[1]) {
+            connectedUsers.push(user);
           }
-        })
+        });
       } else {
         response.forEach((username: string) => {
-          connectedUsers.push(new User(username))
-        })
+          connectedUsers.push(new User(username));
+        });
       }
 
-      lobbyState.users = connectedUsers
-    })
+      lobbyState.users = connectedUsers;
+    });
 }
 
 /**

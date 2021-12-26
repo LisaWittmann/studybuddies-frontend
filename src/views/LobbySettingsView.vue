@@ -66,7 +66,7 @@ export default defineComponent({
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey)
+      updateUsers(gameState.lobbyKey);
     });
 
     const users = computed(() => lobbyState.users);

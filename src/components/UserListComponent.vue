@@ -6,11 +6,7 @@
     </div>
 
     <div class="user-list">
-      <div
-        class="user-list__item"
-        v-for="(user, index) of users"
-        :key="index"
-      >
+      <div class="user-list__item" v-for="(user, index) of users" :key="index">
         <span>{{ user.username }}</span>
         <span
           class="fa fa-circle"
@@ -33,9 +29,9 @@ export default defineComponent({
     users: {
       type: Array,
       required: true,
-    }
-  }
-})
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>

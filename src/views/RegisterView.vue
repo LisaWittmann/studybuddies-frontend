@@ -42,10 +42,7 @@ import { User } from "@/service/login/User";
 export default defineComponent({
   name: "RegisterView",
   setup() {
-    const {
-      register,
-      loginState
-    } = useLoginStore();
+    const { register, loginState } = useLoginStore();
     const user = new User(loginState.username);
     const errorMessage = ref("");
 
