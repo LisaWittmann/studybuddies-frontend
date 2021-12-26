@@ -125,36 +125,22 @@ async function updateUsers(lobbyKey: string) {
       return response.json();
     })
     .then((response) => {
-      const userArr = new Array<User>();
-      let tempUser: User;
-
-      // if users are present
-      if (lobbyState.users.length > 1) {
-        /* iterate over lobbyState.users
-        check if user(s) in backend response are already in lobbyState
-        if yes, check and set ready state accordingly */
-        lobbyState.users.forEach((lobbyUser) => {
-          response.forEach((username: string) => {
-            if (username == lobbyUser.username) {
-              tempUser = new User(username);
-              if (lobbyUser.isReady) {
-                tempUser.setReady(!lobbyUser.isReady);
-              }
-              userArr.push(tempUser);
-            }
-          });
-        });
+      const connectedUsers = new Array<User>();
+      
+      if(lobbyState.users.length > 1) {
+        lobbyState.users.forEach((user: User) => {
+          if(user.username === response[0] || user.username === response[1]) {
+            connectedUsers.push(user)
+          }
+        })
       } else {
-        // if there are not yet any users, fill up lobbyState.users with plain data from response, without special treatment
-        for (const user in response) {
-          tempUser = new User(response[user]);
-          userArr.push(tempUser);
-        }
+        response.forEach((username: string) => {
+          connectedUsers.push(new User(username))
+        })
       }
 
-      // after userArr is prepared, assign it to lobbyState.users
-      lobbyState.users = userArr;
-    });
+      lobbyState.users = connectedUsers
+    })
 }
 
 /**

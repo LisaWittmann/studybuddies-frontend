@@ -50,7 +50,6 @@ export default defineComponent({
     }
 
     function createGame() {
-      //console.log(loginState.username);
       fetch("/api/lobby/create", {
         method: "POST",
         headers: {
