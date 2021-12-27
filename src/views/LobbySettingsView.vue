@@ -4,7 +4,8 @@
       <span class="uppercase"> {{ lobbyKey }}</span>
     </h1>
     <section>
-      <UserListComponent :users="users" />
+      <p>{{ users.length }}/2 Spieler verbunden</p>
+      <UserListComponent :users="users" :isReady="isReady" />
     </section>
     <section>
       <h2>Labyrinth auswählen:</h2>
@@ -13,7 +14,8 @@
     <section>
       <div class="column-wrapper">
         <button
-          class="button--small button--filled"
+          :class="{ 'button--ready': isReady }"
+          class="button--small"
           @click="readyCheck(loginState.username, selectedLabyrinth)"
         >
           Bereit
@@ -43,11 +45,16 @@ export default defineComponent({
   components: { UserListComponent, DropdownComponent },
   setup() {
     const { loginState } = useLoginStore();
-    const { updateUsers, updateLabyrinths, readyCheck, exitLobby } =
-      useLobbyService();
+    const {
+      updateUsers,
+      updateLabyrinths,
+      readyCheck,
+      exitLobby,
+      lobbyState,
+      isReady,
+    } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
-    const users = ref(new Array<string>());
     const labyrinthOptions = ref(new Array<number>());
     const selectedLabyrinth = ref();
 
@@ -60,12 +67,14 @@ export default defineComponent({
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey).then((data) => (users.value = data));
+      updateUsers(gameState.lobbyKey);
     });
 
+    const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
     return {
+      isReady,
       readyCheck,
       selectLabyrinth,
       exitLobby,
@@ -103,16 +112,5 @@ h1 {
       color: darkred;
     }
   }
-
-  &--confirm {
-    &:hover,
-    &:active {
-      color: $color-green;
-    }
-  }
-}
-
-input[type="file"] {
-  display: none;
 }
 </style>

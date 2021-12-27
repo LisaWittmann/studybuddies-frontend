@@ -1,7 +1,15 @@
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
-import { MainPlayer, PartnerPlayer } from "./game/Player";
+import { MainPlayer, PartnerPlayer, Player } from "./game/Player";
 import { useLoginStore } from "@/service/login/LoginStore";
+import { computed, reactive, readonly } from "vue";
+import { User } from "./login/User";
+
+const lobbyState = reactive({
+  lobbyKey: "",
+  users: new Array<User>(),
+  errormessage: "",
+});
 
 /**
  * send request to join lobby with given lobby key
@@ -109,12 +117,30 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
  * @throws error if request was not successful
  */
 async function updateUsers(lobbyKey: string) {
-  return fetch("/api/lobby/users/" + lobbyKey, {
+  fetch("/api/lobby/users/" + lobbyKey, {
     method: "GET",
-  }).then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  });
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((response) => {
+      const connectedUsers = new Array<User>();
+
+      if (lobbyState.users.length > 1) {
+        lobbyState.users.forEach((user: User) => {
+          if (user.username === response[0] || user.username === response[1]) {
+            connectedUsers.push(user);
+          }
+        });
+      } else {
+        response.forEach((username: string) => {
+          connectedUsers.push(new User(username));
+        });
+      }
+
+      lobbyState.users = connectedUsers;
+    });
 }
 
 /**
@@ -153,6 +179,12 @@ function readyCheck(username: string, labId: number) {
     .then((response) => {
       if (!response.ok) {
         throw new Error("Error during ready check: " + response.statusText);
+      } else {
+        lobbyState.users.forEach((e) => {
+          if (e.username == username) {
+            e.setReady(!e.isReady);
+          }
+        });
       }
     })
     .catch((error) => {
@@ -165,11 +197,18 @@ function readyCheck(username: string, labId: number) {
  * @param users : list with usernames in the lobby
  */
 function setupGame(users: string[]) {
-  const { gameState, setPlayer } = useGameStore();
-  //setPlayer(username, gameState.labyrinth.playerStartTileIds[0]);
+  const { gameState, setPlayerData } = useGameStore();
 
   router.replace(`/game/${gameState.lobbyKey}`);
 }
+
+const isReady = computed(() => {
+  return lobbyState.users.some((e) => {
+    if (e.username == useLoginStore().loginState.username) {
+      return e.isReady;
+    }
+  });
+});
 
 export function useLobbyService() {
   return {
@@ -180,5 +219,8 @@ export function useLobbyService() {
     updateUsers,
     updateLabyrinths,
     readyCheck,
+    setupGame,
+    isReady,
+    lobbyState: readonly(lobbyState),
   };
 }

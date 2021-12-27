@@ -2,11 +2,12 @@ import { Client } from "@stomp/stompjs";
 import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "../login/LoginStore";
+import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
 
-const { gameState, updatePlayer, setError, setPlayer, updateGame } =
+const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
   useGameStore();
+const { updateUsers, lobbyState } = useLobbyService();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -42,14 +43,14 @@ stompclient.onConnect = () => {
     const playerToMove: Player | undefined = gameState.playerMap.get(
       eventMessage.username
     );
-    console.log("Acting player: " + playerToMove);
+    console.log(eventMessage);
     switch (eventMessage.operation) {
       case "MOVEMENT":
         if (playerToMove) {
           const destTileID: number = Number.parseInt(eventMessage.data);
 
           if (destTileID) {
-            updatePlayer(playerToMove, destTileID);
+            updatePlayerData(playerToMove, destTileID);
             // -> now the watcher can update the 3D Room
             // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
@@ -71,20 +72,25 @@ stompclient.onConnect = () => {
           // NUR TEMPORÄR (Bis nach dem MessageBroker Ticket)
           // Bitte noch nicht sofort ändern!
           // @todo: Ändern!
-          const { loginState } = useLoginStore();
-          updateGame()
-            .then(() => {
-              setPlayer(
-                loginState.username,
-                gameState.labyrinth.playerStartTileIds[0]
+          updateGameData().then(() => {
+            updateUsers(gameState.lobbyKey);
+            lobbyState.users.forEach((user, index) => {
+              setPlayerData(
+                user.username,
+                gameState.labyrinth.playerStartTileIds[index]
               );
-            })
-            .then(() => {
-              router.push(`/game/${gameState.lobbyKey}`);
-              console.log("gameState nach ready finish");
-              console.log(gameState);
             });
+
+            router.push(`/game/${gameState.lobbyKey}`);
+            console.log("gameState nach ready finish");
+            console.log(gameState);
+          });
+        } else {
+          // One player ready
         }
+        break;
+      case "JOIN":
+        updateUsers(eventMessage.lobbyKey);
         break;
       default:
         break;
