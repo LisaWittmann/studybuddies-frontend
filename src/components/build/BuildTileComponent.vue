@@ -13,31 +13,18 @@
     >
       <i v-if="model.isStart" class="fas fa-map-marker"></i>
       <i v-if="model.isEnd" class="fas fa-map-marker-alt"></i>
-      <i
-        v-if="model.objectsInRoom.length > 0"
-        class="fas fa-box-open"
-        @click="toggleDetails"
-      ></i>
+      <i v-if="model.objectsInRoom.length > 0" class="fas fa-box-open"></i>
     </div>
   </div>
-  <BuildTileDetailComponent
-    v-if="showDetails"
-    :open="false"
-    :size="size"
-    :items="model.objectsInRoom"
-    @remove="onRemove"
-  />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent } from "vue";
 import { Role } from "@/service/labyrinth/build/BuildMode";
-import { ItemModel, TileModel } from "@/service/labyrinth/build/TileModel";
-import BuildTileDetailComponent from "@/components/build/BuildTileDetailComponent.vue";
+import { TileModel } from "@/service/labyrinth/build/TileModel";
 
 export default defineComponent({
   name: "BuildTileComponent",
-  components: { BuildTileDetailComponent },
   props: {
     size: {
       type: Number,
@@ -63,21 +50,13 @@ export default defineComponent({
       else return "default";
     });
 
-    const showDetails = ref(false);
-    const toggleDetails = () => (showDetails.value = !showDetails.value);
-
     const onClick = () => emit("click", props.model);
     const onEnter = () => emit("enter", props.model);
-
-    const onRemove = (item: ItemModel) => emit("remove", props.model, item);
 
     return {
       selected,
       selectable,
       color,
-      showDetails,
-      toggleDetails,
-      onRemove,
       onClick,
       onEnter,
     };
@@ -134,14 +113,5 @@ export default defineComponent({
       }
     }
   }
-}
-.tile-detail {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  bottom: 100px;
-  margin-top: auto;
-  margin-bottom: auto;
 }
 </style>

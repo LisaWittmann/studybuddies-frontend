@@ -12,19 +12,26 @@
         @remove="onRemove"
       />
     </div>
+    <BuildTileOverviewComponent
+      v-if="showTileOverview"
+      :model="clickedTile"
+      @remove="onRemove"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, ref } from "vue";
 import { useBuildService } from "@/service/labyrinth/build/BuildService";
 import { ItemModel, TileModel } from "@/service/labyrinth/build/TileModel";
 import { Mode } from "@/service/labyrinth/build/BuildMode";
+
 import BuildTileComponent from "@/components/build/BuildTileComponent.vue";
+import BuildTileOverviewComponent from "@/components/build/BuildTileOverviewComponent.vue";
 
 export default defineComponent({
   name: "BuildLabyrinthComponent",
-  components: { BuildTileComponent },
+  components: { BuildTileComponent, BuildTileOverviewComponent },
   props: {
     tileSize: {
       type: Number,
@@ -63,12 +70,17 @@ export default defineComponent({
     const columns = computed(() => buildState.columns);
     const gutter = computed(() => props.mode == Mode.CREATE);
 
+    const clickedTile = ref({} as TileModel);
+    const showTileOverview = computed(() => props.mode == Mode.ITEMS);
+
     function onEnter(model: TileModel) {
       if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTIONS) return;
       if (mousedown) onClick(model);
     }
 
     function onClick(model: TileModel) {
+      console.log("click", model);
+      clickedTile.value = model;
       switch (props.mode) {
         case Mode.CREATE: {
           selectTile(model);
@@ -95,7 +107,17 @@ export default defineComponent({
     const onRemove = (model: TileModel, item: ItemModel) =>
       removeItem(model, item);
 
-    return { rows, columns, gutter, getTileModel, onClick, onEnter, onRemove };
+    return {
+      rows,
+      columns,
+      gutter,
+      clickedTile,
+      showTileOverview,
+      getTileModel,
+      onClick,
+      onEnter,
+      onRemove,
+    };
   },
 });
 </script>
@@ -113,6 +135,16 @@ export default defineComponent({
     flex-wrap: nowrap;
     min-width: 100%;
     height: auto;
+  }
+
+  .tile-overview {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    bottom: 100px;
+    margin-top: auto;
+    margin-bottom: auto;
   }
 }
 </style>
