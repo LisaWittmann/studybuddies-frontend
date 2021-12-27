@@ -1,18 +1,26 @@
 <template>
-  <div class="container">
-    <section>
-      <img class="image--header" :src="header" alt="logo" />
-      <h2>Spiel finden</h2>
-      <div class="column-wrapper">
-        <input class="input--small" type="text" v-model="lobbyKey" />
-        <button class="button--small" @click="joinGame">Spiel beitreten</button>
-      </div>
-    </section>
-    <section>
-      <h2>Spiel erstellen</h2>
-      <button class="button--small" @click="createGame">Spiel erstellen</button>
-    </section>
-  </div>
+  <transition name="fade" appear>
+    <div class="container">
+      <img class="header" :src="header" alt="logo" />
+      <section>
+        <h2>Spiel finden</h2>
+        <div class="column-wrapper">
+          <input class="input--small" type="text" v-model="lobbyKey" />
+          <button class="button--small" @click="joinGame">
+            Spiel beitreten
+          </button>
+        </div>
+      </section>
+      <transition name="delay-fade" appear>
+        <section>
+          <h2>Spiel erstellen</h2>
+          <button class="button--small" @click="createGame">
+            Spiel erstellen
+          </button>
+        </section>
+      </transition>
+    </div>
+  </transition>
 </template>
 
 <script lang="ts">
@@ -27,9 +35,8 @@ export default defineComponent({
     const lobbyKey = ref("");
 
     const header = computed(() => {
-      if (matchMedia("(prefers-color-scheme: dark)").matches) {
+      if (matchMedia("(prefers-color-scheme: dark)").matches)
         return require("@/assets/img/logo_header_dark.png");
-      }
       return require("@/assets/img/logo_header.png");
     });
 
@@ -76,8 +83,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.image--header {
-  width: 80%;
+.header {
+  width: 100%;
   max-width: 600px;
+  padding-top: $spacing-l;
 }
 </style>
