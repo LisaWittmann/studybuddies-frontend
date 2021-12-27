@@ -2,10 +2,8 @@ import { Client } from "@stomp/stompjs";
 import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "../login/LoginStore";
 import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
-import { computed, ref } from "vue";
 
 const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
   useGameStore();
@@ -74,11 +72,8 @@ stompclient.onConnect = () => {
           // NUR TEMPORÄR (Bis nach dem MessageBroker Ticket)
           // Bitte noch nicht sofort ändern!
           // @todo: Ändern!
-          const { loginState } = useLoginStore();
-
           updateGameData().then(() => {
             updateUsers(gameState.lobbyKey);
-            //let index = 0;
             lobbyState.users.forEach((user, index) => {
               setPlayerData(
                 user.username,
