@@ -187,8 +187,8 @@ async function updateUsers(lobbyKey: string) {
     return response.json()
   }).then((response) => {
     lobbyState.users = response;
-    console.log(lobbyState.users);
-    console.log(response);
+    /*     console.log(lobbyState.users);
+    console.log(response); */
     sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
   });
 }

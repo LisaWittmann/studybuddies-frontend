@@ -24,15 +24,27 @@ function setGameState(
   lobbyKey: string | null,
   labyrinthId: string | null,
   labyrinth: string | null,
-  playerMap: string | null,
+  mainPlayer: string | null,
+  partnerPlayer: string | null,
   errormessage: string | null,
   score: string | null
 ) {
   if (lobbyKey) gameState.lobbyKey = lobbyKey;
   if (labyrinthId) gameState.labyrinthId = JSON.parse(labyrinthId) as number;
   if (labyrinth) gameState.labyrinth = JSON.parse(labyrinth) as Labyrinth;
-  if (playerMap)
-    gameState.playerMap = JSON.parse(playerMap) as Map<string, Player>;
+  if (mainPlayer) {
+    const jsonObj: any = JSON.parse(mainPlayer);
+    const mP: MainPlayer = Object.assign(new MainPlayer("", 0), jsonObj);
+
+    console.log("MP:" + mP.constructor.name);
+    gameState.playerMap.set(mP.getUsername(), mP);
+  }
+  if (partnerPlayer) {
+    const jsonObj: any = JSON.parse(partnerPlayer);
+    const pP: PartnerPlayer = Object.assign(new PartnerPlayer("", 0), jsonObj);
+
+    gameState.playerMap.set(pP.getUsername(), pP);
+  }
   if (errormessage) gameState.errormessage = errormessage;
   if (score) gameState.score = JSON.parse(score) as number;
 }
@@ -60,7 +72,7 @@ function updatePlayerData(player: Player, newPosition: number) {
  * @param startTileId : start position of the player at the start of the game
  */
 async function setPlayerData(username: string, startTileId: number) {
-  console.log("Starttileid is: " + startTileId);
+  console.log("Starttileid is: " + startTileId + " Playername is: " + username);
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
     gameState.playerMap.set(username, new MainPlayer(username, startTileId));

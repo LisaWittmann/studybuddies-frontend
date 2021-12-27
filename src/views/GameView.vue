@@ -17,21 +17,20 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onBeforeUnmount, onMounted, ref} from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLobbyService } from "@/service/LobbyService";
 
 import { Orientation } from "@/service/labyrinth/Tile";
 import { MoveOperation } from "@/service/game/EventMessage";
-import { MainPlayer } from "@/service/game/Player";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
 
 import "@/service/game/EventStore";
 import router from "@/router";
+import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 
 export default defineComponent({
   name: "GameView",
@@ -43,73 +42,81 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { gameState, updateGameData, setLobbyKey, setPlayerData, setGameState } = useGameStore();
-    const { updateUsers} = useLobbyService();
-    const { playerMovement, itemSelection, updatePlayerPositions } = useGameService();
+    const { gameState, updateGameData, setLobbyKey, setGameState } =
+      useGameStore();
+    const { playerMovement, itemSelection, updatePlayerPositions } =
+      useGameService();
     const { loginState } = useLoginStore();
-    updateGameData();
-
     const showTerminal = ref(false);
 
-    /*
-    // Users Array -> Wird onMounted gefüllt
-    const users = ref(new Array<string>());
-      */
+    //infos for sessionsStorage to fill GameState onMounted
+    const labyrinthState = computed(() => gameState.labyrinth);
+    const score = computed(() => gameState.score);
+    const errormessage = computed(() => gameState.errormessage);
 
+    let mainPlayer = ref();
+    let partnerPlayer = ref();
 
-    //called before view is closed or reloaded
-    onBeforeUnmount(() => {
-      sessionStorage.setItem("lobbyKey", gameState.lobbyKey);
-      sessionStorage.setItem("labyrinthID", JSON.stringify(gameState.labyrinthId));
-      sessionStorage.setItem("labyrinth", JSON.stringify(gameState.labyrinth));
-      sessionStorage.setItem("playerMap", JSON.stringify(gameState.playerMap));
-      sessionStorage.setItem("errormessage", JSON.stringify(gameState.errormessage));
-      sessionStorage.setItem("score", JSON.stringify(gameState.score));
-    })
+    //adds infos from GameState (filled on READY) to SessionStorage
+    sessionStorage.setItem("labyrinth", JSON.stringify(labyrinthState.value));
+    sessionStorage.setItem("score", JSON.stringify(score.value));
+    sessionStorage.setItem("errormessage", JSON.stringify(errormessage.value));
+    sessionStorage.setItem("initialLoad", JSON.stringify(1));
 
-
-    //called when view is loaded
-    onMounted(async () => {
+    //called when view is loaded or reloaded
+    onMounted(() => {
+      console.log("ON MOUNTED");
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      await updateUsers(gameState.lobbyKey);
-
-
-      if(sessionStorage.getItem("lobbyKey") == gameState.lobbyKey){
-        setGameState(
-          sessionStorage.getItem("lobbyKey"),
-          sessionStorage.getItem("labyrinthID"),
-          sessionStorage.getItem("labyrinth"),
-          sessionStorage.getItem("playerMap"),
-          sessionStorage.getItem("errormessage"),
-          sessionStorage.getItem("score")
-          );
-
-        /* const playerPositions =  await updatePlayerPositions(gameState.lobbyKey);
-          playerPositions.forEach((value, key) => {
-          setPlayerData(key, value);
-        }); */
-      }
-
-      
-
       updateGameData();
 
-    })
-  
-
-    let mainPlayer;
-    let partnerPlayer;
-    gameState.playerMap.forEach((player, key) => {
-      if(key == loginState.username) {
-        mainPlayer = computed(() => player);
+      //fills gameState out of sessionStorage when view is reloaded
+      if (sessionStorage.getItem("mainPlayer") && sessionStorage.getItem("partnerPlayer")) {
+        console.log("recreation out of sessionStorage...");
+        setGameState(
+          sessionStorage.getItem("lobbyKey"),
+          sessionStorage.getItem("selectedLabyrinth"),
+          sessionStorage.getItem("labyrinth"),
+          sessionStorage.getItem("mainPlayer"),
+          sessionStorage.getItem("partnerPlayer"),
+          sessionStorage.getItem("errormessage"),
+          sessionStorage.getItem("score")
+        );
+        createPlayerObjects();
       } else {
-        partnerPlayer = computed(() => player);
+        console.log("recreation not necessary...");
+        createPlayerObjects();
       }
-    })
+    });
 
+    //creates player obects out of gameState
+    function createPlayerObjects() {
+      gameState.playerMap.forEach((player, key) => {
+          if (key == loginState.username) {
+            mainPlayer.value = player;
+            sessionStorage.setItem(
+              "mainPlayer",
+              JSON.stringify(mainPlayer.value)
+            );
+          } else {
+            partnerPlayer.value = player;
+            sessionStorage.setItem(
+              "partnerPlayer",
+              JSON.stringify(partnerPlayer.value)
+            );
+          }
+        });
+    }
 
-
+    function printSessionStorage() {
+      console.log("SESSIONSTORAGE");
+      for (let i = 0; i < sessionStorage.length; i++) {
+        let key = sessionStorage.key(i);
+        if (key) {
+          console.log(key, sessionStorage.getItem(key));
+        }
+      }
+    }
     // in-game messages like warnings, errors, hints ...
     const message =
       "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!";
@@ -126,6 +133,7 @@ export default defineComponent({
      * @param orientation : used in the backend to identify the direction to move the player
      */
     function movePlayer(orientation: Orientation) {
+      console.log(gameState.lobbyKey, loginState.username,);
       playerMovement(
         new MoveOperation(
           gameState.lobbyKey,

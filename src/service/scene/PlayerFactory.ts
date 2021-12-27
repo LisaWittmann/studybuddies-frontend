@@ -11,7 +11,7 @@ const { createPlayer } = useObjectFactory();
  * @param tilePosition: position of tile player should be placed on
  */
 function updateMainPlayer(tilePosition: Vector3) {
-  console.log("updating player position");
+  //console.log("updating player position");
   updateCameraPosition(tilePosition);
 }
 
@@ -26,7 +26,7 @@ function updatePartnerPlayer(
   tilePosition: Vector3,
   scene: Scene
 ) {
-  console.log("updating partner position");
+  //console.log("updating partner position");
   const position = calculatePartnerPositon(tilePosition);
   const playerObject = getPlayer(player.getUsername(), scene);
   if (playerObject) playerObject.position.copy(position);
@@ -56,7 +56,7 @@ function getPlayer(
  * @returns position as three dimensional vector
  */
 function calculatePartnerPositon(tilePosition: Vector3): Vector3 {
-  console.log("calculating partner position");
+  //console.log("calculating partner position");
   return tilePosition;
 }
 
