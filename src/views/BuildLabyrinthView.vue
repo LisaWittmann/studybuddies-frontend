@@ -93,7 +93,6 @@ export default defineComponent({
       updateTileModels,
       setItemOptions,
       hasErrors,
-      convert,
       save,
       reset,
     } = useBuildService();
@@ -149,8 +148,7 @@ export default defineComponent({
       if (rollback) {
         currentMode.value = rollback;
       } else {
-        const labyrinth = convert();
-        save(labyrinth)
+        save()
           .then((id) => {
             feedback.active = true;
             feedback.headline = "Gespeichert";

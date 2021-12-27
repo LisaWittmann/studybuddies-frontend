@@ -1,21 +1,52 @@
 <template>
   <div class="tile-overview">
     <div class="tile-overview__content">
-      <div
-        class="tile-overview__item"
-        v-for="(item, index) of model.objectsInRoom"
-        :key="index"
-      >
-        <img v-if="image(index)" :src="image(index)" />
-        <i class="fas fa-trash" @click="remove(index)"></i>
+      <h1>Details</h1>
+      <div v-if="model.isStart">
+        <h2>Startposition:</h2>
+        <div class="tile-overview__element">
+          <span class="fas fa-map-marker icon-image"></span>
+          <i class="fas fa-trash" @click="removeStartTile(model)"></i>
+        </div>
+      </div>
+      <div v-if="model.isEnd">
+        <h2>Ziel:</h2>
+        <div class="tile-overview__element">
+          <span class="fas fa-map-marker-alt icon-image"></span>
+          <i class="fas fa-trash" @click="removeEndTile(model)"></i>
+        </div>
+      </div>
+      <div v-if="model.restrictions.length > 0">
+        <h2>Rollen:</h2>
+        <div
+          class="tile-overview__element"
+          v-for="(role, index) of model.restrictions"
+          :key="index"
+        >
+          <img :src="roleImage(role)" />
+          <i class="fas fa-trash" @click="removeRestriction(model, role)"></i>
+        </div>
+      </div>
+      <div v-if="model.objectsInRoom.length > 0">
+        <h2>Items:</h2>
+        <div
+          class="tile-overview__element"
+          v-for="(item, index) of model.objectsInRoom"
+          :key="index"
+        >
+          <img :src="itemImage(item)" />
+          <i class="fas fa-trash" @click="removeItem(model, item)"></i>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { ItemModel, TileModel } from "@/service/labyrinth/build/TileModel";
 import { defineComponent } from "vue";
+import { Role } from "@/service/labyrinth/build/BuildMode";
+import { ItemModel, TileModel } from "@/service/labyrinth/build/TileModel";
+import { useBuildService } from "@/service/labyrinth/build/BuildService";
 
 export default defineComponent({
   name: "BuildTileOverviewComponent",
@@ -29,16 +60,35 @@ export default defineComponent({
       default: false,
     },
   },
-  setup(props, { emit }) {
-    const image = (index: number) => {
-      const item = props.model.objectsInRoom[index];
-      if (item instanceof ItemModel) {
-        return require(`@/assets/img/items/${item.modelName.toLowerCase()}.svg`);
-      }
-    };
-    const remove = (item: ItemModel) => emit("remove", item);
+  setup() {
+    const { removeItem, removeRestriction, removeEndTile, removeStartTile } =
+      useBuildService();
 
-    return { image, remove };
+    const itemImage = (item: ItemModel) => {
+      return require(`@/assets/img/items/${item.modelName.toLowerCase()}.svg`);
+    };
+
+    const roleImage = (role: Role) => {
+      let rolename = "";
+      switch (role) {
+        case Role.DESIGNER:
+          rolename = "designer";
+          break;
+        case Role.HACKER:
+          rolename = "hacker";
+          break;
+      }
+      return require(`@/assets/img/roles/${rolename}-role.svg`);
+    };
+
+    return {
+      itemImage,
+      roleImage,
+      removeItem,
+      removeRestriction,
+      removeEndTile,
+      removeStartTile,
+    };
   },
 });
 </script>
@@ -49,6 +99,7 @@ export default defineComponent({
 
   &__content {
     @include flex-center();
+    width: 90px;
     position: relative;
     flex-direction: column;
     border-radius: 0 8px 8px 0;
@@ -58,14 +109,39 @@ export default defineComponent({
     @include color-scheme(dark) {
       background: $color-white;
     }
+
+    > * {
+      width: 80%;
+      text-align: left;
+      hyphens: auto;
+      color: $color-white;
+
+      @include color-scheme(dark) {
+        color: $color-black;
+      }
+    }
+
+    h1 {
+      font-size: $text-l;
+    }
+
+    h2 {
+      font-size: $text-m;
+      font-weight: 300;
+    }
   }
 
-  &__item {
+  &__element {
     @include flex-center();
-    height: 80px;
+    height: 60px;
     width: auto;
     margin: 10px;
     position: relative;
+
+    .icon-image {
+      color: $color-dark-green;
+      font-size: 40px;
+    }
 
     img {
       height: 80%;

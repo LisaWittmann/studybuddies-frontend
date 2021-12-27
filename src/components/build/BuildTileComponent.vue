@@ -50,8 +50,8 @@ export default defineComponent({
       else return "default";
     });
 
-    const onClick = () => emit("click", props.model);
-    const onEnter = () => emit("enter", props.model);
+    const onClick = () => emit("clicked", props.model);
+    const onEnter = () => emit("entered", props.model);
 
     return {
       selected,

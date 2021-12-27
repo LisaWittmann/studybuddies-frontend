@@ -140,67 +140,97 @@ function selectTile(model: TileModel): void {
 }
 
 /**
- * add given tile to starttiles or remove it if tile is already marked as start
- * @param model tilemodel to set or unset as a starting position
+ * add given tile to starttiles
+ * @param model tilemodel to set as a starting position
  */
-function setStartTile(model: TileModel): void {
-  if (!model.relationKey || model.isEnd || model.restrictions.length > 0)
+function addStartTile(model: TileModel): void {
+  if (
+    !model.relationKey ||
+    model.isEnd ||
+    model.isStart ||
+    model.restrictions.length > 0
+  )
     return;
-  if (model.isStart) {
-    model.isStart = false;
-    buildState.startPositions = buildState.startPositions.filter(
-      (key) => key != model.relationKey
-    );
-  } else {
-    if (buildState.startPositions.length < 2) {
-      buildState.startPositions.push(model.relationKey);
-      model.isStart = true;
-    }
+  if (buildState.startPositions.length < 2) {
+    buildState.startPositions.push(model.relationKey);
+    model.isStart = true;
   }
 }
 
 /**
- * set given tile as endtile or reset endtile state if tile is already marked as end
- * @param model tilemodel to set or unset as endtile
+ * remove given tile from starttiles
+ * @param model tilemodel to reset as a starting postion
  */
-function setEndTile(model: TileModel): void {
+function removeStartTile(model: TileModel) {
+  model.isStart = false;
+  buildState.startPositions = buildState.startPositions.filter(
+    (key) => key != model.relationKey
+  );
+}
+
+/**
+ * set given tile as endtile
+ * @param model tilemodel to set as endtile
+ */
+function addEndTile(model: TileModel): void {
   if (!model.relationKey || model.isStart || model.restrictions.length > 0)
     return;
-  if (model.isEnd) {
-    buildState.endposition = 0;
-    model.isEnd = false;
-  } else {
-    if (!buildState.endposition) {
-      buildState.endposition = model.relationKey;
-      model.isEnd = true;
-    }
+  if (!buildState.endposition) {
+    buildState.endposition = model.relationKey;
+    model.isEnd = true;
   }
+}
+
+/**
+ * reset endtile state if tile is already marked as end
+ * @param model tilemodel to reset as endtile
+ */
+function removeEndTile(model: TileModel): void {
+  if (!model.isEnd) return;
+  buildState.endposition = 0;
+  model.isEnd = false;
 }
 
 /**
  * set restriction on tilemodel for given role
- * @param model: tilemodel to add or remove restriction for role
- * @param role: role that will be restricted or tolerated for tile
+ * @param model: tilemodel to add  restriction for role
+ * @param role: role that will be restricted for tile
  */
-function setRestriction(model: TileModel, role: Role): void {
+function addRestriction(model: TileModel, role: Role): void {
   if (!model.relationKey || model.isEnd || model.isStart) return;
-  if (model.restrictions?.includes(role)) {
-    model.restrictions = model.restrictions?.filter(
-      (element) => element != role
-    );
-  } else {
+  if (!model.restrictions?.includes(role)) {
     model.restrictions?.push(role);
   }
 }
 
-function setItem(model: TileModel, item: ItemModel): void {
-  if (!model.relationKey || model.objectsInRoom.length >= maxItems || !item) return;
+/**
+ * reset restricion on tilemodel for given role
+ * @param model: tilemodel to remove restriction for role
+ * @param role: role that will be tolerated again for tile
+ */
+function removeRestriction(model: TileModel, role: Role): void {
+  model.restrictions = model.restrictions?.filter((element) => element != role);
+}
+
+/**
+ * add itemmodel to tilemodels objectsInRoom
+ * @param model: tilemodel to add item to
+ * @param item: itemmodel to add
+ */
+function addItem(model: TileModel, item: ItemModel): void {
+  if (!model.relationKey || model.objectsInRoom.length >= maxItems || !item)
+    return;
   model.objectsInRoom.push(item);
   buildState.itemOptions = buildState.itemOptions.filter(
     (i) => i.modelName != item.modelName
   );
 }
 
+/**
+ * remove itemmodel from tilemodels objectsInRoom
+ * @param model: tilemodel to remove item from
+ * @param item: itemmodel to remove
+ */
 function removeItem(model: TileModel, item: ItemModel): void {
   if (!model.relationKey) return;
   model.objectsInRoom = model.objectsInRoom.filter(
@@ -266,10 +296,11 @@ function parseLabyrinth(labyrinth: Labyrinth): string {
 }
 
 /**
- * save labyrinth by API call and return id of saved labyrinth
- * @param labyrinth labyrinth to save
+ * convert labyrinth abd save by API call
+ * return promise with id of saved labyrinth
  */
-async function save(labyrinth: Labyrinth): Promise<number> {
+async function save(): Promise<number> {
+  const labyrinth = convert();
   return fetch("/api/labyrinth/save", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -292,13 +323,15 @@ export function useBuildService() {
     setItemOptions,
     getTileModel,
     selectTile,
-    setStartTile,
-    setEndTile,
-    setRestriction,
-    setItem,
+    addStartTile,
+    removeStartTile,
+    addEndTile,
+    removeEndTile,
+    addRestriction,
+    removeRestriction,
+    addItem,
     removeItem,
     hasErrors,
-    convert,
     save,
     reset,
   };

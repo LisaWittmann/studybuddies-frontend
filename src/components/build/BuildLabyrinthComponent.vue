@@ -7,16 +7,11 @@
         :size="tileSize"
         :gutter="gutter"
         :model="getTileModel(column, row)"
-        @click="onClick"
-        @enter="onEnter"
-        @remove="onRemove"
+        @clicked="onClick"
+        @entered="onEnter"
       />
     </div>
-    <BuildTileOverviewComponent
-      v-if="showTileOverview"
-      :model="clickedTile"
-      @remove="onRemove"
-    />
+    <BuildTileOverviewComponent v-if="showTileOverview" :model="clickedTile" />
   </div>
 </template>
 
@@ -54,11 +49,11 @@ export default defineComponent({
     const {
       buildState,
       getTileModel,
-      setStartTile,
-      setEndTile,
+      addStartTile,
+      addEndTile,
       selectTile,
-      setRestriction,
-      setItem,
+      addRestriction,
+      addItem,
       removeItem,
     } = useBuildService();
 
@@ -71,7 +66,12 @@ export default defineComponent({
     const gutter = computed(() => props.mode == Mode.CREATE);
 
     const clickedTile = ref({} as TileModel);
-    const showTileOverview = computed(() => props.mode == Mode.ITEMS);
+    const showTileOverview = computed(
+      () =>
+        clickedTile.value.objectsInRoom != undefined &&
+        clickedTile.value.restrictions != undefined &&
+        clickedTile.value.hasChanges()
+    );
 
     function onEnter(model: TileModel) {
       if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTIONS) return;
@@ -87,25 +87,23 @@ export default defineComponent({
           break;
         }
         case Mode.START: {
-          setStartTile(model);
+          addStartTile(model);
           break;
         }
         case Mode.END: {
-          setEndTile(model);
+          addEndTile(model);
           break;
         }
         case Mode.RESTRICTIONS: {
-          setRestriction(model, props.role);
+          addRestriction(model, props.role);
           break;
         }
         case Mode.ITEMS: {
-          setItem(model, props.item);
+          addItem(model, props.item);
+          break;
         }
       }
     }
-
-    const onRemove = (model: TileModel, item: ItemModel) =>
-      removeItem(model, item);
 
     return {
       rows,
@@ -116,7 +114,6 @@ export default defineComponent({
       getTileModel,
       onClick,
       onEnter,
-      onRemove,
     };
   },
 });

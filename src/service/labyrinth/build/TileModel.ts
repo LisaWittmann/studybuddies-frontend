@@ -1,6 +1,6 @@
 import { Orientation } from "@/service/labyrinth/Tile";
-import { Item } from "@/service/labyrinth/Item";
 import { Role } from "@/service/labyrinth/build/BuildMode";
+import { setTransitionHooks } from "vue";
 
 /**
  * two dimensional vector
@@ -66,6 +66,15 @@ export class TileModel {
 
   hasPosition(x: number, y: number): boolean {
     return this.position.x == x && this.position.y == y;
+  }
+
+  hasChanges(): boolean {
+    return (
+      this.restrictions.length > 0 ||
+      this.objectsInRoom.length > 0 ||
+      this.isEnd ||
+      this.isStart
+    );
   }
 
   getNeighbor(orientation: Orientation): Vector2 {
