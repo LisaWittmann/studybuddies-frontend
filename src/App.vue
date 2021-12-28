@@ -9,7 +9,6 @@ export default defineComponent({
   setup() {
     const { loginState, fetchSessionStorage } = useLoginStore();
     fetchSessionStorage();
-    console.log(loginState);
   },
 });
 </script>
