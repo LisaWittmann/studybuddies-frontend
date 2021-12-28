@@ -1,5 +1,5 @@
-import { MoveOperation } from "@/service/game/EventMessage";
-import { Message, Response } from "@/service/game/Conversation";
+import { MoveOperation, Operation } from "@/service/game/EventMessage";
+import { Message } from "@/service/game/Conversation";
 import { reactive } from "vue";
 
 // in-game messages like warnings, errors, hints ...
@@ -57,17 +57,24 @@ async function playerMovement(moveOperation: MoveOperation) {
     });
 }
 
-// send the clicked item id to backend
-async function selectItem(itemId: number) {
-  fetch("/api/click/" + itemId, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(itemId),
-  }).catch((error) => {
-    console.error(error);
-  });
+async function clickItem(modelName: string) {
+  fetch("/api/body/click/" + modelName, { method: "GET" })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      const operation = (<any>Operation)[jsonData];
+      console.log(operation);
+      switch (operation) {
+        case Operation.CONVERSATION:
+          startConversation(modelName);
+          break;
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 }
 
 export function useGameService() {
@@ -75,7 +82,7 @@ export function useGameService() {
     eventMessage,
     toggleEventMessage,
     playerMovement,
-    selectItem,
+    clickItem,
     conversation,
     startConversation,
     getConversationMessage,

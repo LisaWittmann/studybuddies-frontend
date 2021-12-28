@@ -2,7 +2,7 @@
   <SceneComponent
     :labyrinth="labyrinth"
     :player="mainPlayer"
-    @click-object="selectItem"
+    @click-object="clickItem"
     @move-player="movePlayer"
     @click-disabled="toggleEventMessage"
   />
@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
+import { defineComponent } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
@@ -54,9 +54,8 @@ export default defineComponent({
       eventMessage,
       toggleEventMessage,
       playerMovement,
-      selectItem,
+      clickItem,
       conversation,
-      startConversation,
       getConversationMessage,
     } = useGameService();
     updateGame();
@@ -89,13 +88,9 @@ export default defineComponent({
       );
     }
 
-    onMounted(() => {
-      startConversation("tupel");
-    });
-
     return {
       movePlayer,
-      selectItem,
+      clickItem,
       toggleEventMessage,
       getConversationMessage,
       mainPlayer,

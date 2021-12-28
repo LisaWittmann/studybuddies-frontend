@@ -14,9 +14,13 @@ export interface EventMessage {
 
 export enum Operation {
   MOVEMENT,
-  CLICK,
-  TRADE,
   CHAT,
+  TRADE,
+  CLICK,
+  READY,
+  CONVERSATION,
+  COLLECT,
+  ACCESS,
 }
 
 /**
