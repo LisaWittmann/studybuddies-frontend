@@ -1,17 +1,25 @@
 <template>
   <transition name="fade" appear>
     <div class="container">
-      <img class="header" :src="header" alt="logo" />
       <section>
+        <img
+          class="image--header"
+          src="@/assets/img/logo_header.png"
+          alt="logo"
+        />
         <h2>Spiel finden</h2>
         <div class="column-wrapper">
-          <input class="input--small" type="text" v-model="lobbyKey" />
+          <input
+            class="input--small uppercase"
+            type="text"
+            v-model="lobbyKey"
+          />
           <button class="button--small" @click="joinGame">
             Spiel beitreten
           </button>
         </div>
       </section>
-      <transition name="delay-fade" appear>
+      <transition name="delay-fade">
         <section>
           <h2>Spiel erstellen</h2>
           <button class="button--small" @click="createGame">
