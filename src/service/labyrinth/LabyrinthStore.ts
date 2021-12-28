@@ -1,8 +1,7 @@
 import { reactive } from "vue";
 import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
-import { Item } from "./Item";
-import { Vector3 } from "three";
+import { Item, Position } from "@/service/labyrinth/Item";
 
 /**
  * constant to keep the tiles or store an errormessage
@@ -34,18 +33,24 @@ async function updateLabyrinth(labyrinthId: number) {
       );
 
       //iterate over the tiles in the jsondata tileMap to create tiles for every tile in jsonobject
-      for (const key in jsonData.tileMap) {
-        const tile = jsonData.tileMap[key];
-        const id = parseInt(key);
+      for (const tileKey in jsonData.tileMap) {
+        const tile = jsonData.tileMap[tileKey];
+        const id = parseInt(tileKey);
         const objectsInRoom = new Array<Item>();
-        for (const item of tile.objectsInRoom) {
+
+        for (const itemKey in tile.objectsInRoom) {
+          const item = tile.objectsInRoom[itemKey];
+          const orientations = new Array<Orientation>();
+
+          for (const orientation of item.orientations) {
+            orientations.push((<any>Orientation)[orientation]);
+          }
           objectsInRoom.push(
             new Item(
               item.id,
               item.modelName,
-              item.positionInRoom,
-              item.orientations,
-              new Vector3()
+              (<any>Position)[item.positionInRoom],
+              orientations
             )
           );
         }

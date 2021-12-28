@@ -1,6 +1,7 @@
-import { reactive, computed, readonly } from "vue";
+import { reactive, computed } from "vue";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Tile } from "@/service/labyrinth/Tile";
+import { Item } from "@/service/labyrinth/Item";
 import { Mode, Role } from "@/service/labyrinth/build/BuildMode";
 import {
   ItemModel,
@@ -91,7 +92,7 @@ function updateTileModels(): void {
   }
   for (const model of buildState.tileModels) {
     for (const [key, value] of model.tileRelationMap) {
-      const position = model.getNeighbor(key);
+      const position = model.getNeighborPosition(key);
       if (!value) {
         model.tileRelationMap.set(key, getTileModel(position.x, position.y));
       }
@@ -262,11 +263,28 @@ function convert(): Labyrinth {
     buildState.startPositions
   );
 
-  for (const model of selectedTiles.value) {
-    const key = model.relationKey as number;
+  for (const tilemodel of selectedTiles.value) {
+    const key = tilemodel.relationKey as number;
     const tile = new Tile(key, []);
-    for (const [orientation, neighbor] of model.tileRelationMap) {
+    for (const [orientation, neighbor] of tilemodel.tileRelationMap) {
       tile.tileRelationMap.set(orientation, neighbor?.relationKey);
+    }
+    tilemodel.setPlacements();
+    for (const itemmodel of tilemodel.objectsInRoom) {
+      const orientations =
+        tilemodel.placements[
+          Math.floor(Math.random() * tilemodel.placements.length)
+        ];
+      itemmodel.orientations = orientations;
+      tilemodel.removePlacement(orientations);
+      tile.objectsInRoom.push(
+        new Item(
+          0,
+          itemmodel.modelName,
+          itemmodel.positionInRoom,
+          itemmodel.orientations
+        )
+      );
     }
     labyrinth.tileMap.set(key, tile);
   }
@@ -284,7 +302,7 @@ function parseLabyrinth(labyrinth: Labyrinth): string {
   for (const [key, tile] of labyrinth.tileMap) {
     tileMapJson.set(key, {
       tileId: tile.tileId,
-      objectsInRoom: tile.objectsInRoom,
+      objectsInRoom: tile.objectsInRoom.map((item) => item.toJsonObject()),
       tileRelationMap: Object.fromEntries(tile.tileRelationMap),
     });
   }
@@ -317,7 +335,7 @@ async function save(): Promise<number> {
 
 export function useBuildService() {
   return {
-    buildState: readonly(buildState),
+    buildState,
     updateTileModels,
     setDimension,
     setItemOptions,

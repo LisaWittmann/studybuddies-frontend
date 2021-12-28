@@ -1,6 +1,6 @@
 import { Orientation } from "@/service/labyrinth/Tile";
 import { Role } from "@/service/labyrinth/build/BuildMode";
-import { setTransitionHooks } from "vue";
+import { Position } from "@/service/labyrinth/Item";
 
 /**
  * two dimensional vector
@@ -45,6 +45,7 @@ export class TileModel {
   tileRelationMap: Map<Orientation, TileModel | undefined>;
   objectsInRoom: Array<ItemModel>;
   restrictions: Array<Role>;
+  placements: Array<Array<Orientation>>;
 
   constructor(position: Vector2) {
     this.position = position;
@@ -60,6 +61,7 @@ export class TileModel {
     this.tileRelationMap.set(Orientation.SOUTH, undefined);
     this.tileRelationMap.set(Orientation.WEST, undefined);
 
+    this.placements = new Array<Array<Orientation>>();
     this.objectsInRoom = new Array<ItemModel>();
     this.restrictions = new Array<Role>();
   }
@@ -77,7 +79,7 @@ export class TileModel {
     );
   }
 
-  getNeighbor(orientation: Orientation): Vector2 {
+  getNeighborPosition(orientation: Orientation): Vector2 {
     switch (orientation) {
       case Orientation.NORTH:
         return this.position.getNorth();
@@ -89,12 +91,32 @@ export class TileModel {
         return this.position.getWest();
     }
   }
+
+  setPlacements(): void {
+    this.placements.push(
+      [Orientation.NORTH, Orientation.EAST],
+      [Orientation.EAST, Orientation.SOUTH],
+      [Orientation.SOUTH, Orientation.WEST],
+      [Orientation.WEST, Orientation.NORTH]
+    );
+    for (const [orientation, relationKey] of this.tileRelationMap) {
+      if (!relationKey) this.placements.push([orientation]);
+    }
+  }
+
+  removePlacement(placement: Array<Orientation>): void {
+    this.placements = this.placements.filter((p) => p != placement);
+  }
 }
 
 export class ItemModel {
   modelName: string;
+  positionInRoom: Position;
+  orientations: Array<Orientation>;
 
   constructor(modelName: string) {
     this.modelName = modelName;
+    this.positionInRoom = Position.FLOOR;
+    this.orientations = new Array<Orientation>();
   }
 }

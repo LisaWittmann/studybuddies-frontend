@@ -26,7 +26,10 @@ import BuildTileOverviewComponent from "@/components/build/BuildTileOverviewComp
 
 export default defineComponent({
   name: "BuildLabyrinthComponent",
-  components: { BuildTileComponent, BuildTileOverviewComponent },
+  components: {
+    BuildTileComponent,
+    BuildTileOverviewComponent,
+  },
   props: {
     tileSize: {
       type: Number,
@@ -54,7 +57,6 @@ export default defineComponent({
       selectTile,
       addRestriction,
       addItem,
-      removeItem,
     } = useBuildService();
 
     let mousedown = false;
@@ -79,7 +81,6 @@ export default defineComponent({
     }
 
     function onClick(model: TileModel) {
-      console.log("click", model);
       clickedTile.value = model;
       switch (props.mode) {
         case Mode.CREATE: {

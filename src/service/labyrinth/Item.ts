@@ -26,21 +26,20 @@ export class Item {
   id: number;
   modelName: string;
   positionInRoom: Position;
-  orientations: Array<string>;
+  orientations: Array<Orientation>;
   calcPosition: Vector3;
 
   constructor(
     id: number,
     modelName: string,
-    positionInRoom: string,
-    orientations: Array<string>,
-    calcPosition: Vector3
+    positionInRoom: Position,
+    orientations: Array<Orientation>
   ) {
     this.id = id;
     this.modelName = modelName;
-    this.positionInRoom = (<any>Position)[positionInRoom]; //convert string from JSON to Enum
+    this.positionInRoom = positionInRoom;
     this.orientations = orientations;
-    this.calcPosition = calcPosition;
+    this.calcPosition = new Vector3();
   }
 
   /**
@@ -63,12 +62,10 @@ export class Item {
 
     //calculation for object positioning
     //set horizontal position
-    this.orientations.forEach((o) => {
+    this.orientations.forEach((orientation) => {
       //cast string from array to enum for simple use of enum in switch
-      const eO: Orientation = (<any>Orientation)[o];
       const directionVector = new Vector3();
-
-      switch (eO) {
+      switch (orientation) {
         case Orientation.NORTH:
           directionVector.copy(direction.north);
           this.calcPosition = this.calcPosition.add(directionVector);
@@ -101,9 +98,8 @@ export class Item {
    */
   rotationY = (): number => {
     let viewdirection = 0;
-    this.orientations.forEach((o) => {
-      const eO: Orientation = (<any>Orientation)[o];
-      switch (eO) {
+    this.orientations.forEach((orientation) => {
+      switch (orientation) {
         case Orientation.NORTH:
           viewdirection += 0;
           break;
@@ -125,4 +121,42 @@ export class Item {
     }
     return radians(viewdirection);
   };
+
+  toJsonObject() {
+    const orientationsString = new Array<string>();
+    for (const orientation of this.orientations) {
+      switch (orientation) {
+        case Orientation.NORTH:
+          orientationsString.push("NORTH");
+          break;
+        case Orientation.SOUTH:
+          orientationsString.push("SOUTH");
+          break;
+        case Orientation.WEST:
+          orientationsString.push("WEST");
+          break;
+        case Orientation.EAST:
+          orientationsString.push("EAST");
+          break;
+      }
+    }
+    let position = "";
+    switch (this.positionInRoom) {
+      case Position.FLOOR:
+        position = "FLOOR";
+        break;
+      case Position.CEILING:
+        position = "CEILING";
+        break;
+      case Position.WALL:
+        position = "WALL";
+        break;
+    }
+    return {
+      id: this.id,
+      modelName: this.modelName,
+      positionInRoom: position,
+      orientations: orientationsString,
+    };
+  }
 }

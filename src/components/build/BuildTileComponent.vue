@@ -1,5 +1,9 @@
 <template>
-  <div class="tile-canvas" :style="{ width: `${size}px` }">
+  <div
+    class="tile-canvas"
+    :style="{ width: `${size}px` }"
+    :class="{ items: model.objectsInRoom.length > 0 }"
+  >
     <div
       class="tile-canvas__inner"
       :class="[
@@ -13,7 +17,6 @@
     >
       <i v-if="model.isStart" class="fas fa-map-marker"></i>
       <i v-if="model.isEnd" class="fas fa-map-marker-alt"></i>
-      <i v-if="model.objectsInRoom.length > 0" class="fas fa-box-open"></i>
     </div>
   </div>
 </template>
@@ -69,6 +72,10 @@ export default defineComponent({
   height: auto;
   border: 1px solid $color-grey;
   position: relative;
+
+  &.items {
+    border: 1px solid red;
+  }
 
   &__inner {
     @include flex-center();
