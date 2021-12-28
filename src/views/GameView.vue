@@ -2,6 +2,7 @@
   <SceneComponent
     :labyrinth="labyrinth"
     :player="mainPlayer"
+    :partner="partnerPlayer"
     @click-object="itemSelection"
     @move-player="movePlayer"
     @click-disabled="toggleTerminal"
@@ -22,14 +23,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
+import { computed, defineComponent, reactive } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 
 import { Orientation } from "@/service/labyrinth/Tile";
 import { MoveOperation } from "@/service/game/EventMessage";
-import { MainPlayer } from "@/service/game/Player";
 import { Message, Response } from "@/service/game/Conversation";
 
 import SceneComponent from "@/components/SceneComponent.vue";
@@ -49,12 +49,33 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { gameState, updateGame } = useGameStore();
+    const { gameState, updateGameData } = useGameStore();
     const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();
-    updateGame();
+    updateGameData();
 
-    const mainPlayer = gameState.playerMap.get(loginState.username);
+    /*
+    // Users Array -> Wird onMounted gefüllt
+    const users = ref(new Array<string>());
+    
+
+    onMounted(async () => {
+      const route = router.currentRoute.value;
+      setLobbyKey(route.params.key as string);
+      await updateUsers(gameState.lobbyKey);
+      updateGameData();
+    })
+    */
+
+    let mainPlayer;
+    let partnerPlayer;
+    gameState.playerMap.forEach((player, key) => {
+      if (key == loginState.username) {
+        mainPlayer = computed(() => player);
+      } else {
+        partnerPlayer = computed(() => player);
+      }
+    });
 
     // in-game messages like warnings, errors, hints ...
     const eventMessage = reactive({
@@ -79,29 +100,18 @@ export default defineComponent({
       visible: true,
     });
 
-    //TODO: remove this temporary operation after showing GameView with key in URL
-    let temporaryCode: string;
-
-    fetch("/api/lobby/random", {
-      method: "GET",
-      headers: {
-        "Content-Type": "html/text;charset=utf-8",
-      },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        temporaryCode = json.key;
-      });
-
     const toggleTerminal = () => (eventMessage.visible = !eventMessage.visible);
 
+    /**
+     * function which is used when clicking the arrow in Interface
+     * By recieving the Orientation it creats a MoveOperation to send it to the BE via GameService Methode
+     * @param orientation : used in the backend to identify the direction to move the player
+     */
     function movePlayer(orientation: Orientation) {
       playerMovement(
         new MoveOperation(
-          temporaryCode,
-          (mainPlayer as MainPlayer).username,
+          gameState.lobbyKey,
+          loginState.username,
           Orientation[orientation].toString()
         )
       );
@@ -123,6 +133,8 @@ export default defineComponent({
       conversation,
       eventMessage,
       gameState,
+      partnerPlayer,
+      labyrinth: gameState.labyrinth,
     };
   },
 });

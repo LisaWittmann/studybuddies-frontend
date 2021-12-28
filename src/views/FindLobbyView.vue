@@ -8,7 +8,7 @@
       />
       <h2>Spiel finden</h2>
       <div class="column-wrapper">
-        <input class="input--small" type="text" v-model="lobbyKey" />
+        <input class="input--small uppercase" type="text" v-model="lobbyKey" />
         <button class="button--small" @click="joinGame">Spiel beitreten</button>
       </div>
     </section>
@@ -48,7 +48,6 @@ export default defineComponent({
     }
 
     function createGame() {
-      console.log(loginState.username);
       fetch("/api/lobby/create", {
         method: "POST",
         headers: {
