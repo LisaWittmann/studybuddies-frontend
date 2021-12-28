@@ -7,7 +7,7 @@
       </div>
       <div class="terminal__content">
         {{ username }}@mi ~ %
-        <span :class="`state--${state}`">{{ message }}</span>
+        <span :class="`terminal__content--${state}`">{{ message }}</span>
       </div>
     </div>
   </OverlayComponent>
@@ -70,7 +70,6 @@ export default defineComponent({
       pointer-events: all;
       position: absolute;
       color: $color-black;
-      cursor: pointer;
       margin: 5px;
       left: 0;
       top: 0;
@@ -98,16 +97,14 @@ export default defineComponent({
       font-family: $font-inconsolata;
     }
 
-    .state {
-      &--neutral {
-        color: $color-white;
-      }
-      &--warning {
-        color: orange;
-      }
-      &--error {
-        color: red;
-      }
+    &--neutral {
+      color: $color-white;
+    }
+    &--warning {
+      color: orange;
+    }
+    &--error {
+      color: red;
     }
   }
 }
