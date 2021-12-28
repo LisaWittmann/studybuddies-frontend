@@ -30,7 +30,10 @@
       <section>
         <div class="column-wrapper">
           <transition name="fade" appear>
-            <button class="button__confirm button--small" @click="readyCheck">
+            <button
+              class="button__confirm button--small"
+              @click="readyCheck(username)"
+            >
               Bereit
             </button>
           </transition>

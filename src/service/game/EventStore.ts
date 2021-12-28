@@ -2,13 +2,9 @@ import { Client } from "@stomp/stompjs";
 import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "../login/LoginStore";
 import { useLobbyService } from "@/service/LobbyService";
-import router from "@/router";
-import { ref } from "vue";
 
-const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
-  useGameStore();
+const { gameState, updatePlayerData, setError } = useGameStore();
 const {
   updateUsers,
   setupGame,
@@ -108,8 +104,7 @@ stompclient.onConnect = () => {
               break;
             default:
               console.info(
-                "No List was updated with Data: " +
-                eventMessage.data
+                "No List was updated with Data: " + eventMessage.data
               );
               break;
           }

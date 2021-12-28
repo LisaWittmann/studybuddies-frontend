@@ -264,14 +264,12 @@ function setLabyrinthSelection(selectedLabyrinth: number) {
  * sends a List of two Arguments to the BE, so there can be checked, whether every Player is ready or not
  * (and reacts to a wrong respond after recieving it)
  * @param username: name of the user in the backend, which shall be taken out of the lobby
- * @param labId : id of the blueprint labyrinth, used for the Game Progression
  */
-function readyCheck(username: string, labId: number) {
+function readyCheck(username: string) {
   const { gameState } = useGameStore();
   const args: string[] = [];
   args.push(username);
-  args.push(String(labId));
-  console.log("gameState vor ready finish");
+  args.push(String(gameState.labyrinthId));
   console.log(gameState);
 
   fetch(`/api/lobby/ready/${gameState.lobbyKey}`, {

@@ -142,7 +142,7 @@ function getIntersections(
   for (const intersection of intersects) {
     const object = intersection.object;
     // if parent object is a 'valid' object (no tile)
-    if (object.parent?.userData.modelName != null) {
+    if (object.parent?.userData.id != null) {
       // mock disabled objects
       if (object.parent.userData.modelName == "COMPUTER") {
         context.emit("click-disabled");
