@@ -7,7 +7,7 @@
         :key="index"
       >
         <span>{{ username }}</span>
-        <span class="status">connected</span>
+        <span class="user-list__status">connected</span>
       </div>
     </div>
   </div>

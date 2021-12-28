@@ -14,7 +14,7 @@
   <section>
     <p>
       <router-link to="/register">Jetzt registrieren</router-link> /
-      <router-link to="/">Jetzt anmelden</router-link>
+      <router-link to="/login">Jetzt anmelden</router-link>
     </p>
   </section>
   <section>

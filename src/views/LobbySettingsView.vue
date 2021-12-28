@@ -1,48 +1,58 @@
 <template>
-  <div class="container">
-    <h1>Lobby
-      <span class="uppercase"> {{ lobbyKey }}</span>
-    </h1>
-    <section>
-      <UserListComponent :users="users" />
-    </section>
-    <section>
-      <h2>Rolle auswählen:</h2>
-      <div class="roles">
-        <span v-if="selected">{{ selected }}</span>
-      </div>
-      <RadioButtonGroupComponent
-        :options="roles"
-        v-model="selected"
-        @clicked="selectRole"
-        :selectable="roleOptions"
-      />
-    </section>
-    <section>
-      <h2>Labyrinth auswählen:</h2>
-      <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
-    </section>
-    <section>
-      <div class="column-wrapper">
-        <button
-          class="button--small button--filled"
-          @click="readyCheck(loginState.username, selectedLabyrinth)"
-        >
-          Bereit
-        </button>
-        <button
-          class="button button--small button--exit"
-          @click="exitLobby(lobbyKey, loginState.username)"
-        >
-          Verlassen
-        </button>
-      </div>
-    </section>
-  </div>
+  <transition name="fade" appear>
+    <div class="container">
+      <h1>
+        Lobby
+        <span class="uppercase"> {{ lobbyKey }}</span>
+      </h1>
+      <section>
+        <UserListComponent :users="users" />
+      </section>
+      <section>
+        <h2>Rolle auswählen:</h2>
+        <div class="roles">
+          <span v-if="selected">{{ selected }}</span>
+        </div>
+        <RadioButtonGroupComponent
+          :options="roles"
+          v-model="selected"
+          @clicked="selectRole"
+          :selectable="roleOptions"
+        />
+      </section>
+      <section>
+        <h2>Labyrinth auswählen:</h2>
+        <DropdownComponent
+          :items="labyrinthOptions"
+          @select="selectLabyrinth"
+        />
+      </section>
+      <section>
+        <div class="column-wrapper">
+          <transition name="fade" appear>
+            <button
+              class="button--small button__confirm"
+              @click="readyCheck(loginState.username, selectedLabyrinth)"
+            >
+              Bereit
+            </button>
+          </transition>
+          <transition name="delay-fade" appear>
+            <button
+              class="button button--small button__exit"
+              @click="exitLobby(lobbyKey, loginState.username)"
+            >
+              Verlassen
+            </button>
+          </transition>
+        </div>
+      </section>
+    </div>
+  </transition>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref} from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
@@ -83,28 +93,27 @@ export default defineComponent({
     const openRoles = computed(() => lobbyState.openRoles);
     let selectedRole = computed(() => lobbyState.selectedRole);
 
-
     function selectLabyrinth(id: number) {
       sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
       updateLabyrinthPick(id, gameState.lobbyKey);
     }
 
     function selectRole(name: string) {
-      sessionStorage.setItem("chosenRole", JSON.stringify(name))
+      sessionStorage.setItem("chosenRole", JSON.stringify(name));
       updateRole(name, gameState.lobbyKey, loginState.username);
     }
 
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      if(sessionStorage.getItem("lobbyKey") == gameState.lobbyKey) {
+      if (sessionStorage.getItem("lobbyKey") == gameState.lobbyKey) {
         setLobbyState(
           sessionStorage.getItem("users"),
           sessionStorage.getItem("selectedLabyrinth"),
           sessionStorage.getItem("labyrinthOptions"),
           sessionStorage.getItem("errormessage"),
-          sessionStorage.getItem("chosenRole"),
-          );
+          sessionStorage.getItem("chosenRole")
+        );
       } else {
         sessionStorage.setItem("lobbyKey", gameState.lobbyKey);
       }
@@ -134,38 +143,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 h1 {
-  margin: $spacing-l 0;
+  padding-top: $spacing-l;
+  margin-top: 0;
 
   span {
     font-weight: inherit;
   }
-}
-
-.button {
-  &--upload {
-    min-height: 0;
-
-    &:hover {
-      color: $color-beige;
-    }
-  }
-
-  &--exit {
-    &:hover,
-    &:active {
-      color: darkred;
-    }
-  }
-
-  &--confirm {
-    &:hover,
-    &:active {
-      color: $color-green;
-    }
-  }
-}
-
-input[type="file"] {
-  display: none;
 }
 </style>
