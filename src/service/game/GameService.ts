@@ -58,6 +58,7 @@ async function playerMovement(moveOperation: MoveOperation) {
 }
 
 async function clickItem(modelName: string) {
+  console.log("click", modelName);
   fetch("/api/body/click/" + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);

@@ -31,16 +31,16 @@
         <div class="column-wrapper">
           <transition name="fade" appear>
             <button
-              class="button__confirm button--small"
-              @click="readyCheck(username)"
+              class="button--small button__confirm"
+              @click="readyCheck(loginState.username, selectedLabyrinth)"
             >
               Bereit
             </button>
           </transition>
-          <transition name="delay-fade" appear>
+          <transition name="fade-delay">
             <button
-              class="button__exit button--small"
-              @click="exitLobby(lobbyKey, username)"
+              class="button--small button__exit"
+              @click="exitLobby(lobbyKey, loginState.username)"
             >
               Verlassen
             </button>
