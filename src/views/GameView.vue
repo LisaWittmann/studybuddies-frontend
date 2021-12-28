@@ -1,8 +1,12 @@
 <template>
-  <SceneComponent :labyrinth="labyrinth" :player="mainPlayer" <<<<<<< HEAD
-  @click-object="clickItem" ======= :partner="partnerPlayer"
-  @click-object="itemSelection" >>>>>>> 87796dc7c07fc8470cd624f024d776351c4afcbb
-  @move-player="movePlayer" @click-disabled="toggleEventMessage" />
+  <SceneComponent
+    :labyrinth="labyrinth"
+    :player="mainPlayer"
+    :partner="partnerPlayer"
+    @click-object="clickItem"
+    @move-player="movePlayer"
+    @click-disabled="toggleEventMessage"
+  />
   <!--warning and errormessages-->
   <OverlayTerminalComponent
     :opened="eventMessage.visible"
