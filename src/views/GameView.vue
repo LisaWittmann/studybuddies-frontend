@@ -3,34 +3,33 @@
     :labyrinth="labyrinth"
     :player="mainPlayer"
     :partner="partnerPlayer"
-    @click-object="itemSelection"
+    @click-object="clickItem"
     @move-player="movePlayer"
-    @click-disabled="toggleTerminal"
+    @click-disabled="toggleEventMessage"
   />
   <!--warning and errormessages-->
   <OverlayTerminalComponent
     :opened="eventMessage.visible"
     :message="eventMessage.message"
     :state="eventMessage.state"
-    @close="toggleTerminal"
+    @close="toggleEventMessage"
   />
   <!--conversations with interactive characters-->
   <OverlayConversationComponent
     :opened="conversation.visible"
     :message="conversation.message"
-    @select-option="selectConversationOption"
+    @respond="getConversationMessage"
   />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive } from "vue";
+import { computed, defineComponent } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 
 import { Orientation } from "@/service/labyrinth/Tile";
 import { MoveOperation } from "@/service/game/EventMessage";
-import { Message, Response } from "@/service/game/Conversation";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
@@ -49,23 +48,17 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { gameState, updateGameData } = useGameStore();
-    const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();
+    const { gameState, updateGameData } = useGameStore();
+    const {
+      eventMessage,
+      toggleEventMessage,
+      playerMovement,
+      clickItem,
+      conversation,
+      getConversationMessage,
+    } = useGameService();
     updateGameData();
-
-    /*
-    // Users Array -> Wird onMounted gefüllt
-    const users = ref(new Array<string>());
-    
-
-    onMounted(async () => {
-      const route = router.currentRoute.value;
-      setLobbyKey(route.params.key as string);
-      await updateUsers(gameState.lobbyKey);
-      updateGameData();
-    })
-    */
 
     let mainPlayer;
     let partnerPlayer;
@@ -76,31 +69,6 @@ export default defineComponent({
         partnerPlayer = computed(() => player);
       }
     });
-
-    // in-game messages like warnings, errors, hints ...
-    const eventMessage = reactive({
-      message: "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!",
-      state: "warning",
-      visible: false,
-    });
-
-    const testConversation = new Message(
-      "1",
-      "Magst du die Zahl 17?",
-      undefined,
-      [
-        new Response("11", "Ja, finde ich super"),
-        new Response("12", "Nein, ich bin eher Fan von der 18"),
-      ]
-    );
-
-    // conversations with interactive game characters
-    const conversation = reactive({
-      message: testConversation,
-      visible: true,
-    });
-
-    const toggleTerminal = () => (eventMessage.visible = !eventMessage.visible);
 
     /**
      * function which is used when clicking the arrow in Interface
@@ -117,22 +85,15 @@ export default defineComponent({
       );
     }
 
-    // testing conversation
-    function selectConversationOption(response: Response) {
-      console.log(response);
-      if (!response.redirect) conversation.visible = false;
-    }
-
     return {
       movePlayer,
-      itemSelection,
-      toggleTerminal,
-      selectConversationOption,
-      testConversation,
-      mainPlayer,
+      clickItem,
+      toggleEventMessage,
+      getConversationMessage,
       conversation,
       eventMessage,
       gameState,
+      mainPlayer,
       partnerPlayer,
       labyrinth: gameState.labyrinth,
     };

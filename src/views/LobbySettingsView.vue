@@ -37,9 +37,9 @@
               Bereit
             </button>
           </transition>
-          <transition name="delay-fade" appear>
+          <transition name="fade-delay">
             <button
-              class="button button--small button__exit"
+              class="button--small button__exit"
               @click="exitLobby(lobbyKey, loginState.username)"
             >
               Verlassen
