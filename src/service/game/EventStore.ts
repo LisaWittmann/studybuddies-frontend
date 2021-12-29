@@ -14,6 +14,7 @@ const {
   setLabyrinthSelection,
   updateLabyrinths,
   getRoleOptions,
+  setUserReadyState,
   lobbyState
 } = useLobbyService();
 
@@ -86,7 +87,7 @@ stompclient.onConnect = () => {
             setupGame();
           }
           else{
-            lobbyState.users.find((user) => user.username == eventMessage.username)?.setReady(eventMessage.data === "READY");
+            setUserReadyState(eventMessage.username, (eventMessage.data === "READY"));
             console.log(lobbyState.users.find((user) => user.username == eventMessage.username));
           }
           break;

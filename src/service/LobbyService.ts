@@ -259,8 +259,6 @@ function readyCheck(username: string, labId: number) {
   const args: string[] = [];
   args.push(username);
   args.push(String(labId));
-  console.log("gameState vor ready finish");
-  console.log(gameState);
 
   fetch(`/api/lobby/ready/${gameState.lobbyKey}`, {
     method: "POST",
@@ -272,17 +270,15 @@ function readyCheck(username: string, labId: number) {
     .then((response) => {
       if (!response.ok) {
         throw new Error("Error during ready check: " + response.statusText);
-      } else {
-        lobbyState.users.forEach((e) => {
-          if (e.username == username) {
-            e.setReady(!e.isReady);
-          }
-        });
       }
     })
     .catch((error) => {
       console.log(error);
     });
+}
+
+function setUserReadyState(username: string, readyState: boolean){
+  lobbyState.users.find((user) => user.username == username)?.setReady(readyState);
 }
 
 function setupGame() {
@@ -317,6 +313,7 @@ export function useLobbyService() {
     updateLabyrinthPick,
     readyCheck,
     setupGame,
+    setUserReadyState,
     lobbyState: readonly(lobbyState),
   };
 }

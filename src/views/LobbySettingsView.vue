@@ -85,6 +85,8 @@ export default defineComponent({
     const openRoles = computed(() => lobbyState.openRoles);
     let selectedRole = computed(() => lobbyState.selectedRole);
 
+    //ReadyState data
+    const isReady = computed(() => lobbyState.users.find((user) => user.username === loginState.username)?.isReady);
 
     function selectLabyrinth(id: number) {
       sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
@@ -129,6 +131,7 @@ export default defineComponent({
       labyrinthOptions,
       selectedLabyrinth,
       loginState,
+      isReady,
     };
   },
 });
