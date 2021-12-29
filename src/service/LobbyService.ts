@@ -30,7 +30,6 @@ function setLobbyState(users: string | null, selectedLabyrinth: string | null, l
  * @param username: identifying name of user that should join lobby
  */
 async function updateRole(role: string, lobbyKey: string, username: string) {
-  lobbyState.selectedRole = role;
   const eventMessage = new EventMessage("ROLE_PICK", lobbyKey, username, role);
   return fetch("/api/lobby/select-role", {
     method: "POST",
@@ -42,6 +41,7 @@ async function updateRole(role: string, lobbyKey: string, username: string) {
         throw new Error("Diese Rolle ist bereits vergeben.");
       else throw new Error("Die Rolle konnte nicht gefunden werden.");
     }
+    lobbyState.selectedRole = role;
   });
 }
 
