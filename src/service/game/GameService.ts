@@ -4,8 +4,8 @@ import { reactive } from "vue";
 
 // in-game messages like warnings, errors, hints ...
 const eventMessage = reactive({
-  message: "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!",
-  state: "warning",
+  message: "",
+  state: "",
   visible: false,
 });
 
@@ -67,7 +67,17 @@ async function checkAccess(modelName: string) {
       return response.json();
     })
     .then((jsonData) => {
-      console.log(jsonData);
+      console.log(jsonData.accesstext);
+      eventMessage.message = jsonData.accesstext;
+      if (jsonData.access) {
+        eventMessage.state = "success";
+      } else {
+        eventMessage.state = "warning";
+      }
+      eventMessage.visible = true;
+    })
+    .catch((error) => {
+      console.error(error);
     });
 }
 
