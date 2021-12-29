@@ -277,15 +277,26 @@ function readyCheck(username: string, labId: number) {
     });
 }
 
+/**
+ * Finds the right user in the users list via the username param and sets the given ReadyState in it.
+ * @param username : The username (from the BE) of the user which pressed the "Ready" Button
+ * @param readyState : The state to determine whether the given user is ready or not
+ */
 function setUserReadyState(username: string, readyState: boolean){
   lobbyState.users.find((user) => user.username == username)?.setReady(readyState);
 }
 
+/**
+ * Initial game setup when all users are ready:
+ * 1. Gathering the labyrinth informations from the BE
+ * 2. Updating the Users one last time, so they can transferred to the gameState properly
+ * 3. Setting up new Players on the basis of the users in the users list
+ * 4. Overwriting the the page history by replacing the url to the game view
+ */
 function setupGame() {
   const { updateGameData, gameState, setPlayerData } = useGameStore();
   updateGameData().then(() => {
 
-    
     updateUsers(gameState.lobbyKey);
     lobbyState.users.forEach((user,index) => {
       console.log(user.username)
