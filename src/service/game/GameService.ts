@@ -1,6 +1,8 @@
 import { MoveOperation, Operation } from "@/service/game/EventMessage";
 import { Message } from "@/service/game/Conversation";
 import { reactive } from "vue";
+import { useGameStore } from "@/service/game/GameStore";
+import { useLoginStore } from "../login/LoginStore";
 
 // in-game messages like warnings, errors, hints ...
 const eventMessage = reactive({
@@ -58,7 +60,11 @@ async function playerMovement(moveOperation: MoveOperation) {
 }
 
 async function checkAccess(modelName: string) {
+  const { gameState } = useGameStore();
+  const { loginState } = useLoginStore();
   console.log("CHECK ACCESS");
+  console.log(gameState);
+  console.log(loginState);
   fetch(`/api/body/access/${modelName}`, {
     method: "GET",
   })
