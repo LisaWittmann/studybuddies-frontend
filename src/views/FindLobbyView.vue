@@ -90,7 +90,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.header {
+.image--header {
   width: 100%;
   max-width: 600px;
   padding-top: $spacing-l;
