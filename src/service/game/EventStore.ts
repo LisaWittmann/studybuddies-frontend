@@ -51,9 +51,6 @@ stompclient.onConnect = () => {
       } else {
         playerToMove = gameState.partnerPlayer;
       }
-      /*  const playerToMove: Player | undefined = gameState.playerMap.get(
-        eventMessage.username
-      ); */
       switch (eventMessage.operation) {
         case "MOVEMENT":
           if (playerToMove) {
@@ -61,7 +58,6 @@ stompclient.onConnect = () => {
 
             if (destTileID) {
               updatePlayerData(playerToMove, destTileID);
-              console.log(playerToMove, destTileID);
               // -> now the watcher can update the 3D Room
               // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
             } else {

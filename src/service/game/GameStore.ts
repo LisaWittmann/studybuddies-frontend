@@ -1,4 +1,4 @@
-import { reactive, readonly, computed, ref } from "vue";
+import { reactive } from "vue";
 import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";
@@ -7,15 +7,12 @@ import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 const { labyrinthState, updateLabyrinthData } = useLabyrinthStore();
 
 /**
- * PlayerMap: To hold both Players
- * PlayerMap key: Username of the Users
  * Errormessage: To display all kind of Errors in the according scene
  */
 const gameState = reactive({
   lobbyKey: "",
   labyrinthId: 1,
   labyrinth: labyrinthState,
-  //playerMap: new Map<string, Player>(),
   mainPlayer: new MainPlayer("", 0),
   partnerPlayer: new PartnerPlayer("", 0),
   errormessage: "",
@@ -50,12 +47,11 @@ async function updateGameData() {
 
 /**
  * Updates the Player so, the watcher can build the changes
+ * Adds changed Player to sessionStorage
  * @param player: the new (changed) player object
- * @param newPosition: setzt die neue Position des Spielers
+ * @param newPosition: sets new position of player
  */
 function updatePlayerData(player: Player, newPosition: number) {
-  //const foundPlayer = gameState.playerMap.get(player.getUsername());
-  //let foundPlayer;
   if (player.getUsername() == gameState.mainPlayer.getUsername()) {
     gameState.mainPlayer.setPosition(newPosition);
     sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer));
@@ -66,16 +62,11 @@ function updatePlayerData(player: Player, newPosition: number) {
       JSON.stringify(gameState.partnerPlayer)
     );
   }
-  //console.log("FOUND PLAYER " + foundPlayer);
-  /*   if (foundPlayer) {
-    foundPlayer.setPosition(newPosition);
-    gameState.playerMap.set(player.username, player);
-  } */
 }
 
 /**
  * sets a Player with its username and the startTileId
- * @param username : name of the user in the playerMap to improve identification between Main- and Partnerplayer
+ * @param username : name of the user to improve identification between Main- and Partnerplayer
  * @param startTileId : start position of the player at the start of the game
  */
 async function setPlayerData(username: string, startTileId: number) {
@@ -83,10 +74,8 @@ async function setPlayerData(username: string, startTileId: number) {
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
     gameState.mainPlayer = new MainPlayer(username, startTileId);
-    //gameState.playerMap.set(username, computed(()=>gameState.mainPlayer));
   } else {
     gameState.partnerPlayer = new PartnerPlayer(username, startTileId);
-    //gameState.playerMap.set(username, gameState.partnerPlayer);
   }
 }
 

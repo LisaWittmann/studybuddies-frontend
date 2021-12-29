@@ -28,10 +28,7 @@ function updatePartnerPlayer(
   tilePosition: Vector3,
   scene: Scene
 ) {
-  //console.log("updating partner position");
-  console.log("PLAYER USERENAME", player.getUsername());
   if (player.getUsername() == "") {
-    console.log("NO PLAYER");
     return;
   } else {
     const position = calculatePartnerPositon(tilePosition);
@@ -68,7 +65,6 @@ function getPlayer(
  * @returns position as three dimensional vector
  */
 function calculatePartnerPositon(tilePosition: Vector3): Vector3 {
-  //console.log("calculating partner position");
   return tilePosition;
 }
 

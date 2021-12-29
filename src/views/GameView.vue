@@ -30,7 +30,6 @@ import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalCompo
 
 import "@/service/game/EventStore";
 import router from "@/router";
-import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 
 export default defineComponent({
   name: "GameView",
@@ -53,7 +52,6 @@ export default defineComponent({
     const score = computed(() => gameState.score);
     const errormessage = computed(() => gameState.errormessage);
 
-
     let mainPlayer = computed(() => gameState.mainPlayer);
     let partnerPlayer = computed(() => gameState.partnerPlayer);
 
@@ -65,7 +63,6 @@ export default defineComponent({
 
     //called when view is loaded or reloaded
     onMounted(() => {
-      console.log("ON MOUNTED");
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       updateGameData();
@@ -75,7 +72,6 @@ export default defineComponent({
         sessionStorage.getItem("mainPlayer") &&
         sessionStorage.getItem("partnerPlayer")
       ) {
-        console.log("recreation out of sessionStorage...");
         setGameState(
           sessionStorage.getItem("lobbyKey"),
           sessionStorage.getItem("selectedLabyrinth"),
@@ -85,45 +81,12 @@ export default defineComponent({
           sessionStorage.getItem("errormessage"),
           sessionStorage.getItem("score")
         );
-        //createPlayerObjects();
-        //console.log( "onMounted (SessionStorage) "+ mainPlayer.value + partnerPlayer.value);
       } else {
-        console.log("recreation not necessary...");
         sessionStorage.setItem("mainPlayer", JSON.stringify(mainPlayer.value));
         sessionStorage.setItem("partnerPlayer", JSON.stringify(partnerPlayer.value));
-        //createPlayerObjects();
-        //console.log( "onMounted (ohne SessionStorage) "+mainPlayer.value + partnerPlayer.value);
       }
     });
 
-    /*   //creates player obects out of gameState
-    function createPlayerObjects() {
-      playerMap.value.forEach((player, key) => {
-          if (key == loginState.username) {
-            mainPlayer = computed(() => player);
-            sessionStorage.setItem(
-              "mainPlayer",
-              JSON.stringify(mainPlayer.value)
-            );
-          } else {
-            partnerPlayer = computed(() => player);
-            sessionStorage.setItem(
-              "partnerPlayer",
-              JSON.stringify(partnerPlayer.value)
-            );
-          }
-        });
-    } */
-
-    function printSessionStorage() {
-      console.log("SESSIONSTORAGE");
-      for (let i = 0; i < sessionStorage.length; i++) {
-        let key = sessionStorage.key(i);
-        if (key) {
-          console.log(key, sessionStorage.getItem(key));
-        }
-      }
-    }
     // in-game messages like warnings, errors, hints ...
     const message =
       "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!";
@@ -140,7 +103,6 @@ export default defineComponent({
      * @param orientation : used in the backend to identify the direction to move the player
      */
     function movePlayer(orientation: Orientation) {
-      console.log(gameState.lobbyKey, loginState.username);
       playerMovement(
         new MoveOperation(
           gameState.lobbyKey,
