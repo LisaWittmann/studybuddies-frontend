@@ -81,8 +81,13 @@ stompclient.onConnect = () => {
         case "TRADE":
           break;
         case "READY":
-          if (eventMessage.data === "READY") {
+          console.log(eventMessage);
+          if(eventMessage.username === "*" && eventMessage.data === "READY") {
             setupGame();
+          }
+          else{
+            lobbyState.users.find((user) => user.username == eventMessage.username)?.setReady(eventMessage.data === "READY");
+            console.log(lobbyState.users.find((user) => user.username == eventMessage.username));
           }
           break;
         case "LABYRINTH_PICK":

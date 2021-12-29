@@ -3,7 +3,6 @@ import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 import { EventMessage } from "@/service/game/EventMessage";
 import { reactive, readonly, computed } from "vue";
-import { PickOperation } from "./game/EventMessage";
 import { User } from "./login/User";
 
 
@@ -32,12 +31,7 @@ function setLobbyState(users: string | null, selectedLabyrinth: string | null, l
  */
 async function updateRole(role: string, lobbyKey: string, username: string) {
   lobbyState.selectedRole = role;
-  const eventMessage: EventMessage = {
-    operation: "ROLE_PICK",
-    lobbyKey: lobbyKey,
-    username: username,
-    data: role,
-  };
+  const eventMessage = new EventMessage("ROLE_PICK", lobbyKey, username, role);
   return fetch("/api/lobby/select-role", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -187,33 +181,26 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
 async function updateUsers(lobbyKey: string) {
   fetch("/api/lobby/users/" + lobbyKey, {
     method: "GET",
-  }).then((response) => {
+  })
+  .then((response) => {
     if (!response.ok) throw new Error(response.statusText);
     return response.json()
   })
-    .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
-      return response.json();
-    })
-    .then((response) => {
-      const connectedUsers = new Array<User>();
+  .then((response) => {
+    const tempUsers = lobbyState.users;
+    lobbyState.users = [];
 
-      if (lobbyState.users.length > 1) {
-        lobbyState.users.forEach((user: User) => {
-          if (user.username === response[0] || user.username === response[1]) {
-            connectedUsers.push(user);
-          }
-        });
-      } else {
-        response.forEach((username: string) => {
-          connectedUsers.push(new User(username));
-        });
-      }
-      lobbyState.users = connectedUsers;
-    /*
-    lobbyState.users = response;
-    sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
-    */
+      response.forEach((username: string)  => {
+        const foundUser: User | undefined = tempUsers.find(user => user.username === username);
+        console.log(foundUser);
+        if(foundUser) {
+          lobbyState.users.push(foundUser);
+        } else {
+          lobbyState.users.push(new User(username));
+        }
+      });
+
+      sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
     });
 }
 
@@ -240,7 +227,7 @@ async function updateLabyrinths() {
  */
 async function updateLabyrinthPick(labId: number, lobbyKey: string) {
   const { loginState } = useLoginStore();
-  const eventMessage = new PickOperation(lobbyKey, loginState.username, labId.toString());
+  const eventMessage = new EventMessage("LABYRINTH_PICK", lobbyKey, loginState.username, labId.toString());
   fetch("/api/lobby/labyrinth-pick", {
     method: "POST",
     headers: {
@@ -302,22 +289,17 @@ function setupGame() {
   const { updateGameData, gameState, setPlayerData } = useGameStore();
   updateGameData().then(() => {
 
+    
     updateUsers(gameState.lobbyKey);
     lobbyState.users.forEach((user,index) => {
+      console.log(user.username)
+      console.log(gameState.labyrinth.playerStartTileIds[index])
       setPlayerData(user.username, gameState.labyrinth.playerStartTileIds[index]);
     });
 
     router.replace(`/game/${gameState.lobbyKey}`);
   });
 }
-
-const isReady = computed(() => {
-  return lobbyState.users.some((e) => {
-    if (e.username == useLoginStore().loginState.username) {
-      return e.isReady;
-    }
-  });
-});
 
 export function useLobbyService() {
   return {
@@ -335,7 +317,6 @@ export function useLobbyService() {
     updateLabyrinthPick,
     readyCheck,
     setupGame,
-    isReady,
     lobbyState: readonly(lobbyState),
   };
 }

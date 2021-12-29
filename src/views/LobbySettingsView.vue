@@ -5,16 +5,16 @@
     </h1>
     <section>
       <p>{{ users.length }}/2 Spieler verbunden</p>
-      <UserListComponent :users="users" :isReady="isReady" />
+      <UserListComponent :users="users" />
     </section>
     <section>
       <h2>Rolle auswählen:</h2>
       <div class="roles">
-        <span v-if="selected">{{ selected }}</span>
+        <span v-if="selectedRole">{{ selectedRole }}</span>
       </div>
       <RadioButtonGroupComponent
         :options="roles"
-        v-model="selected"
+        v-model="selectedRole"
         @clicked="selectRole"
         :selectable="roleOptions"
       />
@@ -73,7 +73,6 @@ export default defineComponent({
       updateRole,
       getRoles,
       getRoleOptions,
-      isReady,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
     const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
@@ -118,8 +117,7 @@ export default defineComponent({
     });
 
     return {
-      selected: selectedRole,
-      isReady,
+      selectedRole,
       readyCheck,
       selectLabyrinth,
       exitLobby,
