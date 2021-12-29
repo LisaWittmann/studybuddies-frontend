@@ -6,6 +6,8 @@ import { PartnerPlayer } from "@/service/game/Player";
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer } = useObjectFactory();
 
+let partnerInitialized = false;
+
 /**
  * update position of main player
  * @param tilePosition: position of tile player should be placed on
@@ -34,8 +36,12 @@ function updatePartnerPlayer(
   } else {
     const position = calculatePartnerPositon(tilePosition);
     const playerObject = getPlayer(player.getUsername(), scene);
-    if (playerObject) playerObject.position.copy(position);
-    else createPlayer(player, position, scene);
+    if (!partnerInitialized) {
+      partnerInitialized = true;
+      createPlayer(player, position, scene);
+    } else if (playerObject) {
+      playerObject.position.copy(position);
+    }
   }
 }
 

@@ -21,7 +21,7 @@ export default defineComponent({
     },
     partner: {
       type: PartnerPlayer,
-      required: true
+      required: true,
     },
   },
   setup(props, context) {
@@ -61,13 +61,16 @@ export default defineComponent({
       removeEventListener("mousedown", onMouseDown);
     });
 
-    watch([props.labyrinth, props.player, props.partner], () => {
-      console.log("updating scene");
-      updateLabyrinth(props.labyrinth, scene);
-      updatePlayer(props.player, scene);
-      updatePlayer(props.partner, scene);
-    },
-    {deep: true});
+    watch(
+      [props.labyrinth, props.player, props.partner],
+      () => {
+        console.log("updating scene");
+        updateLabyrinth(props.labyrinth, scene);
+        updatePlayer(props.player, scene);
+        updatePlayer(props.partner, scene);
+      },
+      { deep: true }
+    );
   },
 });
 </script>
