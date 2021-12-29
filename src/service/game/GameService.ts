@@ -57,6 +57,20 @@ async function playerMovement(moveOperation: MoveOperation) {
     });
 }
 
+async function checkAccess(modelName: string) {
+  console.log("CHECK ACCESS");
+  fetch(`/api/body/access/${modelName}`, {
+    method: "GET",
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      console.log(jsonData);
+    });
+}
+
 async function clickItem(modelName: string) {
   console.log("click", modelName);
   fetch("/api/body/click/" + modelName, { method: "GET" })
@@ -70,6 +84,9 @@ async function clickItem(modelName: string) {
       switch (operation) {
         case Operation.CONVERSATION:
           startConversation(modelName);
+          break;
+        case Operation.ACCESS:
+          checkAccess(modelName);
           break;
       }
     })
