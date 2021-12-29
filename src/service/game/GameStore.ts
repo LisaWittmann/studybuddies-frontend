@@ -1,4 +1,4 @@
-import { reactive, readonly, computed } from "vue";
+import { reactive, readonly, computed, ref } from "vue";
 import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";
@@ -35,18 +35,10 @@ function setGameState(
   if (labyrinthId) gameState.labyrinthId = JSON.parse(labyrinthId) as number;
   if (labyrinth) gameState.labyrinth = JSON.parse(labyrinth) as Labyrinth;
   if (mainPlayer) {
-    const jsonObj: any = JSON.parse(mainPlayer);
-    //Vllt hier, weils nicht mehr das gleiche Objekt ist?
-    const mP: MainPlayer = Object.assign(new MainPlayer("", 0), jsonObj);
-    gameState.mainPlayer = mP;
-    console.log("MP:" + mP.constructor.name);
-    //gameState.playerMap.set(mP.getUsername(), mP);
+    Object.assign(gameState.mainPlayer, JSON.parse(mainPlayer));
   }
   if (partnerPlayer) {
-    const jsonObj: any = JSON.parse(partnerPlayer);
-    const pP: PartnerPlayer = Object.assign(new PartnerPlayer("", 0), jsonObj);
-    gameState.partnerPlayer = pP;
-    //gameState.playerMap.set(pP.getUsername(), pP);
+    Object.assign(gameState.partnerPlayer, JSON.parse(partnerPlayer));
   }
   if (errormessage) gameState.errormessage = errormessage;
   if (score) gameState.score = JSON.parse(score) as number;
@@ -66,8 +58,13 @@ function updatePlayerData(player: Player, newPosition: number) {
   //let foundPlayer;
   if (player.getUsername() == gameState.mainPlayer.getUsername()) {
     gameState.mainPlayer.setPosition(newPosition);
+    sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer));
   } else {
     gameState.partnerPlayer.setPosition(newPosition);
+    sessionStorage.setItem(
+      "partnerPlayer",
+      JSON.stringify(gameState.partnerPlayer)
+    );
   }
   //console.log("FOUND PLAYER " + foundPlayer);
   /*   if (foundPlayer) {
