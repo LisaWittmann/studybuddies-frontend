@@ -34,13 +34,27 @@ async function getConversationMessage(id: string) {
     })
     .then((jsonData) => {
       console.log(jsonData);
+
+      if ((jsonData as Message).id == "0.0") {
+        console.log("endConversation");
+        endConversation()
+        return
+      }
+
       conversation.message = jsonData as Message;
+      if (conversation.message.itemName != null) {
+        console.log("give Item");
+      }
     })
     .catch(() => {
-      conversation.visible = false;
-      conversation.message = new Message("", "", undefined, []);
-      conversation.character = "";
+      endConversation();
     });
+}
+
+async function endConversation() {
+  conversation.visible = false;
+  conversation.message = new Message("", "", undefined, []);
+  conversation.character = "";
 }
 
 async function playerMovement(moveOperation: MoveOperation) {
