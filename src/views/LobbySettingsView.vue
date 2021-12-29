@@ -4,7 +4,8 @@
       <span class="uppercase"> {{ lobbyKey }}</span>
     </h1>
     <section>
-      <UserListComponent :users="users" />
+      <p>{{ users.length }}/2 Spieler verbunden</p>
+      <UserListComponent :users="users" :isReady="isReady" />
     </section>
     <section>
       <h2>Rolle auswählen:</h2>
@@ -17,7 +18,7 @@
         @clicked="selectRole"
         :selectable="roleOptions"
       />
-    </section>
+      </section>
     <section>
       <h2>Labyrinth auswählen:</h2>
       <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
@@ -25,7 +26,8 @@
     <section>
       <div class="column-wrapper">
         <button
-          class="button--small button--filled"
+          :class="{ 'button--ready': isReady }"
+          class="button--small"
           @click="readyCheck(loginState.username, selectedLabyrinth)"
         >
           Bereit
@@ -71,6 +73,7 @@ export default defineComponent({
       updateRole,
       getRoles,
       getRoleOptions,
+      isReady,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
     const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
@@ -116,6 +119,7 @@ export default defineComponent({
 
     return {
       selected: selectedRole,
+      isReady,
       readyCheck,
       selectLabyrinth,
       exitLobby,

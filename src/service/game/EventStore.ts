@@ -2,7 +2,6 @@ import { Client } from "@stomp/stompjs";
 import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "../login/LoginStore";
 import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
 import { ref } from "vue";
@@ -15,6 +14,7 @@ const {
   setLabyrinthSelection,
   updateLabyrinths,
   getRoleOptions,
+  lobbyState
 } = useLobbyService();
 
 const wsurl = "ws://localhost:9090/messagebroker";

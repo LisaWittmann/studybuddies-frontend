@@ -2,12 +2,13 @@ import router from "@/router";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 import { EventMessage } from "@/service/game/EventMessage";
-import { reactive, readonly } from "vue";
+import { reactive, readonly, computed } from "vue";
 import { PickOperation } from "./game/EventMessage";
+import { User } from "./login/User";
 
 
 const lobbyState = reactive({
-  users: new Array<string>(),
+  users: new Array<User>(),
   selectedRole: "",
   openRoles: new Array<string>(),
   selectedLabyrinth: 0,
@@ -189,10 +190,31 @@ async function updateUsers(lobbyKey: string) {
   }).then((response) => {
     if (!response.ok) throw new Error(response.statusText);
     return response.json()
-  }).then((response) => {
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((response) => {
+      const connectedUsers = new Array<User>();
+
+      if (lobbyState.users.length > 1) {
+        lobbyState.users.forEach((user: User) => {
+          if (user.username === response[0] || user.username === response[1]) {
+            connectedUsers.push(user);
+          }
+        });
+      } else {
+        response.forEach((username: string) => {
+          connectedUsers.push(new User(username));
+        });
+      }
+      lobbyState.users = connectedUsers;
+    /*
     lobbyState.users = response;
     sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
-  });
+    */
+    });
 }
 
 /**
@@ -263,6 +285,12 @@ function readyCheck(username: string, labId: number) {
     .then((response) => {
       if (!response.ok) {
         throw new Error("Error during ready check: " + response.statusText);
+      } else {
+        lobbyState.users.forEach((e) => {
+          if (e.username == username) {
+            e.setReady(!e.isReady);
+          }
+        });
       }
     })
     .catch((error) => {
@@ -276,12 +304,20 @@ function setupGame() {
 
     updateUsers(gameState.lobbyKey);
     lobbyState.users.forEach((user,index) => {
-      setPlayerData(user, gameState.labyrinth.playerStartTileIds[index]);
+      setPlayerData(user.username, gameState.labyrinth.playerStartTileIds[index]);
     });
 
     router.replace(`/game/${gameState.lobbyKey}`);
   });
 }
+
+const isReady = computed(() => {
+  return lobbyState.users.some((e) => {
+    if (e.username == useLoginStore().loginState.username) {
+      return e.isReady;
+    }
+  });
+});
 
 export function useLobbyService() {
   return {
@@ -299,6 +335,7 @@ export function useLobbyService() {
     updateLabyrinthPick,
     readyCheck,
     setupGame,
+    isReady,
     lobbyState: readonly(lobbyState),
   };
 }
