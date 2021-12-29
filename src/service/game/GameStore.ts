@@ -1,4 +1,4 @@
-import { reactive, readonly } from "vue";
+import { reactive, readonly, computed } from "vue";
 import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";
@@ -15,7 +15,9 @@ const gameState = reactive({
   lobbyKey: "",
   labyrinthId: 1,
   labyrinth: labyrinthState,
-  playerMap: new Map<string, Player>(),
+  //playerMap: new Map<string, Player>(),
+  mainPlayer: new MainPlayer("", 0),
+  partnerPlayer: new PartnerPlayer("", 0),
   errormessage: "",
   score: 0,
 });
@@ -34,16 +36,17 @@ function setGameState(
   if (labyrinth) gameState.labyrinth = JSON.parse(labyrinth) as Labyrinth;
   if (mainPlayer) {
     const jsonObj: any = JSON.parse(mainPlayer);
+    //Vllt hier, weils nicht mehr das gleiche Objekt ist?
     const mP: MainPlayer = Object.assign(new MainPlayer("", 0), jsonObj);
-
+    gameState.mainPlayer = mP;
     console.log("MP:" + mP.constructor.name);
-    gameState.playerMap.set(mP.getUsername(), mP);
+    //gameState.playerMap.set(mP.getUsername(), mP);
   }
   if (partnerPlayer) {
     const jsonObj: any = JSON.parse(partnerPlayer);
     const pP: PartnerPlayer = Object.assign(new PartnerPlayer("", 0), jsonObj);
-
-    gameState.playerMap.set(pP.getUsername(), pP);
+    gameState.partnerPlayer = pP;
+    //gameState.playerMap.set(pP.getUsername(), pP);
   }
   if (errormessage) gameState.errormessage = errormessage;
   if (score) gameState.score = JSON.parse(score) as number;
@@ -59,11 +62,18 @@ async function updateGameData() {
  * @param newPosition: setzt die neue Position des Spielers
  */
 function updatePlayerData(player: Player, newPosition: number) {
-  const foundPlayer = gameState.playerMap.get(player.getUsername());
-  if (foundPlayer) {
+  //const foundPlayer = gameState.playerMap.get(player.getUsername());
+  //let foundPlayer;
+  if (player.getUsername() == gameState.mainPlayer.getUsername()) {
+    gameState.mainPlayer.setPosition(newPosition);
+  } else {
+    gameState.partnerPlayer.setPosition(newPosition);
+  }
+  //console.log("FOUND PLAYER " + foundPlayer);
+  /*   if (foundPlayer) {
     foundPlayer.setPosition(newPosition);
     gameState.playerMap.set(player.username, player);
-  }
+  } */
 }
 
 /**
@@ -75,9 +85,11 @@ async function setPlayerData(username: string, startTileId: number) {
   console.log("Starttileid is: " + startTileId + " Playername is: " + username);
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
-    gameState.playerMap.set(username, new MainPlayer(username, startTileId));
+    gameState.mainPlayer = new MainPlayer(username, startTileId);
+    //gameState.playerMap.set(username, computed(()=>gameState.mainPlayer));
   } else {
-    gameState.playerMap.set(username, new PartnerPlayer(username, startTileId));
+    gameState.partnerPlayer = new PartnerPlayer(username, startTileId);
+    //gameState.playerMap.set(username, gameState.partnerPlayer);
   }
 }
 
@@ -91,7 +103,7 @@ async function setError(error: string) {
 
 export function useGameStore() {
   return {
-    gameState: readonly(gameState),
+    gameState,
     setGameState,
     updateGameData,
     updatePlayerData,

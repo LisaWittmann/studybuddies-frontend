@@ -44,8 +44,7 @@ export default defineComponent({
   setup() {
     const { gameState, updateGameData, setLobbyKey, setGameState } =
       useGameStore();
-    const { playerMovement, itemSelection, updatePlayerPositions } =
-      useGameService();
+    const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();
     const showTerminal = ref(false);
 
@@ -54,8 +53,9 @@ export default defineComponent({
     const score = computed(() => gameState.score);
     const errormessage = computed(() => gameState.errormessage);
 
-    let mainPlayer = ref();
-    let partnerPlayer = ref();
+
+    let mainPlayer = computed(() => gameState.mainPlayer);
+    let partnerPlayer = computed(() => gameState.partnerPlayer);
 
     //adds infos from GameState (filled on READY) to SessionStorage
     sessionStorage.setItem("labyrinth", JSON.stringify(labyrinthState.value));
@@ -71,7 +71,10 @@ export default defineComponent({
       updateGameData();
 
       //fills gameState out of sessionStorage when view is reloaded
-      if (sessionStorage.getItem("mainPlayer") && sessionStorage.getItem("partnerPlayer")) {
+      if (
+        sessionStorage.getItem("mainPlayer") &&
+        sessionStorage.getItem("partnerPlayer")
+      ) {
         console.log("recreation out of sessionStorage...");
         setGameState(
           sessionStorage.getItem("lobbyKey"),
@@ -82,31 +85,35 @@ export default defineComponent({
           sessionStorage.getItem("errormessage"),
           sessionStorage.getItem("score")
         );
-        createPlayerObjects();
+        //createPlayerObjects();
+        //console.log( "onMounted (SessionStorage) "+ mainPlayer.value + partnerPlayer.value);
       } else {
         console.log("recreation not necessary...");
-        createPlayerObjects();
+        sessionStorage.setItem("mainPlayer", JSON.stringify(mainPlayer.value));
+        sessionStorage.setItem("partnerPlayer", JSON.stringify(partnerPlayer.value));
+        //createPlayerObjects();
+        //console.log( "onMounted (ohne SessionStorage) "+mainPlayer.value + partnerPlayer.value);
       }
     });
 
-    //creates player obects out of gameState
+    /*   //creates player obects out of gameState
     function createPlayerObjects() {
-      gameState.playerMap.forEach((player, key) => {
+      playerMap.value.forEach((player, key) => {
           if (key == loginState.username) {
-            mainPlayer.value = player;
+            mainPlayer = computed(() => player);
             sessionStorage.setItem(
               "mainPlayer",
               JSON.stringify(mainPlayer.value)
             );
           } else {
-            partnerPlayer.value = player;
+            partnerPlayer = computed(() => player);
             sessionStorage.setItem(
               "partnerPlayer",
               JSON.stringify(partnerPlayer.value)
             );
           }
         });
-    }
+    } */
 
     function printSessionStorage() {
       console.log("SESSIONSTORAGE");
@@ -133,7 +140,7 @@ export default defineComponent({
      * @param orientation : used in the backend to identify the direction to move the player
      */
     function movePlayer(orientation: Orientation) {
-      console.log(gameState.lobbyKey, loginState.username,);
+      console.log(gameState.lobbyKey, loginState.username);
       playerMovement(
         new MoveOperation(
           gameState.lobbyKey,

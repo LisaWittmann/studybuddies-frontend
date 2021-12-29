@@ -45,9 +45,15 @@ stompclient.onConnect = () => {
       /**
        * Checks whether the user exists in the Game
        */
-      const playerToMove: Player | undefined = gameState.playerMap.get(
+      let playerToMove;
+      if (eventMessage.username == gameState.mainPlayer.getUsername()) {
+        playerToMove = gameState.mainPlayer;
+      } else {
+        playerToMove = gameState.partnerPlayer;
+      }
+      /*  const playerToMove: Player | undefined = gameState.playerMap.get(
         eventMessage.username
-      );
+      ); */
       switch (eventMessage.operation) {
         case "MOVEMENT":
           if (playerToMove) {
@@ -55,11 +61,11 @@ stompclient.onConnect = () => {
 
             if (destTileID) {
               updatePlayerData(playerToMove, destTileID);
+              console.log(playerToMove, destTileID);
               // -> now the watcher can update the 3D Room
               // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
             } else {
-              setError(
-                "There is no Tilereference for this definition of data");
+              setError("There is no Tilereference for this definition of data");
             }
           } else {
             setError("No existing User");

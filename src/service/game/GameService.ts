@@ -2,6 +2,12 @@ import { MoveOperation } from "@/service/game/EventMessage";
 import { useGameStore } from "./GameStore";
 
 async function playerMovement(moveOperation: MoveOperation) {
+  console.log(
+    moveOperation.username,
+    moveOperation.lobbyKey,
+    moveOperation.operation,
+    moveOperation.data
+  );
   fetch("/api/lobby/move", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -17,27 +23,19 @@ async function playerMovement(moveOperation: MoveOperation) {
 
 // fetches the current tileId of both players
 async function updatePlayerPositions(lobbyKey: string) {
-  const { setPlayerData } = useGameStore();
+  //const { setPlayerData } = useGameStore();
 
   return fetch("/api/lobby/players/" + lobbyKey, {
     method: "GET",
-  })
-    .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
-      return response.json();
-    })
-    .then((jsondata) => {
+  }).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  });
+  /* .then((jsondata) => {
       for (const key in jsondata) {
         setPlayerData(key, Number(jsondata[key]));
       }
-
-      /* const playerPosition = new Map<string, number>();
-      for (const key in jsondata) {
-        playerPosition.set(key, Number(jsondata[key]));
-      } 
-      return playerPosition;
-      */
-    });
+    }); */
 }
 
 // send the clicked item id to backend

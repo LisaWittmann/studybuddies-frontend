@@ -138,6 +138,7 @@ function createPlayer(
   position: THREE.Vector3,
   parent: THREE.Scene | THREE.Group
 ) {
+  console.log("PLAYER", player);
   let model = "squirrel";
   switch (player.getRole()) {
     case Role.DESIGNER:
