@@ -242,14 +242,16 @@ function removeItem(model: TileModel, item: ItemModel): void {
 
 /**
  * validates created labyrinth;
- * min amount of tile models must be selected to save labyrinth
- * and number of start and endpositions must be valid
+ * min amount of tile models must be selected to save labyrinth,
+ * number of start and endpositions must be valid
+ * and all items must be places inside of labyrinth
  * @returns build mode that contains errors or undefindes
  */
 function hasErrors(): Mode | undefined {
   if (selectedTiles.value.length < minTiles) return Mode.CREATE;
   if (buildState.startPositions.length != startPositons) return Mode.START;
   if (!buildState.endposition) return Mode.END;
+  if (buildState.itemOptions.length > 0) return Mode.ITEMS;
   return undefined;
 }
 
@@ -314,7 +316,7 @@ function parseLabyrinth(labyrinth: Labyrinth): string {
 }
 
 /**
- * convert labyrinth abd save by API call
+ * convert labyrinth and save by API call
  * return promise with id of saved labyrinth
  */
 async function save(): Promise<number> {

@@ -10,6 +10,7 @@ export enum Mode {
 }
 
 // temporary filler for roles
+// TODO: remove after merge of S007
 export enum Role {
   DESIGNER,
   HACKER,

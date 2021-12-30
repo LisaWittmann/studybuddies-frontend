@@ -75,12 +75,12 @@ export default defineComponent({
         clickedTile.value.hasChanges()
     );
 
-    function onEnter(model: TileModel) {
+    const onEnter = (model: TileModel) => {
       if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTIONS) return;
       if (mousedown) onClick(model);
-    }
+    };
 
-    function onClick(model: TileModel) {
+    const onClick = (model: TileModel) => {
       clickedTile.value = model;
       switch (props.mode) {
         case Mode.CREATE: {
@@ -104,7 +104,7 @@ export default defineComponent({
           break;
         }
       }
-    }
+    };
 
     return {
       rows,

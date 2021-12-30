@@ -43,7 +43,7 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const selected = computed(() => props.model.relationKey);
+    const selected = computed(() => !!props.model.relationKey);
     const selectable = computed(() => props.model.isSelectable);
 
     const color = computed(() => {
