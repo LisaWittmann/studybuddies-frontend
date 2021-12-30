@@ -61,12 +61,16 @@ export default defineComponent({
       removeEventListener("mousedown", onMouseDown);
     });
 
-    watch([props.labyrinth, props.player, props.partner], () => {
-      console.log("updating scene");
-      updateLabyrinth(props.labyrinth, scene);
-      updatePlayer(props.player, scene);
-      updatePlayer(props.partner, scene);
-    });
+    watch(
+      [props.labyrinth, props.player, props.partner],
+      () => {
+        console.log("updating scene");
+        updateLabyrinth(props.labyrinth, scene);
+        updatePlayer(props.player, scene);
+        updatePlayer(props.partner, scene);
+      },
+      { deep: true }
+    );
   },
 });
 </script>

@@ -21,11 +21,9 @@ import { computed, defineComponent, onMounted, ref } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLobbyService } from "@/service/LobbyService";
 
 import { Orientation } from "@/service/labyrinth/Tile";
 import { MoveOperation } from "@/service/game/EventMessage";
-import { MainPlayer } from "@/service/game/Player";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
@@ -43,33 +41,49 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { gameState, updateGameData, setLobbyKey } = useGameStore();
+    const { gameState, updateGameData, setLobbyKey, setGameState } =
+      useGameStore();
     const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();
-    const { updateUsers } = useLobbyService();
-    updateGameData();
-
     const showTerminal = ref(false);
 
-    /*
-    // Users Array -> Wird onMounted gefüllt
-    const users = ref(new Array<string>());
-    */
+    //infos for sessionsStorage to fill GameState onMounted
+    const labyrinthState = computed(() => gameState.labyrinth);
+    const score = computed(() => gameState.score);
+    const errormessage = computed(() => gameState.errormessage);
 
-    onMounted(async () => {
+    let mainPlayer = computed(() => gameState.mainPlayer);
+    let partnerPlayer = computed(() => gameState.partnerPlayer);
+
+    //adds infos from GameState (filled on READY) to SessionStorage
+    sessionStorage.setItem("labyrinth", JSON.stringify(labyrinthState.value));
+    sessionStorage.setItem("score", JSON.stringify(score.value));
+    sessionStorage.setItem("errormessage", JSON.stringify(errormessage.value));
+    sessionStorage.setItem("initialLoad", JSON.stringify(1));
+
+    //called when view is loaded or reloaded
+    onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      await updateUsers(gameState.lobbyKey);
       updateGameData();
-    });
 
-    let mainPlayer;
-    let partnerPlayer;
-    gameState.playerMap.forEach((player, key) => {
-      if (key == loginState.username) {
-        mainPlayer = computed(() => player);
+      //fills gameState out of sessionStorage when view is reloaded
+      if (
+        sessionStorage.getItem("mainPlayer") &&
+        sessionStorage.getItem("partnerPlayer")
+      ) {
+        setGameState(
+          sessionStorage.getItem("lobbyKey"),
+          sessionStorage.getItem("selectedLabyrinth"),
+          sessionStorage.getItem("labyrinth"),
+          sessionStorage.getItem("mainPlayer"),
+          sessionStorage.getItem("partnerPlayer"),
+          sessionStorage.getItem("errormessage"),
+          sessionStorage.getItem("score")
+        );
       } else {
-        partnerPlayer = computed(() => player);
+        sessionStorage.setItem("mainPlayer", JSON.stringify(mainPlayer.value));
+        sessionStorage.setItem("partnerPlayer", JSON.stringify(partnerPlayer.value));
       }
     });
 

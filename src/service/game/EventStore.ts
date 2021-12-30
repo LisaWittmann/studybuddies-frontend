@@ -60,9 +60,12 @@ stompclient.onConnect = () => {
       /**
        * Checks whether the user exists in the Game
        */
-      const playerToMove: Player | undefined = gameState.playerMap.get(
-        eventMessage.username
-      );
+      let playerToMove;
+      if (eventMessage.username == gameState.mainPlayer.getUsername()) {
+        playerToMove = gameState.mainPlayer;
+      } else {
+        playerToMove = gameState.partnerPlayer;
+      }
       switch (eventMessage.operation) {
         case "MOVEMENT":
           if (playerToMove) {

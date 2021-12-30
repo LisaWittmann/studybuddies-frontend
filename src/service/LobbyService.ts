@@ -109,7 +109,10 @@ async function createLobby(username: string) {
     body: username,
   })
     .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
+      if (!response.ok) {
+        alert("Labyrinth nicht ok!");
+        throw new Error(response.statusText);
+      }
       return response.json();
     })
     .then((jsonData) => {
@@ -203,6 +206,7 @@ async function updateUsers(lobbyKey: string) {
       sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
     });
 }
+
 
 /**
  * send request to get all labyrinths in database that can be selected for game

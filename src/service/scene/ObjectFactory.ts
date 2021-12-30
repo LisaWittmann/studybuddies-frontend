@@ -133,11 +133,12 @@ function createArrow(
  * @param position: global position of player
  * @param parent: scene or group to which player should be added
  */
-function createPlayer(
+async function createPlayer(
   player: PartnerPlayer,
   position: THREE.Vector3,
   parent: THREE.Scene | THREE.Group
 ) {
+  console.log("PLAYER", player);
   let model = "squirrel";
   switch (player.getRole()) {
     case Role.DESIGNER:
@@ -147,7 +148,7 @@ function createPlayer(
       model += "-hacker";
       break;
   }
-  materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
+  await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {

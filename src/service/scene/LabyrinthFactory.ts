@@ -36,8 +36,8 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
  * @param player: main or partner player
  * @param scene: scene that contains player
  */
-async function updatePlayer(player: Player, scene: THREE.Scene) {
-  console.log("Move player: " + player);
+function updatePlayer(player: Player, scene: THREE.Scene) {
+  console.log("Move player: " + player.getUsername());
   const tilePosition = getTilePosition(player.getPosition(), scene);
   if (tilePosition) {
     if (player instanceof MainPlayer) {
