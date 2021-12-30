@@ -28,7 +28,7 @@ async function createItem(
   position: THREE.Vector3
 ) {
   const model = item.modelName.toLowerCase();
-  await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
+  await materialLoader.loadAsync("materials.mtl").then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
