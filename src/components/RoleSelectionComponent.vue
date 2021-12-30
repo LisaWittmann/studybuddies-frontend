@@ -1,5 +1,5 @@
 <template>
-  <label :for="option">
+  <div class="radio-input__wrapper">
     <input
       type="radio"
       :value="option"
@@ -8,9 +8,11 @@
       @change="onClick(option)"
       name="radio-input"
     />
-    <img :src="getImgUrl(option)" :alt="option" width="100" />
-    {{ option }}
-  </label>
+    <label :for="option" class="button" :class="{ disabled: disabled }">
+      <img :src="getImgUrl(option)" :alt="option" />
+      {{ capitalize(option) }}
+    </label>
+  </div>
 </template>
 
 <script lang="ts">
@@ -34,30 +36,54 @@ export default defineComponent({
       emit("clicked", option);
     }
 
+    const capitalize = (name: string) => {
+      return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    };
+
     return {
       getImgUrl,
       onClick,
+      capitalize,
     };
   },
 });
 </script>
 
-<style scoped>
-input[type="radio"] {
-  position: absolute;
-  opacity: 0;
-}
+<style lang="scss" scoped>
+.radio-input__wrapper {
+  width: 40%;
+  position: relative;
 
-input + img {
-  cursor: pointer;
-}
+  input[type="radio"] {
+    height: 100%;
+    opacity: 0;
 
-input:disabled + img {
-  opacity: 0.5;
-}
+    & + label {
+      @include flex-center();
+      flex-direction: column;
+      padding-top: 20px;
+      padding-bottom: 20px;
 
-input:checked + img {
-  opacity: 1;
-  border: solid salmon;
+      img {
+        width: 80%;
+        margin-bottom: 10px;
+      }
+    }
+
+    &:checked + label {
+      border: solid $color-beige;
+    }
+
+    &:disabled {
+      & + label {
+        pointer-events: none;
+        opacity: 0.5;
+      }
+
+      &:checked + label {
+        opacity: 1;
+      }
+    }
+  }
 }
 </style>
