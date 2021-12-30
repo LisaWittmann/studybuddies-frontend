@@ -48,7 +48,7 @@ stompclient.onConnect = () => {
 
     if (
       eventMessage.lobbyKey == gameState.lobbyKey ||
-      eventMessage.lobbyKey == "*"
+      eventMessage.lobbyKey == "ALL"
     ) {
       console.log("Message in the right Lobby");
 
@@ -83,7 +83,7 @@ stompclient.onConnect = () => {
           break;
         case "READY":
           console.log(eventMessage);
-          if(eventMessage.username === "*" && eventMessage.data === "READY") {
+          if(eventMessage.username === "ALL_OF_LOBBY" && eventMessage.data === "READY") {
             setupGame();
           }
           else{
