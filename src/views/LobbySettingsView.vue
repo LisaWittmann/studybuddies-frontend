@@ -1,21 +1,24 @@
 <template>
   <transition name="fade" appear>
     <div class="container">
-      <h1>Lobby {{ lobbyKey }}</h1>
-      <section>
-        <UserListComponent :users="users" />
-      </section>
-      <section>
-        <h2>Labyrinth hochladen:</h2>
-        <label class="button button__upload button--small">
-          <input
-            type="file"
-            ref="upload"
-            accept=".json"
-            @change="uploadLabyrinth"
-          />
-          Hochladen
-        </label>
+      <h1>Lobby
+      <span class="uppercase"> {{ lobbyKey }}</span>
+    </h1>
+    <section>
+      <p>{{ users.length }}/2 Spieler verbunden</p>
+      <UserListComponent :users="users" />
+    </section>
+    <section>
+      <h2>Rolle auswählen:</h2>
+      <div class="roles">
+        <span v-if="selectedRole">{{ selectedRole }}</span>
+      </div>
+      <RadioButtonGroupComponent
+        :options="roles"
+        v-model="selectedRole"
+        @clicked="selectRole"
+        :selectable="roleOptions"
+      />
       </section>
       <section>
         <h2>Labyrinth auswählen:</h2>
@@ -24,17 +27,21 @@
       <section>
         <div class="column-wrapper">
           <transition name="fade" appear>
-            <button class="button__confirm button--small" @click="readyCheck">
-              Bereit
-            </button>
+            <button
+          :class="{ 'button--ready': isReady }"
+          class="button--small"
+          @click="readyCheck(loginState.username, selectedLabyrinth)"
+        >
+          Bereit
+        </button>
           </transition>
           <transition name="delay-fade" appear>
-            <button
-              class="button__exit button--small"
-              @click="exitLobby(lobbyKey, username)"
-            >
-              Verlassen
-            </button>
+        <button
+          class="button button--small button--exit"
+          @click="exitLobby(lobbyKey, loginState.username)"
+        >
+          Verlassen
+        </button>
           </transition>
         </div>
       </section>
@@ -43,61 +50,94 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref} from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
+import { useGameStore } from "@/service/game/GameStore";
+import RadioButtonGroupComponent from "@/components/RadioButtonGroupComponent.vue";
 
 export default defineComponent({
   name: "LobbySettingsView",
-  components: { UserListComponent, DropdownComponent },
+  components: {
+    UserListComponent,
+    DropdownComponent,
+    RadioButtonGroupComponent,
+  },
   setup() {
     const { loginState } = useLoginStore();
     const {
-      uploadJsonFiles,
       updateUsers,
-      updateLabyrinths,
       readyCheck,
       exitLobby,
-      setupGame,
+      updateLabyrinthPick,
+      updateLabyrinths,
+      setLobbyState,
+      lobbyState,
+      updateRole,
+      getRoles,
+      getRoleOptions,
     } = useLobbyService();
-    const upload = ref({} as HTMLInputElement);
+    const { gameState, setLobbyKey } = useGameStore();
+    const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
+    const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinth);
+    const users = computed(() => lobbyState.users);
+    const lobbyKey = computed(() => gameState.lobbyKey);
 
-    const route = router.currentRoute.value;
-    const lobbyKey = route.params.key as string;
+    //Radiobutton data
+    const allRoles = ref([]);
+    const openRoles = computed(() => lobbyState.openRoles);
+    let selectedRole = computed(() => lobbyState.selectedRole);
 
-    const users = ref(new Array<string>());
-    const labyrinthOptions = ref(new Array<number>());
-    const selectedLabyrinth = ref();
-
-    updateUsers(lobbyKey).then((data) => (users.value = data));
-    updateLabyrinths().then((data) => (labyrinthOptions.value = data));
+    //ReadyState data
+    const isReady = computed(() => lobbyState.users.find((user) => user.username === loginState.username)?.isReady);
 
     function selectLabyrinth(id: number) {
-      selectedLabyrinth.value = id;
+      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
+      updateLabyrinthPick(id, gameState.lobbyKey);
     }
 
-    async function uploadLabyrinth() {
-      if (upload.value.files != null) {
-        await uploadJsonFiles(upload.value.files);
-      }
-      updateLabyrinths().then((data) => (labyrinthOptions.value = data));
+    function selectRole(name: string) {
+      sessionStorage.setItem("chosenRole", JSON.stringify(name))
+      updateRole(name, gameState.lobbyKey, loginState.username);
     }
+
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      setLobbyKey(route.params.key as string);
+      if(sessionStorage.getItem("lobbyKey") == gameState.lobbyKey) {
+        setLobbyState(
+          sessionStorage.getItem("users"),
+          sessionStorage.getItem("selectedLabyrinth"),
+          sessionStorage.getItem("labyrinthOptions"),
+          sessionStorage.getItem("errormessage"),
+          sessionStorage.getItem("chosenRole"),
+          );
+      } else {
+        sessionStorage.setItem("lobbyKey", gameState.lobbyKey);
+      }
+      updateLabyrinths();
+      updateUsers(gameState.lobbyKey);
+      getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
+      getRoleOptions(gameState.lobbyKey);
+    });
 
     return {
+      selectedRole,
       readyCheck,
-      uploadLabyrinth,
       selectLabyrinth,
       exitLobby,
-      setupGame,
+      selectRole,
+      roles: allRoles,
+      roleOptions: openRoles,
       users,
-      upload,
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
-      username: loginState.username,
+      loginState,
+      isReady,
     };
   },
 });
@@ -105,8 +145,35 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 h1 {
-  padding-top: $spacing-l;
-  margin-top: 0;
+  margin: $spacing-l 0;
+
+  span {
+    font-weight: inherit;
+  }
+}
+
+.button {
+  &--upload {
+    min-height: 0;
+
+    &:hover {
+      color: $color-beige;
+    }
+  }
+
+  &--exit {
+    &:hover,
+    &:active {
+      color: darkred;
+    }
+  }
+
+  &--confirm {
+    &:hover,
+    &:active {
+      color: $color-green;
+    }
+  }
 }
 
 input[type="file"] {
