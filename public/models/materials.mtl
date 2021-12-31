@@ -206,7 +206,7 @@ illum 2
 # Blender MTL File: 'tupel.blend'
 # Material Count: 7
 
-newmtl None
+newmtl TupelNone
 Ns 0.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000

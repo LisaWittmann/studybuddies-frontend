@@ -104,13 +104,13 @@ export class Item {
           viewdirection += 0;
           break;
         case Orientation.EAST:
-          viewdirection += 270;
+          viewdirection += 90;
           break;
         case Orientation.SOUTH:
           viewdirection += 180;
           break;
         case Orientation.WEST:
-          viewdirection += 90;
+          viewdirection += 270;
           break;
       }
     });
