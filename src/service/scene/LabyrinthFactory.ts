@@ -36,7 +36,7 @@ async function updateLabyrinth(
     if (!tile) {
       const neighbors = getNeighbors(value, labyrinth.tileMap);
       const role = player.getRole();
-      placeTile(position, value, key, role, neighbors, scene);
+      await placeTile(position, value, key, role, neighbors, scene);
     }
   }
 }
@@ -64,6 +64,9 @@ async function updatePlayer(player: Player, scene: THREE.Scene) {
  * adds tile of labyrinth to scene without recursion
  * @param position: starting position of first tile
  * @param tile: tile that should be placed in scene
+ * @param tileKey: index of tile in labyrinth
+ * @param role: role of user logged-in user
+ * @param neighbors: contains relations to neighbors of the current tile
  * @param scene: origin scene
  */
 async function placeTile(
@@ -92,9 +95,13 @@ async function placeTile(
  * @returns color of tile as hexadecimal number
  */
 function getTileColor(tile: Tile) {
-  if (tile.getRestrictions().length == 2) return colors.darkBrown;
-  if (tile.isRestricedFor(Role.DESIGNER)) return colors.beige;
-  if (tile.isRestricedFor(Role.HACKER)) return colors.green;
+  //both players have access to this tile
+  if (tile.getRestrictions().length == 0) return colors.darkBrown;
+  //only the designer has access to this tile
+  if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
+  //only the hacker has access to this tile
+  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
+  //default - this case shouldn't appear
   return colors.grey;
 }
 
@@ -161,7 +168,7 @@ function getNextPosition(
 /**
  * convert tile relations of tile to actual tile objects
  * @param tile tile to get neighbors for
- * @param tileMap tilemap containing relationkeys and tiles
+ * @param tileMap tilemap containing relation keys and tiles
  * @returns map of orientation and tiles
  */
 function getNeighbors(tile: Tile, tileMap: Map<number, Tile>) {
