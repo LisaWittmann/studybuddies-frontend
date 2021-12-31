@@ -6,6 +6,7 @@ import { settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * creates a group of objects representing a tile
+ * @param tileKey: index of tile in the labyrinth
  * @param model: representing tile data
  * @param position: position in scene
  * @param role: role of main player
@@ -35,9 +36,9 @@ function createTile(
   tile.add(createCeiling(position, color));
   neighbors.forEach((neighbor, orientation) => {
     if (neighbor) {
-      // dont add navigation arrow if neighbor has restriction for main players role
+      // don't add navigation arrow if neighbor has restriction for main player's role
       // mark restricted tile with transparent wall
-      if (neighbor.isRestricedFor(role)) {
+      if (neighbor.isRestrictedFor(role)) {
         tile.add(createWall(orientation, position, color, 0.5));
       } else {
         createArrow(orientation, position, tile);
@@ -57,7 +58,6 @@ function createTile(
 /**
  * creates point light underneath top plane
  * @param position: center position of tile
- * @param height: height of tile
  * @returns: point light
  */
 function createLight(position: THREE.Vector3) {

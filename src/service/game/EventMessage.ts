@@ -1,8 +1,8 @@
 /**
- * EventMessage: independant interface to recieving the EventMessage Object from the messagebroker as independent Object
+ * EventMessage: independent interface to receiving the EventMessage Object from the MessageBroker as independent Object
  * @param operation: to clarify which Operation Object can be used and which process can be started
- * @param lobbykey: to clarify the lobby for the Backend
- * @param username: to clarify which user sends an respond to the BE and for which user an operation is to be made when the messagebroker calls
+ * @param lobbyKey: to clarify the lobby for the Backend
+ * @param username: to clarify which user sends a request to the BE and for which user an operation is to be made when the MessageBroker calls
  * @param data: for each Operation to be made, there is different data
  */
 export interface EventMessage {
@@ -21,9 +21,9 @@ export enum Operation {
 }
 
 /**
- * MoveOperation: Respond object to be used for specifiying the EventMessage Object from the messagebroker
+ * MoveOperation: Respond object to be used for specifying the EventMessage Object from the MessageBroker
  * @param data: { "NORTH", "EAST", "SOUTH", "WEST" } to send
- * @param data: { "0"    , "1"   , "2"    , "3" } to recieve
+ * @param data: { "0"    , "1"   , "2"    , "3" } to receive
  */
 export class MoveOperation implements EventMessage {
   operation = "MOVEMENT";
@@ -39,7 +39,7 @@ export class MoveOperation implements EventMessage {
 }
 
 /**
- * MoveOperation: Respond object to be used for specifiying the EventMessage Object from the messagebroker
+ * MoveOperation: Respond object to be used for specifying the EventMessage Object from the MessageBroker
  * 
  */
  export class PickOperation implements EventMessage {

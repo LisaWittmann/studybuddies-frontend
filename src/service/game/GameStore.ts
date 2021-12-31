@@ -26,7 +26,7 @@ function updateGameData() {
 /**
  * Updates the Player so, the watcher can build the changes
  * @param player: the new (changed) player object
- * @param newPosition: setzt die neue Position des Spielers
+ * @param newPosition: new position of the player
  */
 function updatePlayerData(player: Player, newPosition: number) {
   const foundPlayer = gameState.playerMap.get(player.getUsername());
@@ -38,15 +38,16 @@ function updatePlayerData(player: Player, newPosition: number) {
 
 /**
  * sets a Player with its username and the startTileId
- * @param username : name of the user in the playerMap to improve identification between Main- and Partnerplayer
- * @param startTileId : start position of the player at the start of the game
+ * @param username: name of the user in the playerMap to improve identification between Main- and PartnerPlayer
+ * @param role: role of the given user
+ * @param startTileId: start position of the player at the start of the game
  */
 async function setPlayerData(
   username: string,
   role: Role,
   startTileId: number
 ) {
-  console.log("Starttileid is: " + startTileId);
+  console.log("StartTileId is: " + startTileId);
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
     gameState.playerMap.set(

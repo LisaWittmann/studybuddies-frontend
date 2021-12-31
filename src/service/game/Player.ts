@@ -2,7 +2,7 @@ import { Item } from "@/service/labyrinth/Item";
 
 /**
  * enumeration of role of player,
- * defines player apprearance in game
+ * defines player appearance in game
  */
 export enum Role {
   DESIGNER,
@@ -27,7 +27,7 @@ export interface Player {
 /**
  * implementation of player interfaces
  * for main player in game (current loggedIn user)
- * that is representated as camera in scene
+ * that is represented as camera in scene
  * extends player by an inventory
  */
 export class MainPlayer implements Player {
@@ -78,7 +78,7 @@ export class MainPlayer implements Player {
 
 /**
  * implementation of interface player
- * for parnter player that is represented as object in scene
+ * for partner player that is represented as object in scene
  */
 export class PartnerPlayer implements Player {
   username: string;

@@ -36,7 +36,7 @@ async function updateLabyrinthData(lobbyKey: string) {
         jsonData.playerStartTileIds
       );
 
-      //iterate over the tiles in the jsondata tileMap to create tiles for every tile in jsonobject
+      //iterate over the tiles in the json data tileMap to create tiles for every tile in json object
       for (const key in jsonData.tileMap) {
         const tile = jsonData.tileMap[key];
         const id = parseInt(key);
@@ -93,8 +93,8 @@ async function updateLabyrinthData(lobbyKey: string) {
 /**
  * add uni directional relation from firstTile to secondTile
  * add empty relation if secondTile is undefined
- * @param firstTile: tile on wich relation should be added
- * @param secondTile: tile that sould be added to relation
+ * @param firstTile: tile on which relation should be added
+ * @param secondTile: tile that should be added to relation
  * @param orientationRelation: orientation in which relation should be added
  */
 function connectTiles(

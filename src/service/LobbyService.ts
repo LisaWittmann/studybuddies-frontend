@@ -32,9 +32,9 @@ function setLobbyState(
 }
 
 /**
- * send request to pick a available role
+ * send request to pick an available role
  * @param role: the role which was picked from the user
- * @param lobbyKey: identifying key of lobby that sould be joined
+ * @param lobbyKey: identifying key of lobby that should be joined
  * @param username: identifying name of user that should join lobby
  */
 async function updateRole(role: string, lobbyKey: string, username: string) {
@@ -60,7 +60,7 @@ async function updateRole(role: string, lobbyKey: string, username: string) {
 
 /**
  * send request to get every role which exists
- * @param lobbyKey: identifying key of lobby that sould be joined
+ * @param lobbyKey: identifying key of lobby that should be joined
  */
 async function getRoles(lobbyKey: string) {
   return fetch("/api/lobby/roles/" + lobbyKey, {
@@ -73,7 +73,7 @@ async function getRoles(lobbyKey: string) {
 
 /**
  * send request to get every role that can be picked, without the roles that picked already
- * @param lobbyKey: identifying key of lobby that sould be joined
+ * @param lobbyKey: identifying key of lobby that should be joined
  */
 async function getRoleOptions(lobbyKey: string) {
   return fetch("/api/lobby/selectable-roles/" + lobbyKey, {
@@ -90,8 +90,8 @@ async function getRoleOptions(lobbyKey: string) {
 
 /**
  * send request to join lobby with given lobby key
- * redirects to lobby settings view of lobby if joining was sucessfull
- * @param lobbyKey: identifying key of lobby that sould be joined
+ * redirects to lobby settings view of lobby if joining was successful
+ * @param lobbyKey: identifying key of lobby that should be joined
  * @param username: identifying name of user that should join lobby
  */
 async function joinLobby(lobbyKey: string, username: string) {
@@ -111,7 +111,7 @@ async function joinLobby(lobbyKey: string, username: string) {
 }
 
 /**
- * send request to create new lobby and joins creating user automaticly
+ * send request to create new lobby and joins creating user automatically
  * redirects to lobby settings view of created lobby
  * @param username: identifying name of user that creates new lobby
  */
@@ -135,7 +135,7 @@ async function createLobby(username: string) {
 
 /**
  * send request to remove user with given username from lobby
- * redirects back to find lobby view if request was successfull
+ * redirects back to find lobby view if request was successful
  * @param lobbyKey: identifying key of lobby from which user should be removed
  * @param username: identifying name of user that should be removed
  */
@@ -209,7 +209,7 @@ async function updateUsers(lobbyKey: string) {
 
 /**
  * send request to get all labyrinths in database that can be selected for game
- * sets the labyrinthOtions in the lobbyState with all labyrinth ids if request was successful
+ * sets the labyrinthOptions in the lobbyState with all labyrinth ids if request was successful
  * @throws error if request was not successful
  */
 async function updateLabyrinths() {
@@ -254,7 +254,7 @@ async function updateLabyrinthPick(labId: number, lobbyKey: string) {
 }
 
 /**
- * sets the new Labyrinth in the Dropdownmenu
+ * sets the new Labyrinth in the DropdownMenuComponent
  * @param selectedLabyrinth : id of the new selected Labyrinth
  */
 function setLabyrinthSelection(selectedLabyrinth: number) {
@@ -263,7 +263,7 @@ function setLabyrinthSelection(selectedLabyrinth: number) {
 
 /**
  * sends a List of two Arguments to the BE, so there can be checked, whether every Player is ready or not
- * (and reacts to a wrong respond after recieving it)
+ * (and reacts to a wrong respond after receiving it)
  * @param username: name of the user in the backend, which shall be taken out of the lobby
  * @param labId : id of the blueprint labyrinth, used for the Game Progression
  */

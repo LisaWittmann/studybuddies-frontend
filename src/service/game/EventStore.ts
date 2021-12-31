@@ -17,30 +17,30 @@ const {
   getRoleOptions,
 } = useLobbyService();
 
-const wsurl = "ws://localhost:9090/messagebroker";
+const wsURL = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
 
-const stompclient = new Client({ brokerURL: wsurl });
+const stompClient = new Client({ brokerURL: wsURL });
 
 /**
- * Connection Error Feedback for the Stompclient
+ * Connection Error Feedback for the StompClient
  */
-stompclient.onWebSocketError = () => {
+stompClient.onWebSocketError = () => {
   console.log("websocketerror");
   setError("WS-Fehler");
 };
-stompclient.onStompError = () => {
+stompClient.onStompError = () => {
   console.log("Stomperror");
   setError("STOMP-Fehler");
 };
 
 /**
- * Stompclient Methode to subscribe the Backend Messages on successful Connection and work with it
+ * StompClient Methode to subscribe the Backend Messages on successful Connection and work with it
  */
-stompclient.onConnect = () => {
+stompClient.onConnect = () => {
   console.log("stomp verbindet");
 
-  stompclient.subscribe(DEST, (message) => {
+  stompClient.subscribe(DEST, (message) => {
     console.log("Message received");
 
     const eventMessage: EventMessage = JSON.parse(message.body);
@@ -67,7 +67,7 @@ stompclient.onConnect = () => {
               // -> now the watcher can update the 3D Room
               // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
             } else {
-              setError("There is no Tilereference for this definition of data");
+              setError("There is no tile reference for this definition of data");
             }
           } else {
             setError("No existing User");
@@ -120,10 +120,10 @@ stompclient.onConnect = () => {
 };
 
 /**
- * Methode to handle the Disconnection
+ * Method to handle the Disconnection
  */
-stompclient.onDisconnect = () => {
-  /* Verbindung abgebaut*/
+stompClient.onDisconnect = () => {
+  //Connection closed
 };
 
-stompclient.activate();
+stompClient.activate();
