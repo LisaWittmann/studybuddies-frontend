@@ -1,15 +1,22 @@
 /**
- * EventMessage: independent interface to receiving the EventMessage Object from the MessageBroker as independent Object
+ * EventMessage: independent class to receive the EventMessage Object from the MessageBroker as independent Object
  * @param operation: to clarify which Operation Object can be used and which process can be started
  * @param lobbyKey: to clarify the lobby for the Backend
  * @param username: to clarify which user sends a request to the BE and for which user an operation is to be made when the MessageBroker calls
- * @param data: for each Operation to be made, there is different data
+ * @param data: for each Operation to be made, there is different data to give more specific information
  */
-export interface EventMessage {
+export class EventMessage {
   operation: string;
   lobbyKey: string;
   username: string;
   data: string;
+
+  constructor(operation: string, lobbyKey: string, username: string, data: string) {
+    this.operation = operation;
+    this.lobbyKey = lobbyKey;
+    this.username = username;
+    this.data = data;
+  }
 }
 
 export enum Operation {
@@ -21,29 +28,12 @@ export enum Operation {
 }
 
 /**
- * MoveOperation: Respond object to be used for specifying the EventMessage Object from the MessageBroker
+ * MoveOperation: Respond object to be used for specifiying the EventMessage Object from the messagebroker
  * @param data: { "NORTH", "EAST", "SOUTH", "WEST" } to send
  * @param data: { "0"    , "1"   , "2"    , "3" } to receive
  */
 export class MoveOperation implements EventMessage {
   operation = "MOVEMENT";
-  lobbyKey: string;
-  username: string;
-  data: string;
-
-  constructor(lobbyKey: string, username: string, data: string) {
-    this.lobbyKey = lobbyKey;
-    this.username = username;
-    this.data = data;
-  }
-}
-
-/**
- * MoveOperation: Respond object to be used for specifying the EventMessage Object from the MessageBroker
- * 
- */
- export class PickOperation implements EventMessage {
-  operation = "LABYRINTH_PICK";
   lobbyKey: string;
   username: string;
   data: string;

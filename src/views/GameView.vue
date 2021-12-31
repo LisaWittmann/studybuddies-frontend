@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, ref} from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
@@ -46,6 +46,7 @@ export default defineComponent({
     const { gameState, updateGameData, setLobbyKey } = useGameStore();
     const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();
+    const { updateUsers } = useLobbyService();
     updateGameData();
 
     const showTerminal = ref(false);
@@ -53,27 +54,24 @@ export default defineComponent({
     /*
     // Users Array -> Wird onMounted gefüllt
     const users = ref(new Array<string>());
-    
+    */
 
     onMounted(async () => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       await updateUsers(gameState.lobbyKey);
       updateGameData();
-    })
-    */
+    });
 
     let mainPlayer;
     let partnerPlayer;
     gameState.playerMap.forEach((player, key) => {
-      if(key == loginState.username) {
+      if (key == loginState.username) {
         mainPlayer = computed(() => player);
       } else {
         partnerPlayer = computed(() => player);
       }
-    })
-
-
+    });
 
     // in-game messages like warnings, errors, hints ...
     const message =

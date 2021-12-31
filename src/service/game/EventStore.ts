@@ -2,7 +2,6 @@ import { Client } from "@stomp/stompjs";
 import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "../login/LoginStore";
 import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
 import { ref } from "vue";
@@ -15,6 +14,8 @@ const {
   setLabyrinthSelection,
   updateLabyrinths,
   getRoleOptions,
+  setUserReadyState,
+  lobbyState
 } = useLobbyService();
 
 const wsURL = "ws://localhost:9090/messagebroker";
@@ -47,7 +48,7 @@ stompClient.onConnect = () => {
 
     if (
       eventMessage.lobbyKey == gameState.lobbyKey ||
-      eventMessage.lobbyKey == "*"
+      eventMessage.lobbyKey == "ALL"
     ) {
       console.log("Message in the right Lobby");
 
@@ -81,8 +82,13 @@ stompClient.onConnect = () => {
         case "TRADE":
           break;
         case "READY":
-          if (eventMessage.data === "READY") {
+          console.log(eventMessage);
+          if(eventMessage.username === "ALL_OF_LOBBY" && eventMessage.data === "READY") {
             setupGame();
+          }
+          else{
+            setUserReadyState(eventMessage.username, (eventMessage.data === "READY"));
+            console.log(lobbyState.users.find((user) => user.username == eventMessage.username));
           }
           break;
         case "LABYRINTH_PICK":

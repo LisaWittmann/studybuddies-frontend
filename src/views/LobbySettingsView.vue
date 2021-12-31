@@ -1,21 +1,24 @@
 <template>
   <div class="container">
-    <h1>Lobby {{ lobbyKey }}</h1>
+    <h1>Lobby
+      <span class="uppercase"> {{ lobbyKey }}</span>
+    </h1>
     <section>
+      <p>{{ users.length }}/2 Spieler verbunden</p>
       <UserListComponent :users="users" />
     </section>
     <section>
       <h2>Rolle auswählen:</h2>
       <div class="roles">
-        <span v-if="selected">{{ selected }}</span>
+        <span v-if="selectedRole">{{ selectedRole }}</span>
       </div>
       <RadioButtonGroupComponent
         :options="roles"
-        v-model="selected"
+        v-model="selectedRole"
         @clicked="selectRole"
         :selectable="roleOptions"
       />
-    </section>
+      </section>
     <section>
       <h2>Labyrinth auswählen:</h2>
       <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
@@ -23,7 +26,8 @@
     <section>
       <div class="column-wrapper">
         <button
-          class="button--small button--filled"
+          :class="{ 'button--ready': isReady }"
+          class="button--small"
           @click="readyCheck(loginState.username, selectedLabyrinth)"
         >
           Bereit
@@ -81,6 +85,8 @@ export default defineComponent({
     const openRoles = computed(() => lobbyState.openRoles);
     let selectedRole = computed(() => lobbyState.selectedRole);
 
+    //ReadyState data
+    const isReady = computed(() => lobbyState.users.find((user) => user.username === loginState.username)?.isReady);
 
     function selectLabyrinth(id: number) {
       sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
@@ -113,7 +119,7 @@ export default defineComponent({
     });
 
     return {
-      selected: selectedRole,
+      selectedRole,
       readyCheck,
       selectLabyrinth,
       exitLobby,
@@ -125,6 +131,7 @@ export default defineComponent({
       labyrinthOptions,
       selectedLabyrinth,
       loginState,
+      isReady,
     };
   },
 });
@@ -133,6 +140,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 h1 {
   margin: $spacing-l 0;
+
+  span {
+    font-weight: inherit;
+  }
 }
 
 .button {
