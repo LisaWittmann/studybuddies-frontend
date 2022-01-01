@@ -7,7 +7,7 @@ import { settings } from "@/service/scene/helper/SceneConstants";
 /**
  * creates a group of objects representing a tile
  * @param tileKey: index of tile in the labyrinth
- * @param model: representing tile data
+ * @param tile: representing tile data
  * @param position: position in scene
  * @param role: role of main player
  * @param neighbors: neighbor tiles with orientations
@@ -16,43 +16,53 @@ import { settings } from "@/service/scene/helper/SceneConstants";
  */
 function createTile(
   tileKey: number,
-  model: Tile,
+  tile: Tile,
   position: THREE.Vector3,
   role: Role | undefined,
   neighbors: Map<Orientation, Tile | undefined>,
   color = 0xa9a9a9
 ): THREE.Group {
-  const { createFloor, createCeiling, createArrow, createWall, createItem } =
-    useObjectFactory();
-  const tile = new THREE.Group();
-  tile.userData = model;
-  tile.userData.tileId = tileKey;
+  const { createFloor, createCeiling, createArrow, createWall, createItem } = useObjectFactory();
+  const tileModel = new THREE.Group();
+  tileModel.userData = tile;
+  tileModel.userData.tileId = tileKey;
+  const tileRestricted = tile.isRestrictedFor(role);
 
   //LIGHT-----------------
-  tile.add(createLight(position));
+  tileModel.add(createLight(position));
 
   //STATIC-ITEMS----------
-  tile.add(createFloor(position, color, tileKey));
-  tile.add(createCeiling(position, color));
-  neighbors.forEach((neighbor, orientation) => {
-    if (neighbor) {
-      // don't add navigation arrow if neighbor has restriction for main player's role
-      // mark restricted tile with transparent wall
-      if (neighbor.isRestrictedFor(role)) {
-        tile.add(createWall(orientation, position, color, 0.5));
-      } else {
-        createArrow(orientation, position, tile);
+  tileModel.add(createFloor(position, color, tileKey));
+  tileModel.add(createCeiling(position, color));
+  if (tileRestricted) {
+    neighbors.forEach((neighbor, orientation) => {
+      if (!neighbor) {
+        tileModel.add(createWall(orientation, position, color));
+      } else if (!neighbor.isRestrictedFor(role)) {
+        //transparent wall if restricted zone is ending in the current orientation
+        tileModel.add(createWall(orientation, position, color, 0.5));
       }
-    } else {
-      tile.add(createWall(orientation, position, color));
-    }
-  });
+    });
+  } else {
+    neighbors.forEach((neighbor, orientation) => {
+      if (!neighbor) {
+        tileModel.add(createWall(orientation, position, color));
+      } else if (!neighbor.isRestrictedFor(role)) {
+        //arrow if there are no restrictions for the player in relation to the current tile
+        createArrow(orientation, position, tileModel);
+      }
+      else {
+        //transparent wall if restricted zone is starting in the current orientation
+        tileModel.add(createWall(orientation, position, color, 0.5));
+      }
+    });
+  }
 
   //ITEMS-----------------
-  for (const item of model.objectsInRoom) {
-    createItem(item, tile, position);
+  for (const item of tile.objectsInRoom) {
+    createItem(item, tileModel, position);
   }
-  return tile;
+  return tileModel;
 }
 
 /**

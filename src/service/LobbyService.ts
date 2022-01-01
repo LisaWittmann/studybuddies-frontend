@@ -315,7 +315,7 @@ function setupGame() {
           // for testing roles
           fetch(`/api/lobby/role/${gameState.lobbyKey}/${user.username}`)
               .then((response) => {
-                if (response.ok) throw new Error(response.statusText)
+                if (!response.ok) throw new Error(response.statusText)
                 return response.json();
               })
               .then((jsonData) => {
