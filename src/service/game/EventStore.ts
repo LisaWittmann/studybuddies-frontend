@@ -15,7 +15,7 @@ const {
   updateLabyrinths,
   getRoleOptions,
   setUserReadyState,
-  lobbyState
+  lobbyState,
 } = useLobbyService();
 
 const wsurl = "ws://localhost:9090/messagebroker";
@@ -83,12 +83,21 @@ stompclient.onConnect = () => {
           break;
         case "READY":
           console.log(eventMessage);
-          if(eventMessage.username === "ALL_OF_LOBBY" && eventMessage.data === "READY") {
+          if (
+            eventMessage.username === "ALL_OF_LOBBY" &&
+            eventMessage.data === "READY"
+          ) {
             setupGame();
-          }
-          else{
-            setUserReadyState(eventMessage.username, (eventMessage.data === "READY"));
-            console.log(lobbyState.users.find((user) => user.username == eventMessage.username));
+          } else {
+            setUserReadyState(
+              eventMessage.username,
+              eventMessage.data === "READY"
+            );
+            console.log(
+              lobbyState.users.find(
+                (user) => user.username == eventMessage.username
+              )
+            );
           }
           break;
         case "LABYRINTH_PICK":
@@ -109,8 +118,7 @@ stompclient.onConnect = () => {
               break;
             default:
               console.info(
-                "No List was updated with Data: " +
-                eventMessage.data
+                "No List was updated with Data: " + eventMessage.data
               );
               break;
           }

@@ -59,7 +59,7 @@ export default defineComponent({
       isOpen.value = false;
     }
 
-    return { isOpen, openClose, selectItem, props};
+    return { isOpen, openClose, selectItem, props };
   },
 });
 </script>
