@@ -27,25 +27,3 @@ export enum Operation {
   CHAT,
   ROLE_PICK,
 }
-
-/**
- * @todo: Fragen bezüglich Verwendung oder Rausschmiss der spezifischen Operation-Objekte.
- * Objekte sind für Doku zwecke deutlich besser geeignet, um data besser zu ordnen zu können.
- * 
- * Haben ansonsten jedoch keinen Nutzen, da es sich über oben erstellten Konstruktor ebenso lösen lässt.
- * MoveOperation: Respond object to be used for specifiying the EventMessage Object from the messagebroker
- * @param data: { "NORTH", "EAST", "SOUTH", "WEST" } to send
- * @param data: { "0"    , "1"   , "2"    , "3" } to recieve
- */
-export class MoveOperation implements EventMessage {
-  operation = "MOVEMENT";
-  lobbyKey: string;
-  username: string;
-  data: string;
-
-  constructor(lobbyKey: string, username: string, data: string) {
-    this.lobbyKey = lobbyKey;
-    this.username = username;
-    this.data = data;
-  }
-}

@@ -192,7 +192,6 @@ async function updateUsers(lobbyKey: string) {
 
       response.forEach((username: string)  => {
         const foundUser: User | undefined = tempUsers.find(user => user.username === username);
-        console.log(foundUser);
         if(foundUser) {
           lobbyState.users.push(foundUser);
         } else {
