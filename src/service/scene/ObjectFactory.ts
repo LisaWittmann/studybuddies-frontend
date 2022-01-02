@@ -9,6 +9,7 @@ import { PartnerPlayer, Role } from "@/service/game/Player";
 
 import { settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
+import { Vector3 } from "three";
 
 const objectLoader = new OBJLoader();
 const materialLoader = new MTLLoader();
@@ -28,11 +29,27 @@ async function createItem(
   position: THREE.Vector3
 ) {
   const model = item.modelName.toLowerCase();
+  let factor = 0;
+  const size = new Vector3();
+
   await materialLoader.loadAsync("materials.mtl").then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
       object.position.copy(item.calcPositionInRoom().add(position));
+      //get size before rotation
+      const box = new THREE.Box3().setFromObject(object);
+      box.getSize(size);
+      if (size.x > settings.tileSize / 4) {
+        factor = 1 / (size.x / (settings.tileSize / 4));
+        console.log("X bigger", size.x, factor);
+      } else if (size.y > settings.tileSize / 4) {
+        factor = 1 / (size.y / (settings.tileSize / 4));
+        console.log("Y bigger", size.y, factor);
+      }
+
+      object.scale.set(factor, factor, factor);
+
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
