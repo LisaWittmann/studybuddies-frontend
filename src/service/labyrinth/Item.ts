@@ -67,30 +67,25 @@ export class Item {
       //cast string from array to enum for simple use of enum in switch
       const eO: Orientation = (<any>Orientation)[o];
       const directionVector = new Vector3();
-
       switch (eO) {
         case Orientation.NORTH:
           directionVector.copy(direction.north);
-          this.calcPosition = this.calcPosition.add(directionVector);
           break;
         case Orientation.EAST:
           directionVector.copy(direction.east);
-          this.calcPosition = this.calcPosition.add(directionVector);
           break;
         case Orientation.SOUTH:
           directionVector.copy(direction.south);
-          this.calcPosition = this.calcPosition.add(directionVector);
           break;
         case Orientation.WEST:
           directionVector.copy(direction.west);
-          this.calcPosition = this.calcPosition.add(directionVector);
           break;
       }
+      this.calcPosition.copy(this.calcPosition.clone().add(directionVector));
     });
 
     //move item quarter of the current tile size
     this.calcPosition = this.calcPosition.multiplyScalar(settings.tileSize / 4);
-
     return this.calcPosition;
   };
 
