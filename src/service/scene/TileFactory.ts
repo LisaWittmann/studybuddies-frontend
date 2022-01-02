@@ -5,6 +5,7 @@ import { settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * creates a group of objects representing a tile
+ * @param tileKey: id of the tile
  * @param model: representing tile data
  * @param position: position in scene
  * @param color: color of all walls
@@ -21,6 +22,8 @@ function createTile(
   const tile = new THREE.Group();
   tile.userData = model;
   tile.userData.tileId = tileKey;
+  tile.name = tileKey.toString();
+
 
   //LIGHT-----------------
   tile.add(createLight(position));

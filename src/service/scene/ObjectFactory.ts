@@ -36,6 +36,7 @@ async function createItem(
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
+      object.name = "item " + item.modelName;
       parent.add(object);
     });
   });
@@ -56,6 +57,7 @@ function createFloor(position: THREE.Vector3, color = 0x199eb0, key: number) {
   object.position.copy(position);
   object.userData.tileKey = key;
   object.rotateX(radians(90));
+  object.name = "floor";
   return object;
 }
 
@@ -72,6 +74,7 @@ function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
   );
   object.position.set(position.x, position.y + settings.tileSize, position.z);
   object.rotateX(radians(90));
+  object.name = "ceiling";
   return object;
 }
 
@@ -96,6 +99,7 @@ function createWall(
   object.position.copy(position);
   object.rotateY(wall.rotationY());
   object.userData = wall;
+  object.name = "wall";
   return object;
 }
 
@@ -122,6 +126,7 @@ function createArrow(
         child.material.color.setHex(arrow.color);
       }
     });
+    object.name = "arrow";
     parent.add(object);
   });
 }
@@ -154,6 +159,8 @@ async function createPlayer(
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
       object.position.copy(position);
       object.userData.username = player.username;
+      object.name = "partner";
+      object.rotateY(90);
       parent.add(object);
     });
   });

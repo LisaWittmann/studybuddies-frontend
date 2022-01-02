@@ -2,12 +2,15 @@ import { Scene, Vector3 } from "three";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { PartnerPlayer } from "@/service/game/Player";
+import { settings, direction } from "./helper/SceneConstants";
+import { useLabyrinthStore } from "../labyrinth/LabyrinthStore";
+import { Orientation } from "../labyrinth/Tile";
 
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer } = useObjectFactory();
 
 let partnerInitialized = false;
-
+const { labyrinthState } = useLabyrinthStore();
 /**
  * update position of main player
  * @param tilePosition: position of tile player should be placed on
@@ -31,7 +34,11 @@ function updatePartnerPlayer(
   if (player.getUsername() == "") {
     return;
   } else {
-    const position = calculatePartnerPositon(tilePosition);
+    const position = calculatePartnerPositon(
+      player.getPosition(),
+      scene,
+      tilePosition
+    );
     const playerObject = getPlayer(player.getUsername(), scene);
     if (!partnerInitialized) {
       partnerInitialized = true;
@@ -64,8 +71,76 @@ function getPlayer(
  * @param tilePosition: position of tile that player should be placed in
  * @returns position as three dimensional vector
  */
-function calculatePartnerPositon(tilePosition: Vector3): Vector3 {
-  return tilePosition;
+function calculatePartnerPositon(
+  currentTileID: number,
+  scene: THREE.Scene,
+  tilePosition: Vector3
+): Vector3 {
+  const tileItems = labyrinthState.tileMap.get(currentTileID)?.objectsInRoom;
+  const itemOrientations = new Array<string>();
+
+  //partner initially placed in the northwest corner
+  let playerOrientation = "NORTHWEST";
+  let calcPartnerPosition = new Vector3();
+  calcPartnerPosition
+    .copy(tilePosition)
+    .add(direction.north)
+    .add(direction.west);
+
+  //gets all orientations/positions of items in tile
+  if (tileItems) {
+    tileItems.forEach((item) => {
+      itemOrientations.push(item.orientations.toString().replace(",", ""));
+    });
+  }
+
+  console.log("ITEM ORIENTATIONS", itemOrientations);
+
+  itemOrientations.forEach((o) => {
+    if (playerOrientation === o) {
+      switch (o) {
+        case "NORTHWEST" || "WESTNORTH":
+          //there is an item in the northwest corner -> move partner clockwise
+          playerOrientation = "NORTHEAST";
+          calcPartnerPosition
+            .copy(tilePosition)
+            .add(direction.north)
+            .add(direction.east);
+          break;
+        case "NORTHEAST" || "EASTNORTH":
+          playerOrientation = "SOUTHEAST";
+          calcPartnerPosition
+            .copy(tilePosition)
+            .add(direction.south)
+            .add(direction.east);
+          break;
+        case "SOUTHEAST" || "EASTSOUTH":
+          playerOrientation = "SOUTHWEST";
+          calcPartnerPosition
+            .copy(tilePosition)
+            .add(direction.south)
+            .add(direction.west);
+          break;
+        case "SOUTHWEST" || "WESTSOUTH":
+          playerOrientation = "NORTHWEST";
+          calcPartnerPosition
+            .copy(tilePosition)
+            .add(direction.north)
+            .add(direction.west);
+          break;
+      }
+    }
+  });
+
+  console.log("POSITION", playerOrientation, calcPartnerPosition);
+
+  //move partner quarter of the current tile size to be in same
+  calcPartnerPosition = calcPartnerPosition.multiplyScalar(
+    settings.tileSize / 4
+  );
+
+  console.log(calcPartnerPosition);
+  return calcPartnerPosition;
 }
 
 export function usePlayerFactory() {
