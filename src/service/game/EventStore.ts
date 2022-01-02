@@ -5,7 +5,6 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
 import { ref } from "vue";
-import { useLabyrinthStore } from "../labyrinth/LabyrinthStore";
 
 const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
   useGameStore();
@@ -118,8 +117,8 @@ stompclient.onConnect = () => {
               getRoleOptions(eventMessage.lobbyKey);
               break;
             case "COLLECT":
-              console.log('COLLECTING IN ', gameState.lobbyKey)
-              updateGameData()
+              console.log("COLLECTING IN ", gameState.lobbyKey);
+              updateGameData();
               break;
             default:
               console.info(
