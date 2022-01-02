@@ -65,7 +65,7 @@ async function checkAccess(modelName: string) {
   console.log("CHECK ACCESS");
   console.log(gameState);
   console.log(loginState);
-  fetch(`/api/body/access/${modelName}`, {
+  fetch(`/api/body/access/${modelName}/${gameState.lobbyKey}/${loginState.username}`, {
     method: "GET",
   })
     .then((response) => {
