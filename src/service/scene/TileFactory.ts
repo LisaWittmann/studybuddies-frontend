@@ -22,7 +22,14 @@ function createTile(
   neighbors: Map<Orientation, Tile | undefined>,
   color = 0xa9a9a9
 ): THREE.Group {
-  const { createFloor, createCeiling, createArrow, createWall, createItem } = useObjectFactory();
+  const {
+    createFloor,
+    createCeiling,
+    createArrow,
+    createWall,
+    createRestrictiveWall,
+    createItem,
+  } = useObjectFactory();
   const tileModel = new THREE.Group();
   tileModel.userData = tile;
   tileModel.userData.tileId = tileKey;
@@ -32,15 +39,12 @@ function createTile(
   tileModel.add(createLight(position));
 
   //STATIC-ITEMS----------
-  tileModel.add(createFloor(position, color, tileKey));
+  tileModel.add(createFloor(position, tileKey, color));
   tileModel.add(createCeiling(position, color));
   if (tileRestricted) {
     neighbors.forEach((neighbor, orientation) => {
       if (!neighbor) {
         tileModel.add(createWall(orientation, position, color));
-      } else if (!neighbor.isRestrictedFor(role)) {
-        //transparent wall if restricted zone is ending in the current orientation
-        tileModel.add(createWall(orientation, position, color, 0.5));
       }
     });
   } else {
@@ -50,10 +54,9 @@ function createTile(
       } else if (!neighbor.isRestrictedFor(role)) {
         //arrow if there are no restrictions for the player in relation to the current tile
         createArrow(orientation, position, tileModel);
-      }
-      else {
+      } else {
         //transparent wall if restricted zone is starting in the current orientation
-        tileModel.add(createWall(orientation, position, color, 0.5));
+        createRestrictiveWall(tileModel, orientation, position);
       }
     });
   }

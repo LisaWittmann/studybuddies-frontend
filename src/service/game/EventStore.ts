@@ -15,7 +15,7 @@ const {
   updateLabyrinths,
   getRoleOptions,
   setUserReadyState,
-  lobbyState
+  lobbyState,
 } = useLobbyService();
 
 const wsURL = "ws://localhost:9090/messagebroker";
@@ -68,7 +68,9 @@ stompClient.onConnect = () => {
               // -> now the watcher can update the 3D Room
               // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
             } else {
-              setError("There is no tile reference for this definition of data");
+              setError(
+                "There is no tile reference for this definition of data"
+              );
             }
           } else {
             setError("No existing User");
@@ -83,12 +85,21 @@ stompClient.onConnect = () => {
           break;
         case "READY":
           console.log(eventMessage);
-          if(eventMessage.username === "ALL_OF_LOBBY" && eventMessage.data === "READY") {
+          if (
+            eventMessage.username === "ALL_OF_LOBBY" &&
+            eventMessage.data === "READY"
+          ) {
             setupGame();
-          }
-          else{
-            setUserReadyState(eventMessage.username, (eventMessage.data === "READY"));
-            console.log(lobbyState.users.find((user) => user.username == eventMessage.username));
+          } else {
+            setUserReadyState(
+              eventMessage.username,
+              eventMessage.data === "READY"
+            );
+            console.log(
+              lobbyState.users.find(
+                (user) => user.username == eventMessage.username
+              )
+            );
           }
           break;
         case "LABYRINTH_PICK":
@@ -109,8 +120,7 @@ stompClient.onConnect = () => {
               break;
             default:
               console.info(
-                "No List was updated with Data: " +
-                eventMessage.data
+                "No List was updated with Data: " + eventMessage.data
               );
               break;
           }

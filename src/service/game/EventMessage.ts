@@ -11,7 +11,12 @@ export class EventMessage {
   username: string;
   data: string;
 
-  constructor(operation: string, lobbyKey: string, username: string, data: string) {
+  constructor(
+    operation: string,
+    lobbyKey: string,
+    username: string,
+    data: string
+  ) {
     this.operation = operation;
     this.lobbyKey = lobbyKey;
     this.username = username;

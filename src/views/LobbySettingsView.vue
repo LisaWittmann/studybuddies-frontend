@@ -1,6 +1,7 @@
 <template>
   <div class="container">
-    <h1>Lobby
+    <h1>
+      Lobby
       <span class="uppercase"> {{ lobbyKey }}</span>
     </h1>
     <section>
@@ -18,7 +19,7 @@
         @clicked="selectRole"
         :selectable="roleOptions"
       />
-      </section>
+    </section>
     <section>
       <h2>Labyrinth auswählen:</h2>
       <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
@@ -44,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref} from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
@@ -86,7 +87,11 @@ export default defineComponent({
     let selectedRole = computed(() => lobbyState.selectedRole);
 
     //ReadyState data
-    const isReady = computed(() => lobbyState.users.find((user) => user.username === loginState.username)?.isReady);
+    const isReady = computed(
+      () =>
+        lobbyState.users.find((user) => user.username === loginState.username)
+          ?.isReady
+    );
 
     function selectLabyrinth(id: number) {
       sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
@@ -94,21 +99,21 @@ export default defineComponent({
     }
 
     function selectRole(name: string) {
-      sessionStorage.setItem("chosenRole", JSON.stringify(name))
+      sessionStorage.setItem("chosenRole", JSON.stringify(name));
       updateRole(name, gameState.lobbyKey, loginState.username);
     }
 
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      if(sessionStorage.getItem("lobbyKey") == gameState.lobbyKey) {
+      if (sessionStorage.getItem("lobbyKey") == gameState.lobbyKey) {
         setLobbyState(
           sessionStorage.getItem("users"),
           sessionStorage.getItem("selectedLabyrinth"),
           sessionStorage.getItem("labyrinthOptions"),
           sessionStorage.getItem("errormessage"),
-          sessionStorage.getItem("chosenRole"),
-          );
+          sessionStorage.getItem("chosenRole")
+        );
       } else {
         sessionStorage.setItem("lobbyKey", gameState.lobbyKey);
       }

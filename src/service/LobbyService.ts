@@ -2,7 +2,7 @@ import router from "@/router";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 import { EventMessage } from "@/service/game/EventMessage";
-import { reactive, readonly} from "vue";
+import { reactive, readonly } from "vue";
 import { User } from "./login/User";
 import { Role } from "./game/Player";
 
@@ -192,18 +192,20 @@ async function updateUsers(lobbyKey: string) {
   fetch("/api/lobby/users/" + lobbyKey, {
     method: "GET",
   })
-  .then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json()
-  })
-  .then((response) => {
-    const tempUsers = lobbyState.users;
-    lobbyState.users = [];
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((response) => {
+      const tempUsers = lobbyState.users;
+      lobbyState.users = [];
 
-      response.forEach((username: string)  => {
-        const foundUser: User | undefined = tempUsers.find(user => user.username === username);
+      response.forEach((username: string) => {
+        const foundUser: User | undefined = tempUsers.find(
+          (user) => user.username === username
+        );
         console.log(foundUser);
-        if(foundUser) {
+        if (foundUser) {
           lobbyState.users.push(foundUser);
         } else {
           lobbyState.users.push(new User(username));
@@ -242,16 +244,23 @@ async function updateLabyrinths() {
  */
 async function updateLabyrinthPick(labId: number, lobbyKey: string) {
   const { loginState } = useLoginStore();
-  const eventMessage = new EventMessage("LABYRINTH_PICK", lobbyKey, loginState.username, labId.toString());
+  const eventMessage = new EventMessage(
+    "LABYRINTH_PICK",
+    lobbyKey,
+    loginState.username,
+    labId.toString()
+  );
   fetch("/api/lobby/labyrinth-pick", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(eventMessage),
-  }).then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-  }).catch((error) => console.error(error));
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+    })
+    .catch((error) => console.error(error));
 }
 
 /**
@@ -296,8 +305,10 @@ function readyCheck(username: string, labId: number) {
  * @param username The username (from the BE) of the user which pressed the "Ready" Button
  * @param readyState The state to determine whether the given user is ready or not
  */
-function setUserReadyState(username: string, readyState: boolean){
-  lobbyState.users.find((user) => user.username == username)?.setReady(readyState);
+function setUserReadyState(username: string, readyState: boolean) {
+  lobbyState.users
+    .find((user) => user.username == username)
+    ?.setReady(readyState);
 }
 
 /**
@@ -310,24 +321,24 @@ function setUserReadyState(username: string, readyState: boolean){
 function setupGame() {
   const { updateGameData, gameState, setPlayerData } = useGameStore();
   updateUsers(gameState.lobbyKey)
-      .then(() => {
-        lobbyState.users.forEach((user, index) => {
-          // for testing roles
-          fetch(`/api/lobby/role/${gameState.lobbyKey}/${user.username}`)
-              .then((response) => {
-                if (!response.ok) throw new Error(response.statusText)
-                return response.json();
-              })
-              .then((jsonData) => {
-                const role = (<any>Role)[jsonData];
-                const startTile = gameState.labyrinth.playerStartTileIds[index];
-                setPlayerData(user.username, role, startTile);
-              });
-        });
-      })
-      .then(() =>
-          updateGameData().then(() => router.push(`/game/${gameState.lobbyKey}`))
-      );
+    .then(() => {
+      lobbyState.users.forEach((user, index) => {
+        // for testing roles
+        fetch(`/api/lobby/role/${gameState.lobbyKey}/${user.username}`)
+          .then((response) => {
+            if (!response.ok) throw new Error(response.statusText);
+            return response.json();
+          })
+          .then((jsonData) => {
+            const role = (<any>Role)[jsonData];
+            const startTile = gameState.labyrinth.playerStartTileIds[index];
+            setPlayerData(user.username, role, startTile);
+          });
+      });
+    })
+    .then(() =>
+      updateGameData().then(() => router.push(`/game/${gameState.lobbyKey}`))
+    );
 }
 
 export function useLobbyService() {
