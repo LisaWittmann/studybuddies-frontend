@@ -1,4 +1,8 @@
 import { EventMessage } from "@/service/game/EventMessage";
+import { Object3D } from "three";
+import { useGameStore } from "./GameStore";
+
+const { gameState } = useGameStore();
 
 async function playerMovement(evenMessage: EventMessage) {
   fetch("/api/lobby/move", {
@@ -15,16 +19,27 @@ async function playerMovement(evenMessage: EventMessage) {
 }
 
 // send the clicked item id to backend
-async function itemSelection(itemId: number) {
-  fetch("/api/click/" + itemId, {
-    method: "POST",
+async function itemSelection(model: Object3D) {
+  const lobbyKey = gameState.lobbyKey;
+  fetch("/api/lobby/" + lobbyKey + "/item/" + model.id + "/strategy", {
+    method: "GET",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "text/plain",
     },
-    body: JSON.stringify(itemId),
-  }).catch((error) => {
-    console.error(error);
-  });
+  })
+    .then((response) => {
+      if (response.ok) {
+        fetch("/api/lobby/" + lobbyKey + "/item/" + model.id, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "text/plain",
+          },
+        });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 }
 
 export function useGameService() {
