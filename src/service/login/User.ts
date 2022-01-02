@@ -2,9 +2,9 @@
  * datatype user for login and register
  */
 export class User {
-  username!: string;
+  username: string;
   password!: string;
-  isReady!: boolean;
+  isReady: boolean;
 
   constructor(username: string) {
     this.username = username;

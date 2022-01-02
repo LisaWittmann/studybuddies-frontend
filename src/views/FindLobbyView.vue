@@ -29,7 +29,6 @@ export default defineComponent({
   name: "FindLobby",
   setup() {
     const { loginState } = useLoginStore();
-    const { updateUsers } = useLobbyService();
     const lobbyKey = ref("");
 
     function joinGame() {
@@ -63,7 +62,6 @@ export default defineComponent({
           }
         })
         .then((jsonData) => {
-          updateUsers(jsonData.key);
           router.push("/lobby/" + jsonData.key);
         })
         .catch((err) => console.log(err));
