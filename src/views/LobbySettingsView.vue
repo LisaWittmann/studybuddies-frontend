@@ -14,15 +14,19 @@
         <span v-if="selectedRole">{{ selectedRole }}</span>
       </div>
       <RadioButtonGroupComponent
-        :options="roles"
+        :options="allRoles"
         v-model="selectedRole"
         @clicked="selectRole"
-        :selectable="roleOptions"
+        :selectable="openRoles"
       />
     </section>
     <section>
       <h2>Labyrinth auswählen:</h2>
-      <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
+      <DropdownComponent
+        :items="labyrinthOptions"
+        :selectedItem="selectedLabyrinth"
+        @select="selectLabyrinth"
+      />
     </section>
     <section>
       <div class="column-wrapper">
@@ -67,6 +71,7 @@ export default defineComponent({
       updateUsers,
       readyCheck,
       exitLobby,
+      setLabyrinthSelection,
       updateLabyrinthPick,
       updateLabyrinths,
       setLobbyState,
@@ -84,7 +89,7 @@ export default defineComponent({
     //Radiobutton data
     const allRoles = ref([]);
     const openRoles = computed(() => lobbyState.openRoles);
-    let selectedRole = computed(() => lobbyState.selectedRole);
+    const selectedRole = computed(() => lobbyState.selectedRole);
 
     //ReadyState data
     const isReady = computed(
@@ -94,8 +99,9 @@ export default defineComponent({
     );
 
     function selectLabyrinth(id: number) {
-      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
+      setLabyrinthSelection(id);
       updateLabyrinthPick(id, gameState.lobbyKey);
+      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
     }
 
     function selectRole(name: string) {
@@ -129,8 +135,8 @@ export default defineComponent({
       selectLabyrinth,
       exitLobby,
       selectRole,
-      roles: allRoles,
-      roleOptions: openRoles,
+      allRoles,
+      openRoles,
       users,
       lobbyKey,
       labyrinthOptions,
@@ -166,16 +172,5 @@ h1 {
       color: darkred;
     }
   }
-
-  &--confirm {
-    &:hover,
-    &:active {
-      color: $color-green;
-    }
-  }
-}
-
-input[type="file"] {
-  display: none;
 }
 </style>

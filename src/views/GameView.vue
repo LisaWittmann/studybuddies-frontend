@@ -24,7 +24,7 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
 
 import { Orientation } from "@/service/labyrinth/Tile";
-import { MoveOperation } from "@/service/game/EventMessage";
+import { EventMessage } from "@/service/game/EventMessage";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
@@ -49,11 +49,6 @@ export default defineComponent({
     updateGameData();
 
     const showTerminal = ref(false);
-
-    /*
-    // Users Array -> Wird onMounted gefüllt
-    const users = ref(new Array<string>());
-    */
 
     onMounted(async () => {
       const route = router.currentRoute.value;
@@ -84,12 +79,13 @@ export default defineComponent({
 
     /**
      * function which is used when clicking the arrow in Interface
-     * By receiving the Orientation it creates a MoveOperation to send it to the BE via GameService Methode
+     * By receiving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
      * @param orientation : used in the backend to identify the direction to move the player
      */
     function movePlayer(orientation: Orientation) {
       playerMovement(
-        new MoveOperation(
+        new EventMessage(
+          "MOVEMENT",
           gameState.lobbyKey,
           loginState.username,
           Orientation[orientation].toString()
