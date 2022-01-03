@@ -25,6 +25,10 @@
             Noch kein Benutzerkonto?
             <router-link to="/register">Jetzt registrieren</router-link>
           </p>
+          <span>
+            Lade jetzt dein eigenes Labyrinth hoch:<br />
+            <router-link to="/upload">Labyrinth hochladen</router-link>
+          </span>
           <span class="error">{{ loginState.errormessage }}</span>
         </form>
       </section>
@@ -41,7 +45,7 @@ export default defineComponent({
   name: "LoginView",
   setup() {
     const { loginState, login } = useLoginStore();
-    const user = new User();
+    const user = new User(loginState.username);
 
     return {
       user,
@@ -51,3 +55,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+h1 {
+  margin-bottom: 0;
+}
+</style>

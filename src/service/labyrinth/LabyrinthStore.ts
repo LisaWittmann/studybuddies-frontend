@@ -9,18 +9,19 @@ import { Vector3 } from "three";
  */
 const labyrinthState: Labyrinth = reactive<Labyrinth>({
   tileMap: new Map<number, Tile>([]),
-  endTileId: 0,
-  playerStartTileIds: new Array<number>(),
+  endTileKey: 0,
+  playerStartTileKeys: new Array<number>(),
 });
 
 /**
  * update the tiles for getting them initially and every time something changes
- * fetches labyrnith object of api and converts response into labyrinth data
+ * fetches labyrinth object of api and converts response into labyrinth data
  * creates simple fallback labyrinth if fetch fails
  */
-async function updateLabyrinth(labyrinthId: number) {
-  console.log(labyrinthId);
-  await fetch(`/api/labyrinth/${labyrinthId}`, {
+async function updateLabyrinthData(lobbyKey: string) {
+  console.log("Requested lab of lobby " + lobbyKey);
+  //TODO change this to the game api
+  await fetch(`/api/lobby/${lobbyKey}`, {
     method: "GET",
   })
     .then((response) => {
@@ -29,8 +30,8 @@ async function updateLabyrinth(labyrinthId: number) {
     })
     .then((jsonData) => {
       const labyrinth = new Labyrinth(
-        jsonData.endTileId,
-        jsonData.playerStartTileIds
+        jsonData.endTileKey,
+        jsonData.playerStartTileKeys
       );
 
       //iterate over the tiles in the jsondata tileMap to create tiles for every tile in jsonobject
@@ -73,8 +74,8 @@ async function updateLabyrinth(labyrinthId: number) {
       }
 
       labyrinthState.tileMap = labyrinth.tileMap;
-      labyrinthState.endTileId = labyrinth.endTileId;
-      labyrinthState.playerStartTileIds = labyrinth.playerStartTileIds;
+      labyrinthState.endTileKey = labyrinth.endTileKey;
+      labyrinthState.playerStartTileKeys = labyrinth.playerStartTileKeys;
     })
     .catch((error) => {
       console.error(error);
@@ -99,6 +100,6 @@ function connectTiles(
 export function useLabyrinthStore() {
   return {
     labyrinthState,
-    updateLabyrinth,
+    updateLabyrinthData,
   };
 }

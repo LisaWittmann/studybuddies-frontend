@@ -4,6 +4,7 @@ import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import GameView from "@/views/GameView.vue";
 import LobbySettingsView from "@/views/LobbySettingsView.vue";
+import LabyrinthUploadView from "@/views/LabyrinthUploadView.vue";
 import FindLobbyView from "@/views/FindLobbyView.vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 
@@ -40,9 +41,19 @@ const routes: Array<RouteRecordRaw> = [
     component: GameView,
     props: true,
   },
+  {
+    path: "/upload",
+    name: "LabyrinthUploadView",
+    component: LabyrinthUploadView,
+  },
 ];
 
-const noAuthentication = ["HomeView", "RegisterView", "LoginView"];
+const noAuthentication = [
+  "HomeView",
+  "RegisterView",
+  "LoginView",
+  "LabyrinthUploadView",
+];
 
 const router = createRouter({
   history: createWebHashHistory(process.env.BASE_URL),

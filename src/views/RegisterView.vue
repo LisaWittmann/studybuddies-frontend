@@ -25,6 +25,10 @@
             Du bist bereits registriert?
             <router-link to="/login">Jetzt anmelden</router-link>
           </p>
+          <span>
+            Lade jetzt dein eigenes Labyrinth hoch:<br />
+            <router-link to="/upload">Labyrinth hochladen</router-link>
+          </span>
           <span class="error">{{ errorMessage }}</span>
         </form>
       </section>
@@ -40,10 +44,9 @@ import { User } from "@/service/login/User";
 export default defineComponent({
   name: "RegisterView",
   setup() {
-    const user = new User();
+    const { register, loginState } = useLoginStore();
+    const user = new User(loginState.username);
     const errorMessage = ref("");
-
-    const { register } = useLoginStore();
 
     function registerUser() {
       register(user).catch((error) => (errorMessage.value = error.message));
@@ -57,3 +60,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+h1 {
+  margin-bottom: 0;
+}
+</style>
