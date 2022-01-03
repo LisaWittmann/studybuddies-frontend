@@ -17,14 +17,14 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, ref} from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
 
 import { Orientation } from "@/service/labyrinth/Tile";
-import { MoveOperation } from "@/service/game/EventMessage";
+import { EventMessage } from "@/service/game/EventMessage";
 import { MainPlayer } from "@/service/game/Player";
 
 import SceneComponent from "@/components/SceneComponent.vue";
@@ -44,37 +44,29 @@ export default defineComponent({
   },
   setup() {
     const { gameState, updateGameData, setLobbyKey } = useGameStore();
-    const { updateUsers } = useLobbyService();
     const { playerMovement, itemSelection } = useGameService();
     const { loginState } = useLoginStore();
+    const { updateUsers } = useLobbyService();
     updateGameData();
 
     const showTerminal = ref(false);
-
-    /*
-    // Users Array -> Wird onMounted gefüllt
-    const users = ref(new Array<string>());
-    
 
     onMounted(async () => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       await updateUsers(gameState.lobbyKey);
       updateGameData();
-    })
-    */
+    });
 
     let mainPlayer;
     let partnerPlayer;
     gameState.playerMap.forEach((player, key) => {
-      if(key == loginState.username) {
+      if (key == loginState.username) {
         mainPlayer = computed(() => player);
       } else {
         partnerPlayer = computed(() => player);
       }
-    })
-
-
+    });
 
     // in-game messages like warnings, errors, hints ...
     const message =
@@ -88,12 +80,13 @@ export default defineComponent({
 
     /**
      * function which is used when clicking the arrow in Interface
-     * By recieving the Orientation it creats a MoveOperation to send it to the BE via GameService Methode
+     * By recieving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
      * @param orientation : used in the backend to identify the direction to move the player
      */
     function movePlayer(orientation: Orientation) {
       playerMovement(
-        new MoveOperation(
+        new EventMessage(
+          "MOVEMENT",
           gameState.lobbyKey,
           loginState.username,
           Orientation[orientation].toString()

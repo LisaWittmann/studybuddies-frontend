@@ -1,29 +1,38 @@
 <template>
   <div class="container">
-    <h1>Lobby {{ lobbyKey }}</h1>
+    <h1>
+      Lobby
+      <span class="uppercase"> {{ lobbyKey }}</span>
+    </h1>
     <section>
+      <p>{{ users.length }}/2 Spieler verbunden</p>
       <UserListComponent :users="users" />
     </section>
     <section>
       <h2>Rolle auswählen:</h2>
       <div class="roles">
-        <span v-if="selected">{{ selected }}</span>
+        <span v-if="selectedRole">{{ selectedRole }}</span>
       </div>
-      <RadioButtonGroup
-        :options="roles"
-        v-model="selected"
-        @clicked="selectedRole"
-        :selectable="roleOptions"
+      <RadioButtonGroupComponent
+        :options="allRoles"
+        v-model="selectedRole"
+        @clicked="selectRole"
+        :selectable="openRoles"
       />
     </section>
     <section>
       <h2>Labyrinth auswählen:</h2>
-      <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
+      <DropdownComponent
+        :items="labyrinthOptions"
+        :selectedItem="selectedLabyrinth"
+        @select="selectLabyrinth"
+      />
     </section>
     <section>
       <div class="column-wrapper">
         <button
-          class="button--small button--filled"
+          :class="{ 'button--ready': isReady }"
+          class="button--small"
           @click="readyCheck(loginState.username, selectedLabyrinth)"
         >
           Bereit
@@ -47,23 +56,23 @@ import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
-import RadioButtonGroup from "@/components/RadioButtonGroup.vue";
+import RadioButtonGroupComponent from "@/components/RadioButtonGroupComponent.vue";
 import { onBeforeRouteLeave } from "vue-router";
 
 export default defineComponent({
   name: "LobbySettingsView",
-  components: { UserListComponent, DropdownComponent, RadioButtonGroup },
+  components: {
+    UserListComponent,
+    DropdownComponent,
+    RadioButtonGroupComponent,
+  },
   setup() {
-    //Radiobutton data
-    const allRoles = ref([]);
-    const openRoles = ref([]);
-    let selectedRole = ref("");
-
     const { loginState } = useLoginStore();
     const {
       updateUsers,
       readyCheck,
       exitLobby,
+      setLabyrinthSelection,
       updateLabyrinthPick,
       updateLabyrinths,
       setLobbyState,
@@ -78,19 +87,27 @@ export default defineComponent({
     const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
+    //Radiobutton data
+    const allRoles = ref([]);
+    const openRoles = computed(() => lobbyState.openRoles);
+    const selectedRole = computed(() => lobbyState.selectedRole);
+
+    //ReadyState data
+    const isReady = computed(
+      () =>
+        lobbyState.users.find((user) => user.username === loginState.username)
+          ?.isReady
+    );
+
     function selectLabyrinth(id: number) {
+      setLabyrinthSelection(id);
+      updateLabyrinthPick(id, gameState.lobbyKey);
       sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
-      updateLabyrinthPick(id, lobbyKey.value);
     }
 
     function selectRole(name: string) {
       sessionStorage.setItem("chosenRole", JSON.stringify(name));
-      selectedRole.value = name;
-      updateRole(name, gameState.lobbyKey, loginState.username).then(() => {
-        getRoleOptions(gameState.lobbyKey).then((data) => {
-          openRoles.value = data;
-        });
-      });
+      updateRole(name, gameState.lobbyKey, loginState.username);
     }
 
     // open dialog before unload
@@ -118,43 +135,37 @@ export default defineComponent({
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      if (sessionStorage.getItem("lobbyKey") == lobbyKey.value) {
+      if (sessionStorage.getItem("lobbyKey") == gameState.lobbyKey) {
         setLobbyState(
           sessionStorage.getItem("users"),
           sessionStorage.getItem("selectedLabyrinth"),
           sessionStorage.getItem("labyrinthOptions"),
-          sessionStorage.getItem("errormessage")
+          sessionStorage.getItem("errormessage"),
+          sessionStorage.getItem("chosenRole")
         );
-        selectedRole.value = sessionStorage.getItem("chosenRole") as string;
       } else {
-        sessionStorage.setItem("lobbyKey", lobbyKey.value);
+        sessionStorage.setItem("lobbyKey", gameState.lobbyKey);
       }
       updateLabyrinths();
-      updateUsers(gameState.lobbyKey).then(() => {
-        // redirect to lobby find view if user is not in lobby
-        if (lobbyState.users.includes(loginState.username)) {
-          router.push("/find");
-        }
-      });
+      updateUsers(gameState.lobbyKey);
       getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
-      getRoleOptions(gameState.lobbyKey).then(
-        (data) => (openRoles.value = data)
-      );
+      getRoleOptions(gameState.lobbyKey);
     });
 
     return {
-      selected: selectedRole,
+      selectedRole,
       readyCheck,
       selectLabyrinth,
       exitLobby,
       selectRole,
-      roles: allRoles,
-      roleOptions: openRoles,
+      allRoles,
+      openRoles,
       users,
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
       loginState,
+      isReady,
     };
   },
 });
@@ -163,6 +174,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 h1 {
   margin: $spacing-l 0;
+
+  span {
+    font-weight: inherit;
+  }
 }
 
 .button {
@@ -180,16 +195,5 @@ h1 {
       color: darkred;
     }
   }
-
-  &--confirm {
-    &:hover,
-    &:active {
-      color: $color-green;
-    }
-  }
-}
-
-input[type="file"] {
-  display: none;
 }
 </style>

@@ -21,7 +21,7 @@ export default defineComponent({
     },
     partner: {
       type: PartnerPlayer,
-      required: true
+      required: true,
     },
   },
   setup(props, context) {

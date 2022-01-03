@@ -15,7 +15,7 @@
       <div class="menu-arrow" />
       <div
         class="option"
-        v-for="(item, index) of labItems"
+        v-for="(item, index) of items"
         :key="index"
         @click="selectItem(item)"
       >
@@ -30,17 +30,20 @@
 
 <script lang="ts">
 import { useLobbyService } from "@/service/LobbyService";
-import { computed, defineComponent, ref } from "vue";
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   props: {
     items: {
       type: Array,
     },
+    selectedItem: {
+      type: Number,
+    },
   },
   name: "DropdownComponent",
   setup(props, context) {
-    const { lobbyState, setLabyrinthSelection } = useLobbyService();
+    const { lobbyState } = useLobbyService();
 
     let isOpen = ref(false);
 
@@ -49,18 +52,14 @@ export default defineComponent({
       isOpen.value = !isOpen.value;
     }
 
-    const selectedItem = computed(() => lobbyState.selectedLabyrinth);
-    const labItems = computed(() => lobbyState.labyrinthOptions);
-
     function selectItem(item: number) {
       if (item != lobbyState.selectedLabyrinth) {
-        setLabyrinthSelection(item);
-        context.emit("select", selectedItem.value);
+        context.emit("select", item);
       }
       isOpen.value = false;
     }
 
-    return { isOpen, openClose, selectItem, selectedItem, labItems };
+    return { isOpen, openClose, selectItem, props };
   },
 });
 </script>
