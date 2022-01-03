@@ -28,9 +28,12 @@ async function playerMovement(evenMessage: EventMessage) {
 async function checkAccess(modelName: string) {
   const { gameState } = useGameStore();
   const { loginState } = useLoginStore();
-  fetch(`/api/body/access/${modelName}/${gameState.lobbyKey}/${loginState.username}`, {
-    method: "GET",
-  })
+  fetch(
+    `/api/body/access/${modelName}/${gameState.lobbyKey}/${loginState.username}`,
+    {
+      method: "GET",
+    }
+  )
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
