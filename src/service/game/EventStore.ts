@@ -2,11 +2,21 @@ import { Client } from "@stomp/stompjs";
 import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "../login/LoginStore";
+import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
+import { ref } from "vue";
 
-const { gameState, updatePlayer, setError, setPlayer, updateGame } =
+const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
   useGameStore();
+const {
+  updateUsers,
+  setupGame,
+  setLabyrinthSelection,
+  updateLabyrinths,
+  getRoleOptions,
+  setUserReadyState,
+  lobbyState,
+} = useLobbyService();
 
 const wsurl = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -32,62 +42,93 @@ stompclient.onConnect = () => {
   console.log("stomp verbindet");
 
   stompclient.subscribe(DEST, (message) => {
-    console.log("Message ist angekommen");
+    console.log("Message received");
 
     const eventMessage: EventMessage = JSON.parse(message.body);
 
-    /**
-     * Checks whether the user exists in the Game
-     */
-    const playerToMove: Player | undefined = gameState.playerMap.get(
-      eventMessage.username
-    );
-    console.log("Acting player: " + playerToMove);
-    switch (eventMessage.operation) {
-      case "MOVEMENT":
-        if (playerToMove) {
-          const destTileID: number = Number.parseInt(eventMessage.data);
+    if (
+      eventMessage.lobbyKey == gameState.lobbyKey ||
+      eventMessage.lobbyKey == "ALL"
+    ) {
+      console.log("Message in the right Lobby");
 
-          if (destTileID) {
-            updatePlayer(playerToMove, destTileID);
-            // -> now the watcher can update the 3D Room
-            // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
+      /**
+       * Checks whether the user exists in the Game
+       */
+      const playerToMove: Player | undefined = gameState.playerMap.get(
+        eventMessage.username
+      );
+      switch (eventMessage.operation) {
+        case "MOVEMENT":
+          if (playerToMove) {
+            const destTileID: number = Number.parseInt(eventMessage.data);
+
+            if (destTileID) {
+              updatePlayerData(playerToMove, destTileID);
+              // -> now the watcher can update the 3D Room
+              // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
+            } else {
+              setError("There is no Tilereference for this definition of data");
+            }
           } else {
-            setError("There is no Tilereference for this definition of data");
+            setError("No existing User");
           }
-        } else {
-          setError("No existing User");
-        }
 
-        break;
-      case "CLICK":
-        break;
-      case "CHAT":
-        break;
-      case "TRADE":
-        break;
-      case "READY":
-        if (eventMessage.data === "READY") {
-          // NUR TEMPORÄR (Bis nach dem MessageBroker Ticket)
-          // Bitte noch nicht sofort ändern!
-          // @todo: Ändern!
-          const { loginState } = useLoginStore();
-          updateGame()
-            .then(() => {
-              setPlayer(
-                loginState.username,
-                gameState.labyrinth.playerStartTileKeys[0]
+          break;
+        case "CLICK":
+          break;
+        case "CHAT":
+          break;
+        case "TRADE":
+          break;
+        case "READY":
+          console.log(eventMessage);
+          if (
+            eventMessage.username === "ALL_OF_LOBBY" &&
+            eventMessage.data === "READY"
+          ) {
+            setupGame();
+          } else {
+            setUserReadyState(
+              eventMessage.username,
+              eventMessage.data === "READY"
+            );
+            console.log(
+              lobbyState.users.find(
+                (user) => user.username == eventMessage.username
+              )
+            );
+          }
+          break;
+        case "LABYRINTH_PICK":
+          console.log(Number(eventMessage.data));
+          setLabyrinthSelection(Number(eventMessage.data));
+          break;
+        case "UPDATE":
+          switch (eventMessage.data) {
+            case "LABYRINTHS":
+              updateLabyrinths();
+              break;
+            case "USERS":
+              updateUsers(eventMessage.lobbyKey);
+              break;
+            case "ROLE":
+              console.log("RoleOptions holen");
+              getRoleOptions(eventMessage.lobbyKey);
+              break;
+            default:
+              console.info(
+                "No List was updated with Data: " + eventMessage.data
               );
-            })
-            .then(() => {
-              router.push(`/game/${gameState.lobbyKey}`);
-              console.log("gameState nach ready finish");
-              console.log(gameState);
-            });
-        }
-        break;
-      default:
-        break;
+              break;
+          }
+          break;
+        default:
+          console.error(
+            eventMessage.operation + " is no valid EventMessage Operation."
+          );
+          break;
+      }
     }
   });
 };
