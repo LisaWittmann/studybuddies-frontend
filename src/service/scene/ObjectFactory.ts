@@ -5,10 +5,10 @@ import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 import { Item } from "@/service/labyrinth/Item";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { Arrow, Wall } from "@/service/labyrinth/FixedObject";
+import { PartnerPlayer, Role } from "@/service/game/Player";
 
 import { settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
-import { PartnerPlayer } from "@/service/game/Player";
 
 const objectLoader = new OBJLoader();
 const materialLoader = new MTLLoader();
@@ -126,12 +126,36 @@ function createArrow(
   });
 }
 
+/**
+ * creates a new partner player representation
+ * appearance of player is defined by it's role
+ * @param player: player that should be represented
+ * @param position: global position of player
+ * @param parent: scene or group to which player should be added
+ */
 function createPlayer(
-  model: PartnerPlayer,
-  position: THREE.Vector3
-): THREE.Object3D | undefined {
-  console.log("creating partner player");
-  return undefined;
+  player: PartnerPlayer,
+  position: THREE.Vector3,
+  parent: THREE.Scene | THREE.Group
+) {
+  let model = "squirrel";
+  switch (player.getRole()) {
+    case Role.DESIGNER:
+      model += "-designer";
+      break;
+    case Role.HACKER:
+      model += "-hacker";
+      break;
+  }
+  materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
+    materials.preload();
+    objectLoader.setMaterials(materials);
+    objectLoader.loadAsync(`${model}.obj`).then((object) => {
+      object.position.copy(position);
+      object.userData.username = player.username;
+      parent.add(object);
+    });
+  });
 }
 
 export function useObjectFactory() {

@@ -1,10 +1,10 @@
-import { MoveOperation } from "@/service/game/EventMessage";
+import { EventMessage } from "@/service/game/EventMessage";
 
-async function playerMovement(moveOperation: MoveOperation) {
+async function playerMovement(evenMessage: EventMessage) {
   fetch("/api/lobby/move", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(moveOperation),
+    body: JSON.stringify(evenMessage),
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
