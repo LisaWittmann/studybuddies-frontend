@@ -2,7 +2,7 @@ import { reactive, readonly } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 import { EventMessage } from "@/service/game/EventMessage";
-import { User } from "@/service/login/User";
+import { User } from "./login/User";
 import { Role } from "@/service/game/Player";
 import router from "@/router";
 
@@ -119,7 +119,10 @@ async function createLobby(username: string) {
     body: username,
   })
     .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
+      if (!response.ok) {
+        alert("Labyrinth nicht ok!");
+        throw new Error(response.statusText);
+      }
       return response.json();
     })
     .then((jsonData) => {
@@ -209,6 +212,7 @@ async function updateUsers(lobbyKey: string) {
         const foundUser: User | undefined = tempUsers.find(
           (user) => user.username === username
         );
+        console.log(foundUser);
         if (foundUser) {
           lobbyState.users.push(foundUser);
         } else {

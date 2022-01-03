@@ -28,9 +28,8 @@ import { EventMessage } from "@/service/game/EventMessage";
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
 
-import "@/service/game/EventStore";
-import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
+import "@/service/game/EventStore";
 
 export default defineComponent({
   name: "GameView",
@@ -43,26 +42,50 @@ export default defineComponent({
   },
   setup() {
     const { loginState } = useLoginStore();
-    const { updateUsers } = useLobbyService();
-    const { gameState, updateGameData, setLobbyKey } = useGameStore();
+    const { gameState, updateGameData, setLobbyKey, setGameState } =
+      useGameStore();
     const { gameEventMessage, toggleEventMessage, playerMovement, clickItem } =
       useGameService();
     updateGameData();
 
+    const labyrinthState = computed(() => gameState.labyrinth);
+    const score = computed(() => gameState.score);
+    const errormessage = computed(() => gameState.errormessage);
+
+    let mainPlayer = computed(() => gameState.mainPlayer);
+    let partnerPlayer = computed(() => gameState.partnerPlayer);
+
+    //adds infos from GameState (filled on READY) to SessionStorage
+    sessionStorage.setItem("labyrinth", JSON.stringify(labyrinthState.value));
+    sessionStorage.setItem("score", JSON.stringify(score.value));
+    sessionStorage.setItem("errormessage", JSON.stringify(errormessage.value));
+    sessionStorage.setItem("initialLoad", JSON.stringify(1));
+
     onMounted(async () => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      await updateUsers(gameState.lobbyKey);
       updateGameData();
-    });
 
-    let mainPlayer;
-    let partnerPlayer;
-    gameState.playerMap.forEach((player, key) => {
-      if (key == loginState.username) {
-        mainPlayer = computed(() => player);
+      //fills gameState out of sessionStorage when view is reloaded
+      if (
+        sessionStorage.getItem("mainPlayer") &&
+        sessionStorage.getItem("partnerPlayer")
+      ) {
+        setGameState(
+          sessionStorage.getItem("lobbyKey"),
+          sessionStorage.getItem("selectedLabyrinth"),
+          sessionStorage.getItem("labyrinth"),
+          sessionStorage.getItem("mainPlayer"),
+          sessionStorage.getItem("partnerPlayer"),
+          sessionStorage.getItem("errormessage"),
+          sessionStorage.getItem("score")
+        );
       } else {
-        partnerPlayer = computed(() => player);
+        sessionStorage.setItem("mainPlayer", JSON.stringify(mainPlayer.value));
+        sessionStorage.setItem(
+          "partnerPlayer",
+          JSON.stringify(partnerPlayer.value)
+        );
       }
     });
 

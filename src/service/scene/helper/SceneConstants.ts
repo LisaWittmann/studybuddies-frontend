@@ -10,6 +10,14 @@ export const settings = {
 };
 
 /**
+ * scale factor for models
+ */
+export const factors = {
+  objectScaleFactor: settings.tileSize / 4,
+  partnerTranslateFactor: settings.tileSize / 4,
+};
+
+/**
  * axis vectors
  */
 export const axis = {

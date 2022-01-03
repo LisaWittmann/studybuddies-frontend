@@ -16,6 +16,7 @@ const { createTile } = useTileFactory();
 const { updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
+let labyrinthInitialized = false;
 
 /**
  * gets map of all tiles of a Labyrinth
@@ -30,6 +31,8 @@ async function updateLabyrinth(
   player: MainPlayer,
   scene: THREE.Scene
 ) {
+  if (labyrinthInitialized) return;
+  labyrinthInitialized = true;
   const position = vector(0, 0, 0);
   for (const [key, value] of labyrinth.tileMap) {
     const tile = getTile(value.tileId, scene);
@@ -47,8 +50,8 @@ async function updateLabyrinth(
  * @param player: main or partner player
  * @param scene: scene that contains player
  */
-async function updatePlayer(player: Player, scene: THREE.Scene) {
-  console.log("Move player: " + player);
+function updatePlayer(player: Player, scene: THREE.Scene) {
+  console.log("Move player: " + player.getUsername());
   const tilePosition = getTilePosition(player.getPosition(), scene);
   if (tilePosition) {
     if (player instanceof MainPlayer) {

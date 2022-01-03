@@ -7,7 +7,7 @@ import { Orientation } from "@/service/labyrinth/Tile";
 import { Arrow, Wall } from "@/service/labyrinth/FixedObject";
 import { PartnerPlayer, Role } from "@/service/game/Player";
 
-import { settings } from "@/service/scene/helper/SceneConstants";
+import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 import { DoubleSide, Texture, TextureLoader } from "three";
 
@@ -31,14 +31,27 @@ async function createItem(
   position: THREE.Vector3
 ) {
   const model = item.modelName.toLowerCase();
+  let factor = 1;
+  const size = new THREE.Vector3();
+
   await materialLoader.loadAsync("materials.mtl").then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
       object.position.copy(item.calcPositionInRoom().add(position));
+      //get object size before rotation
+      const box = new THREE.Box3().setFromObject(object);
+      box.getSize(size);
+      if (size.x > settings.tileSize / 4) {
+        factor = 1 / (size.x / factors.objectScaleFactor);
+      } else if (size.y > settings.tileSize / 4) {
+        factor = 1 / (size.y / factors.objectScaleFactor);
+      }
+      object.scale.set(factor, factor, factor); //scale object to max size
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
+      object.name = "item " + item.modelName;
       parent.add(object);
     });
   });
@@ -60,6 +73,7 @@ function createFloor(position: THREE.Vector3, key: number, color = 0x199eb0) {
   object.position.copy(position);
   object.userData.tileKey = key;
   object.rotateX(radians(90));
+  object.name = "floor";
   return object;
 }
 
@@ -76,6 +90,7 @@ function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
   );
   object.position.set(position.x, position.y + settings.tileSize, position.z);
   object.rotateX(radians(90));
+  object.name = "ceiling";
   return object;
 }
 
@@ -107,6 +122,7 @@ function createWall(
   object.position.copy(position);
   object.rotateY(wall.rotationY());
   object.userData = wall;
+  object.name = "wall";
   return object;
 }
 
@@ -167,6 +183,7 @@ function createArrow(
         child.material.color.setHex(arrow.color);
       }
     });
+    object.name = "arrow";
     parent.add(object);
   });
 }
@@ -178,12 +195,13 @@ function createArrow(
  * @param position: global position of player
  * @param parent: scene or group to which player should be added
  */
-function createPlayer(
+async function createPlayer(
   player: PartnerPlayer,
   position: THREE.Vector3,
   parent: THREE.Scene | THREE.Group
 ) {
   let model = "squirrel";
+
   switch (player.getRole()) {
     case Role.DESIGNER:
       model += "-designer";
@@ -192,15 +210,131 @@ function createPlayer(
       model += "-hacker";
       break;
   }
-  materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
+  await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
+      object.userData.username = player.getUsername();
+      object.name = player.getUsername();
       object.position.copy(position);
-      object.userData.username = player.username;
+      object.rotateY(90);
+      const newPos = checkIntersect(object, player, position, parent);
+      object.position.copy(newPos);
       parent.add(object);
     });
   });
+}
+
+/**
+ * checks for intersections of partner model with items and updates position of partner accordingly
+ * @param playerObject: model/Three.Group of PartnerPlayer
+ * @param player: data of PartnerPlayer
+ * @param position: current vector position of player
+ * @param scene: scene that contains all models + the partner
+ * @returns
+ */
+function checkIntersect(
+  playerObject: THREE.Group,
+  player: PartnerPlayer,
+  position: THREE.Vector3,
+  scene: THREE.Scene | THREE.Group
+): THREE.Vector3 {
+  const tile = scene.getObjectByName(player.getPosition().toString()); //get current tile
+  const items = tile?.children.filter((c) => c.name.includes("item")); //get all meshes in tile
+  const playerBox = new THREE.Box3().setFromObject(playerObject); //creates bounding box of player
+
+  items?.forEach((i) => {
+    const itemBox = new THREE.Box3().setFromObject(i); //creates bounding box for each item
+    if (itemBox.intersectsBox(playerBox)) {
+      let playerCorner;
+      const intersectionBox = itemBox.intersect(playerBox);
+
+      //get in which corner player is positioned
+      if (position.x > 0 && position.z < 0) {
+        playerCorner = "NORTHEAST";
+      } else if (position.x > 0 && position.z > 0) {
+        playerCorner = "SOUTHEAST";
+      } else if (position.x < 0 && position.z < 0) {
+        playerCorner = "NORTHWEST";
+      } else if (position.x < 0 && position.z > 0) {
+        playerCorner = "SOUTHWEST";
+      }
+
+      //check for intersections in corner
+      switch (playerCorner) {
+        case "NORTHEAST":
+          if (
+            intersectionBox.min.x == playerBox.min.x &&
+            intersectionBox.max.x == itemBox.max.x
+          ) {
+            //intersection with item on west
+            const x = intersectionBox.max.x - intersectionBox.min.x;
+            position.setX(position.x + x);
+            break;
+          } else if (
+            intersectionBox.min.z == playerBox.max.z &&
+            intersectionBox.max.z == itemBox.min.z
+          ) {
+            //intersection with item on south
+            const z = intersectionBox.max.z - intersectionBox.min.z;
+            position.setZ(position.z - z);
+          }
+          break;
+        case "SOUTHEAST":
+          if (
+            intersectionBox.min.x == playerBox.min.x &&
+            intersectionBox.max.x == itemBox.max.x
+          ) {
+            //intersection with item on west
+            const x = intersectionBox.max.x - intersectionBox.min.x;
+            position.setX(position.x + x);
+          } else if (
+            intersectionBox.max.z == playerBox.max.z &&
+            intersectionBox.min.z == itemBox.min.z
+          ) {
+            //intersection with item on north
+            const z = intersectionBox.max.z - intersectionBox.min.z;
+            position.setZ(position.z + z);
+          }
+          break;
+        case "NORTHWEST":
+          if (
+            intersectionBox.min.x == playerBox.max.x &&
+            intersectionBox.max.x == itemBox.min.x
+          ) {
+            //intersection with item on east
+            const x = intersectionBox.max.x - intersectionBox.min.x;
+            position.setX(position.x - x);
+          } else if (
+            intersectionBox.min.z == playerBox.max.z &&
+            intersectionBox.max.z == itemBox.min.z
+          ) {
+            //intersection with item on south
+            const z = intersectionBox.max.z - intersectionBox.min.z;
+            position.setZ(position.z + z);
+          }
+          break;
+        case "SOUTHWEST":
+          if (
+            intersectionBox.min.x == playerBox.max.x &&
+            intersectionBox.max.x == itemBox.min.x
+          ) {
+            //intersection with item on east
+            const x = intersectionBox.max.x - intersectionBox.min.x;
+            position.setX(position.x - x);
+          } else if (
+            intersectionBox.max.z == playerBox.max.z &&
+            intersectionBox.min.z == itemBox.min.z
+          ) {
+            //intersection with item on north
+            const z = intersectionBox.max.z - intersectionBox.min.z;
+            position.setZ(position.z + z);
+          }
+          break;
+      }
+    }
+  });
+  return position;
 }
 
 export function useObjectFactory() {
@@ -212,5 +346,6 @@ export function useObjectFactory() {
     createFloor,
     createItem,
     createPlayer,
+    checkIntersect,
   };
 }

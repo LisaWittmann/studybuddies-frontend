@@ -25,6 +25,16 @@ async function playerMovement(evenMessage: EventMessage) {
     });
 }
 
+// fetches the current tileId of both players
+async function updatePlayerPositions(lobbyKey: string) {
+  return fetch("/api/lobby/players/" + lobbyKey, {
+    method: "GET",
+  }).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  });
+}
+
 async function checkAccess(modelName: string) {
   const { gameState } = useGameStore();
   const { loginState } = useLoginStore();
@@ -82,6 +92,7 @@ export function useGameService() {
   return {
     gameEventMessage,
     toggleEventMessage,
+    updatePlayerPositions,
     playerMovement,
     clickItem,
   };
