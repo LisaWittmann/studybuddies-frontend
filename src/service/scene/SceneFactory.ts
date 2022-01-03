@@ -148,9 +148,9 @@ function getIntersections(
         context.emit("click-disabled");
       }
       //object dissapears per click (optically)
-      else if (object.parent.visible) {
-        object.parent.visible = false;
-      }
+      // else if (object.parent.visible) {
+      //   object.parent.visible = false;
+      // }
       context.emit("click-object", object.parent.userData);
     } else if (object.parent?.userData.showInView) {
       context.emit("move-player", object.parent.userData.orientation);
