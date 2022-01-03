@@ -6,7 +6,7 @@
 import { defineComponent, onBeforeUnmount, onMounted, watch } from "vue";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
-import { MainPlayer } from "@/service/game/Player";
+import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 
 export default defineComponent({
   name: "SceneComponent",
