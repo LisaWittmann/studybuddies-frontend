@@ -42,7 +42,7 @@ function createScene(debug = false): THREE.Scene {
   //CONTROLS-----------------
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.enableZoom = false;
-  orbitControls.enablePan = false;
+  orbitControls.enablePan = true;
   orbitControls.update();
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();

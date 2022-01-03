@@ -83,7 +83,10 @@ export default defineComponent({
         );
       } else {
         sessionStorage.setItem("mainPlayer", JSON.stringify(mainPlayer.value));
-        sessionStorage.setItem("partnerPlayer", JSON.stringify(partnerPlayer.value));
+        sessionStorage.setItem(
+          "partnerPlayer",
+          JSON.stringify(partnerPlayer.value)
+        );
       }
     });
 
