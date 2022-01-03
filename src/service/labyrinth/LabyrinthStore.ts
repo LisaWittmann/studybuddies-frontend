@@ -15,12 +15,13 @@ const labyrinthState: Labyrinth = reactive<Labyrinth>({
 
 /**
  * update the tiles for getting them initially and every time something changes
- * fetches labyrnith object of api and converts response into labyrinth data
+ * fetches labyrinth object of api and converts response into labyrinth data
  * creates simple fallback labyrinth if fetch fails
  */
-async function updateLabyrinth(labyrinthId: number) {
-  console.log(labyrinthId);
-  await fetch(`/api/labyrinth/${labyrinthId}`, {
+async function updateLabyrinthData(lobbyKey: string) {
+  console.log("Requested lab of lobby " + lobbyKey);
+  //TODO change this to the game api
+  await fetch(`/api/lobby/${lobbyKey}`, {
     method: "GET",
   })
     .then((response) => {
@@ -99,6 +100,6 @@ function connectTiles(
 export function useLabyrinthStore() {
   return {
     labyrinthState,
-    updateLabyrinth,
+    updateLabyrinthData,
   };
 }

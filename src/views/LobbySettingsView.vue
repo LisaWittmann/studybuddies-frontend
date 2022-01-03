@@ -1,33 +1,45 @@
 <template>
   <div class="container">
-    <h1>Lobby {{ lobbyKey }}</h1>
+    <h1>
+      Lobby
+      <span class="uppercase"> {{ lobbyKey }}</span>
+    </h1>
     <section>
+      <p>{{ users.length }}/2 Spieler verbunden</p>
       <UserListComponent :users="users" />
     </section>
     <section>
-      <h2>Labyrinth hochladen:</h2>
-      <label class="button button--small button--upload">
-        <input
-          type="file"
-          ref="upload"
-          accept=".json"
-          @change="uploadLabyrinth"
-        />
-        Hochladen
-      </label>
+      <h2>Rolle auswählen:</h2>
+      <div class="roles">
+        <span v-if="selectedRole">{{ selectedRole }}</span>
+      </div>
+      <RadioButtonGroupComponent
+        :options="allRoles"
+        v-model="selectedRole"
+        @clicked="selectRole"
+        :selectable="openRoles"
+      />
     </section>
     <section>
       <h2>Labyrinth auswählen:</h2>
-      <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
+      <DropdownComponent
+        :items="labyrinthOptions"
+        :selectedItem="selectedLabyrinth"
+        @select="selectLabyrinth"
+      />
     </section>
     <section>
       <div class="column-wrapper">
-        <button class="button--small button--filled" @click="readyCheck">
+        <button
+          :class="{ 'button--ready': isReady }"
+          class="button--small"
+          @click="readyCheck(loginState.username, selectedLabyrinth)"
+        >
           Bereit
         </button>
         <button
           class="button button--small button--exit"
-          @click="exitLobby(lobbyKey, username)"
+          @click="exitLobby(lobbyKey, loginState.username)"
         >
           Verlassen
         </button>
@@ -37,61 +49,100 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
+import { useGameStore } from "@/service/game/GameStore";
+import RadioButtonGroupComponent from "@/components/RadioButtonGroupComponent.vue";
 
 export default defineComponent({
   name: "LobbySettingsView",
-  components: { UserListComponent, DropdownComponent },
+  components: {
+    UserListComponent,
+    DropdownComponent,
+    RadioButtonGroupComponent,
+  },
   setup() {
     const { loginState } = useLoginStore();
     const {
-      uploadJsonFiles,
       updateUsers,
-      updateLabyrinths,
       readyCheck,
       exitLobby,
-      setupGame,
+      setLabyrinthSelection,
+      updateLabyrinthPick,
+      updateLabyrinths,
+      setLobbyState,
+      lobbyState,
+      updateRole,
+      getRoles,
+      getRoleOptions,
     } = useLobbyService();
-    const upload = ref({} as HTMLInputElement);
+    const { gameState, setLobbyKey } = useGameStore();
+    const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
+    const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinth);
+    const users = computed(() => lobbyState.users);
+    const lobbyKey = computed(() => gameState.lobbyKey);
 
-    const route = router.currentRoute.value;
-    const lobbyKey = route.params.key as string;
+    //Radiobutton data
+    const allRoles = ref([]);
+    const openRoles = computed(() => lobbyState.openRoles);
+    const selectedRole = computed(() => lobbyState.selectedRole);
 
-    const users = ref(new Array<string>());
-    const labyrinthOptions = ref(new Array<number>());
-    const selectedLabyrinth = ref();
-
-    updateUsers(lobbyKey).then((data) => (users.value = data));
-    updateLabyrinths().then((data) => (labyrinthOptions.value = data));
+    //ReadyState data
+    const isReady = computed(
+      () =>
+        lobbyState.users.find((user) => user.username === loginState.username)
+          ?.isReady
+    );
 
     function selectLabyrinth(id: number) {
-      selectedLabyrinth.value = id;
+      setLabyrinthSelection(id);
+      updateLabyrinthPick(id, gameState.lobbyKey);
+      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
     }
 
-    async function uploadLabyrinth() {
-      if (upload.value.files != null) {
-        await uploadJsonFiles(upload.value.files);
-      }
-      updateLabyrinths().then((data) => (labyrinthOptions.value = data));
+    function selectRole(name: string) {
+      sessionStorage.setItem("chosenRole", JSON.stringify(name));
+      updateRole(name, gameState.lobbyKey, loginState.username);
     }
+
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      setLobbyKey(route.params.key as string);
+      if (sessionStorage.getItem("lobbyKey") == gameState.lobbyKey) {
+        setLobbyState(
+          sessionStorage.getItem("users"),
+          sessionStorage.getItem("selectedLabyrinth"),
+          sessionStorage.getItem("labyrinthOptions"),
+          sessionStorage.getItem("errormessage"),
+          sessionStorage.getItem("chosenRole")
+        );
+      } else {
+        sessionStorage.setItem("lobbyKey", gameState.lobbyKey);
+      }
+      updateLabyrinths();
+      updateUsers(gameState.lobbyKey);
+      getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
+      getRoleOptions(gameState.lobbyKey);
+    });
 
     return {
+      selectedRole,
       readyCheck,
-      uploadLabyrinth,
       selectLabyrinth,
       exitLobby,
-      setupGame,
+      selectRole,
+      allRoles,
+      openRoles,
       users,
-      upload,
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
-      username: loginState.username,
+      loginState,
+      isReady,
     };
   },
 });
@@ -100,6 +151,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 h1 {
   margin: $spacing-l 0;
+
+  span {
+    font-weight: inherit;
+  }
 }
 
 .button {
@@ -117,16 +172,5 @@ h1 {
       color: darkred;
     }
   }
-
-  &--confirm {
-    &:hover,
-    &:active {
-      color: $color-green;
-    }
-  }
-}
-
-input[type="file"] {
-  display: none;
 }
 </style>

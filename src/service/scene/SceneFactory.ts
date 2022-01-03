@@ -151,7 +151,7 @@ function getIntersections(
       else if (object.parent.visible) {
         object.parent.visible = false;
       }
-      context.emit("click-object", object.parent.userData.id);
+      context.emit("click-object", object.parent.userData);
     } else if (object.parent?.userData.showInView) {
       context.emit("move-player", object.parent.userData.orientation);
     }

@@ -22,7 +22,6 @@ p, span, a {
 h1 {
     font-weight: 500;
     font-size: $headline-xl;
-    margin-bottom: 0;
 }
 
 h2 {
@@ -43,4 +42,8 @@ a {
     &:hover {
         color: $color-green;
     }
+}
+
+.uppercase {
+    text-transform: uppercase;
 }

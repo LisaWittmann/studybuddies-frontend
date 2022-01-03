@@ -23,6 +23,7 @@ export default defineComponent({
     },
     partner: {
       type: PartnerPlayer,
+      required: true,
     },
   },
   setup(props, context) {
@@ -66,7 +67,7 @@ export default defineComponent({
       console.log("updating scene");
       updateLabyrinth(props.labyrinth, scene);
       updatePlayer(props.player, scene);
-      //updatePlayer(props.partner, scene);
+      updatePlayer(props.partner, scene);
     });
   },
 });

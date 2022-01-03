@@ -3,9 +3,9 @@ import { useTileFactory } from "@/service/scene/TileFactory";
 import { usePlayerFactory } from "@/service/scene/PlayerFactory";
 
 import { Orientation, Tile } from "@/service/labyrinth/Tile";
+import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 
 import { vector } from "@/service/scene/helper/GeometryHelper";
-import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 import { direction, settings } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
@@ -26,8 +26,6 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
     const tile = getTile(value.tileId, scene);
     if (!tile) {
       placeTile(position, value, key, scene);
-    } else if (value.objectsInRoom != tile.userData.objectsInRoom) {
-      updateTile();
     }
   }
 }
@@ -39,13 +37,15 @@ async function updateLabyrinth(labyrinth: any, scene: THREE.Scene) {
  * @param scene: scene that contains player
  */
 async function updatePlayer(player: Player, scene: THREE.Scene) {
-  if (player instanceof MainPlayer) {
-    const tilePosition = getTilePosition(player.getPosition(), scene);
-    if (tilePosition) updateMainPlayer(tilePosition);
-  }
-  if (player instanceof PartnerPlayer) {
-    const tilePosition = getTilePosition(player.getPosition(), scene);
-    if (tilePosition) updatePartnerPlayer(player, tilePosition, scene);
+  console.log("Move player: " + player);
+  const tilePosition = getTilePosition(player.getPosition(), scene);
+  if (tilePosition) {
+    if (player instanceof MainPlayer) {
+      updateMainPlayer(tilePosition);
+    }
+    if (player instanceof PartnerPlayer) {
+      updatePartnerPlayer(player, tilePosition, scene);
+    }
   }
 }
 
@@ -70,10 +70,6 @@ async function placeTile(
   // store placed tile with position to calculate position of next tiles
   storedTiles.set(tileKey, position);
   scene.add(createTile(tileKey, tile, position));
-}
-
-async function updateTile() {
-  console.log("updating tile");
 }
 
 /**
