@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onDeactivated, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
@@ -93,19 +93,24 @@ export default defineComponent({
       });
     }
 
-    // open dialog before unlod
+    // open dialog before unload
     onbeforeunload = () => {
+      if (lobbyState.users.includes(loginState.username)) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
       return "Leaving Lobby";
     };
     // exit lobby on unload
     onunload = () => {
-      exitLobby(lobbyKey.value, loginState.username);
+      if (lobbyState.users.includes(loginState.username)) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
     };
 
     // exit lobby if any other page than game is opened
     onBeforeRouteLeave((to) => {
       const nextKey = to.params.key as string;
-      if (nextKey != gameState.lobbyKey) {
+      if (nextKey != gameState.lobbyKey && lobbyState.users.includes(loginState.username)) {
         exitLobby(lobbyKey.value, loginState.username);
       }
     });
