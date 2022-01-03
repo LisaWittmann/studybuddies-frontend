@@ -14,12 +14,6 @@
     :state="eventMessage.state"
     @close="toggleEventMessage"
   />
-  <!--conversations with interactive characters-->
-  <OverlayConversationComponent
-    :opened="conversation.visible"
-    :message="conversation.message"
-    @respond="getConversationMessage"
-  />
 </template>
 
 <script lang="ts">
@@ -33,7 +27,6 @@ import { EventMessage } from "@/service/game/EventMessage";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
-import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import "@/service/game/EventStore";
 import { useLobbyService } from "@/service/LobbyService";
@@ -43,7 +36,6 @@ export default defineComponent({
   name: "GameView",
   components: {
     SceneComponent,
-    OverlayConversationComponent,
     OverlayTerminalComponent,
   },
   props: {
@@ -53,14 +45,8 @@ export default defineComponent({
     const { loginState } = useLoginStore();
     const { updateUsers } = useLobbyService();
     const { gameState, updateGameData, setLobbyKey } = useGameStore();
-    const {
-      eventMessage,
-      toggleEventMessage,
-      playerMovement,
-      clickItem,
-      conversation,
-      getConversationMessage,
-    } = useGameService();
+    const { eventMessage, toggleEventMessage, playerMovement, clickItem } =
+      useGameService();
     updateGameData();
 
     onMounted(async () => {
@@ -100,8 +86,6 @@ export default defineComponent({
       movePlayer,
       clickItem,
       toggleEventMessage,
-      getConversationMessage,
-      conversation,
       eventMessage,
       gameState,
       mainPlayer,

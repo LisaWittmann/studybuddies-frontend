@@ -1,4 +1,3 @@
-import { Message } from "@/service/game/Conversation";
 import { reactive } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "../login/LoginStore";
@@ -11,37 +10,6 @@ const eventMessage = reactive({
 });
 
 const toggleEventMessage = () => (eventMessage.visible = !eventMessage.visible);
-
-const conversation = reactive({
-  character: "",
-  message: new Message("", "", undefined, []),
-  visible: false,
-});
-
-async function startConversation(character: string) {
-  conversation.character = character;
-  conversation.visible = true;
-  getConversationMessage("1.1");
-}
-
-async function getConversationMessage(id: string) {
-  fetch(`/api/body/npc/${conversation.character}/${id}`, {
-    method: "GET",
-  })
-    .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
-      return response.json();
-    })
-    .then((jsonData) => {
-      console.log(jsonData);
-      conversation.message = jsonData as Message;
-    })
-    .catch(() => {
-      conversation.visible = false;
-      conversation.message = new Message("", "", undefined, []);
-      conversation.character = "";
-    });
-}
 
 async function playerMovement(evenMessage: EventMessage) {
   fetch("/api/lobby/move", {
@@ -92,9 +60,6 @@ async function clickItem(modelName: string) {
       const operation = (<any>Operation)[jsonData];
       console.log(operation);
       switch (operation) {
-        case Operation.CONVERSATION:
-          startConversation(modelName);
-          break;
         case Operation.ACCESS:
           checkAccess(modelName);
           break;
@@ -111,8 +76,5 @@ export function useGameService() {
     toggleEventMessage,
     playerMovement,
     clickItem,
-    conversation,
-    startConversation,
-    getConversationMessage,
   };
 }
