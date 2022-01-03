@@ -5,6 +5,7 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
 import { ref } from "vue";
+import { useLabyrinthStore } from "../labyrinth/LabyrinthStore";
 
 const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
   useGameStore();
@@ -76,6 +77,15 @@ stompclient.onConnect = () => {
 
           break;
         case "CLICK":
+          console.log("COLLECTING IN ", gameState.lobbyKey);
+          console.log('FE TILE MAP: ', gameState.labyrinth.tileMap)
+          console.log('EVENT MESSAGE DATA: ', eventMessage.data)
+
+          console.log('gamestate tilemap: ', gameState.labyrinth.tileMap)
+          updateGameData()
+          updateLabyrinths()
+          useLabyrinthStore().updateLabyrinthData(gameState.lobbyKey);
+          console.log('FE TILE MAP AFTER: ', gameState.labyrinth.tileMap);
           break;
         case "CHAT":
           break;
@@ -115,10 +125,6 @@ stompclient.onConnect = () => {
             case "ROLE":
               console.log("RoleOptions holen");
               getRoleOptions(eventMessage.lobbyKey);
-              break;
-            case "COLLECT":
-              console.log("COLLECTING IN ", gameState.lobbyKey);
-              updateGameData();
               break;
             default:
               console.info(

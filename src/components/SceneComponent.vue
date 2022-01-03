@@ -68,7 +68,7 @@ export default defineComponent({
       updateLabyrinth(props.labyrinth, scene);
       updatePlayer(props.player, scene);
       updatePlayer(props.partner, scene);
-    });
+    }, { deep: true });
   },
 });
 </script>
