@@ -1,5 +1,4 @@
 import { Item } from "@/service/labyrinth/Item";
-import { Vector3 } from "three";
 
 /**
  * enumeration of role of player,
@@ -35,10 +34,11 @@ export class MainPlayer implements Player {
   username: string;
   position: number;
   role: Role | undefined;
+  inventory: Item[];
   /*dummydata for development
     -> wait for Task #100 to be finished
   */
-  inventory: Item[] = [
+  /* inventory: Item[] = [
     new Item(1, "usb", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
     new Item(2, "mouse", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
     new Item(3, "keyboard", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
@@ -50,13 +50,13 @@ export class MainPlayer implements Player {
     new Item(9, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
     new Item(10, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
     new Item(11, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-  ];
+  ]; */
 
   constructor(username: string, playerPosition: number) {
     this.username = username;
     this.position = playerPosition;
     this.role = undefined;
-    //this.inventory = new Array<Item>();
+    this.inventory = new Array<Item>();
   }
 
   /**
@@ -78,7 +78,7 @@ export class MainPlayer implements Player {
   getRole(): Role | undefined {
     return this.role;
   }
-  
+
   getInventory(): Array<Item> {
     return this.inventory;
   }
