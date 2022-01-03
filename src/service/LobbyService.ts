@@ -1,9 +1,9 @@
-import router from "@/router";
+import { reactive, readonly } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 import { EventMessage } from "@/service/game/EventMessage";
-import { reactive, readonly } from "vue";
 import { User } from "./login/User";
+import router from "@/router";
 
 const lobbyState = reactive({
   users: new Array<User>(),
@@ -143,11 +143,12 @@ async function exitLobby(lobbyKey: string, username: string) {
   })
     .then((response) => {
       if (response.ok) {
-        lobbyState.users = lobbyState.users.filter((user) => user.username != username);
+        lobbyState.users = lobbyState.users.filter(
+          (user) => user.username != username
+        );
         sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
         router.push("/find");
-      }
-      else throw new Error(response.statusText);
+      } else throw new Error(response.statusText);
     })
     .catch((error) => console.error(error));
 }

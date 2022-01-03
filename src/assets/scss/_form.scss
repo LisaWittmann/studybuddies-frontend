@@ -1,5 +1,6 @@
 input {
     border: 1px solid $color-grey;
+    background: transparent;
     border-radius: 8px;
     font-weight: 300;
     font-size: $text-m;
@@ -12,6 +13,10 @@ input {
     &::-moz-placeholder {
         opacity: 1;
         color: $color-green;
+
+        @include color-scheme(dark) {
+            color: $color-grey;
+        }
     }
     
     &:focus {
@@ -23,6 +28,10 @@ input {
 
     &:focus:invalid {
         border-color: darkred;
+    
+        @include color-scheme(dark) {
+            border-color: hotpink;
+        }
     }
 
     &.input {
@@ -43,4 +52,8 @@ input {
 
 .error {
     color: darkred;
+
+    @include color-scheme(dark) {
+        color: hotpink;
+    }
 }

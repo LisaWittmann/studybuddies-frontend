@@ -1,11 +1,11 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
+import { radians } from "@/service/scene/helper/GeometryHelper";
 import {
   direction,
   position,
   settings,
 } from "@/service/scene/helper/SceneConstants";
-import { radians } from "@/service/scene/helper/GeometryHelper";
 
 /**
  * enumeration of vertical object position in tile
@@ -101,8 +101,8 @@ export class Item {
    */
   rotationY = (): number => {
     let viewdirection = 0;
-    this.orientations.forEach((o) => {
-      const eO: Orientation = (<any>Orientation)[o];
+    this.orientations.forEach((orientation) => {
+      const eO: Orientation = (<any>Orientation)[orientation];
       switch (eO) {
         case Orientation.NORTH:
           viewdirection += 0;
