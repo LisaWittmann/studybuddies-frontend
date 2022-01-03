@@ -32,7 +32,7 @@ export default defineComponent({
     },
     /**
      * state of the message
-     * @values neutral, warning, error
+     * @values neutral, success, warning, error
      */
     state: {
       type: String,
@@ -99,6 +99,9 @@ export default defineComponent({
 
     &--neutral {
       color: $color-white;
+    }
+    &--success {
+      color: green;
     }
     &--warning {
       color: orange;

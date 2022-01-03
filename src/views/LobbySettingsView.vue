@@ -40,7 +40,7 @@
               Bereit
             </button>
           </transition>
-          <transition name="delay-fade" appear>
+          <transition name="delay-fade">
             <button
               class="button button--small button__exit"
               @click="exitLobby(lobbyKey, loginState.username)"

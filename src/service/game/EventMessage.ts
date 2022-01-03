@@ -27,8 +27,12 @@ export class EventMessage {
 
 export enum Operation {
   MOVEMENT,
-  CLICK,
-  TRADE,
   CHAT,
+  TRADE,
+  CLICK,
+  READY,
+  CONVERSATION,
+  COLLECT,
+  ACCESS,
   ROLE_PICK,
 }
