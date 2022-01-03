@@ -17,7 +17,7 @@ const textureLoader = new TextureLoader();
 
 objectLoader.setPath("/models/");
 materialLoader.setPath("/models/");
-textureLoader.setPath("/models");
+textureLoader.setPath("/models/");
 
 /**
  * creates item by loading its obj representation from models directory
@@ -48,7 +48,8 @@ async function createItem(
  * creates plane representing tile's floor
  * contains tile position and userData
  * @param position: tile position
- * @param color: floor color in hexa
+ * @param key: index of current tile
+ * @param color: floor color in hex-code
  * @returns THREE.Mesh representation of floor
  */
 function createFloor(position: THREE.Vector3, key: number, color = 0x199eb0) {
@@ -65,7 +66,7 @@ function createFloor(position: THREE.Vector3, key: number, color = 0x199eb0) {
 /**
  * creates plane representing tile's ceiling
  * @param position: tile position
- * @param color: floor color in hexa
+ * @param color: floor color in hex-code
  * @returns THREE.Mesh representation of ceiling
  */
 function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
@@ -82,7 +83,7 @@ function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
  * creates plane representing tile's wall on given orientation
  * @param orientation: orientation which wall should be placed and aligned on
  * @param tilePosition: position of parent tile
- * @param color: wall color in hexa
+ * @param color: wall color in hex-code
  * @param opacity: opacity as decimal of mesh
  * @returns THREE.Mesh representation of wall
  */
@@ -123,7 +124,7 @@ function createRestrictiveWall(
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   textureLoader.load(
-    "/textures/RestrictedTexture.png",
+    "textures/RestrictedTexture.png",
     function (texture: Texture) {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
@@ -144,8 +145,9 @@ function createRestrictiveWall(
 
 /**
  * creates an arrow object that is aligned and directs to given orientation
- * @param orientation: orientation arrow should directs to
+ * @param orientation: orientation arrow should direct to
  * @param tilePosition: position of parent tile
+ * @param parent group on which arrow is placed
  * @returns: clickable arrow representation
  */
 function createArrow(
@@ -171,7 +173,7 @@ function createArrow(
 
 /**
  * creates a new partner player representation
- * appearance of player is defined by it's role
+ * appearance of player is defined by its role
  * @param player: player that should be represented
  * @param position: global position of player
  * @param parent: scene or group to which player should be added

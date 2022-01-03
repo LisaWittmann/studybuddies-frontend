@@ -66,7 +66,7 @@ export default defineComponent({
     position: relative;
     height: 25px;
 
-    & i {
+    & em {
       pointer-events: all;
       position: absolute;
       color: $color-black;
