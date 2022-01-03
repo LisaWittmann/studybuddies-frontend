@@ -24,7 +24,6 @@ function createTile(
   tile.userData.tileId = tileKey;
   tile.name = tileKey.toString();
 
-
   //LIGHT-----------------
   tile.add(createLight(position));
 

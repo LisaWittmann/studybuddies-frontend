@@ -2,7 +2,7 @@ import { Scene, Vector3 } from "three";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { PartnerPlayer } from "@/service/game/Player";
-import { settings, direction, factors } from "./helper/SceneConstants";
+import { direction, factors } from "./helper/SceneConstants";
 import { useLabyrinthStore } from "../labyrinth/LabyrinthStore";
 
 const { updateCameraPosition } = useSceneFactory();
