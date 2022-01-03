@@ -68,7 +68,8 @@ function getPlayer(
 
 /**
  * calculating position of player in tile
- * @param tilePosition: position of tile that player should be placed in
+ * @param currentTileID: tileID that player should be placed in
+ * @param tilePosition: vector position of tile that player should be placed in
  * @returns position as three dimensional vector
  */
 function calculatePartnerPositon(

@@ -184,7 +184,9 @@ async function createPlayer(
 
 /**
  * checks for intersections of partner model with items and updates position of partner accordingly
+ * @param playerObject: model/Three.Group of PartnerPlayer
  * @param player: data of PartnerPlayer
+ * @param position: current vector position of player
  * @param scene: scene that contains all models + the partner
  * @returns
  */
