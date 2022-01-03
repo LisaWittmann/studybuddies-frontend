@@ -31,15 +31,15 @@
       <section>
         <div class="column-wrapper">
           <transition name="fade" appear>
-           <button
-              :class="{ 'button__ready': isReady }"
+            <button
+              :class="{ button__ready: isReady }"
               class="button--small"
               @click="readyCheck(loginState.username, selectedLabyrinth)"
             >
               Bereit
             </button>
           </transition>
-          <transition name="fade-delay">
+          <transition name="delay-fade">
             <button
               class="button button--small button__exit"
               @click="exitLobby(lobbyKey, loginState.username)"
