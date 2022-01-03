@@ -1,11 +1,11 @@
 <template>
   <transition name="fade" appear>
     <div class="container">
-      <img class="image--header" :src="header" alt="logo"/>
+      <img class="image--header" :src="header" alt="logo" />
       <section>
         <h2>Spiel finden</h2>
         <div class="column-wrapper">
-          <input class="input--small" type="text" v-model="lobbyKey"/>
+          <input class="input--small" type="text" v-model="lobbyKey" />
           <button class="button--small" @click="joinGame">
             Spiel beitreten
           </button>
@@ -25,14 +25,14 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, ref} from "vue";
-import {useLoginStore} from "@/service/login/LoginStore";
+import { defineComponent, ref, computed } from "vue";
+import { useLoginStore } from "@/service/login/LoginStore";
 import router from "@/router";
 
 export default defineComponent({
   name: "FindLobby",
   setup() {
-    const {loginState} = useLoginStore();
+    const { loginState } = useLoginStore();
     const lobbyKey = ref("");
     const errorMessage = ref("");
 
@@ -53,7 +53,8 @@ export default defineComponent({
       }).then((response) => {
         if (response.ok) router.push("/lobby/" + key);
         else if (response.status == 409) errorMessage.value = "Lobby voll";
-        else if (response.status == 404) errorMessage.value = "Lobby nicht gefunden";
+        else if (response.status == 404)
+          errorMessage.value = "Lobby nicht gefunden";
       });
     }
 
@@ -65,19 +66,19 @@ export default defineComponent({
         },
         body: loginState.username,
       })
-          .then((response) => {
-            if (response.ok) {
-              return response.json();
-            }
-          })
-          .then((jsonData) => {
-            router.push("/lobby/" + jsonData.key);
-          })
-          .catch((err) => console.log(err));
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+        })
+        .then((jsonData) => {
+          router.push("/lobby/" + jsonData.key);
+        })
+        .catch((err) => console.log(err));
     }
 
     onbeforeunload = () => console.log("overriding previous listener");
-    return {lobbyKey, createGame, joinGame, header, errorMessage};
+    return { lobbyKey, createGame, joinGame, header, errorMessage };
   },
 });
 </script>

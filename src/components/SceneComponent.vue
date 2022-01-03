@@ -63,7 +63,7 @@ export default defineComponent({
 
     watch([props.labyrinth, props.player, props.partner], () => {
       console.log("updating scene");
-      updateLabyrinth(props.labyrinth, scene);
+      updateLabyrinth(props.labyrinth, props.player, scene);
       updatePlayer(props.player, scene);
       updatePlayer(props.partner, scene);
     });
