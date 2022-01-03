@@ -9,12 +9,15 @@ import { PartnerPlayer, Role } from "@/service/game/Player";
 
 import { settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
+import { DoubleSide, Texture, TextureLoader } from "three";
 
 const objectLoader = new OBJLoader();
 const materialLoader = new MTLLoader();
+const textureLoader = new TextureLoader();
 
 objectLoader.setPath("/models/");
 materialLoader.setPath("/models/");
+textureLoader.setPath("/models/");
 
 /**
  * creates item by loading its obj representation from models directory
@@ -45,10 +48,11 @@ async function createItem(
  * creates plane representing tile's floor
  * contains tile position and userData
  * @param position: tile position
- * @param color: floor color in hexa
+ * @param key: index of current tile
+ * @param color: floor color in hex-code
  * @returns THREE.Mesh representation of floor
  */
-function createFloor(position: THREE.Vector3, color = 0x199eb0, key: number) {
+function createFloor(position: THREE.Vector3, key: number, color = 0x199eb0) {
   const object = new THREE.Mesh(
     new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
@@ -62,7 +66,7 @@ function createFloor(position: THREE.Vector3, color = 0x199eb0, key: number) {
 /**
  * creates plane representing tile's ceiling
  * @param position: tile position
- * @param color: floor color in hexa
+ * @param color: floor color in hex-code
  * @returns THREE.Mesh representation of ceiling
  */
 function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
@@ -77,21 +81,28 @@ function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
 
 /**
  * creates plane representing tile's wall on given orientation
- * @param orientation: orientaion which wall should be placed and aligned on
+ * @param orientation: orientation which wall should be placed and aligned on
  * @param tilePosition: position of parent tile
- * @param color: wall color in hexa
+ * @param color: wall color in hex-code
+ * @param opacity: opacity as decimal of mesh
  * @returns THREE.Mesh representation of wall
  */
 function createWall(
   orientation: Orientation,
   tilePosition: THREE.Vector3,
-  color = 0x199eb0
+  color = 0x199eb0,
+  opacity = 1
 ): THREE.Mesh {
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const object = new THREE.Mesh(
     new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-    new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
+    new THREE.MeshStandardMaterial({
+      color: color,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: opacity,
+    })
   );
   object.position.copy(position);
   object.rotateY(wall.rotationY());
@@ -100,9 +111,43 @@ function createWall(
 }
 
 /**
+ * creates optical restriction wall for user that isn't allowed to enter this area
+ * @param tileModel contains TileGroup to add image of restriction
+ * @param orientation orientation which restriction wall should be placed and aligned on
+ * @param tilePosition position of parent tile
+ */
+function createRestrictiveWall(
+  tileModel: THREE.Group,
+  orientation: Orientation,
+  tilePosition: THREE.Vector3
+) {
+  const wall = new Wall(orientation, tilePosition);
+  const position = baseline(wall.position(), settings.tileSize);
+  textureLoader.load(
+    "textures/RestrictedTexture.png",
+    function (texture: Texture) {
+      texture.minFilter = THREE.NearestFilter;
+      const object = new THREE.Mesh(
+        new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
+        new THREE.MeshStandardMaterial({
+          side: DoubleSide,
+          map: texture,
+          transparent: true,
+        })
+      );
+      object.position.copy(position);
+      object.userData = wall;
+      object.rotateY(wall.rotationY());
+      tileModel.add(object);
+    }
+  );
+}
+
+/**
  * creates an arrow object that is aligned and directs to given orientation
- * @param orientation: orientation arrow should directs to
+ * @param orientation: orientation arrow should direct to
  * @param tilePosition: position of parent tile
+ * @param parent group on which arrow is placed
  * @returns: clickable arrow representation
  */
 function createArrow(
@@ -128,7 +173,7 @@ function createArrow(
 
 /**
  * creates a new partner player representation
- * appearance of player is defined by it's role
+ * appearance of player is defined by its role
  * @param player: player that should be represented
  * @param position: global position of player
  * @param parent: scene or group to which player should be added
@@ -162,6 +207,7 @@ export function useObjectFactory() {
   return {
     createArrow,
     createWall,
+    createRestrictiveWall,
     createCeiling,
     createFloor,
     createItem,

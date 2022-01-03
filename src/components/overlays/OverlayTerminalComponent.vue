@@ -2,7 +2,7 @@
   <OverlayComponent :opened="opened">
     <div class="terminal">
       <div class="terminal__header">
-        <i class="fas fa-times-circle" @click="close"></i>
+        <em class="fas fa-times-circle" @click="close" />
         {{ username }} –– -zsh
       </div>
       <div class="terminal__content">
@@ -66,7 +66,7 @@ export default defineComponent({
     position: relative;
     height: 25px;
 
-    & i {
+    & em {
       pointer-events: all;
       position: absolute;
       color: $color-black;

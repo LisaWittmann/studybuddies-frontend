@@ -7,7 +7,7 @@
     @move-player="movePlayer"
     @click-disabled="openTerminal"
   />
-  <!--warning and errormessages-->
+  <!--warning and error messages-->
   <OverlayTerminalComponent
     :opened="showTerminal"
     :message="message"
@@ -25,7 +25,6 @@ import { useLobbyService } from "@/service/LobbyService";
 
 import { Orientation } from "@/service/labyrinth/Tile";
 import { EventMessage } from "@/service/game/EventMessage";
-import { MainPlayer } from "@/service/game/Player";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
@@ -80,7 +79,7 @@ export default defineComponent({
 
     /**
      * function which is used when clicking the arrow in Interface
-     * By recieving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
+     * By receiving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
      * @param orientation : used in the backend to identify the direction to move the player
      */
     function movePlayer(orientation: Orientation) {

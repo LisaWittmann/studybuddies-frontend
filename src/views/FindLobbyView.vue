@@ -22,7 +22,6 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
-import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
 
 export default defineComponent({
