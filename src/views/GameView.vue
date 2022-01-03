@@ -9,9 +9,9 @@
   />
   <!--warning and errormessages-->
   <OverlayTerminalComponent
-    :opened="eventMessage.visible"
-    :message="eventMessage.message"
-    :state="eventMessage.state"
+    :opened="gameEventMessage.visible"
+    :message="gameEventMessage.message"
+    :state="gameEventMessage.state"
     @close="toggleEventMessage"
   />
 </template>
@@ -45,7 +45,7 @@ export default defineComponent({
     const { loginState } = useLoginStore();
     const { updateUsers } = useLobbyService();
     const { gameState, updateGameData, setLobbyKey } = useGameStore();
-    const { eventMessage, toggleEventMessage, playerMovement, clickItem } =
+    const { gameEventMessage, toggleEventMessage, playerMovement, clickItem } =
       useGameService();
     updateGameData();
 
@@ -86,7 +86,7 @@ export default defineComponent({
       movePlayer,
       clickItem,
       toggleEventMessage,
-      eventMessage,
+      gameEventMessage,
       gameState,
       mainPlayer,
       partnerPlayer,

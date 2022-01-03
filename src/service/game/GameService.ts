@@ -3,13 +3,13 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "../login/LoginStore";
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 
-const eventMessage = reactive({
+const gameEventMessage = reactive({
   message: "",
   state: "",
   visible: false,
 });
 
-const toggleEventMessage = () => (eventMessage.visible = !eventMessage.visible);
+const toggleEventMessage = () => (gameEventMessage.visible = !gameEventMessage.visible);
 
 async function playerMovement(evenMessage: EventMessage) {
   fetch("/api/lobby/move", {
@@ -28,24 +28,29 @@ async function playerMovement(evenMessage: EventMessage) {
 async function checkAccess(modelName: string) {
   const { gameState } = useGameStore();
   const { loginState } = useLoginStore();
-  fetch(
-    `/api/body/access/${modelName}/${gameState.lobbyKey}/${loginState.username}`,
-    {
-      method: "GET",
-    }
-  )
+  const eventMessage = new EventMessage(
+    Operation[Operation.ACCESS],
+    gameState.lobbyKey,
+    loginState.username,
+    modelName.toUpperCase()
+  );
+  fetch("/api/lobby/access", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(eventMessage),
+  })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((jsonData) => {
-      eventMessage.message = jsonData.accesstext;
+      gameEventMessage.message = jsonData.accesstext;
       if (jsonData.access) {
-        eventMessage.state = "success";
+        gameEventMessage.state = "success";
       } else {
-        eventMessage.state = "warning";
+        gameEventMessage.state = "warning";
       }
-      eventMessage.visible = true;
+      gameEventMessage.visible = true;
     })
     .catch((error) => {
       console.error(error);
@@ -54,7 +59,7 @@ async function checkAccess(modelName: string) {
 
 async function clickItem(modelName: string) {
   console.log("click", modelName);
-  fetch("/api/body/click/" + modelName, { method: "GET" })
+  fetch("/api/lobby/click/" + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
@@ -75,7 +80,7 @@ async function clickItem(modelName: string) {
 
 export function useGameService() {
   return {
-    eventMessage,
+    gameEventMessage,
     toggleEventMessage,
     playerMovement,
     clickItem,
