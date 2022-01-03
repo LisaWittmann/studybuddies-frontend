@@ -62,9 +62,6 @@ async function playerMovement(moveOperation: MoveOperation) {
 async function checkAccess(modelName: string) {
   const { gameState } = useGameStore();
   const { loginState } = useLoginStore();
-  console.log("CHECK ACCESS");
-  console.log(gameState);
-  console.log(loginState);
   fetch(`/api/body/access/${modelName}/${gameState.lobbyKey}/${loginState.username}`, {
     method: "GET",
   })
@@ -73,7 +70,6 @@ async function checkAccess(modelName: string) {
       return response.json();
     })
     .then((jsonData) => {
-      console.log(jsonData.accesstext);
       eventMessage.message = jsonData.accesstext;
       if (jsonData.access) {
         eventMessage.state = "success";
