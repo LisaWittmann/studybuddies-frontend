@@ -322,10 +322,10 @@ function setupGame() {
     updateUsers(gameState.lobbyKey);
     lobbyState.users.forEach((user, index) => {
       console.log(user.username);
-      console.log(gameState.labyrinth.playerStartTileIds[index]);
+      console.log(gameState.labyrinth.playerStartTileKeys[index]);
       setPlayerData(
         user.username,
-        gameState.labyrinth.playerStartTileIds[index]
+        gameState.labyrinth.playerStartTileKeys[index]
       );
     });
 
