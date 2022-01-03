@@ -1,12 +1,12 @@
 <template>
   <transition name="fade" appear>
     <div class="container">
+      <img
+        class="image--header"
+        src="@/assets/img/logo_header.png"
+        alt="logo"
+      />
       <section>
-        <img
-          class="image--header"
-          src="@/assets/img/logo_header.png"
-          alt="logo"
-        />
         <h2>Spiel finden</h2>
         <div class="column-wrapper">
           <input

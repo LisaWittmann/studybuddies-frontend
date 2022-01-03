@@ -23,19 +23,21 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, onMounted } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 
 import { Orientation } from "@/service/labyrinth/Tile";
-import { MoveOperation } from "@/service/game/EventMessage";
+import { EventMessage } from "@/service/game/EventMessage";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import "@/service/game/EventStore";
+import { useLobbyService } from "@/service/LobbyService";
+import router from "@/router";
 
 export default defineComponent({
   name: "GameView",
@@ -49,7 +51,8 @@ export default defineComponent({
   },
   setup() {
     const { loginState } = useLoginStore();
-    const { gameState, updateGameData } = useGameStore();
+    const { updateUsers } = useLobbyService();
+    const { gameState, updateGameData, setLobbyKey } = useGameStore();
     const {
       eventMessage,
       toggleEventMessage,
@@ -59,6 +62,13 @@ export default defineComponent({
       getConversationMessage,
     } = useGameService();
     updateGameData();
+
+    onMounted(async () => {
+      const route = router.currentRoute.value;
+      setLobbyKey(route.params.key as string);
+      await updateUsers(gameState.lobbyKey);
+      updateGameData();
+    });
 
     let mainPlayer;
     let partnerPlayer;
@@ -72,12 +82,13 @@ export default defineComponent({
 
     /**
      * function which is used when clicking the arrow in Interface
-     * By recieving the Orientation it creats a MoveOperation to send it to the BE via GameService Methode
+     * By recieving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
      * @param orientation : used in the backend to identify the direction to move the player
      */
     function movePlayer(orientation: Orientation) {
       playerMovement(
-        new MoveOperation(
+        new EventMessage(
+          "MOVEMENT",
           gameState.lobbyKey,
           loginState.username,
           Orientation[orientation].toString()

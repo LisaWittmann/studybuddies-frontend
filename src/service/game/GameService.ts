@@ -1,10 +1,9 @@
-import { MoveOperation, Operation } from "@/service/game/EventMessage";
 import { Message } from "@/service/game/Conversation";
 import { reactive } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "../login/LoginStore";
+import { EventMessage, Operation } from "@/service/game/EventMessage";
 
-// in-game messages like warnings, errors, hints ...
 const eventMessage = reactive({
   message: "",
   state: "",
@@ -13,7 +12,6 @@ const eventMessage = reactive({
 
 const toggleEventMessage = () => (eventMessage.visible = !eventMessage.visible);
 
-// conversations with interactive game characters
 const conversation = reactive({
   character: "",
   message: new Message("", "", undefined, []),
@@ -45,11 +43,11 @@ async function getConversationMessage(id: string) {
     });
 }
 
-async function playerMovement(moveOperation: MoveOperation) {
+async function playerMovement(evenMessage: EventMessage) {
   fetch("/api/lobby/move", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(moveOperation),
+    body: JSON.stringify(evenMessage),
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);

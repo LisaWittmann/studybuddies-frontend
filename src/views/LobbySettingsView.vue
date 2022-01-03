@@ -11,27 +11,29 @@
       <section>
         <h2>Rolle auswählen:</h2>
         <div class="roles">
-          <span v-if="selected">{{ selected }}</span>
+          <span v-if="selectedRole">{{ selectedRole }}</span>
         </div>
         <RadioButtonGroupComponent
-          :options="roles"
-          v-model="selected"
+          :options="allRoles"
+          v-model="selectedRole"
           @clicked="selectRole"
-          :selectable="roleOptions"
+          :selectable="openRoles"
         />
       </section>
       <section>
         <h2>Labyrinth auswählen:</h2>
         <DropdownComponent
           :items="labyrinthOptions"
+          :selectedItem="selectedLabyrinth"
           @select="selectLabyrinth"
         />
       </section>
       <section>
         <div class="column-wrapper">
           <transition name="fade" appear>
-            <button
-              class="button--small button__confirm"
+           <button
+              :class="{ 'button__ready': isReady }"
+              class="button--small"
               @click="readyCheck(loginState.username, selectedLabyrinth)"
             >
               Bereit
@@ -39,7 +41,7 @@
           </transition>
           <transition name="fade-delay">
             <button
-              class="button--small button__exit"
+              class="button button--small button__exit"
               @click="exitLobby(lobbyKey, loginState.username)"
             >
               Verlassen
@@ -74,6 +76,7 @@ export default defineComponent({
       updateUsers,
       readyCheck,
       exitLobby,
+      setLabyrinthSelection,
       updateLabyrinthPick,
       updateLabyrinths,
       setLobbyState,
@@ -91,11 +94,19 @@ export default defineComponent({
     //Radiobutton data
     const allRoles = ref([]);
     const openRoles = computed(() => lobbyState.openRoles);
-    let selectedRole = computed(() => lobbyState.selectedRole);
+    const selectedRole = computed(() => lobbyState.selectedRole);
+
+    //ReadyState data
+    const isReady = computed(
+      () =>
+        lobbyState.users.find((user) => user.username === loginState.username)
+          ?.isReady
+    );
 
     function selectLabyrinth(id: number) {
-      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
+      setLabyrinthSelection(id);
       updateLabyrinthPick(id, gameState.lobbyKey);
+      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
     }
 
     function selectRole(name: string) {
@@ -124,18 +135,19 @@ export default defineComponent({
     });
 
     return {
-      selected: selectedRole,
+      selectedRole,
       readyCheck,
       selectLabyrinth,
       exitLobby,
       selectRole,
-      roles: allRoles,
-      roleOptions: openRoles,
+      allRoles,
+      openRoles,
       users,
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
       loginState,
+      isReady,
     };
   },
 });
