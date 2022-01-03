@@ -7,9 +7,9 @@ import { Orientation } from "@/service/labyrinth/Tile";
 import { Arrow, Wall } from "@/service/labyrinth/FixedObject";
 import { PartnerPlayer, Role } from "@/service/game/Player";
 
-import { settings } from "@/service/scene/helper/SceneConstants";
+import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
-import { Scene, Vector3 } from "three";
+import { Vector3 } from "three";
 
 const objectLoader = new OBJLoader();
 const materialLoader = new MTLLoader();
@@ -37,15 +37,15 @@ async function createItem(
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
       object.position.copy(item.calcPositionInRoom().add(position));
-      //get size before rotation
+      //get object size before rotation
       const box = new THREE.Box3().setFromObject(object);
       box.getSize(size);
       if (size.x > settings.tileSize / 4) {
-        factor = 1 / (size.x / (settings.tileSize / 4));
+        factor = 1 / (size.x / factors.objectScaleFactor);
       } else if (size.y > settings.tileSize / 4) {
-        factor = 1 / (size.y / (settings.tileSize / 4));
+        factor = 1 / (size.y / factors.objectScaleFactor);
       }
-      object.scale.set(factor, factor, factor);
+      object.scale.set(factor, factor, factor); //scale object to max size
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
@@ -156,7 +156,6 @@ async function createPlayer(
   position: THREE.Vector3,
   parent: THREE.Scene | THREE.Group
 ) {
-  console.log("PLAYER", player);
   let model = "squirrel";
   const size = new Vector3();
 
@@ -195,36 +194,17 @@ function checkIntersect(
   position: THREE.Vector3,
   scene: THREE.Scene | THREE.Group
 ): Vector3 {
-  //const playerObject = scene.getObjectByName(player.getUsername());
-  const tile = scene.getObjectByName(player.getPosition().toString());
+  const tile = scene.getObjectByName(player.getPosition().toString()); //get current tile
+  const items = tile?.children.filter((c) => c.name.includes("item")); //get all meshes in tile
+  const playerBox = new THREE.Box3().setFromObject(playerObject); //creates bounding box of player
 
-  //get all meshes in tile
-  const items = tile?.children.filter((c) => c.name.includes("item"));
-
-  //Player------
-  const playerBox = new THREE.Box3().setFromObject(playerObject);
-  //remove later-------
-  const playerBoxHelper = new THREE.BoxHelper(playerObject, 0xff0000);
-  scene.add(playerBoxHelper);
-
-  //-------------------
-
-  console.log("PLAYER POSITION:", position);
-  //Items--------
-  //Für jedes Item überprüfen, ober der Player intersects und dann player position in entprechende Richtung für Höhe der intersection verschieben
-  //remove later-------
   items?.forEach((i) => {
-    const itemBox = new THREE.Box3().setFromObject(i);
-    console.log(itemBox.intersectsBox(playerBox));
+    const itemBox = new THREE.Box3().setFromObject(i); //creates bounding box for each item
     if (itemBox.intersectsBox(playerBox)) {
-      console.log("intersection with ", i.name);
-      console.log("ITEM BOX ", itemBox.min, itemBox.max);
-      console.log("PLAYER BOX ", playerBox.min, playerBox.max);
-      const intersectionBox = itemBox.intersect(playerBox);
-      console.log("INTERSECTION BOX ", intersectionBox);
-
       let playerCorner;
+      const intersectionBox = itemBox.intersect(playerBox);
 
+      //get in which corner player is positioned
       if (position.x > 0 && position.z < 0) {
         playerCorner = "NORTHEAST";
       } else if (position.x > 0 && position.z > 0) {
@@ -235,6 +215,7 @@ function checkIntersect(
         playerCorner = "SOUTHWEST";
       }
 
+      //check for intersections in corner
       switch (playerCorner) {
         case "NORTHEAST":
           if (
@@ -249,6 +230,7 @@ function checkIntersect(
             intersectionBox.min.z == playerBox.max.z &&
             intersectionBox.max.z == itemBox.min.z
           ) {
+            //intersection with item on south
             const z = intersectionBox.max.z - intersectionBox.min.z;
             position.setZ(position.z - z);
           }
@@ -265,6 +247,7 @@ function checkIntersect(
             intersectionBox.max.z == playerBox.max.z &&
             intersectionBox.min.z == itemBox.min.z
           ) {
+            //intersection with item on north
             const z = intersectionBox.max.z - intersectionBox.min.z;
             position.setZ(position.z + z);
           }
@@ -274,13 +257,14 @@ function checkIntersect(
             intersectionBox.min.x == playerBox.max.x &&
             intersectionBox.max.x == itemBox.min.x
           ) {
-            //intersection with item on west
+            //intersection with item on east
             const x = intersectionBox.max.x - intersectionBox.min.x;
             position.setX(position.x - x);
           } else if (
             intersectionBox.min.z == playerBox.max.z &&
             intersectionBox.max.z == itemBox.min.z
           ) {
+            //intersection with item on south
             const z = intersectionBox.max.z - intersectionBox.min.z;
             position.setZ(position.z + z);
           }
@@ -290,26 +274,21 @@ function checkIntersect(
             intersectionBox.min.x == playerBox.max.x &&
             intersectionBox.max.x == itemBox.min.x
           ) {
-            //intersection with item on west
+            //intersection with item on east
             const x = intersectionBox.max.x - intersectionBox.min.x;
             position.setX(position.x - x);
           } else if (
             intersectionBox.max.z == playerBox.max.z &&
             intersectionBox.min.z == itemBox.min.z
           ) {
+            //intersection with item on north
             const z = intersectionBox.max.z - intersectionBox.min.z;
             position.setZ(position.z + z);
           }
           break;
       }
     }
-    const itemBoxHelper = new THREE.BoxHelper(i, 0x006800);
-    scene.add(itemBoxHelper);
-    itemBoxHelper.update();
-    playerBoxHelper.update();
   });
-  //-------------------
-
   return position;
 }
 
