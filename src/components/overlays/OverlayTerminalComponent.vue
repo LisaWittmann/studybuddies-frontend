@@ -7,7 +7,7 @@
       </div>
       <div class="terminal__content">
         {{ username }}@mi ~ %
-        <span :class="`state--${state}`">{{ message }}</span>
+        <span :class="`terminal__content--${state}`">{{ message }}</span>
       </div>
     </div>
   </OverlayComponent>
@@ -39,7 +39,7 @@ export default defineComponent({
       default: "neutral",
     },
   },
-  setup(props, { emit }) {
+  setup(_, { emit }) {
     const { loginState } = useLoginStore();
     const username = loginState.username;
     const close = () => emit("close");
@@ -53,6 +53,7 @@ export default defineComponent({
 .terminal {
   max-width: 500px;
   width: 80%;
+  pointer-events: none;
 
   &__header {
     @include flex-center();
@@ -66,9 +67,9 @@ export default defineComponent({
     height: 25px;
 
     & i {
+      pointer-events: all;
       position: absolute;
       color: $color-black;
-      cursor: pointer;
       margin: 5px;
       left: 0;
       top: 0;
@@ -96,16 +97,14 @@ export default defineComponent({
       font-family: $font-inconsolata;
     }
 
-    .state {
-      &--neutral {
-        color: $color-white;
-      }
-      &--warning {
-        color: orange;
-      }
-      &--error {
-        color: red;
-      }
+    &--neutral {
+      color: $color-white;
+    }
+    &--warning {
+      color: orange;
+    }
+    &--error {
+      color: red;
     }
   }
 }

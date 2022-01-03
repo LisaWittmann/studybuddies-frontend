@@ -1,5 +1,5 @@
 <template>
-  <div class="user-list__wrapper">
+  <div class="column-wrapper">
     <div class="user-list">
       <div
         class="user-list__item"
@@ -7,7 +7,7 @@
         :key="index"
       >
         <span>{{ username }}</span>
-        <span class="status">connected</span>
+        <span class="user-list__status">connected</span>
       </div>
     </div>
   </div>
@@ -31,11 +31,6 @@ export default defineComponent({
 .user-list {
   width: 80%;
   max-width: 500px;
-
-  &__wrapper {
-    width: 100%;
-    @include flex-center();
-  }
 
   &__item {
     width: 100%;

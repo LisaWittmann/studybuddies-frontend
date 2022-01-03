@@ -3,11 +3,12 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 
 import { Item } from "@/service/labyrinth/Item";
-import { Orientation, Tile } from "@/service/labyrinth/Tile";
+import { Orientation } from "@/service/labyrinth/Tile";
 import { Arrow, Wall } from "@/service/labyrinth/FixedObject";
 
-import { axis, settings } from "@/service/scene/helper/SceneConstants";
+import { settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
+import { PartnerPlayer } from "@/service/game/Player";
 
 const objectLoader = new OBJLoader();
 const materialLoader = new MTLLoader();
@@ -19,14 +20,19 @@ materialLoader.setPath("/models/");
  * creates item by loading its obj representation from models directory
  * @param item: item that should be loaded and added to scene
  * @param parent: group or scene object will be added to after loading
+ * @param position: position of parent object
  */
-async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
+async function createItem(
+  item: Item,
+  parent: THREE.Group | THREE.Scene,
+  position: THREE.Vector3
+) {
   const model = item.modelName.toLowerCase();
-  await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
+  await materialLoader.loadAsync("materials.mtl").then((materials) => {
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
-      object.position.copy(item.calcPositionInRoom());
+      object.position.copy(item.calcPositionInRoom().add(position));
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
@@ -42,14 +48,14 @@ async function createItem(item: Item, parent: THREE.Group | THREE.Scene) {
  * @param color: floor color in hexa
  * @returns THREE.Mesh representation of floor
  */
-function createFloor(position: THREE.Vector3, color = 0x199eb0, model: Tile) {
+function createFloor(position: THREE.Vector3, color = 0x199eb0, key: number) {
   const object = new THREE.Mesh(
     new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.copy(position);
-  object.userData = model;
-  object.rotateOnAxis(axis.x, radians(90));
+  object.userData.tileKey = key;
+  object.rotateX(radians(90));
   return object;
 }
 
@@ -65,7 +71,7 @@ function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.set(position.x, position.y + settings.tileSize, position.z);
-  object.rotateOnAxis(axis.x, radians(90));
+  object.rotateX(radians(90));
   return object;
 }
 
@@ -88,7 +94,7 @@ function createWall(
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.copy(position);
-  object.rotateOnAxis(axis.y, radians(wall.rotationY()));
+  object.rotateY(wall.rotationY());
   object.userData = wall;
   return object;
 }
@@ -109,7 +115,7 @@ function createArrow(
     object.position.copy(arrow.position());
     object.userData = arrow;
     object.userData.clickable = true;
-    object.rotateOnAxis(axis.y, radians(arrow.rotationY()));
+    object.rotateY(arrow.rotationY());
     object.visible = false;
     object.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -120,6 +126,21 @@ function createArrow(
   });
 }
 
+function createPlayer(
+  model: PartnerPlayer,
+  position: THREE.Vector3
+): THREE.Object3D | undefined {
+  console.log("creating partner player");
+  return undefined;
+}
+
 export function useObjectFactory() {
-  return { createArrow, createWall, createCeiling, createFloor, createItem };
+  return {
+    createArrow,
+    createWall,
+    createCeiling,
+    createFloor,
+    createItem,
+    createPlayer,
+  };
 }

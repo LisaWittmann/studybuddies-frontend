@@ -1,27 +1,36 @@
 <template>
-  <section class="dropdown-menu-wrapper">
-    <button class="dropdown-menu-button" @click="openClose">
-      <span v-if="selectedItem">Labyrinth {{ selectedItem }}</span>
-      <span v-else>Labyrinth auswählen</span>
+  <section class="dropdown">
+    <button class="dropdown__button button--large" @click="openClose">
+      <div class="text-wrapper">
+        <span v-if="selectedItem">Labyrinth {{ selectedItem }}</span>
+        <span v-else>Labyrinth auswählen</span>
+      </div>
+      <div class="icon-wrapper">
+        <div class="bar bar-1" :class="{ 'bar-1--open': isOpen }" />
+        <div class="bar bar-2" :class="{ 'bar-2--open': isOpen }" />
+        <div class="bar bar-3" :class="{ 'bar-3--open': isOpen }" />
+      </div>
     </button>
 
-    <div class="icon-wrapper">
-      <div class="bar bar-1" :class="{ 'bar-1--open': isOpen }" />
-      <div class="bar bar-2" :class="{ 'bar-2--open': isOpen }" />
-      <div class="bar bar-3" :class="{ 'bar-3--open': isOpen }" />
-    </div>
-
-    <div class="dropdown-menu" v-if="isOpen === true">
-      <div class="menu-arrow" />
+    <div
+      class="dropdown__menu button button--large button--filled"
+      v-if="isOpen"
+    >
+      <div class="dropdown__menu-arrow" />
       <div
-        class="option"
+        class="dropdown__menu-option"
         v-for="(item, index) of items"
         :key="index"
         @click="selectItem(item)"
       >
         <div>Labyrinth {{ item }}</div>
       </div>
-      <div v-if="!items">Noch keine Labyrinthe verfügbar</div>
+      <div
+        class="dropdown__menu-option dropdown__menu-option--disabled"
+        v-if="items.length < 1"
+      >
+        <div>Noch keine Labyrinthe verfügbar</div>
+      </div>
     </div>
   </section>
 </template>
@@ -32,13 +41,16 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   props: {
     items: {
-      type: [],
+      type: Array,
+    },
+    selected: {
+      type: String,
     },
   },
   name: "DropdownComponent",
   setup(_, context) {
     let isOpen = ref(false);
-    let selectedItem = ref("");
+    let selectedItem = ref(props.selected);
 
     // open or close the dropdown menu
     function openClose() {
@@ -57,153 +69,131 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.dropdown-menu-wrapper {
+.dropdown {
+  @include flex-center();
   position: relative;
-  width: 500px;
-  margin: 0 auto;
-  height: 80px;
-  border-radius: 8px;
-  background: white;
-  border: 1px solid $color-grey;
-  box-shadow: 10px 10px 0 0 rgba(black, 0.03);
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
-  * {
-    box-sizing: border-box;
-    text-align: left;
-  }
+  button {
+    @include flex-center();
+    justify-content: space-between;
+    padding: 25px;
 
-  .dropdown-menu-button {
-    border: none;
-    font-size: inherit;
-    background: none;
-    outline: none;
-    border-radius: 4px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    align-items: center;
-    padding: 0 70px 0 20px;
-    margin: 0;
-    line-height: 1;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-    cursor: pointer;
+    &:hover {
+      font-weight: 300;
+    }
   }
 
   .icon-wrapper {
     width: 25px;
     height: 25px;
-    position: absolute;
-    right: 30px;
-    top: 50%;
-    transform: translate(0, -50%);
-    z-index: 1;
+    transform: translate(0, 0);
 
     .bar {
       width: 100%;
       max-width: 28px;
       height: 3px;
-      background: $color-dark-green;
       position: absolute;
       top: 50%;
       left: 50%;
       border-radius: 9999px;
       transition: all 0.2s ease;
+
+      @include color-scheme(light) {
+        background: $color-dark-green;
+      }
+
+      @include color-scheme(dark) {
+        background: $color-white;
+      }
     }
 
     .bar-1 {
       transform: translate(-50%, calc(-50% - 8px));
-    }
-
-    .bar-1--open {
-      transform: translate(-50%, -50%) rotate(45deg);
-      margin-top: 0;
-      background: $color-beige;
+      &--open {
+        transform: translate(-50%, -50%) rotate(45deg);
+        margin-top: 0;
+        background: $color-beige;
+      }
     }
 
     .bar-2 {
       transform: translate(-50%, -50%);
-    }
-
-    .bar-2--open {
-      opacity: 0;
+      &--open {
+        opacity: 0;
+      }
     }
 
     .bar-3 {
       transform: translate(-50%, calc(-50% + 8px));
-    }
-
-    .bar-3--open {
-      top: 50%;
-      transform: translate(-50%, -50%) rotate(-45deg);
-      background: $color-beige;
+      &--open {
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        background: $color-beige;
+      }
     }
   }
 
-  .dropdown-menu {
+  &__menu {
+    @include float-animation();
     position: absolute;
+    flex-direction: column;
+    text-align: left;
     top: 100%;
-    width: 100%;
-    min-width: 300px;
-    min-height: 10px;
-    border-radius: 8px;
-    border: 1px solid $color-grey;
-    box-shadow: 10px 10px 0 0 rgba(black, 0.03);
-    background: white;
-    padding: 10px 30px;
-    animation: menu 0.3s ease forwards;
-    font-weight: 300;
 
-    .menu-arrow {
+    &.button {
+      padding: 10px 0px;
+    }
+
+    @include color-scheme(light) {
+      background: $color-white;
+      color: $color-black;
+      box-shadow: 10px 10px 0 0 rgba(black, 0.03);
+      &-arrow {
+        background: $color-white;
+      }
+    }
+
+    @include color-scheme(dark) {
+      background: $color-black-background;
+      color: $color-white;
+      box-shadow: 10px 10px 0 0 rgba(grey, 0.03);
+      &-arrow {
+        background: $color-black-background;
+      }
+    }
+
+    &-arrow {
       width: 20px;
       height: 20px;
       position: absolute;
-      top: -10px;
-      left: 20px;
       border-left: 1px solid $color-grey;
       border-top: 1px solid $color-grey;
-      background: white;
+      top: -10px;
+      left: 20px;
       transform: rotate(45deg);
       border-radius: 4px 0 0 0;
     }
 
-    .option {
+    &-option {
       width: 100%;
-      border-bottom: 1px solid $color-grey;
-      padding: 20px 0;
-      cursor: pointer;
-      position: relative;
-      z-index: 2;
 
-      &:last-child {
+      &--disabled {
+        pointer-events: none;
+      }
+
+      > * {
+        margin: 0px 20px;
+        padding: 25px 0px;
+        border-bottom: 1px solid $color-grey;
+      }
+
+      &:last-child > * {
         border-bottom: 0;
       }
 
       &:hover {
-        color: $color-green;
+        color: $color-beige;
       }
-
-      * {
-        color: inherit;
-        text-decoration: none;
-        background: none;
-        border: 0;
-        padding: 0;
-        outline: none;
-        cursor: pointer;
-      }
-    }
-  }
-
-  @keyframes menu {
-    from {
-      transform: translate3d(0, 30px, 0);
-    }
-    to {
-      transform: translate3d(0, 20px, 0);
     }
   }
 }

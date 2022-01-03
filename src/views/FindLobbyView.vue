@@ -1,28 +1,44 @@
 <template>
-  <h1>Platzhalter Logo</h1>
-  <section>
-    <h2>Spiel finden</h2>
-    <div class="button-wrapper">
-      <input type="text" v-model="lobbyKey" />
-      <button @click="joinGame">Spiel beitreten</button>
+  <transition name="fade" appear>
+    <div class="container">
+      <img class="header" :src="header" alt="logo" />
+      <section>
+        <h2>Spiel finden</h2>
+        <div class="column-wrapper">
+          <input class="input--small" type="text" v-model="lobbyKey" />
+          <button class="button--small" @click="joinGame">
+            Spiel beitreten
+          </button>
+        </div>
+      </section>
+      <transition name="delay-fade" appear>
+        <section>
+          <h2>Spiel erstellen</h2>
+          <button class="button--small" @click="createGame">
+            Spiel erstellen
+          </button>
+        </section>
+      </transition>
     </div>
-  </section>
-  <section>
-    <h2>Spiel erstellen</h2>
-    <button @click="createGame">Spiel erstellen</button>
-  </section>
+  </transition>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import router from "@/router";
+import { computed, defineComponent, ref } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
+import router from "@/router";
 
 export default defineComponent({
   name: "FindLobby",
   setup() {
     const { loginState } = useLoginStore();
     const lobbyKey = ref("");
+
+    const header = computed(() => {
+      if (matchMedia("(prefers-color-scheme: dark)").matches)
+        return require("@/assets/img/logo_header_dark.png");
+      return require("@/assets/img/logo_header.png");
+    });
 
     function joinGame() {
       let key = lobbyKey.value;
@@ -61,43 +77,15 @@ export default defineComponent({
         .catch((err) => console.log(err));
     }
 
-    return { lobbyKey, createGame, joinGame };
+    return { lobbyKey, createGame, joinGame, header };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-h1 {
-  margin: $spacing-l 0;
-}
-
-button {
-  margin: 10px;
-  min-height: 35px;
-  max-width: 200px;
-  background: transparent;
-  font-size: 16px;
-}
-
-input,
-button {
-  border: 1px solid $color-grey;
-  border-radius: 8px;
-  font-weight: 300;
-  width: 80%;
-  display: inline-block;
-  padding: 10px 12px;
-  cursor: pointer;
-}
-
-input {
-  min-height: 20px;
-  max-width: 300px;
-  margin-bottom: $spacing-xs;
-}
-
-.button-wrapper {
-  @include flex-center();
-  flex-direction: column;
+.header {
+  width: 100%;
+  max-width: 600px;
+  padding-top: $spacing-l;
 }
 </style>

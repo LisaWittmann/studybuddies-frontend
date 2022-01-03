@@ -1,5 +1,6 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
+import { radians } from "@/service/scene/helper/GeometryHelper";
 import {
   settings,
   direction,
@@ -23,13 +24,13 @@ class FixedObject {
   rotationY = (): number => {
     switch (this.orientation) {
       case Orientation.NORTH:
-        return 0;
+        return radians(0);
       case Orientation.EAST:
-        return 270;
+        return radians(270);
       case Orientation.SOUTH:
-        return 180;
+        return radians(180);
       case Orientation.WEST:
-        return 90;
+        return radians(90);
     }
   };
 

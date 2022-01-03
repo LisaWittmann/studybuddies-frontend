@@ -26,7 +26,7 @@ function createTile(
   tile.add(createLight(position));
 
   //STATIC-ITEMS----------
-  tile.add(createFloor(position, color, model));
+  tile.add(createFloor(position, color, tileKey));
   tile.add(createCeiling(position, color));
   model.tileRelationMap.forEach((value, key) => {
     if (value) createArrow(key, position, tile);
@@ -35,7 +35,7 @@ function createTile(
 
   //ITEMS-----------------
   for (const item of model.objectsInRoom) {
-    createItem(item, tile);
+    createItem(item, tile, position);
   }
   return tile;
 }

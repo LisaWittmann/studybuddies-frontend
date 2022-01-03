@@ -1,7 +1,18 @@
 body {
     margin: 0;
     font-family: $font-outfit;
+    background: $color-white;
     color: $color-black;
+
+    @include color-scheme(dark) {
+        background: $color-black-background;
+        color: $color-white;
+    }
+}
+
+#app {
+    min-height: 100vh;
+    text-align: center;
 }
 
 input, button {
@@ -14,10 +25,38 @@ p, span, a {
     font-weight: 300;
 }
 
-h1, h2 {
+h1 {
     font-weight: 500;
+    font-size: $headline-xl;
+    margin-bottom: 0;
+}
+
+h2 {
+    font-weight: 500;
+    font-size: $headline-l;
 }
 
 section {
     margin: $spacing-l 0;
+    width: 100%;
+}
+
+i {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: underline;
+    cursor: pointer;
+    color: $color-dark-green;
+    &:hover {
+        color: $color-light-green;
+    }
+   
+   @include color-scheme(dark) {
+       color: $color-grey;
+        &:hover {
+            color: $color-white;
+        }
+    }
 }

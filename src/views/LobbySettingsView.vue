@@ -1,35 +1,45 @@
 <template>
-  <h1>Lobby {{ lobbyKey }}</h1>
-  <section>
-    <UserListComponent :users="users" />
-  </section>
-  <section>
-    <h2>Labyrinth hochladen:</h2>
-    <label class="file-upload">
-      <input
-        type="file"
-        ref="upload"
-        accept=".json"
-        @change="uploadLabyrinth"
-      />
-      Hochladen
-    </label>
-  </section>
-  <section>
-    <h2>Labyrinth auswählen:</h2>
-    <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
-  </section>
-  <section>
-    <div class="button-wrapper">
-      <button class="button button--confirm" @click="readyCheck">Bereit</button>
-      <button
-        class="button button--exit"
-        @click="exitLobby(lobbyKey, username)"
-      >
-        Verlassen
-      </button>
+  <transition name="fade" appear>
+    <div class="container">
+      <h1>Lobby {{ lobbyKey }}</h1>
+      <section>
+        <UserListComponent :users="users" />
+      </section>
+      <section>
+        <h2>Labyrinth hochladen:</h2>
+        <label class="button button__upload button--small">
+          <input
+            type="file"
+            ref="upload"
+            accept=".json"
+            @change="uploadLabyrinth"
+          />
+          Hochladen
+        </label>
+      </section>
+      <section>
+        <h2>Labyrinth auswählen:</h2>
+        <DropdownComponent :items="labyrinthOptions" @select="selectLabyrinth" />
+      </section>
+      <section>
+        <div class="column-wrapper">
+          <transition name="fade" appear>
+            <button class="button__confirm button--small" @click="readyCheck">
+              Bereit
+            </button>
+          </transition>
+          <transition name="delay-fade" appear>
+            <button
+              class="button__exit button--small"
+              @click="exitLobby(lobbyKey, username)"
+            >
+              Verlassen
+            </button>
+          </transition>
+        </div>
+      </section>
     </div>
-  </section>
+  </transition>
 </template>
 
 <script lang="ts">
@@ -95,57 +105,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 h1 {
-  margin: $spacing-l 0;
-}
-
-.button-wrapper {
-  @include flex-center();
-  flex-direction: column;
-}
-
-.button {
-  margin: 10px;
-  min-height: 35px;
-  background: transparent;
-  font-size: 16px;
-
-  &:hover {
-    font-weight: 400;
-  }
-
-  &--exit {
-    &:hover,
-    &:active {
-      color: darkred;
-    }
-  }
-
-  &--confirm {
-    &:hover,
-    &:active {
-      color: $color-green;
-    }
-  }
+  padding-top: $spacing-l;
+  margin-top: 0;
 }
 
 input[type="file"] {
   display: none;
-}
-
-.file-upload,
-.button {
-  border: 1px solid $color-grey;
-  border-radius: 8px;
-  font-weight: 300;
-  display: inline-block;
-  padding: 10px 12px;
-  width: 80%;
-  max-width: 200px;
-  cursor: pointer;
-}
-
-.file-upload:hover {
-  color: $color-beige;
-  font-weight: 400;
 }
 </style>
