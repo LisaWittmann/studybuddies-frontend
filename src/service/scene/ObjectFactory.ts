@@ -9,7 +9,7 @@ import { PartnerPlayer, Role } from "@/service/game/Player";
 
 import { settings } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
-import { Vector3 } from "three";
+import { Scene, Vector3 } from "three";
 
 const objectLoader = new OBJLoader();
 const materialLoader = new MTLLoader();
@@ -42,14 +42,10 @@ async function createItem(
       box.getSize(size);
       if (size.x > settings.tileSize / 4) {
         factor = 1 / (size.x / (settings.tileSize / 4));
-        console.log("X bigger", size.x, factor);
       } else if (size.y > settings.tileSize / 4) {
         factor = 1 / (size.y / (settings.tileSize / 4));
-        console.log("Y bigger", size.y, factor);
       }
-
       object.scale.set(factor, factor, factor);
-
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
@@ -162,6 +158,8 @@ async function createPlayer(
 ) {
   console.log("PLAYER", player);
   let model = "squirrel";
+  const size = new Vector3();
+
   switch (player.getRole()) {
     case Role.DESIGNER:
       model += "-designer";
@@ -174,13 +172,57 @@ async function createPlayer(
     materials.preload();
     objectLoader.setMaterials(materials);
     objectLoader.loadAsync(`${model}.obj`).then((object) => {
+      object.userData.username = player.getUsername();
+      object.name = player.getUsername();
       object.position.copy(position);
-      object.userData.username = player.username;
-      object.name = "partner";
+      const newPos = checkIntersect(object, player, position, parent);
       object.rotateY(90);
       parent.add(object);
     });
   });
+}
+
+/**
+ * checks for intersections of partner model with items and updates position of partner accordingly
+ * @param player: data of PartnerPlayer
+ * @param scene: scene that contains all models + the partner
+ * @returns
+ */
+function checkIntersect(
+  playerObject: THREE.Group,
+  player: PartnerPlayer,
+  position: THREE.Vector3,
+  scene: THREE.Scene | THREE.Group
+): Vector3 {
+  //const playerObject = scene.getObjectByName(player.getUsername());
+  const tile = scene.getObjectByName(player.getPosition().toString());
+
+  //get all meshes in tile
+  const items = tile?.children.filter((c) => c.name.includes("item"));
+  console.log("PARNTER", playerObject);
+  console.log("Items", items);
+
+  //Player------
+  const playerBox = new THREE.Box3().setFromObject(playerObject);
+  //remove later-------
+  const playerBoxHelper = new THREE.BoxHelper(playerObject, 0xff0000);
+  playerBoxHelper.update();
+  scene.add(playerBoxHelper);
+  //-------------------
+
+  //Items--------
+  //Für jedes Item überprüfen, ober der Player intersects und dann player position in entprechende Richtung für Höhe der intersection verschieben
+  //remove later-------
+  items?.forEach((i) => {
+    const itemBox = new THREE.Box3().setFromObject(i);
+
+    const itemBoxHelper = new THREE.BoxHelper(i, 0x006800);
+    itemBoxHelper.update();
+    scene.add(itemBoxHelper);
+  });
+  //-------------------
+
+  return position;
 }
 
 export function useObjectFactory() {

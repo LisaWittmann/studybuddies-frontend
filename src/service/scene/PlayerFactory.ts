@@ -4,7 +4,8 @@ import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { PartnerPlayer } from "@/service/game/Player";
 import { settings, direction } from "./helper/SceneConstants";
 import { useLabyrinthStore } from "../labyrinth/LabyrinthStore";
-import { Orientation } from "../labyrinth/Tile";
+import { Orientation, Tile } from "../labyrinth/Tile";
+import { Item } from "../labyrinth/Item";
 
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer } = useObjectFactory();
@@ -34,19 +35,21 @@ function updatePartnerPlayer(
   if (player.getUsername() == "") {
     return;
   } else {
+    const playerObject = getPlayer(player.getUsername(), scene);
     const position = calculatePartnerPositon(
       player.getPosition(),
-      scene,
       tilePosition
     );
-    const playerObject = getPlayer(player.getUsername(), scene);
     if (!partnerInitialized) {
       partnerInitialized = true;
       createPlayer(player, position, scene);
     } else if (playerObject) {
+      console.log("PLAYER EXISTS!!!!!!!!!!!!!!!!!!!!!!!!")
       playerObject.position.copy(position);
     }
   }
+
+ 
 }
 
 /**
@@ -73,7 +76,6 @@ function getPlayer(
  */
 function calculatePartnerPositon(
   currentTileID: number,
-  scene: THREE.Scene,
   tilePosition: Vector3
 ): Vector3 {
   const tileItems = labyrinthState.tileMap.get(currentTileID)?.objectsInRoom;
@@ -94,13 +96,12 @@ function calculatePartnerPositon(
     });
   }
 
-  console.log("ITEM ORIENTATIONS", itemOrientations);
-
+  //iterates over all orientations and checks if the planned corner position is already taken by an item
   itemOrientations.forEach((o) => {
+    //if there is an item in the corner -> move partner clockwise
     if (playerOrientation === o) {
       switch (o) {
         case "NORTHWEST" || "WESTNORTH":
-          //there is an item in the northwest corner -> move partner clockwise
           playerOrientation = "NORTHEAST";
           calcPartnerPosition
             .copy(tilePosition)
@@ -132,9 +133,7 @@ function calculatePartnerPositon(
     }
   });
 
-  console.log("POSITION", playerOrientation, calcPartnerPosition);
-
-  //move partner quarter of the current tile size to be in same
+  //move partner quarter of the current tile size to be in same radius as items
   calcPartnerPosition = calcPartnerPosition.multiplyScalar(
     settings.tileSize / 4
   );
@@ -142,6 +141,8 @@ function calculatePartnerPositon(
   console.log(calcPartnerPosition);
   return calcPartnerPosition;
 }
+
+
 
 export function usePlayerFactory() {
   return { updateMainPlayer, updatePartnerPlayer };
