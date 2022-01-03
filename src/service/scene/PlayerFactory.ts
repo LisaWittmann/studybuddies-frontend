@@ -27,7 +27,7 @@ function updatePartnerPlayer(
   scene: Scene
 ) {
   console.log("updating partner position");
-  const position = calculatePartnerPositon(tilePosition);
+  const position = calculatePartnerPosition(tilePosition);
   const playerObject = getPlayer(player.getUsername(), scene);
   if (playerObject) playerObject.position.copy(position);
   else createPlayer(player, position, scene);
@@ -53,9 +53,9 @@ function getPlayer(
 /**
  * calculating position of player in tile
  * @param tilePosition: position of tile that player should be placed in
- * @returns position as three dimensional vector
+ * @returns position as three-dimensional vector
  */
-function calculatePartnerPositon(tilePosition: Vector3): Vector3 {
+function calculatePartnerPosition(tilePosition: Vector3): Vector3 {
   console.log("calculating partner position");
   return tilePosition;
 }

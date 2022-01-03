@@ -1,5 +1,5 @@
 /**
- * EventMessage: independant class to recieve the EventMessage from the messagebroker as independent Object
+ * EventMessage: independent class to receive the EventMessage Object from the MessageBroker as independent Object
  * @param operation: to clarify which Operation Object can be used and which process can be started
  * @param lobbykey: to clarify the lobby for the Backend
  * @param username: to clarify which user sends a respond to the BE or with which user an operation is to be made when the messagebroker calls

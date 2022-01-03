@@ -7,7 +7,7 @@
     @move-player="movePlayer"
     @click-disabled="toggleEventMessage"
   />
-  <!--warning and errormessages-->
+  <!--warning and error messages-->
   <OverlayTerminalComponent
     :opened="gameEventMessage.visible"
     :message="gameEventMessage.message"
@@ -68,7 +68,7 @@ export default defineComponent({
 
     /**
      * function which is used when clicking the arrow in Interface
-     * By recieving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
+     * By receiving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
      * @param orientation : used in the backend to identify the direction to move the player
      */
     function movePlayer(orientation: Orientation) {
