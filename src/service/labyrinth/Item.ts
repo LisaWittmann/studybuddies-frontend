@@ -123,40 +123,13 @@ export class Item {
   };
 
   toJsonObject() {
-    const orientationsString = new Array<string>();
-    for (const orientation of this.orientations) {
-      switch (orientation) {
-        case Orientation.NORTH:
-          orientationsString.push("NORTH");
-          break;
-        case Orientation.SOUTH:
-          orientationsString.push("SOUTH");
-          break;
-        case Orientation.WEST:
-          orientationsString.push("WEST");
-          break;
-        case Orientation.EAST:
-          orientationsString.push("EAST");
-          break;
-      }
-    }
-    let position = "";
-    switch (this.positionInRoom) {
-      case Position.FLOOR:
-        position = "FLOOR";
-        break;
-      case Position.CEILING:
-        position = "CEILING";
-        break;
-      case Position.WALL:
-        position = "WALL";
-        break;
-    }
     return {
       id: this.id,
       modelName: this.modelName,
-      positionInRoom: position,
-      orientations: orientationsString,
+      positionInRoom: Position[this.positionInRoom],
+      orientations: this.orientations.map(
+        (orientation) => Orientation[orientation]
+      ),
     };
   }
 }
