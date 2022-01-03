@@ -28,11 +28,13 @@ function updateGameData() {
  * @param player: the new (changed) player object
  * @param newPosition: new position of the player
  */
-function updatePlayerData(player: Player, newPosition: number) {
-  const foundPlayer = gameState.playerMap.get(player.getUsername());
+function updatePlayerData(username: string, newPosition: number) {
+  const foundPlayer = gameState.playerMap.get(username);
   if (foundPlayer) {
     foundPlayer.setPosition(newPosition);
-    gameState.playerMap.set(player.username, player);
+    gameState.playerMap.set(foundPlayer.username, foundPlayer);
+  } else {
+    setError("No Player found with Name: " + username);
   }
 }
 
@@ -42,23 +44,12 @@ function updatePlayerData(player: Player, newPosition: number) {
  * @param role: role of the given user
  * @param startTileId: start position of the player at the start of the game
  */
-async function setPlayerData(
-  username: string,
-  role: Role,
-  startTileId: number
-) {
-  console.log("StartTileId is: " + startTileId);
+async function setPlayerData(username: string, role: Role) {
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
-    gameState.playerMap.set(
-      username,
-      new MainPlayer(username, role, startTileId)
-    );
+    gameState.playerMap.set(username, new MainPlayer(username, role));
   } else {
-    gameState.playerMap.set(
-      username,
-      new PartnerPlayer(username, role, startTileId)
-    );
+    gameState.playerMap.set(username, new PartnerPlayer(username, role));
   }
 }
 

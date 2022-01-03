@@ -42,38 +42,26 @@ stompClient.onConnect = () => {
   console.log("stomp verbindet");
 
   stompClient.subscribe(DEST, (message) => {
-    console.log("Message received");
-
     const eventMessage: EventMessage = JSON.parse(message.body);
 
     if (
       eventMessage.lobbyKey == gameState.lobbyKey ||
       eventMessage.lobbyKey == "ALL"
     ) {
-      console.log("Message in the right Lobby");
+      console.log("new Message for the Lobby");
 
-      /**
-       * Checks whether the user exists in the Game
-       */
-      const playerToMove: Player | undefined = gameState.playerMap.get(
-        eventMessage.username
-      );
+      let destTileID: number;
+
       switch (eventMessage.operation) {
         case "MOVEMENT":
-          if (playerToMove) {
-            const destTileID: number = Number.parseInt(eventMessage.data);
+          destTileID = Number.parseInt(eventMessage.data);
 
-            if (destTileID) {
-              updatePlayerData(playerToMove, destTileID);
-              // -> now the watcher can update the 3D Room
-              // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
-            } else {
-              setError(
-                "There is no tile reference for this definition of data"
-              );
-            }
+          if (destTileID) {
+            updatePlayerData(eventMessage.username, destTileID);
+            // -> now the watcher can update the 3D Room
+            // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
-            setError("No existing User");
+            setError("There is no tile reference for this definition of data");
           }
 
           break;

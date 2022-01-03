@@ -3,7 +3,7 @@ import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 import { EventMessage } from "@/service/game/EventMessage";
 import { User } from "@/service/login/User";
-import { Role } from "@/service/game/Player";
+import { Player, Role } from "@/service/game/Player";
 import router from "@/router";
 
 const lobbyState = reactive({
@@ -318,10 +318,11 @@ function setUserReadyState(username: string, readyState: boolean) {
  * 4. Overwriting the page history by replacing the url to the game view
  */
 function setupGame() {
-  const { updateGameData, gameState, setPlayerData } = useGameStore();
+  const { updateGameData, gameState, setPlayerData, updatePlayerData } =
+    useGameStore();
   updateUsers(gameState.lobbyKey)
     .then(() => {
-      lobbyState.users.forEach((user, index) => {
+      lobbyState.users.forEach((user) => {
         // for testing roles
         fetch(`/api/lobby/role/${gameState.lobbyKey}/${user.username}`)
           .then((response) => {
@@ -330,14 +331,20 @@ function setupGame() {
           })
           .then((jsonData) => {
             const role = (<any>Role)[jsonData];
-            const startTile = gameState.labyrinth.playerStartTileIds[index];
-            setPlayerData(user.username, role, startTile);
+            setPlayerData(user.username, role);
           });
       });
     })
-    .then(() =>
-      updateGameData().then(() => router.push(`/game/${gameState.lobbyKey}`))
-    );
+    .then(() => {
+      updateGameData().then(() => {
+        lobbyState.users.forEach((user, index) => {
+          const startTile = gameState.labyrinth.playerStartTileIds[index];
+          updatePlayerData(user.username, startTile);
+          console.log("StartTileId is: " + startTile);
+        });
+        router.push(`/game/${gameState.lobbyKey}`);
+      });
+    });
 }
 
 export function useLobbyService() {

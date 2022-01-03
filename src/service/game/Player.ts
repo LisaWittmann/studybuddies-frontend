@@ -32,17 +32,12 @@ export interface Player {
  */
 export class MainPlayer implements Player {
   username: string;
-  position: number;
+  position!: number;
   role: Role | undefined;
   inventory: Map<number, Item>;
 
-  constructor(
-    username: string,
-    role: Role | undefined,
-    playerPosition: number
-  ) {
+  constructor(username: string, role: Role | undefined) {
     this.username = username;
-    this.position = playerPosition;
     this.role = role;
     this.inventory = new Map<number, Item>();
   }
@@ -82,17 +77,12 @@ export class MainPlayer implements Player {
  */
 export class PartnerPlayer implements Player {
   username: string;
-  position: number;
+  position!: number;
   role: Role | undefined;
 
-  constructor(
-    username: string,
-    role: Role | undefined,
-    playerPosition: number
-  ) {
+  constructor(username: string, role: Role | undefined) {
     this.username = username;
     this.role = role;
-    this.position = playerPosition;
   }
 
   getUsername(): string {
