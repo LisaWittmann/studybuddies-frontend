@@ -29,7 +29,7 @@ async function createItem(
   position: THREE.Vector3
 ) {
   const model = item.modelName.toLowerCase();
-  let factor = 0;
+  let factor = 1;
   const size = new Vector3();
 
   await materialLoader.loadAsync("materials.mtl").then((materials) => {
@@ -175,8 +175,9 @@ async function createPlayer(
       object.userData.username = player.getUsername();
       object.name = player.getUsername();
       object.position.copy(position);
-      const newPos = checkIntersect(object, player, position, parent);
       object.rotateY(90);
+      const newPos = checkIntersect(object, player, position, parent);
+      object.position.copy(newPos);
       parent.add(object);
     });
   });
@@ -199,26 +200,113 @@ function checkIntersect(
 
   //get all meshes in tile
   const items = tile?.children.filter((c) => c.name.includes("item"));
-  console.log("PARNTER", playerObject);
-  console.log("Items", items);
 
   //Player------
   const playerBox = new THREE.Box3().setFromObject(playerObject);
   //remove later-------
   const playerBoxHelper = new THREE.BoxHelper(playerObject, 0xff0000);
-  playerBoxHelper.update();
   scene.add(playerBoxHelper);
+
   //-------------------
 
+  console.log("PLAYER POSITION:", position);
   //Items--------
   //Für jedes Item überprüfen, ober der Player intersects und dann player position in entprechende Richtung für Höhe der intersection verschieben
   //remove later-------
   items?.forEach((i) => {
     const itemBox = new THREE.Box3().setFromObject(i);
+    console.log(itemBox.intersectsBox(playerBox));
+    if (itemBox.intersectsBox(playerBox)) {
+      console.log("intersection with ", i.name);
+      console.log("ITEM BOX ", itemBox.min, itemBox.max);
+      console.log("PLAYER BOX ", playerBox.min, playerBox.max);
+      const intersectionBox = itemBox.intersect(playerBox);
+      console.log("INTERSECTION BOX ", intersectionBox);
 
+      let playerCorner;
+
+      if (position.x > 0 && position.z < 0) {
+        playerCorner = "NORTHEAST";
+      } else if (position.x > 0 && position.z > 0) {
+        playerCorner = "SOUTHEAST";
+      } else if (position.x < 0 && position.z < 0) {
+        playerCorner = "NORTHWEST";
+      } else if (position.x < 0 && position.z > 0) {
+        playerCorner = "SOUTHWEST";
+      }
+
+      switch (playerCorner) {
+        case "NORTHEAST":
+          if (
+            intersectionBox.min.x == playerBox.min.x &&
+            intersectionBox.max.x == itemBox.max.x
+          ) {
+            //intersection with item on west
+            const x = intersectionBox.max.x - intersectionBox.min.x;
+            position.setX(position.x + x);
+            break;
+          } else if (
+            intersectionBox.min.z == playerBox.max.z &&
+            intersectionBox.max.z == itemBox.min.z
+          ) {
+            const z = intersectionBox.max.z - intersectionBox.min.z;
+            position.setZ(position.z - z);
+          }
+          break;
+        case "SOUTHEAST":
+          if (
+            intersectionBox.min.x == playerBox.min.x &&
+            intersectionBox.max.x == itemBox.max.x
+          ) {
+            //intersection with item on west
+            const x = intersectionBox.max.x - intersectionBox.min.x;
+            position.setX(position.x + x);
+          } else if (
+            intersectionBox.max.z == playerBox.max.z &&
+            intersectionBox.min.z == itemBox.min.z
+          ) {
+            const z = intersectionBox.max.z - intersectionBox.min.z;
+            position.setZ(position.z + z);
+          }
+          break;
+        case "NORTHWEST":
+          if (
+            intersectionBox.min.x == playerBox.max.x &&
+            intersectionBox.max.x == itemBox.min.x
+          ) {
+            //intersection with item on west
+            const x = intersectionBox.max.x - intersectionBox.min.x;
+            position.setX(position.x - x);
+          } else if (
+            intersectionBox.min.z == playerBox.max.z &&
+            intersectionBox.max.z == itemBox.min.z
+          ) {
+            const z = intersectionBox.max.z - intersectionBox.min.z;
+            position.setZ(position.z + z);
+          }
+          break;
+        case "SOUTHWEST":
+          if (
+            intersectionBox.min.x == playerBox.max.x &&
+            intersectionBox.max.x == itemBox.min.x
+          ) {
+            //intersection with item on west
+            const x = intersectionBox.max.x - intersectionBox.min.x;
+            position.setX(position.x - x);
+          } else if (
+            intersectionBox.max.z == playerBox.max.z &&
+            intersectionBox.min.z == itemBox.min.z
+          ) {
+            const z = intersectionBox.max.z - intersectionBox.min.z;
+            position.setZ(position.z + z);
+          }
+          break;
+      }
+    }
     const itemBoxHelper = new THREE.BoxHelper(i, 0x006800);
-    itemBoxHelper.update();
     scene.add(itemBoxHelper);
+    itemBoxHelper.update();
+    playerBoxHelper.update();
   });
   //-------------------
 
@@ -233,5 +321,6 @@ export function useObjectFactory() {
     createFloor,
     createItem,
     createPlayer,
+    checkIntersect,
   };
 }

@@ -57,6 +57,7 @@ function updatePlayerData(player: Player, newPosition: number) {
     sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer));
   } else {
     gameState.partnerPlayer.setPosition(newPosition);
+    console.log("NEW POSITION: ", newPosition);
     sessionStorage.setItem(
       "partnerPlayer",
       JSON.stringify(gameState.partnerPlayer)
