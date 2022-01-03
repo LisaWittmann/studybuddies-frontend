@@ -10,8 +10,8 @@ import { useGameStore } from "@/service/game/GameStore";
  */
 const labyrinthState: Labyrinth = reactive<Labyrinth>({
   tileMap: new Map<number, Tile>([]),
-  endTileId: 0,
-  playerStartTileIds: new Array<number>(),
+  endTileKey: 0,
+  playerStartTileKeys: new Array<number>(),
 });
 
 /**
@@ -31,8 +31,8 @@ async function updateLabyrinthData(lobbyKey: string) {
     })
     .then((jsonData) => {
       const labyrinth = new Labyrinth(
-        jsonData.endTileId,
-        jsonData.playerStartTileIds
+        jsonData.endTileKey,
+        jsonData.playerStartTileKeys
       );
 
       //iterate over the tiles in the jsondata tileMap to create tiles for every tile in jsonobject
@@ -75,8 +75,8 @@ async function updateLabyrinthData(lobbyKey: string) {
       }
 
       labyrinthState.tileMap = labyrinth.tileMap;
-      labyrinthState.endTileId = labyrinth.endTileId;
-      labyrinthState.playerStartTileIds = labyrinth.playerStartTileIds;
+      labyrinthState.endTileKey = labyrinth.endTileKey;
+      labyrinthState.playerStartTileKeys = labyrinth.playerStartTileKeys;
     })
     .catch((error) => {
       console.error(error);

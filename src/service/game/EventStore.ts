@@ -76,7 +76,7 @@ stompclient.onConnect = () => {
             .then(() => {
               setPlayer(
                 loginState.username,
-                gameState.labyrinth.playerStartTileIds[0]
+                gameState.labyrinth.playerStartTileKeys[0]
               );
             })
             .then(() => {
