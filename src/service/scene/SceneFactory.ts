@@ -138,7 +138,6 @@ function getIntersections(
   raycaster.setFromCamera({ x: x, y: y }, camera);
   const intersects = raycaster.intersectObjects(scene.children);
 
-  // testing intersections
   for (const intersection of intersects) {
     const object = intersection.object;
     // if parent object is a 'valid' object (no tile)
@@ -147,11 +146,7 @@ function getIntersections(
       if (object.parent.userData.modelName == "COMPUTER") {
         context.emit("click-disabled");
       }
-      //object dissapears per click (optically)
-      else if (object.parent.visible) {
-        object.parent.visible = false;
-      }
-      context.emit("click-object", object.parent.userData.id);
+      context.emit("click-object", object.parent.userData.modelName);
     } else if (object.parent?.userData.showInView) {
       context.emit("move-player", object.parent.userData.orientation);
     }

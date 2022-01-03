@@ -48,7 +48,12 @@ const routes: Array<RouteRecordRaw> = [
   },
 ];
 
-const noAuthentication = ["HomeView", "RegisterView", "LoginView"];
+const noAuthentication = [
+  "HomeView",
+  "RegisterView",
+  "LoginView",
+  "LabyrinthUploadView",
+];
 
 const router = createRouter({
   history: createWebHashHistory(process.env.BASE_URL),

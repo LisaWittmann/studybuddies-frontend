@@ -3,11 +3,8 @@ import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
-import router from "@/router";
-import { ref } from "vue";
 
-const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
-  useGameStore();
+const { gameState, updatePlayerData, setError } = useGameStore();
 const {
   updateUsers,
   setupGame,

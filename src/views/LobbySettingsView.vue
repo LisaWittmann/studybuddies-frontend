@@ -1,7 +1,10 @@
 <template>
   <transition name="fade" appear>
     <div class="container">
-      <h1>Lobby {{ lobbyKey }}</h1>
+      <h1>
+        Lobby
+        <span class="uppercase"> {{ lobbyKey }}</span>
+      </h1>
       <section>
         <UserListComponent :users="users" />
       </section>
@@ -28,17 +31,17 @@
       <section>
         <div class="column-wrapper">
           <transition name="fade" appear>
-           <button
-              :class="{ 'button--ready': isReady }"
+            <button
+              :class="{ button__ready: isReady }"
               class="button--small"
               @click="readyCheck(loginState.username, selectedLabyrinth)"
             >
               Bereit
             </button>
           </transition>
-          <transition name="delay-fade" appear>
+          <transition name="delay-fade">
             <button
-              class="button button--small button--exit"
+              class="button button--small button__exit"
               @click="exitLobby(lobbyKey, loginState.username)"
             >
               Verlassen

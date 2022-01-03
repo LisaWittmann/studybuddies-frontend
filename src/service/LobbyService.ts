@@ -2,7 +2,7 @@ import router from "@/router";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 import { EventMessage } from "@/service/game/EventMessage";
-import { reactive, readonly, computed } from "vue";
+import { reactive, readonly } from "vue";
 import { User } from "./login/User";
 
 const lobbyState = reactive({

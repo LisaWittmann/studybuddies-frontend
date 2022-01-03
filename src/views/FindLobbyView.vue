@@ -19,7 +19,7 @@
           </button>
         </div>
       </section>
-      <transition name="delay-fade" appear>
+      <transition name="delay-fade">
         <section>
           <h2>Spiel erstellen</h2>
           <button class="button--small" @click="createGame">
@@ -90,7 +90,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.header {
+.image--header {
   width: 100%;
   max-width: 600px;
   padding-top: $spacing-l;
