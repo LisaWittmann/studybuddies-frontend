@@ -41,21 +41,21 @@ function setGameState(
   if (score) gameState.score = JSON.parse(score) as number;
 }
 
-async function updateGameData() {
-  await updateLabyrinthData(gameState.lobbyKey);
+function updateGameData() {
+  return updateLabyrinthData(gameState.lobbyKey);
 }
 
 /**
  * Updates the Player so, the watcher can build the changes
  * Adds changed Player to sessionStorage
- * @param player: the new (changed) player object
+ * @param username: username of the player which position will be updated
  * @param newPosition: sets new position of player
  */
-function updatePlayerData(player: Player, newPosition: number) {
-  if (player.getUsername() == gameState.mainPlayer.getUsername()) {
+function updatePlayerData(username: string, newPosition: number) {
+  if (username == gameState.mainPlayer.getUsername()) {
     gameState.mainPlayer.setPosition(newPosition);
     sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer));
-  } else {
+  } else if (username == gameState.partnerPlayer.getUsername()) {
     gameState.partnerPlayer.setPosition(newPosition);
     console.log("NEW POSITION: ", newPosition);
     sessionStorage.setItem(
@@ -88,6 +88,14 @@ async function setError(error: string) {
   gameState.errormessage = error;
 }
 
+function getPlayer(username: string) {
+  if (gameState.mainPlayer.username == username) {
+    return gameState.mainPlayer;
+  } else if (gameState.partnerPlayer.username == username) {
+    return gameState.partnerPlayer;
+  }
+}
+
 export function useGameStore() {
   return {
     gameState,
@@ -97,5 +105,6 @@ export function useGameStore() {
     setPlayerData,
     setLobbyKey,
     setError,
+    getPlayer,
   };
 }

@@ -15,16 +15,17 @@
           <span v-if="selectedRole">{{ selectedRole }}</span>
         </div>
         <RadioButtonGroupComponent
-          :options="roles"
+          :options="allRoles"
           v-model="selectedRole"
           @clicked="selectRole"
-          :selectable="roleOptions"
+          :selectable="openRoles"
         />
       </section>
       <section>
         <h2>Labyrinth auswählen:</h2>
         <DropdownComponent
           :items="labyrinthOptions"
+          :selectedItem="selectedLabyrinth"
           @select="selectLabyrinth"
         />
       </section>
@@ -32,16 +33,16 @@
         <div class="column-wrapper">
           <transition name="fade" appear>
             <button
-              :class="{ 'button--ready': isReady }"
+              :class="{ button__ready: isReady }"
               class="button--small"
               @click="readyCheck(loginState.username, selectedLabyrinth)"
             >
               Bereit
             </button>
           </transition>
-          <transition name="delay-fade" appear>
+          <transition name="delay-fade">
             <button
-              class="button button--small button--exit"
+              class="button button--small button__exit"
               @click="exitLobby(lobbyKey, loginState.username)"
             >
               Verlassen
@@ -62,6 +63,7 @@ import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
 import RadioButtonGroupComponent from "@/components/RadioButtonGroupComponent.vue";
+import { onBeforeRouteLeave } from "vue-router";
 
 export default defineComponent({
   name: "LobbySettingsView",
@@ -76,6 +78,7 @@ export default defineComponent({
       updateUsers,
       readyCheck,
       exitLobby,
+      setLabyrinthSelection,
       updateLabyrinthPick,
       updateLabyrinths,
       setLobbyState,
@@ -93,7 +96,7 @@ export default defineComponent({
     //Radiobutton data
     const allRoles = ref([]);
     const openRoles = computed(() => lobbyState.openRoles);
-    let selectedRole = computed(() => lobbyState.selectedRole);
+    const selectedRole = computed(() => lobbyState.selectedRole);
 
     //ReadyState data
     const isReady = computed(
@@ -103,14 +106,44 @@ export default defineComponent({
     );
 
     function selectLabyrinth(id: number) {
-      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
+      setLabyrinthSelection(id);
       updateLabyrinthPick(id, gameState.lobbyKey);
+      sessionStorage.setItem("selectedLabyrinth", JSON.stringify(id));
     }
 
     function selectRole(name: string) {
       sessionStorage.setItem("chosenRole", JSON.stringify(name));
       updateRole(name, gameState.lobbyKey, loginState.username);
     }
+
+    // open dialog before unload
+    onbeforeunload = () => {
+      if (
+        lobbyState.users.some((user) => user.username === loginState.username)
+      ) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
+      return "Leaving Lobby";
+    };
+    // exit lobby on unload
+    onunload = () => {
+      if (
+        lobbyState.users.some((user) => user.username === loginState.username)
+      ) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
+    };
+
+    // exit lobby if any other page than game is opened
+    onBeforeRouteLeave((to) => {
+      const nextKey = to.params.key as string;
+      if (
+        nextKey != gameState.lobbyKey &&
+        lobbyState.users.some((user) => user.username === loginState.username)
+      ) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
+    });
 
     onMounted(() => {
       const route = router.currentRoute.value;
@@ -123,6 +156,9 @@ export default defineComponent({
           sessionStorage.getItem("errormessage"),
           sessionStorage.getItem("chosenRole")
         );
+        if (lobbyState.users.length == 0) {
+          router.push("/find");
+        }
       } else {
         sessionStorage.setItem("lobbyKey", gameState.lobbyKey);
       }
@@ -138,8 +174,8 @@ export default defineComponent({
       selectLabyrinth,
       exitLobby,
       selectRole,
-      roles: allRoles,
-      roleOptions: openRoles,
+      allRoles,
+      openRoles,
       users,
       lobbyKey,
       labyrinthOptions,
@@ -153,38 +189,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 h1 {
-  margin: $spacing-l 0;
+  padding-top: $spacing-l;
+  margin-top: 0;
 
   span {
     font-weight: inherit;
   }
-}
-
-.button {
-  &--upload {
-    min-height: 0;
-
-    &:hover {
-      color: $color-beige;
-    }
-  }
-
-  &--exit {
-    &:hover,
-    &:active {
-      color: darkred;
-    }
-  }
-
-  &--confirm {
-    &:hover,
-    &:active {
-      color: $color-green;
-    }
-  }
-}
-
-input[type="file"] {
-  display: none;
 }
 </style>

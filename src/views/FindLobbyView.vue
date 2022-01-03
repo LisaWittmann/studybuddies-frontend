@@ -1,17 +1,22 @@
 <template>
   <transition name="fade" appear>
     <div class="container">
-      <img class="header" :src="header" alt="logo" />
+      <img class="image--header" :src="header" alt="logo" />
       <section>
         <h2>Spiel finden</h2>
         <div class="column-wrapper">
-          <input class="input--small" type="text" v-model="lobbyKey" />
+          <input
+            class="input--small uppercase"
+            type="text"
+            v-model="lobbyKey"
+          />
           <button class="button--small" @click="joinGame">
             Spiel beitreten
           </button>
         </div>
+        <span class="error" v-if="errorMessage">{{ errorMessage }}</span>
       </section>
-      <transition name="delay-fade" appear>
+      <transition name="delay-fade">
         <section>
           <h2>Spiel erstellen</h2>
           <button class="button--small" @click="createGame">
@@ -24,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 import router from "@/router";
 
@@ -33,6 +38,7 @@ export default defineComponent({
   setup() {
     const { loginState } = useLoginStore();
     const lobbyKey = ref("");
+    const errorMessage = ref("");
 
     const header = computed(() => {
       if (matchMedia("(prefers-color-scheme: dark)").matches)
@@ -49,11 +55,10 @@ export default defineComponent({
         },
         body: loginState.username,
       }).then((response) => {
-        if (response.ok) {
-          router.push("/lobby/" + key);
-        } else {
-          console.log(response.statusText);
-        }
+        if (response.ok) router.push("/lobby/" + key);
+        else if (response.status == 409) errorMessage.value = "Lobby voll";
+        else if (response.status == 404)
+          errorMessage.value = "Lobby nicht gefunden";
       });
     }
 
@@ -76,13 +81,14 @@ export default defineComponent({
         .catch((err) => console.log(err));
     }
 
-    return { lobbyKey, createGame, joinGame, header };
+    onbeforeunload = () => console.log("overriding previous listener");
+    return { lobbyKey, createGame, joinGame, header, errorMessage };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.header {
+.image--header {
   width: 100%;
   max-width: 600px;
   padding-top: $spacing-l;
