@@ -67,6 +67,7 @@ export default defineComponent({
         .catch((err) => console.log(err));
     }
 
+    onbeforeunload = () => console.log("overriding previous listener");
     return { lobbyKey, createGame, joinGame };
   },
 });

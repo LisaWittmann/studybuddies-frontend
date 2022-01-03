@@ -57,6 +57,7 @@ import UserListComponent from "@/components/UserListComponent.vue";
 import router from "@/router";
 import { useGameStore } from "@/service/game/GameStore";
 import RadioButtonGroupComponent from "@/components/RadioButtonGroupComponent.vue";
+import { onBeforeRouteLeave } from "vue-router";
 
 export default defineComponent({
   name: "LobbySettingsView",
@@ -109,6 +110,28 @@ export default defineComponent({
       updateRole(name, gameState.lobbyKey, loginState.username);
     }
 
+    // open dialog before unload
+    onbeforeunload = () => {
+      if (lobbyState.users.some((user) => user.username === loginState.username)) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
+      return "Leaving Lobby";
+    };
+    // exit lobby on unload
+    onunload = () => {
+      if (lobbyState.users.some((user) => user.username === loginState.username)) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
+    };
+
+    // exit lobby if any other page than game is opened
+    onBeforeRouteLeave((to) => {
+      const nextKey = to.params.key as string;
+      if (nextKey != gameState.lobbyKey && lobbyState.users.some((user) => user.username === loginState.username)) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
+    });
+
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
@@ -120,6 +143,9 @@ export default defineComponent({
           sessionStorage.getItem("errormessage"),
           sessionStorage.getItem("chosenRole")
         );
+        if (lobbyState.users.length == 0) {
+          router.push("/find")
+        }
       } else {
         sessionStorage.setItem("lobbyKey", gameState.lobbyKey);
       }
