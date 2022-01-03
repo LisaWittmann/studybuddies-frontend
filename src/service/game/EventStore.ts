@@ -6,9 +6,17 @@ import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
 import { ref } from "vue";
 import { useLabyrinthStore } from "../labyrinth/LabyrinthStore";
+import { VectorKeyframeTrack } from "three";
+import { Item } from "../labyrinth/Item";
 
-const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
-  useGameStore();
+const {
+  gameState,
+  updatePlayerData,
+  updatePlayerInventory,
+  setError,
+  setPlayerData,
+  updateGameData,
+} = useGameStore();
 const {
   updateUsers,
   setupGame,
@@ -78,14 +86,19 @@ stompclient.onConnect = () => {
           break;
         case "CLICK":
           console.log("COLLECTING IN ", gameState.lobbyKey);
-          console.log('FE TILE MAP: ', gameState.labyrinth.tileMap)
-          console.log('EVENT MESSAGE DATA: ', eventMessage.data)
+          console.log("FE TILE MAP: ", gameState.labyrinth.tileMap);
+          console.log("EVENT MESSAGE DATA: ", eventMessage.data);
 
-          console.log('gamestate tilemap: ', gameState.labyrinth.tileMap)
-          updateGameData()
-          updateLabyrinths()
-          useLabyrinthStore().updateLabyrinthData(gameState.lobbyKey);
-          console.log('FE TILE MAP AFTER: ', gameState.labyrinth.tileMap);
+          console.log("gamestate tilemap: ", gameState.labyrinth.tileMap);
+          updateGameData();
+          console.log("FE TILE MAP AFTER: ", gameState.labyrinth.tileMap);
+          break;
+        case "COLLECT":
+          {
+            console.log("ITEM COLLECTED ", eventMessage.data);
+            const collectedItem = JSON.parse(eventMessage.data) as Item;
+            updatePlayerInventory(collectedItem);
+          }
           break;
         case "CHAT":
           break;

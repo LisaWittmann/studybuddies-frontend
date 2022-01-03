@@ -2,8 +2,10 @@ import { reactive, readonly } from "vue";
 import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";
+import { Item } from "../labyrinth/Item";
 
 const { labyrinthState, updateLabyrinthData } = useLabyrinthStore();
+const { loginState } = useLoginStore();
 
 /**
  * PlayerMap: To hold both Players
@@ -51,6 +53,12 @@ async function setPlayerData(username: string, startTileId: number) {
   }
 }
 
+async function updatePlayerInventory(item: Item) {
+  const mP = <MainPlayer>gameState.playerMap.get(loginState.username);
+  mP.addItem(item);
+  console.log("INVENTORY", mP.getInventory(), "TO ADD: ", item);
+}
+
 async function setLobbyKey(lobbyKey: string) {
   gameState.lobbyKey = lobbyKey;
 }
@@ -64,6 +72,7 @@ export function useGameStore() {
     gameState: readonly(gameState),
     updateGameData,
     updatePlayerData,
+    updatePlayerInventory,
     setPlayerData,
     setLobbyKey,
     setError,
