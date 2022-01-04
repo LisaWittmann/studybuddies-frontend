@@ -69,8 +69,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 .overlay {
   background: $color-white;
+  color: $color-black;
   @include color-scheme(dark) {
     background: $color-black-background;
+    color: $color-white;
   }
 }
 
