@@ -286,6 +286,7 @@ function setLabyrinthSelection(selectedLabyrinth: number) {
  * @param labId : id of the blueprint labyrinth, used for the Game Progression
  */
 function readyCheck(username: string, labId: number) {
+  if(!lobbyState.selectedLabyrinth || !lobbyState.selectedRole) return;
   const { gameState } = useGameStore();
   const args: string[] = [];
   args.push(username);
