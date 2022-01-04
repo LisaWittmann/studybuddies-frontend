@@ -1,5 +1,5 @@
 <template>
-  <div id="scene"></div>
+  <div id="scene" @click="onClick"></div>
 </template>
 
 <script lang="ts">
@@ -21,6 +21,7 @@ export default defineComponent({
     },
     partner: {
       type: PartnerPlayer,
+      required: true,
     },
   },
   setup(props, context) {
@@ -39,7 +40,7 @@ export default defineComponent({
       requestAnimationFrame(render);
     };
 
-    function onMouseDown(event: MouseEvent) {
+    function onClick(event: MouseEvent) {
       getIntersections(
         context,
         (event.clientX / innerWidth) * 2 - 1,
@@ -52,20 +53,20 @@ export default defineComponent({
       requestAnimationFrame(render);
 
       addEventListener("resize", updateScene);
-      addEventListener("mousedown", onMouseDown);
     });
 
     onBeforeUnmount(() => {
       removeEventListener("resize", updateScene);
-      removeEventListener("mousedown", onMouseDown);
     });
 
     watch([props.labyrinth, props.player, props.partner], () => {
       console.log("updating scene");
-      updateLabyrinth(props.labyrinth, scene);
+      updateLabyrinth(props.labyrinth, props.player, scene);
       updatePlayer(props.player, scene);
-      //updatePlayer(props.partner, scene);
+      updatePlayer(props.partner, scene);
     });
+
+    return { onClick };
   },
 });
 </script>

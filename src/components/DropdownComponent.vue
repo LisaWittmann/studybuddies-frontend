@@ -36,6 +36,7 @@
 </template>
 
 <script lang="ts">
+import { useLobbyService } from "@/service/LobbyService";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
@@ -43,27 +44,29 @@ export default defineComponent({
     items: {
       type: Array,
     },
-    selected: {
-      type: String,
+    selectedItem: {
+      type: Number,
     },
   },
   name: "DropdownComponent",
   setup(props, context) {
+    const { lobbyState } = useLobbyService();
+
     let isOpen = ref(false);
-    let selectedItem = ref(props.selected);
 
     // open or close the dropdown menu
     function openClose() {
       isOpen.value = !isOpen.value;
     }
 
-    function selectItem(item: string) {
-      selectedItem.value = item;
+    function selectItem(item: number) {
+      if (item != lobbyState.selectedLabyrinth) {
+        context.emit("select", item);
+      }
       isOpen.value = false;
-      context.emit("select", selectedItem.value);
     }
 
-    return { isOpen, openClose, selectItem, selectedItem };
+    return { isOpen, openClose, selectItem, props };
   },
 });
 </script>

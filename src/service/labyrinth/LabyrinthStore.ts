@@ -2,24 +2,26 @@ import { reactive } from "vue";
 import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Item, Position } from "@/service/labyrinth/Item";
+import { Role } from "@/service/game/Player";
 
 /**
  * constant to keep the tiles or store an errormessage
  */
 const labyrinthState: Labyrinth = reactive<Labyrinth>({
   tileMap: new Map<number, Tile>([]),
-  endTileId: 0,
-  playerStartTileIds: new Array<number>(),
+  endTileKey: 0,
+  playerStartTileKeys: new Array<number>(),
 });
 
 /**
  * update the tiles for getting them initially and every time something changes
- * fetches labyrnith object of api and converts response into labyrinth data
+ * fetches labyrinth object of api and converts response into labyrinth data
  * creates simple fallback labyrinth if fetch fails
  */
-async function updateLabyrinth(labyrinthId: number) {
-  console.log(labyrinthId);
-  await fetch(`/api/labyrinth/${labyrinthId}`, {
+async function updateLabyrinthData(lobbyKey: string) {
+  console.log("Requested lab of lobby " + lobbyKey);
+  //TODO change this to the game api
+  await fetch(`/api/lobby/${lobbyKey}`, {
     method: "GET",
   })
     .then((response) => {
@@ -28,8 +30,8 @@ async function updateLabyrinth(labyrinthId: number) {
     })
     .then((jsonData) => {
       const labyrinth = new Labyrinth(
-        jsonData.endTileId,
-        jsonData.playerStartTileIds
+        jsonData.endTileKey,
+        jsonData.playerStartTileKeys
       );
 
       //iterate over the tiles in the jsondata tileMap to create tiles for every tile in jsonobject
@@ -54,8 +56,14 @@ async function updateLabyrinth(labyrinthId: number) {
             )
           );
         }
-
-        labyrinth.tileMap.set(id, new Tile(tile.tileId, objectsInRoom));
+        const restrictions = new Array<Role>();
+        for (const role of tile.restrictions) {
+          restrictions.push((<any>Role)[role]);
+        }
+        labyrinth.tileMap.set(
+          id,
+          new Tile(tile.tileId, objectsInRoom, restrictions)
+        );
 
         //workaround to parse json list in map
         const tileRelationMap = new Map<Orientation, number | undefined>();
@@ -78,8 +86,8 @@ async function updateLabyrinth(labyrinthId: number) {
       }
 
       labyrinthState.tileMap = labyrinth.tileMap;
-      labyrinthState.endTileId = labyrinth.endTileId;
-      labyrinthState.playerStartTileIds = labyrinth.playerStartTileIds;
+      labyrinthState.endTileKey = labyrinth.endTileKey;
+      labyrinthState.playerStartTileKeys = labyrinth.playerStartTileKeys;
     })
     .catch((error) => {
       console.error(error);
@@ -89,8 +97,8 @@ async function updateLabyrinth(labyrinthId: number) {
 /**
  * add uni directional relation from firstTile to secondTile
  * add empty relation if secondTile is undefined
- * @param firstTile: tile on wich relation should be added
- * @param secondTile: tile that sould be added to relation
+ * @param firstTile: tile on which relation should be added
+ * @param secondTile: tile that should be added to relation
  * @param orientationRelation: orientation in which relation should be added
  */
 function connectTiles(
@@ -104,6 +112,6 @@ function connectTiles(
 export function useLabyrinthStore() {
   return {
     labyrinthState,
-    updateLabyrinth,
+    updateLabyrinthData,
   };
 }

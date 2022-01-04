@@ -10,6 +10,14 @@ export const settings = {
 };
 
 /**
+ * scale factor for models
+ */
+export const factors = {
+  objectScaleFactor: settings.tileSize / 4,
+  partnerTranslateFactor: settings.tileSize / 4,
+};
+
+/**
  * axis vectors
  */
 export const axis = {
@@ -46,7 +54,7 @@ export const colors = {
   darkGreen: 0x39432f,
   beige: 0xe6bf5f,
   brown: 0x994814,
-  darkBrow: 0x5641a,
+  darkBrown: 0x56341a,
   white: 0xf8f7f5,
   grey: 0xd7d9d5,
   black: 0x1a1e16,

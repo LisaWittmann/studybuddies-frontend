@@ -62,8 +62,7 @@ button,
     }
 
     &--filled {
-        background: $color-dark-green;
-        color: $color-white;
+        background-color: $color-dark-green;
         box-shadow: 5px 5px 0 0 rgba(black, 0.04);
 
         @include color-scheme(dark) {
@@ -93,6 +92,11 @@ button,
         &:active {
             color: $color-green;
         }
+    }
+
+    &__ready {
+        background-color: $color-light-green;
+        color: rgb(56, 56, 56);
     }
 
     &__icon {

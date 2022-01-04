@@ -35,7 +35,7 @@ class FixedObject {
   };
 
   /**
-   * calculates position of static item based on tilePostion, given orientation and distance
+   * calculates position of static item based on tile position, given orientation and distance
    * @param distance: distance from central point of tile in orientation direction
    * @returns global position of item
    */
