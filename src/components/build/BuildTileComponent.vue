@@ -47,9 +47,9 @@ export default defineComponent({
     const selectable = computed(() => props.model.isSelectable);
 
     const color = computed(() => {
-      if (props.model.restrictions?.length == 2) return "brown";
-      if (props.model.restrictions?.includes(Role.DESIGNER)) return "beige";
-      if (props.model.restrictions?.includes(Role.HACKER)) return "green";
+      if (props.model.restrictions?.length == 2) return "grey";
+      if (props.model.restrictions?.includes(Role.DESIGNER)) return "green";
+      if (props.model.restrictions?.includes(Role.HACKER)) return "beige";
       else return "default";
     });
 
@@ -94,8 +94,8 @@ export default defineComponent({
       }
 
       &.color {
-        &--brown {
-          background: $color-dark-brown;
+        &--grey {
+          background: $color-grey;
         }
 
         &--green {

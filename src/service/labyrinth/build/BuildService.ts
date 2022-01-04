@@ -267,7 +267,7 @@ function convert(): Labyrinth {
 
   for (const tilemodel of selectedTiles.value) {
     const key = tilemodel.relationKey as number;
-    const tile = new Tile(key, []);
+    const tile = new Tile(key, [], tilemodel.restrictions);
     for (const [orientation, neighbor] of tilemodel.tileRelationMap) {
       tile.tileRelationMap.set(orientation, neighbor?.relationKey);
     }
@@ -305,12 +305,13 @@ function parseLabyrinth(labyrinth: Labyrinth): string {
     tileMapJson.set(key, {
       tileId: tile.tileId,
       objectsInRoom: tile.objectsInRoom.map((item) => item.toJsonObject()),
+      restrictions: tile.restrictions.map((restriction) => Role[restriction]),
       tileRelationMap: Object.fromEntries(tile.tileRelationMap),
     });
   }
   return JSON.stringify({
-    endTileId: labyrinth.endTileId,
-    playerStartTileIds: labyrinth.playerStartTileIds,
+    endTileKey: labyrinth.endTileKey,
+    playerStartTileKeys: labyrinth.playerStartTileKeys,
     tileMap: Object.fromEntries(tileMapJson),
   });
 }

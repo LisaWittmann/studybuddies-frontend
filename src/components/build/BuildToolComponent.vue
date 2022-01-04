@@ -91,11 +91,11 @@ export default defineComponent({
   }
 
   .button__option-designer:not(.open) {
-    background: $color-beige;
+    background: $color-green;
   }
 
   .button__option-hacker:not(.open) {
-    background: $color-green;
+    background: $color-beige;
   }
 }
 </style>
