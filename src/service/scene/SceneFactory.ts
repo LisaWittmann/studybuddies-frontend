@@ -3,17 +3,17 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { Vector3 } from "three";
 import { settings, direction } from "@/service/scene/helper/SceneConstants";
-import { EmitsOptions, SetupContext } from "vue";
+import { SetupContext } from "vue";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
-let raycaster: THREE.Raycaster;
+let rayCaster: THREE.Raycaster;
 
 let camera: THREE.PerspectiveCamera;
 let orbitControls: OrbitControls;
 
 /**
- * creates new threejs 3D scene
+ * creates new Three js 3D scene
  * @param debug: activates grid helper
  * @returns initialized scene with simple lightning
  */
@@ -26,9 +26,9 @@ function createScene(debug = false): THREE.Scene {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  //RAYCASTER----------------
-  raycaster = new THREE.Raycaster();
-  raycaster.far = settings.tileSize;
+  //RAY_CASTER----------------
+  rayCaster = new THREE.Raycaster();
+  rayCaster.far = Math.sqrt(Math.pow(settings.tileSize/2, 2) + Math.pow(settings.cameraHeight, 2));
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
@@ -81,7 +81,8 @@ function insertCanvas(container: string | null) {
 
 /**
  * updates camera / player position
- * @param position: new camera position
+ * @param position new camera position
+ * @param orientation contains new camera orientation
  */
 function updateCameraPosition(
   position: THREE.Vector3,
@@ -131,12 +132,12 @@ function updateCameraOrbit() {
  * @param y: converted y position of cursor
  */
 function getIntersections(
-  context: SetupContext<EmitsOptions>,
+  context: SetupContext,
   x: number,
   y: number
 ) {
-  raycaster.setFromCamera({ x: x, y: y }, camera);
-  const intersects = raycaster.intersectObjects(scene.children);
+  rayCaster.setFromCamera({ x: x, y: y }, camera);
+  const intersects = rayCaster.intersectObjects(scene.children);
 
   for (const intersection of intersects) {
     const object = intersection.object;
