@@ -5,7 +5,7 @@
         <section>
           <div class="column-wrapper">
             <h1>{{ headline }}</h1>
-            <p>{{ subline }}</p>
+            <p>{{ subLine }}</p>
             <transition name="delay-slow-fade" appear>
               <router-link
                 :to="link"

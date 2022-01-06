@@ -16,7 +16,8 @@ const buildState = reactive({
   tileModels: new Array<TileModel>(),
   startPositions: new Array<number>(),
   endPosition: 0,
-  labyrinthName: ""
+  labyrinthName: "",
+  errorMessage: ""
 });
 
 updateTileModels();
@@ -48,6 +49,7 @@ function reset(): void {
   buildState.startPositions = new Array<number>();
   buildState.endPosition = 0;
   buildState.labyrinthName = "";
+  buildState.errorMessage = "";
 }
 
 /**
@@ -254,11 +256,23 @@ function removeItem(model: TileModel, item: ItemModel): void {
  * @returns build mode that contains errors or undefined
  */
 function hasErrors(): Mode | undefined {
-  if (selectedTiles.value.length < minTiles) return Mode.CREATE;
-  if (buildState.startPositions.length != startPositions) return Mode.START;
-  if (!buildState.endPosition) return Mode.END;
-  if (buildState.itemOptions.length > 0) return Mode.ITEMS;
-  if (buildState.labyrinthName == null || buildState.labyrinthName.trim().length === 0) return Mode.LABYRINTH_NAME
+  debugger;
+  if (selectedTiles.value.length < minTiles) {
+    buildState.errorMessage = "Labyrinth ist zu klein";
+    return Mode.CREATE;
+  } else if (buildState.startPositions.length != startPositions) {
+    buildState.errorMessage = "Zu wenig Startfelder definiert";
+    return Mode.START;
+  } else if (!buildState.endPosition) {
+    buildState.errorMessage = "Ende noch nicht definiert";
+    return Mode.END;
+  } else if (buildState.itemOptions.length > 0) {
+    buildState.errorMessage = "Noch nicht alle Objekte platziert";
+    return Mode.ITEMS;
+  } else if (buildState.labyrinthName == null || buildState.labyrinthName.trim().length === 0) {
+    buildState.errorMessage = "Name noch nicht vergeben";
+    return Mode.LABYRINTH_NAME;
+  }
   return undefined;
 }
 
@@ -338,6 +352,9 @@ async function save(): Promise<string> {
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
+      if (response.status === 409) {
+        buildState.errorMessage = "Name bereits vergeben";
+      }
       return response.text();
     });
 }

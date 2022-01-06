@@ -38,6 +38,7 @@
             :role="currentRole"
             :item="currentItem"
         />
+        <span class="error" v-if="errorMessage">{{ errorMessage }}</span>
       </div>
     </transition>
     <transition name="delay-fade" appear>
@@ -54,7 +55,7 @@
   <OverlayFeedbackComponent
       :opened="feedback.active"
       :headline="feedback.headline"
-      :subline="feedback.subLine"
+      :subLine="feedback.subLine"
       :link="feedback.link"
       :linkText="feedback.linkText"
       :reload="feedback.reload"
@@ -68,7 +69,7 @@ import {
   computed,
   reactive,
   onUnmounted,
-  watch,
+  watch, onMounted,
 } from "vue";
 import {useBuildService} from "@/service/labyrinth/build/BuildService";
 import {Mode, Role} from "@/service/labyrinth/build/BuildMode";
@@ -141,6 +142,7 @@ export default defineComponent({
       linkText: "",
       reload: false,
     });
+    const errorMessage = computed(() => buildState.errorMessage);
 
     function onComplete() {
       const rollback = hasErrors();
@@ -155,8 +157,12 @@ export default defineComponent({
               feedback.link = "/find";
               feedback.linkText = "Jetzt spielen";
               feedback.reload = false;
+              reset();
+              sessionStorage.setItem("buildState", "");
             })
             .catch(() => {
+              console.log(buildState.errorMessage);
+              sessionStorage.setItem("buildState", JSON.stringify(buildState));
               feedback.active = true;
               feedback.headline = "Fehler";
               feedback.subLine =
@@ -176,8 +182,10 @@ export default defineComponent({
         {deep: true}
     );
 
+    onMounted(() => {
+      //TODO parse buildState to safe editor data
+    })
     onUnmounted(() => {
-      reset();
       updateTileModels();
       feedback.active = false;
     });
@@ -201,6 +209,7 @@ export default defineComponent({
       changeItem,
       onComplete,
       feedback,
+      errorMessage
     };
   },
 });
@@ -235,6 +244,16 @@ export default defineComponent({
   }
 
   &__stage {
+    span {
+      position: sticky;
+      bottom: 0;
+      font-size: $headline-xxl;
+      font-weight: 500;
+      filter: drop-shadow(0 0 20px $color-black);
+      @include color-scheme(dark) {
+        filter: drop-shadow(0 0 20px $color-white);
+      }
+    }
     height: calc(100% - 100px);
     width: 100%;
     overflow: scroll;
