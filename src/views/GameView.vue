@@ -16,9 +16,9 @@
   />
   <!--conversations with interactive characters-->
   <OverlayConversationComponent
-      :opened="conversation.visible"
-      :message="conversation.message"
-      @respond="getConversationMessage"
+    :opened="conversation.visible"
+    :message="conversation.message"
+    @respond="getConversationMessage"
   />
 </template>
 
@@ -52,8 +52,14 @@ export default defineComponent({
     const { loginState } = useLoginStore();
     const { gameState, updateGameData, setLobbyKey, setGameState } =
       useGameStore();
-    const { gameEventMessage, toggleEventMessage, playerMovement, clickItem, conversation, getConversationMessage } =
-      useGameService();
+    const {
+      gameEventMessage,
+      toggleEventMessage,
+      playerMovement,
+      clickItem,
+      conversation,
+      getConversationMessage,
+    } = useGameService();
     updateGameData();
 
     const labyrinthState = computed(() => gameState.labyrinth);

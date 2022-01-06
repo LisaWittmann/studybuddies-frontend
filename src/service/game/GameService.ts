@@ -17,7 +17,8 @@ const conversation = reactive({
   visible: false,
 });
 
-const toggleEventMessage = () => (gameEventMessage.visible = !gameEventMessage.visible);
+const toggleEventMessage = () =>
+  (gameEventMessage.visible = !gameEventMessage.visible);
 
 async function playerMovement(evenMessage: EventMessage) {
   fetch("/api/lobby/move", {
@@ -32,8 +33,7 @@ async function playerMovement(evenMessage: EventMessage) {
     .catch((error) => {
       console.error(error);
     });
-  }
-
+}
 
 async function startConversation(character: string) {
   conversation.character = character;
@@ -54,8 +54,8 @@ async function getConversationMessage(id: string) {
 
       if ((jsonData as Message).id == "0.0") {
         console.log("endConversation");
-        endConversation()
-        return
+        endConversation();
+        return;
       }
 
       conversation.message = jsonData as Message;

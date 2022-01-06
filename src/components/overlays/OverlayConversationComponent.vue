@@ -6,11 +6,11 @@
       </div>
       <div class="conversation__option-wrapper">
         <div
-            class="conversation__option"
-            v-for="response of message.responses"
-            :key="response.redirect"
-            :style="{ flexBasis: 100 / message.responses.length + '%' }"
-            @click="clickOption(response.redirect)"
+          class="conversation__option"
+          v-for="response of message.responses"
+          :key="response.redirect"
+          :style="{ flexBasis: 100 / message.responses.length + '%' }"
+          @click="clickOption(response.redirect)"
         >
           {{ response.text }}
         </div>

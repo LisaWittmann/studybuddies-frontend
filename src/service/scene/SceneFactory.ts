@@ -28,7 +28,11 @@ function createScene(debug = false): THREE.Scene {
 
   //RAY_CASTER----------------
   rayCaster = new THREE.Raycaster();
-  rayCaster.far = Math.ceil(Math.sqrt(Math.pow(settings.tileSize/2, 2) + Math.pow(settings.cameraHeight, 2)));
+  rayCaster.far = Math.ceil(
+    Math.sqrt(
+      Math.pow(settings.tileSize / 2, 2) + Math.pow(settings.cameraHeight, 2)
+    )
+  );
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
@@ -131,11 +135,7 @@ function updateCameraOrbit() {
  * @param x: converted x position of cursor
  * @param y: converted y position of cursor
  */
-function getIntersections(
-  context: SetupContext,
-  x: number,
-  y: number
-) {
+function getIntersections(context: SetupContext, x: number, y: number) {
   rayCaster.setFromCamera({ x: x, y: y }, camera);
   const intersects = rayCaster.intersectObjects(scene.children);
 
