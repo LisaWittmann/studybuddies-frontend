@@ -45,10 +45,7 @@ stompClient.onConnect = () => {
   stompClient.subscribe(DEST, (message) => {
     const eventMessage: EventMessage = JSON.parse(message.body);
 
-    if (
-      eventMessage.lobbyKey == gameState.lobbyKey ||
-      eventMessage.lobbyKey == "ALL"
-    ) {
+    if (eventMessage.lobbyKey == gameState.lobbyKey || eventMessage.lobbyKey == "ALL") {
       console.log("new Message for the Lobby");
 
       let destTileID: number;
@@ -74,15 +71,10 @@ stompClient.onConnect = () => {
           break;
         case "READY":
           console.log(eventMessage);
-          if (
-            eventMessage.username === "ALL_OF_LOBBY" &&
-            eventMessage.data === "READY"
-          ) {
+          if (eventMessage.username === "ALL_OF_LOBBY" && eventMessage.data === "READY") {
             setupGame();
           } else {
-            setUserReadyState(
-              eventMessage.username,
-              eventMessage.data === "READY"
+            setUserReadyState(eventMessage.username, eventMessage.data === "READY"
             );
             console.log(
               lobbyState.users.find(
@@ -92,8 +84,7 @@ stompClient.onConnect = () => {
           }
           break;
         case "LABYRINTH_PICK":
-          console.log(Number(eventMessage.data));
-          setLabyrinthSelection(Number(eventMessage.data));
+          setLabyrinthSelection(eventMessage.data);
           break;
         case "UPDATE":
           switch (eventMessage.data) {

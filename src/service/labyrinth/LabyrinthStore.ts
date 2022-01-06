@@ -9,6 +9,7 @@ import { Role } from "@/service/game/Player";
  */
 const labyrinthState: Labyrinth = reactive<Labyrinth>({
   tileMap: new Map<number, Tile>([]),
+  name: "",
   endTileKey: 0,
   playerStartTileKeys: new Array<number>(),
 });
@@ -30,11 +31,12 @@ async function updateLabyrinthData(lobbyKey: string) {
     })
     .then((jsonData) => {
       const labyrinth = new Labyrinth(
+          jsonData.name,
         jsonData.endTileKey,
         jsonData.playerStartTileKeys
       );
 
-      //iterate over the tiles in the jsondata tileMap to create tiles for every tile in jsonobject
+      //iterate over the tiles in the json data tileMap to create tiles for every tile in json object
       for (const tileKey in jsonData.tileMap) {
         const tile = jsonData.tileMap[tileKey];
         const id = parseInt(tileKey);

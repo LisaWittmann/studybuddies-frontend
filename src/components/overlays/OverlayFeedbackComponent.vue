@@ -39,7 +39,7 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    subline: {
+    subLine: {
       type: String,
       required: true,
     },

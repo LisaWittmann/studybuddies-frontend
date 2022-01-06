@@ -10,21 +10,21 @@ const lobbyState = reactive({
   users: new Array<User>(),
   selectedRole: "",
   openRoles: new Array<string>(),
-  selectedLabyrinth: 0,
-  labyrinthOptions: new Array<number>(),
+  selectedLabyrinthName: "",
+  labyrinthOptions: new Array<string>(),
   errormessage: "",
 });
 
 function setLobbyState(
   users: string | null,
-  selectedLabyrinth: string | null,
+  selectedLabyrinthName: string | null,
   labyrinthOptions: string | null,
   errormessage: string | null,
   selectedRole: string | null
 ) {
   if (users) lobbyState.users = JSON.parse(users);
-  if (selectedLabyrinth)
-    lobbyState.selectedLabyrinth = JSON.parse(selectedLabyrinth) as number;
+  if (selectedLabyrinthName)
+    lobbyState.selectedLabyrinthName = JSON.parse(selectedLabyrinthName);
   if (labyrinthOptions)
     lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
   if (errormessage) lobbyState.errormessage = JSON.parse(errormessage);
@@ -175,10 +175,11 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
           if (!response.ok) {
             throw new Error(response.statusText);
           }
-          responseList.push("Upload von " + file.name + " war erfolgreich");
           return response.json();
-        })
-        .catch((error) => {
+        }).then((jsonData) => {
+            console.log("Test:   ", jsonData)
+            responseList.push("Upload von " + jsonData + " war erfolgreich");
+        }).catch((error) => {
           responseList.push("Upload von " + file.name + " ist fehlgeschlagen");
           console.error(error);
         });
@@ -230,7 +231,7 @@ async function updateUsers(lobbyKey: string) {
  * @throws error if request was not successful
  */
 async function updateLabyrinths() {
-  fetch("/api/labyrinth/ids")
+  fetch("/api/labyrinth/names")
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
@@ -250,13 +251,13 @@ async function updateLabyrinths() {
  * @returns promise containing evenMessage with selectedLabyrinth
  * @throws error if request was not successful
  */
-async function updateLabyrinthPick(labId: number, lobbyKey: string) {
+async function updateLabyrinthPick(labyrinthName: string, lobbyKey: string) {
   const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
     "LABYRINTH_PICK",
     lobbyKey,
     loginState.username,
-    labId.toString()
+    labyrinthName
   );
   fetch("/api/lobby/labyrinth-pick", {
     method: "POST",
@@ -273,23 +274,23 @@ async function updateLabyrinthPick(labId: number, lobbyKey: string) {
 
 /**
  * sets the new Labyrinth in the DropdownMenuComponent
- * @param selectedLabyrinth : id of the new selected Labyrinth
+ * @param blueprintLabName name of the new selected Labyrinth
  */
-function setLabyrinthSelection(selectedLabyrinth: number) {
-  lobbyState.selectedLabyrinth = selectedLabyrinth;
+function setLabyrinthSelection(blueprintLabName: string) {
+  lobbyState.selectedLabyrinthName = blueprintLabName;
 }
 
 /**
  * sends a List of two Arguments to the BE, so there can be checked, whether every Player is ready or not
  * (and reacts to a wrong respond after receiving it)
- * @param username: name of the user in the backend, which shall be taken out of the lobby
- * @param labId : id of the blueprint labyrinth, used for the Game Progression
+ * @param username name of the user in the backend, which shall be taken out of the lobby
+ * @param labName name of the blueprint labyrinth, used for the Game Progression
  */
-function readyCheck(username: string, labId: number) {
+function readyCheck(username: string, labName: string) {
   const { gameState } = useGameStore();
   const args: string[] = [];
   args.push(username);
-  args.push(String(labId));
+  args.push(labName);
 
   fetch(`/api/lobby/ready/${gameState.lobbyKey}`, {
     method: "POST",

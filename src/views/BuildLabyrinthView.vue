@@ -6,9 +6,9 @@
           <i class="fas fa-search-plus"></i>
         </button>
         <button
-          class="button__icon"
-          :disabled="zoomOutDisabled"
-          @click="zoomOut"
+            class="button__icon"
+            :disabled="zoomOutDisabled"
+            @click="zoomOut"
         >
           <i class="fas fa-search-minus"></i>
         </button>
@@ -17,47 +17,47 @@
     <transition name="delay-fade" appear>
       <div class="builder__tool">
         <BuildToolComponent
-          v-if="restrictionMode"
-          :options="roleOptions"
-          :selected="currentRole"
-          @select="changeRole"
+            v-if="restrictionMode"
+            :options="roleOptions"
+            :selected="currentRole"
+            @select="changeRole"
         />
         <BuildToolComponent
-          v-if="itemsMode && itemOptions.length > 0"
-          :options="itemOptions"
-          :selected="itemOptions.indexOf(currentItem)"
-          @select="changeItem"
+            v-if="itemsMode && itemOptions.length > 0"
+            :options="itemOptions"
+            :selected="itemOptions.indexOf(currentItem)"
+            @select="changeItem"
         />
       </div>
     </transition>
     <transition name="fade" appear>
       <div class="builder__stage">
         <BuildLabyrinthComponent
-          :tile-size="tileSize"
-          :mode="currentMode"
-          :role="currentRole"
-          :item="currentItem"
+            :tile-size="tileSize"
+            :mode="currentMode"
+            :role="currentRole"
+            :item="currentItem"
         />
       </div>
     </transition>
     <transition name="delay-fade" appear>
       <div class="builder__steps">
         <PaginationComponent
-          :items="modes"
-          :activeIndex="modes.indexOf(currentMode)"
-          @select="changeMode"
-          @complete="onComplete"
+            :items="modes"
+            :activeIndex="modes.indexOf(currentMode)"
+            @select="changeMode"
+            @complete="onComplete"
         />
       </div>
     </transition>
   </div>
   <OverlayFeedbackComponent
-    :opened="feedback.active"
-    :headline="feedback.headline"
-    :subline="feedback.subline"
-    :link="feedback.link"
-    :linkText="feedback.linkText"
-    :reload="feedback.reload"
+      :opened="feedback.active"
+      :headline="feedback.headline"
+      :subline="feedback.subLine"
+      :link="feedback.link"
+      :linkText="feedback.linkText"
+      :reload="feedback.reload"
   />
 </template>
 
@@ -70,14 +70,14 @@ import {
   onUnmounted,
   watch,
 } from "vue";
-import { useBuildService } from "@/service/labyrinth/build/BuildService";
-import { Mode, Role } from "@/service/labyrinth/build/BuildMode";
+import {useBuildService} from "@/service/labyrinth/build/BuildService";
+import {Mode, Role} from "@/service/labyrinth/build/BuildMode";
 
 import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
 import BuildLabyrinthComponent from "@/components/build/BuildLabyrinthComponent.vue";
 import BuildToolComponent from "@/components/build/BuildToolComponent.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
-import { ItemModel } from "@/service/labyrinth/build/TileModel";
+import {ItemModel} from "@/service/labyrinth/build/TileModel";
 
 export default defineComponent({
   name: "LabyrinthBuildView",
@@ -98,11 +98,12 @@ export default defineComponent({
     } = useBuildService();
 
     const modes = new Array<Mode>(
-      Mode.CREATE,
-      Mode.START,
-      Mode.END,
-      Mode.RESTRICTIONS,
-      Mode.ITEMS
+        Mode.CREATE,
+        Mode.START,
+        Mode.END,
+        Mode.RESTRICTIONS,
+        Mode.ITEMS,
+        Mode.LABYRINTH_NAME
     );
     const currentMode = ref(Mode.CREATE);
     const changeMode = (mode: Mode) => (currentMode.value = mode);
@@ -121,9 +122,7 @@ export default defineComponent({
       if (!zoomOutDisabled.value) tileSize.value -= zoomFactor;
     };
 
-    const restrictionMode = computed(
-      () => currentMode.value == Mode.RESTRICTIONS
-    );
+    const restrictionMode = computed(() => currentMode.value == Mode.RESTRICTIONS);
     const roleOptions = new Array<Role>(Role.DESIGNER, Role.HACKER);
     const currentRole = ref(0);
     const changeRole = (role: Role) => (currentRole.value = role);
@@ -137,7 +136,7 @@ export default defineComponent({
     const feedback = reactive({
       active: false,
       headline: "",
-      subline: "",
+      subLine: "",
       link: "",
       linkText: "",
       reload: false,
@@ -149,32 +148,32 @@ export default defineComponent({
         currentMode.value = rollback;
       } else {
         save()
-          .then((id) => {
-            feedback.active = true;
-            feedback.headline = "Gespeichert";
-            feedback.subline = `Dein Labyrinth wurde gespeichert unter der ID ${id}`;
-            feedback.link = "/find";
-            feedback.linkText = "Jetzt spielen";
-            feedback.reload = false;
-          })
-          .catch(() => {
-            feedback.active = true;
-            feedback.headline = "Fehler";
-            feedback.subline =
-              "Leider ist etwas schief gelaufen. Bitte versuche es noch einmal";
-            feedback.link = "/build";
-            feedback.linkText = "Zurück";
-            feedback.reload = true;
-          });
+            .then((id) => {
+              feedback.active = true;
+              feedback.headline = "Gespeichert";
+              feedback.subLine = `Dein Labyrinth wurde gespeichert unter der ID ${id}`;
+              feedback.link = "/find";
+              feedback.linkText = "Jetzt spielen";
+              feedback.reload = false;
+            })
+            .catch(() => {
+              feedback.active = true;
+              feedback.headline = "Fehler";
+              feedback.subLine =
+                  "Leider ist etwas schief gelaufen. Bitte versuche es noch einmal";
+              feedback.link = "/build";
+              feedback.linkText = "Zurück";
+              feedback.reload = true;
+            });
       }
     }
 
     watch(
-      () => buildState.itemOptions,
-      () => {
-        currentItem.value = itemOptions.value[0];
-      },
-      { deep: true }
+        () => buildState.itemOptions,
+        () => {
+          currentItem.value = itemOptions.value[0];
+        },
+        {deep: true}
     );
 
     onUnmounted(() => {
@@ -220,6 +219,7 @@ export default defineComponent({
     z-index: 5;
     right: 0;
     margin: 20px;
+
     i {
       margin: 5px 10px;
     }

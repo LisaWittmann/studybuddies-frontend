@@ -1,5 +1,9 @@
 <template>
-  <div class="labyrinth-canvas">
+  <div v-if="nameMode">
+    <h1>Labyrinth benennen</h1>
+    <input class="input--small" type="text" v-model="labyrinthName" @change="updateName"/>
+  </div>
+  <div v-else class="labyrinth-canvas">
     <div class="labyrinth-canvas__row" v-for="row in rows" :key="row">
       <BuildTileComponent
         v-for="column in columns"
@@ -57,6 +61,7 @@ export default defineComponent({
       selectTile,
       addRestriction,
       addItem,
+      setName
     } = useBuildService();
 
     let mousedown = false;
@@ -66,6 +71,9 @@ export default defineComponent({
     const rows = computed(() => buildState.rows);
     const columns = computed(() => buildState.columns);
     const gutter = computed(() => props.mode == Mode.CREATE);
+    const nameMode = computed(() => props.mode == Mode.LABYRINTH_NAME);
+
+    const labyrinthName = ref(buildState.labyrinthName);
 
     const clickedTile = ref({} as TileModel);
     const showTileOverview = computed(
@@ -106,12 +114,19 @@ export default defineComponent({
       }
     };
 
+    function updateName() {
+      setName(labyrinthName.value);
+    }
+
     return {
       rows,
       columns,
       gutter,
+      nameMode,
       clickedTile,
       showTileOverview,
+      labyrinthName,
+      updateName,
       getTileModel,
       onClick,
       onEnter,
@@ -143,6 +158,15 @@ export default defineComponent({
     bottom: 100px;
     margin-top: auto;
     margin-bottom: auto;
+  }
+
+  h1 {
+    padding-top: $spacing-l;
+    margin-top: 0;
+
+    span {
+      font-weight: inherit;
+    }
   }
 }
 </style>
