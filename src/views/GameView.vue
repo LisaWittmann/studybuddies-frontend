@@ -7,41 +7,34 @@
     @move-player="movePlayer"
     @click-disabled="toggleEventMessage"
   />
-  <!--warning and errormessages-->
+  <!--warning and error messages-->
   <OverlayTerminalComponent
-    :opened="eventMessage.visible"
-    :message="eventMessage.message"
-    :state="eventMessage.state"
+    :opened="gameEventMessage.visible"
+    :message="gameEventMessage.message"
+    :state="gameEventMessage.state"
     @close="toggleEventMessage"
-  />
-  <!--conversations with interactive characters-->
-  <OverlayConversationComponent
-    :opened="conversation.visible"
-    :message="conversation.message"
-    @respond="getConversationMessage"
   />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, onMounted } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 
 import { Orientation } from "@/service/labyrinth/Tile";
-import { MoveOperation } from "@/service/game/EventMessage";
+import { EventMessage } from "@/service/game/EventMessage";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
-import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
+import router from "@/router";
 import "@/service/game/EventStore";
 
 export default defineComponent({
   name: "GameView",
   components: {
     SceneComponent,
-    OverlayConversationComponent,
     OverlayTerminalComponent,
   },
   props: {
@@ -49,35 +42,62 @@ export default defineComponent({
   },
   setup() {
     const { loginState } = useLoginStore();
-    const { gameState, updateGameData } = useGameStore();
-    const {
-      eventMessage,
-      toggleEventMessage,
-      playerMovement,
-      clickItem,
-      conversation,
-      getConversationMessage,
-    } = useGameService();
+    const { gameState, updateGameData, setLobbyKey, setGameState } =
+      useGameStore();
+    const { gameEventMessage, toggleEventMessage, playerMovement, clickItem } =
+      useGameService();
     updateGameData();
 
-    let mainPlayer;
-    let partnerPlayer;
-    gameState.playerMap.forEach((player, key) => {
-      if (key == loginState.username) {
-        mainPlayer = computed(() => player);
+    const labyrinthState = computed(() => gameState.labyrinth);
+    const score = computed(() => gameState.score);
+    const errormessage = computed(() => gameState.errormessage);
+
+    let mainPlayer = computed(() => gameState.mainPlayer);
+    let partnerPlayer = computed(() => gameState.partnerPlayer);
+
+    //adds infos from GameState (filled on READY) to SessionStorage
+    sessionStorage.setItem("labyrinth", JSON.stringify(labyrinthState.value));
+    sessionStorage.setItem("score", JSON.stringify(score.value));
+    sessionStorage.setItem("errormessage", JSON.stringify(errormessage.value));
+    sessionStorage.setItem("initialLoad", JSON.stringify(1));
+
+    onMounted(async () => {
+      const route = router.currentRoute.value;
+      setLobbyKey(route.params.key as string);
+      updateGameData();
+
+      //fills gameState out of sessionStorage when view is reloaded
+      if (
+        sessionStorage.getItem("mainPlayer") &&
+        sessionStorage.getItem("partnerPlayer")
+      ) {
+        setGameState(
+          sessionStorage.getItem("lobbyKey"),
+          sessionStorage.getItem("selectedLabyrinth"),
+          sessionStorage.getItem("labyrinth"),
+          sessionStorage.getItem("mainPlayer"),
+          sessionStorage.getItem("partnerPlayer"),
+          sessionStorage.getItem("errormessage"),
+          sessionStorage.getItem("score")
+        );
       } else {
-        partnerPlayer = computed(() => player);
+        sessionStorage.setItem("mainPlayer", JSON.stringify(mainPlayer.value));
+        sessionStorage.setItem(
+          "partnerPlayer",
+          JSON.stringify(partnerPlayer.value)
+        );
       }
     });
 
     /**
      * function which is used when clicking the arrow in Interface
-     * By recieving the Orientation it creats a MoveOperation to send it to the BE via GameService Methode
+     * By receiving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
      * @param orientation : used in the backend to identify the direction to move the player
      */
     function movePlayer(orientation: Orientation) {
       playerMovement(
-        new MoveOperation(
+        new EventMessage(
+          "MOVEMENT",
           gameState.lobbyKey,
           loginState.username,
           Orientation[orientation].toString()
@@ -89,9 +109,7 @@ export default defineComponent({
       movePlayer,
       clickItem,
       toggleEventMessage,
-      getConversationMessage,
-      conversation,
-      eventMessage,
+      gameEventMessage,
       gameState,
       mainPlayer,
       partnerPlayer,

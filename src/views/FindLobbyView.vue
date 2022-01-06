@@ -1,12 +1,8 @@
 <template>
   <transition name="fade" appear>
     <div class="container">
+      <img class="image--header" :src="header" alt="logo" />
       <section>
-        <img
-          class="image--header"
-          src="@/assets/img/logo_header.png"
-          alt="logo"
-        />
         <h2>Spiel finden</h2>
         <div class="column-wrapper">
           <input
@@ -18,6 +14,7 @@
             Spiel beitreten
           </button>
         </div>
+        <span class="error" v-if="errorMessage">{{ errorMessage }}</span>
       </section>
       <transition name="delay-fade">
         <section>
@@ -32,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 import router from "@/router";
 
@@ -41,6 +38,7 @@ export default defineComponent({
   setup() {
     const { loginState } = useLoginStore();
     const lobbyKey = ref("");
+    const errorMessage = ref("");
 
     const header = computed(() => {
       if (matchMedia("(prefers-color-scheme: dark)").matches)
@@ -57,11 +55,10 @@ export default defineComponent({
         },
         body: loginState.username,
       }).then((response) => {
-        if (response.ok) {
-          router.push("/lobby/" + key);
-        } else {
-          console.log(response.statusText);
-        }
+        if (response.ok) router.push("/lobby/" + key);
+        else if (response.status == 409) errorMessage.value = "Lobby voll";
+        else if (response.status == 404)
+          errorMessage.value = "Lobby nicht gefunden";
       });
     }
 
@@ -84,7 +81,8 @@ export default defineComponent({
         .catch((err) => console.log(err));
     }
 
-    return { lobbyKey, createGame, joinGame, header };
+    onbeforeunload = () => console.log("overriding previous listener");
+    return { lobbyKey, createGame, joinGame, header, errorMessage };
   },
 });
 </script>

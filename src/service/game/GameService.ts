@@ -1,15 +1,14 @@
-import { MoveOperation, Operation } from "@/service/game/EventMessage";
-import { Message } from "@/service/game/Conversation";
 import { reactive } from "vue";
+import { useGameStore } from "@/service/game/GameStore";
+import { useLoginStore } from "../login/LoginStore";
+import { EventMessage, Operation } from "@/service/game/EventMessage";
+import { Message } from "@/service/game/Conversation";
 
-// in-game messages like warnings, errors, hints ...
-const eventMessage = reactive({
-  message: "Dieser Computer ist passwortgeschützt. Kein Zugriff möglich!",
-  state: "warning",
+const gameEventMessage = reactive({
+  message: "",
+  state: "",
   visible: false,
 });
-
-const toggleEventMessage = () => (eventMessage.visible = !eventMessage.visible);
 
 // conversations with interactive game characters
 const conversation = reactive({
@@ -17,6 +16,24 @@ const conversation = reactive({
   message: new Message("", "", undefined, []),
   visible: false,
 });
+
+const toggleEventMessage = () => (gameEventMessage.visible = !gameEventMessage.visible);
+
+async function playerMovement(evenMessage: EventMessage) {
+  fetch("/api/lobby/move", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(evenMessage),
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
+
 
 async function startConversation(character: string) {
   conversation.character = character;
@@ -57,14 +74,42 @@ async function endConversation() {
   conversation.character = "";
 }
 
-async function playerMovement(moveOperation: MoveOperation) {
-  fetch("/api/lobby/move", {
+// fetches the current tileId of both players
+async function updatePlayerPositions(lobbyKey: string) {
+  return fetch("/api/lobby/players/" + lobbyKey, {
+    method: "GET",
+  }).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  });
+}
+
+async function checkAccess(modelName: string) {
+  const { gameState } = useGameStore();
+  const { loginState } = useLoginStore();
+  const eventMessage = new EventMessage(
+    Operation[Operation.ACCESS],
+    gameState.lobbyKey,
+    loginState.username,
+    modelName.toUpperCase()
+  );
+  fetch("/api/lobby/access", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(moveOperation),
+    body: JSON.stringify(eventMessage),
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      gameEventMessage.message = jsonData.accesstext;
+      if (jsonData.access) {
+        gameEventMessage.state = "success";
+      } else {
+        gameEventMessage.state = "warning";
+      }
+      gameEventMessage.visible = true;
     })
     .catch((error) => {
       console.error(error);
@@ -73,7 +118,7 @@ async function playerMovement(moveOperation: MoveOperation) {
 
 async function clickItem(modelName: string) {
   console.log("click", modelName);
-  fetch("/api/body/click/" + modelName, { method: "GET" })
+  fetch("/api/lobby/click/" + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
@@ -82,6 +127,9 @@ async function clickItem(modelName: string) {
       const operation = (<any>Operation)[jsonData];
       console.log(operation);
       switch (operation) {
+        case Operation.ACCESS:
+          checkAccess(modelName);
+          break;
         case Operation.CONVERSATION:
           startConversation(modelName);
           break;
@@ -94,12 +142,10 @@ async function clickItem(modelName: string) {
 
 export function useGameService() {
   return {
-    eventMessage,
+    gameEventMessage,
     toggleEventMessage,
+    updatePlayerPositions,
     playerMovement,
     clickItem,
-    conversation,
-    startConversation,
-    getConversationMessage,
   };
 }

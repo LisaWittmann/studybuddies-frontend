@@ -23,7 +23,7 @@
           </button>
           <p>
             Du bist bereits registriert?
-            <router-link to="/login">Jetzt anmelden</router-link>
+            <router-link to="/">Jetzt anmelden</router-link>
           </p>
           <span>
             Lade jetzt dein eigenes Labyrinth hoch:<br />
@@ -44,10 +44,9 @@ import { User } from "@/service/login/User";
 export default defineComponent({
   name: "RegisterView",
   setup() {
-    const user = new User();
+    const { register, loginState } = useLoginStore();
+    const user = new User(loginState.username);
     const errorMessage = ref("");
-
-    const { register } = useLoginStore();
 
     function registerUser() {
       register(user).catch((error) => (errorMessage.value = error.message));

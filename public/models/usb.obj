@@ -1,7 +1,7 @@
-# Blender v2.93.5 OBJ File: 'usb-key.blend'
+# Blender v2.93.5 OBJ File: 'usb.blend'
 # www.blender.org
-mtllib usb-key.mtl
-o Torus.001
+mtllib usb.mtl
+o usb
 v 0.000652 0.014568 0.235490
 v 0.040253 0.014448 0.240350
 v 0.042206 0.008926 0.235166

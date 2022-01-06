@@ -1,12 +1,13 @@
-import router from "@/router";
+import { reactive, readonly } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 import { EventMessage } from "@/service/game/EventMessage";
-import { reactive, readonly } from "vue";
-import { PickOperation } from "./game/EventMessage";
+import { User } from "./login/User";
+import { Role } from "@/service/game/Player";
+import router from "@/router";
 
 const lobbyState = reactive({
-  users: new Array<string>(),
+  users: new Array<User>(),
   selectedRole: "",
   openRoles: new Array<string>(),
   selectedLabyrinth: 0,
@@ -31,19 +32,13 @@ function setLobbyState(
 }
 
 /**
- * send request to pick a available role
+ * send request to pick an available role
  * @param role: the role which was picked from the user
- * @param lobbyKey: identifying key of lobby that sould be joined
+ * @param lobbyKey: identifying key of lobby that should be joined
  * @param username: identifying name of user that should join lobby
  */
 async function updateRole(role: string, lobbyKey: string, username: string) {
-  lobbyState.selectedRole = role;
-  const eventMessage: EventMessage = {
-    operation: "ROLE_PICK",
-    lobbyKey: lobbyKey,
-    username: username,
-    data: role,
-  };
+  const eventMessage = new EventMessage("ROLE_PICK", lobbyKey, username, role);
   return fetch("/api/lobby/select-role", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -54,12 +49,13 @@ async function updateRole(role: string, lobbyKey: string, username: string) {
         throw new Error("Diese Rolle ist bereits vergeben.");
       else throw new Error("Die Rolle konnte nicht gefunden werden.");
     }
+    lobbyState.selectedRole = role;
   });
 }
 
 /**
  * send request to get every role which exists
- * @param lobbyKey: identifying key of lobby that sould be joined
+ * @param lobbyKey: identifying key of lobby that should be joined
  */
 async function getRoles(lobbyKey: string) {
   return fetch("/api/lobby/roles/" + lobbyKey, {
@@ -72,7 +68,7 @@ async function getRoles(lobbyKey: string) {
 
 /**
  * send request to get every role that can be picked, without the roles that picked already
- * @param lobbyKey: identifying key of lobby that sould be joined
+ * @param lobbyKey: identifying key of lobby that should be joined
  */
 async function getRoleOptions(lobbyKey: string) {
   return fetch("/api/lobby/selectable-roles/" + lobbyKey, {
@@ -89,8 +85,8 @@ async function getRoleOptions(lobbyKey: string) {
 
 /**
  * send request to join lobby with given lobby key
- * redirects to lobby settings view of lobby if joining was sucessfull
- * @param lobbyKey: identifying key of lobby that sould be joined
+ * redirects to lobby settings view of lobby if joining was successful
+ * @param lobbyKey: identifying key of lobby that should be joined
  * @param username: identifying name of user that should join lobby
  */
 async function joinLobby(lobbyKey: string, username: string) {
@@ -110,7 +106,7 @@ async function joinLobby(lobbyKey: string, username: string) {
 }
 
 /**
- * send request to create new lobby and joins creating user automaticly
+ * send request to create new lobby and joins creating user automatically
  * redirects to lobby settings view of created lobby
  * @param username: identifying name of user that creates new lobby
  */
@@ -123,7 +119,10 @@ async function createLobby(username: string) {
     body: username,
   })
     .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
+      if (!response.ok) {
+        alert("Labyrinth nicht ok!");
+        throw new Error(response.statusText);
+      }
       return response.json();
     })
     .then((jsonData) => {
@@ -134,7 +133,7 @@ async function createLobby(username: string) {
 
 /**
  * send request to remove user with given username from lobby
- * redirects back to find lobby view if request was successfull
+ * redirects back to find lobby view if request was successful
  * @param lobbyKey: identifying key of lobby from which user should be removed
  * @param username: identifying name of user that should be removed
  */
@@ -147,8 +146,13 @@ async function exitLobby(lobbyKey: string, username: string) {
     body: username,
   })
     .then((response) => {
-      if (response.ok) router.push("/find");
-      else throw new Error(response.statusText);
+      if (response.ok) {
+        lobbyState.users = lobbyState.users.filter(
+          (user) => user.username != username
+        );
+        sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+        router.push("/find");
+      } else throw new Error(response.statusText);
     })
     .catch((error) => console.error(error));
 }
@@ -201,14 +205,28 @@ async function updateUsers(lobbyKey: string) {
       return response.json();
     })
     .then((response) => {
-      lobbyState.users = response;
+      const tempUsers = lobbyState.users;
+      lobbyState.users = [];
+
+      response.forEach((username: string) => {
+        const foundUser: User | undefined = tempUsers.find(
+          (user) => user.username === username
+        );
+        console.log(foundUser);
+        if (foundUser) {
+          lobbyState.users.push(foundUser);
+        } else {
+          lobbyState.users.push(new User(username));
+        }
+      });
+
       sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
     });
 }
 
 /**
  * send request to get all labyrinths in database that can be selected for game
- * sets the labyrinthOtions in the lobbyState with all labyrinth ids if request was successful
+ * sets the labyrinthOptions in the lobbyState with all labyrinth ids if request was successful
  * @throws error if request was not successful
  */
 async function updateLabyrinths() {
@@ -234,7 +252,8 @@ async function updateLabyrinths() {
  */
 async function updateLabyrinthPick(labId: number, lobbyKey: string) {
   const { loginState } = useLoginStore();
-  const eventMessage = new PickOperation(
+  const eventMessage = new EventMessage(
+    "LABYRINTH_PICK",
     lobbyKey,
     loginState.username,
     labId.toString()
@@ -253,7 +272,7 @@ async function updateLabyrinthPick(labId: number, lobbyKey: string) {
 }
 
 /**
- * sets the new Labyrinth in the Dropdownmenu
+ * sets the new Labyrinth in the DropdownMenuComponent
  * @param selectedLabyrinth : id of the new selected Labyrinth
  */
 function setLabyrinthSelection(selectedLabyrinth: number) {
@@ -262,17 +281,16 @@ function setLabyrinthSelection(selectedLabyrinth: number) {
 
 /**
  * sends a List of two Arguments to the BE, so there can be checked, whether every Player is ready or not
- * (and reacts to a wrong respond after recieving it)
+ * (and reacts to a wrong respond after receiving it)
  * @param username: name of the user in the backend, which shall be taken out of the lobby
  * @param labId : id of the blueprint labyrinth, used for the Game Progression
  */
 function readyCheck(username: string, labId: number) {
+  if(!lobbyState.selectedLabyrinth || !lobbyState.selectedRole) return;
   const { gameState } = useGameStore();
   const args: string[] = [];
   args.push(username);
   args.push(String(labId));
-
-  console.log(gameState);
 
   fetch(`/api/lobby/ready/${gameState.lobbyKey}`, {
     method: "POST",
@@ -291,16 +309,51 @@ function readyCheck(username: string, labId: number) {
     });
 }
 
-function setupGame() {
-  const { updateGameData, gameState, setPlayerData } = useGameStore();
-  updateGameData().then(() => {
-    updateUsers(gameState.lobbyKey);
-    lobbyState.users.forEach((user, index) => {
-      setPlayerData(user, gameState.labyrinth.playerStartTileIds[index]);
-    });
+/**
+ * Finds the right user in the users list via the username param and sets the given ReadyState in it.
+ * @param username The username (from the BE) of the user which pressed the "Ready" Button
+ * @param readyState The state to determine whether the given user is ready or not
+ */
+function setUserReadyState(username: string, readyState: boolean) {
+  lobbyState.users
+    .find((user) => user.username == username)
+    ?.setReady(readyState);
+}
 
-    router.replace(`/game/${gameState.lobbyKey}`);
-  });
+/**
+ * Initial game setup when all users are ready:
+ * 1. Gathering the labyrinth information from the BE
+ * 2. Updating the Users one last time, so they can get transferred to the gameState properly
+ * 3. Setting up new Players on the basis of the users in the users list
+ * 4. Overwriting the page history by replacing the url to the game view
+ */
+function setupGame() {
+  const { updateGameData, gameState, setPlayerData, updatePlayerData } =
+    useGameStore();
+  updateUsers(gameState.lobbyKey)
+    .then(() => {
+      lobbyState.users.forEach((user) => {
+        fetch(`/api/lobby/role/${gameState.lobbyKey}/${user.username}`)
+          .then((response) => {
+            if (!response.ok) throw new Error(response.statusText);
+            return response.json();
+          })
+          .then((jsonData) => {
+            const role = (<any>Role)[jsonData];
+            setPlayerData(user.username, role);
+          });
+      });
+    })
+    .then(() => {
+      updateGameData().then(() => {
+        lobbyState.users.forEach((user, index) => {
+          const startTile = gameState.labyrinth.playerStartTileKeys[index];
+          updatePlayerData(user.username, startTile);
+          console.log("StartTileId is: " + startTile);
+        });
+        router.push(`/game/${gameState.lobbyKey}`);
+      });
+    });
 }
 
 export function useLobbyService() {
@@ -319,6 +372,7 @@ export function useLobbyService() {
     updateLabyrinthPick,
     readyCheck,
     setupGame,
+    setUserReadyState,
     lobbyState: readonly(lobbyState),
   };
 }
