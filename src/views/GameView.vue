@@ -14,6 +14,12 @@
     :state="gameEventMessage.state"
     @close="toggleEventMessage"
   />
+  <!--conversations with interactive characters-->
+  <OverlayConversationComponent
+      :opened="conversation.visible"
+      :message="conversation.message"
+      @respond="getConversationMessage"
+  />
 </template>
 
 <script lang="ts">
@@ -27,6 +33,7 @@ import { EventMessage } from "@/service/game/EventMessage";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
+import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import router from "@/router";
 import "@/service/game/EventStore";
@@ -36,6 +43,7 @@ export default defineComponent({
   components: {
     SceneComponent,
     OverlayTerminalComponent,
+    OverlayConversationComponent,
   },
   props: {
     key: { type: String, required: true },
@@ -44,7 +52,7 @@ export default defineComponent({
     const { loginState } = useLoginStore();
     const { gameState, updateGameData, setLobbyKey, setGameState } =
       useGameStore();
-    const { gameEventMessage, toggleEventMessage, playerMovement, clickItem } =
+    const { gameEventMessage, toggleEventMessage, playerMovement, clickItem, conversation, getConversationMessage } =
       useGameService();
     updateGameData();
 
@@ -114,6 +122,8 @@ export default defineComponent({
       mainPlayer,
       partnerPlayer,
       labyrinth: gameState.labyrinth,
+      conversation,
+      getConversationMessage,
     };
   },
 });

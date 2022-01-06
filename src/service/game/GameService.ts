@@ -131,6 +131,7 @@ async function clickItem(modelName: string) {
           checkAccess(modelName);
           break;
         case Operation.CONVERSATION:
+          console.log("test");
           startConversation(modelName);
           break;
       }
@@ -147,5 +148,8 @@ export function useGameService() {
     updatePlayerPositions,
     playerMovement,
     clickItem,
+    startConversation,
+    getConversationMessage,
+    conversation,
   };
 }
