@@ -338,10 +338,7 @@ async function save(): Promise<string> {
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
-      return response.json();
-    })
-    .then((jsonData) => {
-      return jsonData;
+      return response.text();
     });
 }
 

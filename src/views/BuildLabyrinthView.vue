@@ -148,10 +148,10 @@ export default defineComponent({
         currentMode.value = rollback;
       } else {
         save()
-            .then((id) => {
+            .then((name) => {
               feedback.active = true;
               feedback.headline = "Gespeichert";
-              feedback.subLine = `Dein Labyrinth wurde gespeichert unter der ID ${id}`;
+              feedback.subLine = `Dein Labyrinth wurde gespeichert unter dem Namen ${name}`;
               feedback.link = "/find";
               feedback.linkText = "Jetzt spielen";
               feedback.reload = false;

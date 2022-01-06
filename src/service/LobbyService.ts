@@ -175,9 +175,8 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
           if (!response.ok) {
             throw new Error(response.statusText);
           }
-          return response.json();
+          return response.text();
         }).then((jsonData) => {
-            console.log("Test:   ", jsonData)
             responseList.push("Upload von " + jsonData + " war erfolgreich");
         }).catch((error) => {
           responseList.push("Upload von " + file.name + " ist fehlgeschlagen");
@@ -237,7 +236,6 @@ async function updateLabyrinths() {
       return response.json();
     })
     .then((response) => {
-      console.log(response);
       lobbyState.labyrinthOptions = response;
       sessionStorage.setItem(
         "labyrinthOptions",
