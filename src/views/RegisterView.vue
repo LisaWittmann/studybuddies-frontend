@@ -1,45 +1,52 @@
 <template>
-  <div class="register">
-    <div class="register__content">
-      <div class="register__content-header">
+  <div class="flex-container">
+    <transition name="slow-fade" appear>
+      <section>
         <h1>Registrieren</h1>
-      </div>
-      <form @submit.prevent="registerUser" class="form">
-        <input
-          type="username"
-          placeholder="Benutzername"
-          v-model="user.username"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Passwort"
-          v-model="user.password"
-          required
-        />
-        <button type="submit">Registrieren</button>
-        <p>
-          Du bist bereits registriert?
-          <a href="/login">Jetzt anmelden</a>
-        </p>
-        <span class="error">{{ errorMessage }}</span>
-      </form>
-    </div>
+        <form @submit.prevent="registerUser" class="column-wrapper">
+          <input
+            class="input--medium"
+            type="username"
+            placeholder="Benutzername"
+            v-model="user.username"
+            required
+          />
+          <input
+            class="input--medium"
+            type="password"
+            placeholder="Passwort"
+            v-model="user.password"
+            required
+          />
+          <button class="button--filled button--medium" type="submit">
+            Registrieren
+          </button>
+          <p>
+            Du bist bereits registriert?
+            <router-link to="/">Jetzt anmelden</router-link>
+          </p>
+          <span>
+            Lade jetzt dein eigenes Labyrinth hoch:<br />
+            <router-link to="/upload">Labyrinth hochladen</router-link>
+          </span>
+          <span class="error">{{ errorMessage }}</span>
+        </form>
+      </section>
+    </transition>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { useLoginStore } from "@/service/LoginStore";
-import { User } from "@/service/User";
+import { useLoginStore } from "@/service/login/LoginStore";
+import { User } from "@/service/login/User";
 
 export default defineComponent({
   name: "RegisterView",
   setup() {
-    const user = new User();
+    const { register, loginState } = useLoginStore();
+    const user = new User(loginState.username);
     const errorMessage = ref("");
-
-    const { register } = useLoginStore();
 
     function registerUser() {
       register(user).catch((error) => (errorMessage.value = error.message));
@@ -55,19 +62,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.register {
-  width: 100%;
-  height: 100%;
-  @include flex-center();
-
-  &__content {
-    max-width: 400px;
-    width: 70%;
-    margin: auto;
-
-    &-header {
-      margin-bottom: $spacing-m;
-    }
-  }
+h1 {
+  margin-bottom: 0;
 }
 </style>

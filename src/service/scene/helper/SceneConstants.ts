@@ -6,7 +6,15 @@ import { vector } from "@/service/scene/helper/GeometryHelper";
  */
 export const settings = {
   tileSize: 20,
-  cameraHeight: 5,
+  cameraHeight: 4,
+};
+
+/**
+ * scale factor for models
+ */
+export const factors = {
+  objectScaleFactor: settings.tileSize / 4,
+  partnerTranslateFactor: settings.tileSize / 4,
 };
 
 /**
@@ -32,7 +40,7 @@ export const direction = {
  * vertical positions of objects in room
  */
 export const position = {
-  bottom: readonly(vector(0, 0, 0)),
+  floor: readonly(vector(0, 0, 0)),
   wall: readonly(vector(0, settings.tileSize / 2, 0)),
   ceiling: readonly(vector(0, settings.tileSize, 0)),
 };
@@ -46,7 +54,7 @@ export const colors = {
   darkGreen: 0x39432f,
   beige: 0xe6bf5f,
   brown: 0x994814,
-  darkBrow: 0x5641a,
+  darkBrown: 0x56341a,
   white: 0xf8f7f5,
   grey: 0xd7d9d5,
   black: 0x1a1e16,

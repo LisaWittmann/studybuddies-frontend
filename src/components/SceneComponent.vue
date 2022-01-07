@@ -1,17 +1,30 @@
 <template>
-  <div id="scene"></div>
+  <div id="scene" @click="onClick"></div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted } from "vue";
+import { defineComponent, onBeforeUnmount, onMounted, watch } from "vue";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
-import { useLabyrinthStore } from "@/service/LabyrinthStore";
-import { vector } from "@/service/scene/helper/GeometryHelper";
+import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 
 export default defineComponent({
   name: "SceneComponent",
-  setup() {
+  props: {
+    labyrinth: {
+      type: Object,
+      required: true,
+    },
+    player: {
+      type: MainPlayer,
+      required: true,
+    },
+    partner: {
+      type: PartnerPlayer,
+      required: true,
+    },
+  },
+  setup(props, context) {
     const {
       createScene,
       renderScene,
@@ -19,20 +32,17 @@ export default defineComponent({
       updateScene,
       getIntersections,
     } = useSceneFactory();
-    const { createLabyrinth } = useLabyrinthFactory();
+    const { updateLabyrinth, updatePlayer } = useLabyrinthFactory();
 
-    // testing data
-    const scene = createScene(vector(0, 0, 0));
-    const { labyrinthState, updateLabyrinth } = useLabyrinthStore();
-    updateLabyrinth().then(() => createLabyrinth(labyrinthState, scene));
-
-    function render() {
+    const scene = createScene();
+    const render = () => {
       renderScene();
       requestAnimationFrame(render);
-    }
+    };
 
-    function onMouseDown(event: MouseEvent) {
+    function onClick(event: MouseEvent) {
       getIntersections(
+        context,
         (event.clientX / innerWidth) * 2 - 1,
         -(event.clientY / innerHeight) * 2 + 1
       );
@@ -43,13 +53,20 @@ export default defineComponent({
       requestAnimationFrame(render);
 
       addEventListener("resize", updateScene);
-      addEventListener("mousedown", onMouseDown);
     });
 
     onBeforeUnmount(() => {
       removeEventListener("resize", updateScene);
-      removeEventListener("mousedown", onMouseDown);
     });
+
+    watch([props.labyrinth, props.player, props.partner], () => {
+      console.log("updating scene");
+      updateLabyrinth(props.labyrinth, props.player, scene);
+      updatePlayer(props.player, scene);
+      updatePlayer(props.partner, scene);
+    });
+
+    return { onClick };
   },
 });
 </script>
