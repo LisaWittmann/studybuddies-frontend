@@ -97,7 +97,7 @@ export class TileModel {
       [Orientation.NORTH, Orientation.EAST],
       [Orientation.EAST, Orientation.SOUTH],
       [Orientation.SOUTH, Orientation.WEST],
-      [Orientation.WEST, Orientation.NORTH]
+      [Orientation.NORTH, Orientation.WEST]
     );
     for (const [orientation, relationKey] of this.tileRelationMap) {
       if (!relationKey) this.placements.push([orientation]);
