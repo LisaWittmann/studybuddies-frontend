@@ -83,7 +83,7 @@ export default defineComponent({
       setLabyrinthSelection,
       updateLabyrinthPick,
       updateLabyrinths,
-      getSessionStorage,
+      getLobbySessionStorage,
       lobbyState,
       updateRole,
       getRoles,
@@ -134,14 +134,14 @@ export default defineComponent({
         nextKey != gameState.lobbyKey &&
         lobbyState.users.some((user) => user.username === loginState.username)
       ) {
-        exitLobby(lobbyKey.value, loginState.username);
+        exitLobby(gameState.lobbyKey, loginState.username);
       }
     });
 
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      getSessionStorage();
+      getLobbySessionStorage();
       updateUsers(gameState.lobbyKey).catch(() => router.push("/find"));
       updateLabyrinths();
       getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));

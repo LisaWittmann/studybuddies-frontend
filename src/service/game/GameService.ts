@@ -57,6 +57,7 @@ async function startConversation(character: string) {
   conversation.visible = true;
   getConversationMessage("1.1");
 }
+
 /**
  * get next message of conversation with game character
  * @param id message id

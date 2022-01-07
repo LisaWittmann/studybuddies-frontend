@@ -24,7 +24,7 @@ function resetLobbyState() {
   lobbyState.labyrinthOptions = new Array<number>();
   lobbyState.errormessage = "";
   setLobbyKey("");
-  setSessionStorage();
+  setLobbySessionStorage();
 }
 
 function setLobbyState(
@@ -43,7 +43,7 @@ function setLobbyState(
   if (selectedRole) lobbyState.selectedRole = JSON.parse(selectedRole);
 }
 
-function setSessionStorage() {
+function setLobbySessionStorage() {
   sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
   sessionStorage.setItem(
     "selectedLabyrinth",
@@ -63,7 +63,7 @@ function setSessionStorage() {
   );
 }
 
-function getSessionStorage() {
+function getLobbySessionStorage() {
   setLobbyState(
     sessionStorage.getItem("users"),
     sessionStorage.getItem("selectedLabyrinth"),
@@ -417,8 +417,8 @@ export function useLobbyService() {
     readyCheck,
     setupGame,
     setUserReadyState,
-    setSessionStorage,
-    getSessionStorage,
+    setLobbySessionStorage,
+    getLobbySessionStorage,
     lobbyState: readonly(lobbyState),
   };
 }

@@ -44,7 +44,7 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { gameState, getSessionStorage, updateGameData, setLobbyKey } =
+    const { gameState, getGameSessionStorage, updateGameData, setLobbyKey } =
       useGameStore();
     const {
       gameEventMessage,
@@ -64,7 +64,7 @@ export default defineComponent({
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       updateGameData();
-      getSessionStorage();
+      getGameSessionStorage();
     });
 
     return {

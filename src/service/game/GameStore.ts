@@ -41,7 +41,7 @@ function setGameState(
   if (score) gameState.score = JSON.parse(score) as number;
 }
 
-function setSessionStorage() {
+function setGameSessionStorage() {
   sessionStorage.setItem("lobbyKey", JSON.stringify(gameState.lobbyKey)),
     sessionStorage.setItem(
       "selectedLabyrinth",
@@ -60,7 +60,7 @@ function setSessionStorage() {
     sessionStorage.setItem("score", JSON.stringify(gameState.score));
 }
 
-function getSessionStorage() {
+function getGameSessionStorage() {
   setGameState(
     sessionStorage.getItem("lobbyKey"),
     sessionStorage.getItem("selectedLabyrinth"),
@@ -139,7 +139,7 @@ export function useGameStore() {
     setLobbyKey,
     setError,
     getPlayer,
-    setSessionStorage,
-    getSessionStorage,
+    setGameSessionStorage,
+    getGameSessionStorage,
   };
 }
