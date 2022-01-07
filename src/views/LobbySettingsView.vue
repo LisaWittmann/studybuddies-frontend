@@ -83,7 +83,6 @@ export default defineComponent({
       setLabyrinthSelection,
       updateLabyrinthPick,
       updateLabyrinths,
-      getLobbySessionStorage,
       lobbyState,
       updateRole,
       getRoles,
@@ -141,7 +140,6 @@ export default defineComponent({
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      getLobbySessionStorage();
       updateUsers(gameState.lobbyKey).catch(() => router.push("/find"));
       updateLabyrinths();
       getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
