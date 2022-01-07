@@ -84,7 +84,7 @@ async function register(user: User) {
  * get username from sessionStorage
  * so user won't get logged out on browser refresh
  */
-function fetchSessionStorage() {
+function getLoginSessionStorage() {
   const loginSession = sessionStorage.getItem("username");
   if (loginSession) {
     loginState.isLoggedIn = true;
@@ -98,6 +98,6 @@ export function useLoginStore() {
     register,
     login,
     logout,
-    fetchSessionStorage,
+    getLoginSessionStorage,
   };
 }
