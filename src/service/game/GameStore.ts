@@ -82,10 +82,10 @@ async function setPlayerData(username: string, startTileId: number) {
   }
 }
 
-async function updatePlayerInventory(item: Item) {
-  const mP = gameState.mainPlayer;
-  mP.addItem(item);
-  console.log("INVENTORY", mP.getInventory(), "TO ADD: ", item);
+async function updatePlayerInventory(username: string, inventory: Array<Item>) {
+  const mainPlayer = gameState.mainPlayer;
+
+  console.log("INVENTORY", mainPlayer.getInventory());
 }
 
 async function setLobbyKey(lobbyKey: string) {

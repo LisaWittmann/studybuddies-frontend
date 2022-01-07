@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from "vue";
+import { computed, defineComponent, reactive, ref } from "vue";
 
 import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "@/service/login/LoginStore";
@@ -28,21 +28,18 @@ export default defineComponent({
   },
   setup() {
     const { gameState} = useGameStore();
-    const { loginState } = useLoginStore();
     let isOpen = ref(false);
 
     //casting because playerMap only holds type Player -> here we only need MainPlayer
-    const mainPlayer: MainPlayer | undefined = gameState.mainPlayer;  
-    let inventory: Array<Item> = new Array<Item>();
+    const mainPlayer = ref(gameState.mainPlayer);
+    const inventory = ref(mainPlayer.value.getInventory());  
 
-    if (mainPlayer != undefined){
-      inventory = reactive(mainPlayer.getInventory());
       //Whats in the inventory -> remove later
       console.log("INVENTAR:");
-      for (let item of inventory){
+      for (let item of inventory.value){
         console.log(item.modelName);
       }
-    }
+    
 
     /**
      * creates image url
@@ -54,6 +51,15 @@ export default defineComponent({
    * shows opened or closed backpack svg (inventory button) 
    */
     function toggleInventoryButton() {
+      console.log("INVENTAR inventory:");
+      for (let item of inventory.value){
+        console.log(item.modelName);
+      }
+       console.log("INVENTAR player:");
+      for (let item of mainPlayer.value.getInventory()){
+        console.log(item.modelName);
+      }
+
       isOpen.value = !isOpen.value;
     }
 

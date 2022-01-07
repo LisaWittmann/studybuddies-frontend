@@ -86,6 +86,10 @@ export class MainPlayer implements Player {
   setPosition(position: number): void {
     this.position = position;
   }
+
+  setInventory(invenory: Array<Item>) {
+    this.inventory = invenory;
+  }
 }
 
 /**

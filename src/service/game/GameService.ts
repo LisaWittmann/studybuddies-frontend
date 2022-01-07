@@ -1,8 +1,13 @@
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "../login/LoginStore";
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message } from "@/service/game/Conversation";
+import { Item, Position } from "../labyrinth/Item";
+import { Tile } from "../labyrinth/Tile";
+import { MainPlayer } from "./Player";
+
+const { updatePlayerInventory } = useGameStore();
 
 const gameEventMessage = reactive({
   message: "",
@@ -142,10 +147,42 @@ async function clickItem(objectData: string) {
         case Operation.COLLECT:
           console.log("Item ", modelId, " deleted");
           // "/lobby/{lobbyKey}/item/{itemId}"
-          console.log('GameState lobbyKey: ', gameState.lobbyKey)
-          removeItemFromTile(gameState.lobbyKey, itemId);
+          addToInventory(
+            gameState.lobbyKey,
+            itemId,
+            modelName,
+            gameState.mainPlayer.getUsername()
+          );
+          //removeItemFromTile(gameState.lobbyKey, itemId);
           break;
       }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+async function addToInventory(
+  lobbyKey: string,
+  itemId: string,
+  modelName: string,
+  username: string
+) {
+  //"/lobby/{key}/username/{username}/item/{itemId}"
+
+  fetch("api/lobby/" + lobbyKey + "/username/" + username + "/item/" + itemId, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      console.log(jsonData);
+      let inventory = new Array<Item>();
+      inventory = jsonData;
+      updatePlayerInventory(username, inventory);
     })
     .catch((error) => {
       console.error(error);
