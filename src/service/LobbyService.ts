@@ -1,7 +1,7 @@
 import { reactive, readonly } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
-import { EventMessage } from "@/service/game/EventMessage";
+import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { User } from "./login/User";
 import { Role } from "@/service/game/Player";
 import router from "@/router";
@@ -80,7 +80,11 @@ function getLobbySessionStorage() {
  * @param username: identifying name of user that should join lobby
  */
 async function updateRole(role: string, lobbyKey: string, username: string) {
-  const eventMessage = new EventMessage("ROLE_PICK", lobbyKey, username, role);
+  const eventMessage = new EventMessage(
+    Operation[Operation.ROLE_PICK],
+    lobbyKey,
+    username,
+    role);
   return fetch("/api/lobby/select-role", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -292,7 +296,7 @@ async function updateLabyrinths() {
 async function updateLabyrinthPick(labId: number, lobbyKey: string) {
   const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
-    "LABYRINTH_PICK",
+    Operation[Operation.LABYRINTH_PICK],
     lobbyKey,
     loginState.username,
     labId.toString()
