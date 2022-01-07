@@ -1,7 +1,7 @@
 import { reactive, readonly } from "vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
-import { EventMessage } from "@/service/game/EventMessage";
+import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { User } from "./login/User";
 import { Role } from "@/service/game/Player";
 import router from "@/router";
@@ -15,6 +15,18 @@ const lobbyState = reactive({
   errormessage: "",
 });
 
+function resetLobbyState() {
+  const { setLobbyKey } = useGameStore();
+  lobbyState.users = new Array<User>();
+  lobbyState.selectedRole = "";
+  lobbyState.openRoles = new Array<string>();
+  lobbyState.selectedLabyrinth = 0;
+  lobbyState.labyrinthOptions = new Array<number>();
+  lobbyState.errormessage = "";
+  setLobbyKey("");
+  setLobbySessionStorage();
+}
+
 function setLobbyState(
   users: string | null,
   selectedLabyrinth: string | null,
@@ -27,8 +39,38 @@ function setLobbyState(
     lobbyState.selectedLabyrinth = JSON.parse(selectedLabyrinth) as number;
   if (labyrinthOptions)
     lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
-  if (errormessage) lobbyState.errormessage = JSON.parse(errormessage);
-  if (selectedRole) lobbyState.selectedRole = JSON.parse(selectedRole);
+  if (errormessage) lobbyState.errormessage = errormessage;
+  if (selectedRole) lobbyState.selectedRole = selectedRole;
+}
+
+function setLobbySessionStorage() {
+  sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+  sessionStorage.setItem(
+    "selectedLabyrinth",
+    JSON.stringify(lobbyState.selectedLabyrinth)
+  );
+  sessionStorage.setItem(
+    "labyrinthOptions",
+    JSON.stringify(lobbyState.labyrinthOptions)
+  );
+  sessionStorage.setItem(
+    "errormessage",
+    lobbyState.errormessage
+  );
+  sessionStorage.setItem(
+    "selectedRole",
+    lobbyState.selectedRole
+  );
+}
+
+function getLobbySessionStorage() {
+  setLobbyState(
+    sessionStorage.getItem("users"),
+    sessionStorage.getItem("selectedLabyrinth"),
+    sessionStorage.getItem("labyrinthOptions"),
+    sessionStorage.getItem("errormessage"),
+    sessionStorage.getItem("selectedRole")
+  );
 }
 
 /**
@@ -38,7 +80,11 @@ function setLobbyState(
  * @param username: identifying name of user that should join lobby
  */
 async function updateRole(role: string, lobbyKey: string, username: string) {
-  const eventMessage = new EventMessage("ROLE_PICK", lobbyKey, username, role);
+  const eventMessage = new EventMessage(
+    Operation[Operation.ROLE_PICK],
+    lobbyKey,
+    username,
+    role);
   return fetch("/api/lobby/select-role", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -50,6 +96,7 @@ async function updateRole(role: string, lobbyKey: string, username: string) {
       else throw new Error("Die Rolle konnte nicht gefunden werden.");
     }
     lobbyState.selectedRole = role;
+    sessionStorage.setItem("selectedRole", JSON.stringify(role));
   });
 }
 
@@ -147,10 +194,7 @@ async function exitLobby(lobbyKey: string, username: string) {
   })
     .then((response) => {
       if (response.ok) {
-        lobbyState.users = lobbyState.users.filter(
-          (user) => user.username != username
-        );
-        sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+        resetLobbyState();
         router.push("/find");
       } else throw new Error(response.statusText);
     })
@@ -197,18 +241,18 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
  * @throws error if request was not successful
  */
 async function updateUsers(lobbyKey: string) {
-  fetch("/api/lobby/users/" + lobbyKey, {
+  return fetch("/api/lobby/users/" + lobbyKey, {
     method: "GET",
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
-    .then((response) => {
+    .then((jsonData) => {
       const tempUsers = lobbyState.users;
       lobbyState.users = [];
 
-      response.forEach((username: string) => {
+      jsonData.forEach((username: string) => {
         const foundUser: User | undefined = tempUsers.find(
           (user) => user.username === username
         );
@@ -219,7 +263,6 @@ async function updateUsers(lobbyKey: string) {
           lobbyState.users.push(new User(username));
         }
       });
-
       sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
     });
 }
@@ -253,7 +296,7 @@ async function updateLabyrinths() {
 async function updateLabyrinthPick(labId: number, lobbyKey: string) {
   const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
-    "LABYRINTH_PICK",
+    Operation[Operation.LABYRINTH_PICK],
     lobbyKey,
     loginState.username,
     labId.toString()
@@ -277,6 +320,10 @@ async function updateLabyrinthPick(labId: number, lobbyKey: string) {
  */
 function setLabyrinthSelection(selectedLabyrinth: number) {
   lobbyState.selectedLabyrinth = selectedLabyrinth;
+  sessionStorage.setItem(
+    "selectedLabyrinth",
+    JSON.stringify(selectedLabyrinth)
+  );
 }
 
 /**
@@ -286,6 +333,7 @@ function setLabyrinthSelection(selectedLabyrinth: number) {
  * @param labId : id of the blueprint labyrinth, used for the Game Progression
  */
 function readyCheck(username: string, labId: number) {
+  if (!lobbyState.selectedLabyrinth || !lobbyState.selectedRole) return;
   const { gameState } = useGameStore();
   const args: string[] = [];
   args.push(username);
@@ -317,6 +365,7 @@ function setUserReadyState(username: string, readyState: boolean) {
   lobbyState.users
     .find((user) => user.username == username)
     ?.setReady(readyState);
+  sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
 }
 
 /**
@@ -372,6 +421,8 @@ export function useLobbyService() {
     readyCheck,
     setupGame,
     setUserReadyState,
+    setLobbySessionStorage,
+    getLobbySessionStorage,
     lobbyState: readonly(lobbyState),
   };
 }
