@@ -1,5 +1,4 @@
 import { Client } from "@stomp/stompjs";
-import { Player } from "@/service/game/Player";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
@@ -27,60 +26,55 @@ const {
   lobbyState,
 } = useLobbyService();
 
-const wsurl = "ws://localhost:9090/messagebroker";
+let wsURL = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
 
-const stompclient = new Client({ brokerURL: wsurl });
+// websocket url for production
+if (location.protocol.startsWith("https")) {
+  wsURL = `wss://${location.host}/messagebroker`;
+}
+
+const stompClient = new Client({ brokerURL: wsURL });
 
 /**
- * Connection Error Feedback for the Stompclient
+ * Connection Error Feedback for the StompClient
  */
-stompclient.onWebSocketError = () => {
+stompClient.onWebSocketError = () => {
   console.log("websocketerror");
   setError("WS-Fehler");
 };
-stompclient.onStompError = () => {
+stompClient.onStompError = () => {
   console.log("Stomperror");
   setError("STOMP-Fehler");
 };
 
 /**
- * Stompclient Methode to subscribe the Backend Messages on successful Connection and work with it
+ * StompClient Methode to subscribe the Backend Messages on successful Connection and work with it
  */
-stompclient.onConnect = () => {
+stompClient.onConnect = () => {
   console.log("stomp verbindet");
 
-  stompclient.subscribe(DEST, (message) => {
-    console.log("Message received");
-
+  stompClient.subscribe(DEST, (message) => {
     const eventMessage: EventMessage = JSON.parse(message.body);
 
     if (
       eventMessage.lobbyKey == gameState.lobbyKey ||
       eventMessage.lobbyKey == "ALL"
     ) {
-      console.log("Message in the right Lobby");
+      console.log("new Message for the Lobby");
 
-      /**
-       * Checks whether the user exists in the Game
-       */
-      const playerToMove: Player | undefined = gameState.playerMap.get(
-        eventMessage.username
-      );
+      let destTileID: number;
+
       switch (eventMessage.operation) {
         case "MOVEMENT":
-          if (playerToMove) {
-            const destTileID: number = Number.parseInt(eventMessage.data);
+          destTileID = Number.parseInt(eventMessage.data);
 
-            if (destTileID) {
-              updatePlayerData(playerToMove, destTileID);
-              // -> now the watcher can update the 3D Room
-              // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
-            } else {
-              setError("There is no Tilereference for this definition of data");
-            }
+          if (destTileID) {
+            updatePlayerData(eventMessage.username, destTileID);
+            // -> now the watcher can update the 3D Room
+            // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
-            setError("No existing User");
+            setError("There is no tile reference for this definition of data");
           }
 
           break;
@@ -157,10 +151,10 @@ stompclient.onConnect = () => {
 };
 
 /**
- * Methode to handle the Disconnection
+ * Method to handle the Disconnection
  */
-stompclient.onDisconnect = () => {
-  /* Verbindung abgebaut*/
+stompClient.onDisconnect = () => {
+  //Connection closed
 };
 
-stompclient.activate();
+stompClient.activate();

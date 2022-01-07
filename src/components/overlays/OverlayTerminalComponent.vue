@@ -2,12 +2,12 @@
   <OverlayComponent :opened="opened">
     <div class="terminal">
       <div class="terminal__header">
-        <i class="fas fa-times-circle" @click="close"></i>
+        <em class="fas fa-times-circle" @click="close" />
         {{ username }} –– -zsh
       </div>
       <div class="terminal__content">
         {{ username }}@mi ~ %
-        <span :class="`state--${state}`">{{ message }}</span>
+        <span :class="`terminal__content--${state}`">{{ message }}</span>
       </div>
     </div>
   </OverlayComponent>
@@ -32,7 +32,7 @@ export default defineComponent({
     },
     /**
      * state of the message
-     * @values neutral, warning, error
+     * @values neutral, success, warning, error
      */
     state: {
       type: String,
@@ -66,11 +66,10 @@ export default defineComponent({
     position: relative;
     height: 25px;
 
-    & i {
+    & em {
       pointer-events: all;
       position: absolute;
       color: $color-black;
-      cursor: pointer;
       margin: 5px;
       left: 0;
       top: 0;
@@ -98,16 +97,17 @@ export default defineComponent({
       font-family: $font-inconsolata;
     }
 
-    .state {
-      &--neutral {
-        color: $color-white;
-      }
-      &--warning {
-        color: orange;
-      }
-      &--error {
-        color: red;
-      }
+    &--neutral {
+      color: $color-white;
+    }
+    &--success {
+      color: green;
+    }
+    &--warning {
+      color: orange;
+    }
+    &--error {
+      color: red;
     }
   }
 }

@@ -2,7 +2,7 @@ import { Item } from "@/service/labyrinth/Item";
 
 /**
  * enumeration of role of player,
- * defines player apprearance in game
+ * defines player appearance in game
  */
 export enum Role {
   DESIGNER,
@@ -27,12 +27,12 @@ export interface Player {
 /**
  * implementation of player interfaces
  * for main player in game (current loggedIn user)
- * that is representated as camera in scene
+ * that is represented as camera in scene
  * extends player by an inventory
  */
 export class MainPlayer implements Player {
   username: string;
-  position: number;
+  position!: number;
   role: Role | undefined;
   inventory: Item[];
   /*dummydata for development
@@ -52,10 +52,10 @@ export class MainPlayer implements Player {
     new Item(11, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
   ]; */
 
-  constructor(username: string, playerPosition: number) {
+  constructor(username: string, role: Role | undefined) {
     this.username = username;
-    this.position = playerPosition;
-    this.role = undefined;
+    //this.position = playerPosition;
+    this.role = role;
     this.inventory = new Array<Item>();
   }
 
@@ -90,17 +90,16 @@ export class MainPlayer implements Player {
 
 /**
  * implementation of interface player
- * for parnter player that is represented as object in scene
+ * for partner player that is represented as object in scene
  */
 export class PartnerPlayer implements Player {
   username: string;
-  position: number;
+  position!: number;
   role: Role | undefined;
 
-  constructor(username: string, playerPosition: number) {
+  constructor(username: string, role: Role | undefined) {
     this.username = username;
-    this.role = undefined;
-    this.position = playerPosition;
+    this.role = role;
   }
 
   getUsername(): string {

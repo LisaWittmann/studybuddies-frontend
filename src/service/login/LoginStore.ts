@@ -20,10 +20,10 @@ function logout() {
 }
 
 /**
- * send request to login user with given username and password
- * updates loginState with user data if request was successfull
- * ans redirects to lobbyview
- * sets errorMessage of loginState if request was not successfull
+ * send request to log in user with given username and password
+ * updates loginState with user data if request was successful
+ * and redirects to LobbyView
+ * sets errorMessage of loginState if request was not successful
  * @param user: user object containing username and password
  */
 async function login(user: User) {
@@ -42,8 +42,8 @@ async function login(user: User) {
       }
       return response.json();
     })
-    .then((jsondata) => {
-      loginState.username = jsondata.username;
+    .then((jsonData) => {
+      loginState.username = jsonData.username;
       loginState.errormessage = "";
       loginState.isLoggedIn = true;
       sessionStorage.setItem("username", loginState.username);
@@ -59,9 +59,9 @@ async function login(user: User) {
 
 /**
  * send request to register user with given username and password
- * redirects to login view if request was successfull
+ * redirects to LoginView if request was successful
  * @param user: user object with username and password
- * @throws error with error essage
+ * @throws error with error message
  */
 async function register(user: User) {
   return fetch("/api/register", {
@@ -76,7 +76,7 @@ async function register(user: User) {
         "Deine Registrierung ist fehlgeschlagen. Bitte versuche es noch einmal"
       );
     }
-    router.push("/");
+    router.push("/login");
   });
 }
 
