@@ -32,7 +32,7 @@ export default defineComponent({
     let isOpen = ref(false);
 
     //casting because playerMap only holds type Player -> here we only need MainPlayer
-    const mainPlayer: MainPlayer | undefined = (gameState.playerMap.get(loginState.username) as MainPlayer);  
+    const mainPlayer: MainPlayer | undefined = gameState.mainPlayer;  
     let inventory: Array<Item> = new Array<Item>();
 
     if (mainPlayer != undefined){
