@@ -15,6 +15,18 @@ const lobbyState = reactive({
   errormessage: "",
 });
 
+function resetLobbyState() {
+  const { setLobbyKey } = useGameStore();
+  lobbyState.users = new Array<User>();
+  lobbyState.selectedRole = "";
+  lobbyState.openRoles = new Array<string>();
+  lobbyState.selectedLabyrinth = 0;
+  lobbyState.labyrinthOptions = new Array<number>();
+  lobbyState.errormessage = "";
+  setLobbyKey("");
+  setSessionStorage();
+}
+
 function setLobbyState(
   users: string | null,
   selectedLabyrinth: string | null,
@@ -29,6 +41,36 @@ function setLobbyState(
     lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
   if (errormessage) lobbyState.errormessage = JSON.parse(errormessage);
   if (selectedRole) lobbyState.selectedRole = JSON.parse(selectedRole);
+}
+
+function setSessionStorage() {
+  sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+  sessionStorage.setItem(
+    "selectedLabyrinth",
+    JSON.stringify(lobbyState.selectedLabyrinth)
+  );
+  sessionStorage.setItem(
+    "labyrinthOptions",
+    JSON.stringify(lobbyState.labyrinthOptions)
+  );
+  sessionStorage.setItem(
+    "errormessage",
+    JSON.stringify(lobbyState.errormessage)
+  );
+  sessionStorage.setItem(
+    "selectedRole",
+    JSON.stringify(lobbyState.selectedRole)
+  );
+}
+
+function getSessionStorage() {
+  setLobbyState(
+    sessionStorage.getItem("users"),
+    sessionStorage.getItem("selectedLabyrinth"),
+    sessionStorage.getItem("labyrinthOptions"),
+    sessionStorage.getItem("errormessage"),
+    sessionStorage.getItem("selectedRole")
+  );
 }
 
 /**
@@ -50,6 +92,7 @@ async function updateRole(role: string, lobbyKey: string, username: string) {
       else throw new Error("Die Rolle konnte nicht gefunden werden.");
     }
     lobbyState.selectedRole = role;
+    sessionStorage.setItem("selectedRole", JSON.stringify(role));
   });
 }
 
@@ -147,10 +190,7 @@ async function exitLobby(lobbyKey: string, username: string) {
   })
     .then((response) => {
       if (response.ok) {
-        lobbyState.users = lobbyState.users.filter(
-          (user) => user.username != username
-        );
-        sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+        resetLobbyState();
         router.push("/find");
       } else throw new Error(response.statusText);
     })
@@ -197,18 +237,18 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
  * @throws error if request was not successful
  */
 async function updateUsers(lobbyKey: string) {
-  fetch("/api/lobby/users/" + lobbyKey, {
+  return fetch("/api/lobby/users/" + lobbyKey, {
     method: "GET",
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
-    .then((response) => {
+    .then((jsonData) => {
       const tempUsers = lobbyState.users;
       lobbyState.users = [];
 
-      response.forEach((username: string) => {
+      jsonData.forEach((username: string) => {
         const foundUser: User | undefined = tempUsers.find(
           (user) => user.username === username
         );
@@ -219,7 +259,6 @@ async function updateUsers(lobbyKey: string) {
           lobbyState.users.push(new User(username));
         }
       });
-
       sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
     });
 }
@@ -277,6 +316,10 @@ async function updateLabyrinthPick(labId: number, lobbyKey: string) {
  */
 function setLabyrinthSelection(selectedLabyrinth: number) {
   lobbyState.selectedLabyrinth = selectedLabyrinth;
+  sessionStorage.setItem(
+    "selectedLabyrinth",
+    JSON.stringify(selectedLabyrinth)
+  );
 }
 
 /**
@@ -318,6 +361,7 @@ function setUserReadyState(username: string, readyState: boolean) {
   lobbyState.users
     .find((user) => user.username == username)
     ?.setReady(readyState);
+  sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
 }
 
 /**
@@ -373,6 +417,8 @@ export function useLobbyService() {
     readyCheck,
     setupGame,
     setUserReadyState,
+    setSessionStorage,
+    getSessionStorage,
     lobbyState: readonly(lobbyState),
   };
 }

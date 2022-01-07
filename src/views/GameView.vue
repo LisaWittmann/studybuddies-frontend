@@ -5,7 +5,6 @@
     :partner="partnerPlayer"
     @click-object="clickItem"
     @move-player="movePlayer"
-    @click-disabled="toggleEventMessage"
   />
   <!--warning and error messages-->
   <OverlayTerminalComponent
@@ -25,11 +24,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted } from "vue";
 import { useGameService } from "@/service/game/GameService";
-import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
-
-import { Orientation } from "@/service/labyrinth/Tile";
-import { EventMessage } from "@/service/game/EventMessage";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
@@ -49,75 +44,28 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { loginState } = useLoginStore();
-    const { gameState, updateGameData, setLobbyKey, setGameState } =
+    const { gameState, getSessionStorage, updateGameData, setLobbyKey } =
       useGameStore();
     const {
       gameEventMessage,
       toggleEventMessage,
-      playerMovement,
+      movePlayer,
       clickItem,
       conversation,
       getConversationMessage,
     } = useGameService();
     updateGameData();
 
-    const labyrinthState = computed(() => gameState.labyrinth);
-    const score = computed(() => gameState.score);
-    const errormessage = computed(() => gameState.errormessage);
-
-    let mainPlayer = computed(() => gameState.mainPlayer);
-    let partnerPlayer = computed(() => gameState.partnerPlayer);
-
-    //adds infos from GameState (filled on READY) to SessionStorage
-    sessionStorage.setItem("labyrinth", JSON.stringify(labyrinthState.value));
-    sessionStorage.setItem("score", JSON.stringify(score.value));
-    sessionStorage.setItem("errormessage", JSON.stringify(errormessage.value));
-    sessionStorage.setItem("initialLoad", JSON.stringify(1));
+    const labyrinth = computed(() => gameState.labyrinth);
+    const mainPlayer = computed(() => gameState.mainPlayer);
+    const partnerPlayer = computed(() => gameState.partnerPlayer);
 
     onMounted(async () => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       updateGameData();
-
-      //fills gameState out of sessionStorage when view is reloaded
-      if (
-        sessionStorage.getItem("mainPlayer") &&
-        sessionStorage.getItem("partnerPlayer")
-      ) {
-        setGameState(
-          sessionStorage.getItem("lobbyKey"),
-          sessionStorage.getItem("selectedLabyrinth"),
-          sessionStorage.getItem("labyrinth"),
-          sessionStorage.getItem("mainPlayer"),
-          sessionStorage.getItem("partnerPlayer"),
-          sessionStorage.getItem("errormessage"),
-          sessionStorage.getItem("score")
-        );
-      } else {
-        sessionStorage.setItem("mainPlayer", JSON.stringify(mainPlayer.value));
-        sessionStorage.setItem(
-          "partnerPlayer",
-          JSON.stringify(partnerPlayer.value)
-        );
-      }
+      getSessionStorage();
     });
-
-    /**
-     * function which is used when clicking the arrow in Interface
-     * By receiving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
-     * @param orientation : used in the backend to identify the direction to move the player
-     */
-    function movePlayer(orientation: Orientation) {
-      playerMovement(
-        new EventMessage(
-          "MOVEMENT",
-          gameState.lobbyKey,
-          loginState.username,
-          Orientation[orientation].toString()
-        )
-      );
-    }
 
     return {
       movePlayer,
@@ -127,7 +75,7 @@ export default defineComponent({
       gameState,
       mainPlayer,
       partnerPlayer,
-      labyrinth: gameState.labyrinth,
+      labyrinth,
       conversation,
       getConversationMessage,
     };
