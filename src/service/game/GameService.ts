@@ -17,6 +17,8 @@ const conversation = reactive({
   visible: false,
 });
 
+const { gameState } = useGameStore();
+
 const toggleEventMessage = () =>
   (gameEventMessage.visible = !gameEventMessage.visible);
 
@@ -116,8 +118,11 @@ async function checkAccess(modelName: string) {
     });
 }
 
-async function clickItem(modelName: string) {
-  console.log("click", modelName);
+async function clickItem(objectData: string) {
+  const modelName = objectData.split(" ")[1];
+  const modelId = objectData.split(" ")[3];
+  const itemId = modelId.toString();
+
   fetch("/api/lobby/click/" + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
@@ -134,7 +139,27 @@ async function clickItem(modelName: string) {
           console.log("test");
           startConversation(modelName);
           break;
+        case Operation.COLLECT:
+          console.log("Item ", modelId, " deleted");
+          // "/lobby/{lobbyKey}/item/{itemId}"
+          console.log('GameState lobbyKey: ', gameState.lobbyKey)
+          removeItemFromTile(gameState.lobbyKey, itemId);
+          break;
       }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+async function removeItemFromTile(lobbyKey: string, itemId: string) {
+  fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
+    method: "DELETE",
+    headers: { "Content-Type": "text/plain" },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
     })
     .catch((error) => {
       console.error(error);

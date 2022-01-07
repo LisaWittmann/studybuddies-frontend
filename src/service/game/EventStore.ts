@@ -79,20 +79,8 @@ stompClient.onConnect = () => {
 
           break;
         case "CLICK":
-          console.log("COLLECTING IN ", gameState.lobbyKey);
-          console.log("FE TILE MAP: ", gameState.labyrinth.tileMap);
-          console.log("EVENT MESSAGE DATA: ", eventMessage.data);
-
-          console.log("gamestate tilemap: ", gameState.labyrinth.tileMap);
-          updateGameData();
-          console.log("FE TILE MAP AFTER: ", gameState.labyrinth.tileMap);
-          break;
-        case "COLLECT":
-          {
-            console.log("ITEM COLLECTED ", eventMessage.data);
-            const collectedItem = JSON.parse(eventMessage.data) as Item;
-            updatePlayerInventory(collectedItem);
-          }
+          // Item needs to disappear
+          updateLabyrinths();
           break;
         case "CHAT":
           break;

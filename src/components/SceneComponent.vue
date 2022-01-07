@@ -61,12 +61,16 @@ export default defineComponent({
       removeEventListener("resize", updateScene);
     });
 
-    watch([props.labyrinth, props.player, props.partner], () => {
-      console.log("updating scene");
-      updateLabyrinth(props.labyrinth, props.player, scene);
-      updatePlayer(props.player, scene);
-      updatePlayer(props.partner, scene);
-    }, { deep: true });
+    watch(
+      [props.labyrinth, props.player, props.partner],
+      () => {
+        console.log("updating scene");
+        updateLabyrinth(props.labyrinth, props.player, scene);
+        updatePlayer(props.player, scene);
+        updatePlayer(props.partner, scene);
+      },
+      { deep: true }
+    );
 
     return { onClick };
   },

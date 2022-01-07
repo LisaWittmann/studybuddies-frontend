@@ -147,7 +147,7 @@ function getIntersections(context: SetupContext, x: number, y: number) {
       if (object.parent.userData.modelName == "COMPUTER") {
         context.emit("click-disabled");
       }
-      context.emit("click-object", object.parent.userData.modelName);
+      context.emit("click-object", object.parent.name);
     } else if (object.parent?.userData.showInView) {
       context.emit("move-player", object.parent.userData.orientation);
     }
