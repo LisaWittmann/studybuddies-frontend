@@ -7,7 +7,7 @@ import { Item, Position } from "../labyrinth/Item";
 import { Tile } from "../labyrinth/Tile";
 import { MainPlayer } from "./Player";
 
-const { updatePlayerInventory } = useGameStore();
+const { updateInventory } = useGameStore();
 
 const gameEventMessage = reactive({
   message: "",
@@ -182,7 +182,7 @@ async function addToInventory(
       console.log(jsonData);
       let inventory = new Array<Item>();
       inventory = jsonData;
-      updatePlayerInventory(username, inventory);
+      updateInventory(inventory);
     })
     .catch((error) => {
       console.error(error);

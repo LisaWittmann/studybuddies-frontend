@@ -8,14 +8,8 @@ import { useLabyrinthStore } from "../labyrinth/LabyrinthStore";
 import { VectorKeyframeTrack } from "three";
 import { Item } from "../labyrinth/Item";
 
-const {
-  gameState,
-  updatePlayerData,
-  updatePlayerInventory,
-  setError,
-  setPlayerData,
-  updateGameData,
-} = useGameStore();
+const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
+  useGameStore();
 const {
   updateUsers,
   setupGame,

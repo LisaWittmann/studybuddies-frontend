@@ -67,6 +67,12 @@ function updatePlayerData(username: string, newPosition: number) {
   }
 }
 
+async function updateInventory(inventory: Array<Item>) {
+  console.log(inventory);
+  gameState.mainPlayer.setInventory(inventory);
+  console.log("INVENTORY", gameState.mainPlayer.getInventory());
+}
+
 /**
  * sets a Player with its username and the startTileId
  * @param username : name of the user to improve identification between Main- and Partnerplayer
@@ -80,12 +86,6 @@ async function setPlayerData(username: string, startTileId: number) {
   } else {
     gameState.partnerPlayer = new PartnerPlayer(username, startTileId);
   }
-}
-
-async function updatePlayerInventory(username: string, inventory: Array<Item>) {
-  const mainPlayer = gameState.mainPlayer;
-
-  console.log("INVENTORY", mainPlayer.getInventory());
 }
 
 async function setLobbyKey(lobbyKey: string) {
@@ -110,7 +110,7 @@ export function useGameStore() {
     setGameState,
     updateGameData,
     updatePlayerData,
-    updatePlayerInventory,
+    updateInventory,
     setPlayerData,
     setLobbyKey,
     setError,

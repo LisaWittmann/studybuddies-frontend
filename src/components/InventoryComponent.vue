@@ -3,7 +3,7 @@
   <transition name="slide-fade">
     <div class="inventory-box" v-if="isOpen">
         <div class="inventory">
-          <div v-for="item in inventory" :key="item" class="inventory-item-box">
+          <div v-for="item in mainPlayer.inventory" :key="item" class="inventory-item-box">
             <img class="item-img" :src="getImgUrl(item.modelName)" :alt="item.modelName" width="300"/>
           </div>
 
@@ -31,7 +31,7 @@ export default defineComponent({
     let isOpen = ref(false);
 
     //casting because playerMap only holds type Player -> here we only need MainPlayer
-    const mainPlayer = ref(gameState.mainPlayer);
+    let mainPlayer = computed(() => gameState.mainPlayer);
     const inventory = ref(mainPlayer.value.getInventory());  
 
       //Whats in the inventory -> remove later
@@ -45,17 +45,13 @@ export default defineComponent({
      * creates image url
      */
     function getImgUrl(imgName : string){
-      return require('../assets/img/inventory/'+imgName+'.svg')  
+      return require('../assets/img/inventory/'+imgName.toLowerCase()+'.svg')  
     }
   /**
    * shows opened or closed backpack svg (inventory button) 
    */
     function toggleInventoryButton() {
-      console.log("INVENTAR inventory:");
-      for (let item of inventory.value){
-        console.log(item.modelName);
-      }
-       console.log("INVENTAR player:");
+      console.log("INVENTAR player:");
       for (let item of mainPlayer.value.getInventory()){
         console.log(item.modelName);
       }
@@ -66,7 +62,7 @@ export default defineComponent({
 
     return {
       mainPlayer,
-      inventory,
+      //inventory,
       getImgUrl,
       toggleInventoryButton,
       isOpen
