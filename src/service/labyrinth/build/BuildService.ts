@@ -174,12 +174,17 @@ function removeStartTile(model: TileModel) {
  * @param model tilemodel to set as endtile
  */
 function addEndTile(model: TileModel): void {
-  if (!model.relationKey || model.isStart || model.restrictions.length > 0)
+  if (
+    !model.relationKey ||
+    model.isStart ||
+    model.restrictions.length > 0 ||
+    model.getNeighborsAsList().length > 1 ||
+    buildState.endposition
+  ) {
     return;
-  if (!buildState.endposition) {
-    buildState.endposition = model.relationKey;
-    model.isEnd = true;
   }
+  buildState.endposition = model.relationKey;
+  model.isEnd = true;
 }
 
 /**
