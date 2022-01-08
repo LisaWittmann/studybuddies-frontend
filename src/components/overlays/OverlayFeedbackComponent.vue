@@ -5,7 +5,8 @@
         <section>
           <div class="column-wrapper">
             <h1>{{ headline }}</h1>
-            <p>{{ subLine }}</p>
+            <span class="error" v-if="error">{{ error }}</span>
+            <span v-else>{{ subLine }}</span>
             <transition name="delay-slow-fade" appear>
               <router-link
                 :to="link"
@@ -41,7 +42,11 @@ export default defineComponent({
     },
     subLine: {
       type: String,
-      required: true,
+      required: false,
+    },
+    error: {
+      type: String,
+      required: false,
     },
     link: {
       type: String,
@@ -51,14 +56,10 @@ export default defineComponent({
       type: String,
       default: "Jetzt spielen",
     },
-    reload: {
-      type: Boolean,
-      default: false,
-    },
   },
-  setup(props) {
+  setup(props, context) {
     const onClick = () => {
-      if (props.reload) history.go();
+      if (props.error) context.emit("close");
       else router.push(props.link);
     };
     return { onClick };

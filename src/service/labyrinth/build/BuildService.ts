@@ -262,13 +262,13 @@ function hasErrors(): Mode | undefined {
     return Mode.CREATE;
   } else if (buildState.startPositions.length != startPositions) {
     buildState.errorMessage = "Zu wenig Startfelder definiert";
-    return Mode.START;
+    return Mode.START_TILES;
   } else if (!buildState.endPosition) {
     buildState.errorMessage = "Ende noch nicht definiert";
-    return Mode.END;
+    return Mode.END_TILE;
   } else if (buildState.itemOptions.length > 0) {
     buildState.errorMessage = "Noch nicht alle Objekte platziert";
-    return Mode.ITEMS;
+    return Mode.ITEM_PLACEMENT;
   } else if (buildState.labyrinthName == null || buildState.labyrinthName.trim().length === 0) {
     buildState.errorMessage = "Name noch nicht vergeben";
     return Mode.LABYRINTH_NAME;
@@ -351,10 +351,15 @@ async function save(): Promise<string> {
     body: parseLabyrinth(labyrinth),
   })
     .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
       if (response.status === 409) {
-        buildState.errorMessage = "Name bereits vergeben";
+        buildState.errorMessage = "Name \"" + buildState.labyrinthName + "\" bereits vergeben";
+        throw new Error(response.statusText)
       }
+      else if (!response.ok) {
+        buildState.errorMessage = "Labyrinth ist invalide. Bitte prüfe es erneut";
+        throw new Error(response.statusText);
+      }
+
       return response.text();
     });
 }

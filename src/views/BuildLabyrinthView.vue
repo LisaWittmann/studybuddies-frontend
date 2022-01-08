@@ -58,19 +58,13 @@
       :subLine="feedback.subLine"
       :link="feedback.link"
       :linkText="feedback.linkText"
-      :reload="feedback.reload"
+      :error="feedback.error"
+      @close="closeFeedback"
   />
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  ref,
-  computed,
-  reactive,
-  onUnmounted,
-  watch, onMounted,
-} from "vue";
+import {computed, defineComponent, onUnmounted, reactive, ref, watch,} from "vue";
 import {useBuildService} from "@/service/labyrinth/build/BuildService";
 import {Mode, Role} from "@/service/labyrinth/build/BuildMode";
 
@@ -100,10 +94,10 @@ export default defineComponent({
 
     const modes = new Array<Mode>(
         Mode.CREATE,
-        Mode.START,
-        Mode.END,
-        Mode.RESTRICTIONS,
-        Mode.ITEMS,
+        Mode.START_TILES,
+        Mode.END_TILE,
+        Mode.RESTRICTION_PLACEMENT,
+        Mode.ITEM_PLACEMENT,
         Mode.LABYRINTH_NAME
     );
     const currentMode = ref(Mode.CREATE);
@@ -123,12 +117,12 @@ export default defineComponent({
       if (!zoomOutDisabled.value) tileSize.value -= zoomFactor;
     };
 
-    const restrictionMode = computed(() => currentMode.value == Mode.RESTRICTIONS);
+    const restrictionMode = computed(() => currentMode.value == Mode.RESTRICTION_PLACEMENT);
     const roleOptions = new Array<Role>(Role.DESIGNER, Role.HACKER);
     const currentRole = ref(0);
     const changeRole = (role: Role) => (currentRole.value = role);
 
-    const itemsMode = computed(() => currentMode.value == Mode.ITEMS);
+    const itemsMode = computed(() => currentMode.value == Mode.ITEM_PLACEMENT);
     const itemOptions = computed(() => buildState.itemOptions);
     setItemOptions().then(() => (currentItem.value = itemOptions.value[0]));
     const currentItem = ref(new ItemModel(""));
@@ -138,9 +132,9 @@ export default defineComponent({
       active: false,
       headline: "",
       subLine: "",
+      error: "",
       link: "",
       linkText: "",
-      reload: false,
     });
     const errorMessage = computed(() => buildState.errorMessage);
 
@@ -153,25 +147,34 @@ export default defineComponent({
             .then((name) => {
               feedback.active = true;
               feedback.headline = "Gespeichert";
-              feedback.subLine = `Dein Labyrinth wurde gespeichert unter dem Namen ${name}`;
+              feedback.subLine = `Dein Labyrinth wurde unter dem Namen ${name} gespeichert`;
+              feedback.error = "";
               feedback.link = "/find";
               feedback.linkText = "Jetzt spielen";
-              feedback.reload = false;
               reset();
-              sessionStorage.setItem("buildState", "");
             })
             .catch(() => {
-              console.log(buildState.errorMessage);
-              sessionStorage.setItem("buildState", JSON.stringify(buildState));
               feedback.active = true;
               feedback.headline = "Fehler";
-              feedback.subLine =
-                  "Leider ist etwas schief gelaufen. Bitte versuche es noch einmal";
-              feedback.link = "/build";
-              feedback.linkText = "Zurück";
-              feedback.reload = true;
+              feedback.error = buildState.errorMessage;
+              feedback.linkText = "Zurück zur Bearbeitung";
             });
       }
+    }
+
+    function resetFeedback() {
+      feedback.active = false;
+      feedback.headline = "";
+      feedback.subLine = "";
+      feedback.error = "";
+      feedback.link = "";
+      feedback.linkText = "";
+    }
+
+    function closeFeedback() {
+      if (buildState.errorMessage.includes("vergeben")) currentMode.value = Mode.LABYRINTH_NAME;
+      else currentMode.value = Mode.CREATE;
+      resetFeedback();
     }
 
     watch(
@@ -182,9 +185,6 @@ export default defineComponent({
         {deep: true}
     );
 
-    onMounted(() => {
-      //TODO parse buildState to safe editor data
-    })
     onUnmounted(() => {
       updateTileModels();
       feedback.active = false;
@@ -209,7 +209,8 @@ export default defineComponent({
       changeItem,
       onComplete,
       feedback,
-      errorMessage
+      errorMessage,
+      closeFeedback
     };
   },
 });

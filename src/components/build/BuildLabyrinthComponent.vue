@@ -1,7 +1,7 @@
 <template>
-  <div v-if="nameMode">
-    <h1>Labyrinth benennen</h1>
-    <input class="input--small" type="text" v-model="labyrinthName" @change="updateName"/>
+  <div v-if="nameMode" class="column-wrapper labyrinth-name-mode">
+      <h1>Labyrinth benennen</h1>
+      <input class="input--small" type="text" v-model="labyrinthName" @change="updateName"/>
   </div>
   <div v-else class="labyrinth-canvas">
     <div class="labyrinth-canvas__row" v-for="row in rows" :key="row">
@@ -84,7 +84,7 @@ export default defineComponent({
     );
 
     const onEnter = (model: TileModel) => {
-      if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTIONS) return;
+      if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTION_PLACEMENT) return;
       if (mousedown) onClick(model);
     };
 
@@ -95,19 +95,19 @@ export default defineComponent({
           selectTile(model);
           break;
         }
-        case Mode.START: {
+        case Mode.START_TILES: {
           addStartTile(model);
           break;
         }
-        case Mode.END: {
+        case Mode.END_TILE: {
           addEndTile(model);
           break;
         }
-        case Mode.RESTRICTIONS: {
+        case Mode.RESTRICTION_PLACEMENT: {
           addRestriction(model, props.role);
           break;
         }
-        case Mode.ITEMS: {
+        case Mode.ITEM_PLACEMENT: {
           addItem(model, props.item);
           break;
         }
@@ -136,6 +136,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.labyrinth-name-mode {
+  height: 100%;
+}
 .labyrinth-canvas {
   @include flex-center();
   flex-direction: column;
