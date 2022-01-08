@@ -15,11 +15,11 @@ export class Vector2 {
   }
 
   getNorth(): Vector2 {
-    return new Vector2(this.x, this.y + 1);
+    return new Vector2(this.x, this.y - 1);
   }
 
   getSouth(): Vector2 {
-    return new Vector2(this.x, this.y - 1);
+    return new Vector2(this.x, this.y + 1);
   }
 
   getEast(): Vector2 {

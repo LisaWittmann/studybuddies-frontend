@@ -31,9 +31,9 @@ export const axis = {
  */
 export const direction = {
   north: readonly(vector(0, 0, -1)),
-  east: readonly(vector(-1, 0, 0)),
+  east: readonly(vector(1, 0, 0)),
   south: readonly(vector(0, 0, 1)),
-  west: readonly(vector(1, 0, 0)),
+  west: readonly(vector(-1, 0, 0)),
 };
 
 /**
