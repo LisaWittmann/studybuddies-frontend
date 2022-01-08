@@ -8,7 +8,7 @@ import { settings } from "@/service/scene/helper/SceneConstants";
  * creates a group of objects representing a tile
  * @param tileKey: index of tile in the labyrinth
  * @param tile: representing tile data
- * @param position: position in scene
+ * @param tilePosition: position in scene
  * @param role: role of main player
  * @param neighbors: neighbor tiles with orientations
  * @param color: color of all walls
@@ -17,7 +17,7 @@ import { settings } from "@/service/scene/helper/SceneConstants";
 function createTile(
   tileKey: number,
   tile: Tile,
-  position: THREE.Vector3,
+  tilePosition: THREE.Vector3,
   role: Role | undefined,
   neighbors: Map<Orientation, Tile | undefined>,
   color = 0xa9a9a9
@@ -37,34 +37,34 @@ function createTile(
   const tileRestricted = tile.isRestrictedFor(role);
 
   //LIGHT-----------------
-  tileModel.add(createLight(position));
+  tileModel.add(createLight(tilePosition));
 
   //STATIC-ITEMS----------
-  createCeiling(position, tileModel, color);
-  createFloor(position, tileKey, tileModel, color);
+  createCeiling(tilePosition, tileModel, color);
+  createFloor(tilePosition, tileModel, tileKey, color);
   if (tileRestricted) {
     neighbors.forEach((neighbor, orientation) => {
       if (!neighbor) {
-        createTexturedWall(orientation, position, tileModel, color);
+        createTexturedWall(tilePosition, tileModel, orientation, color);
       }
     });
   } else {
     neighbors.forEach((neighbor, orientation) => {
       if (!neighbor) {
-        createTexturedWall(orientation, position, tileModel, color);
+        createTexturedWall(tilePosition, tileModel, orientation, color);
       } else if (!neighbor.isRestrictedFor(role)) {
         //arrow if there are no restrictions for the player in relation to the current tile
-        createArrow(orientation, position, tileModel, role);
+        createArrow(tilePosition, tileModel, orientation, role);
       } else {
         //transparent wall if restricted zone is starting in the current orientation
-        createRestrictiveWall(tileModel, orientation, position, color);
+        createRestrictiveWall(tilePosition, tileModel, orientation, color);
       }
     });
   }
 
   //ITEMS-----------------
   for (const item of tile.objectsInRoom) {
-    createItem(item, tileModel, position);
+    createItem(tilePosition, tileModel, item);
   }
   return tileModel;
 }

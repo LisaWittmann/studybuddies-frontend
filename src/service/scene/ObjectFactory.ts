@@ -7,24 +7,20 @@ import { Orientation } from "@/service/labyrinth/Tile";
 import { Arrow, Wall } from "@/service/labyrinth/FixedObject";
 import { PartnerPlayer, Role } from "@/service/game/Player";
 
-import {
-  settings,
-  factors,
-  colors,
-} from "@/service/scene/helper/SceneConstants";
+import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 import { DoubleSide, Texture, TextureLoader } from "three";
 
 /**
  * creates item by loading its obj representation from models directory
+ * @param tilePosition: position of parent object
+ * @param tileModel: group or scene object will be added to after loading
  * @param item: item that should be loaded and added to scene
- * @param parent: group or scene object will be added to after loading
- * @param position: position of parent object
  */
 async function createItem(
-  item: Item,
-  parent: THREE.Group | THREE.Scene,
-  position: THREE.Vector3
+  tilePosition: THREE.Vector3,
+  tileModel: THREE.Group | THREE.Scene,
+  item: Item
 ) {
   const model = item.modelName.toLowerCase();
   let factor = 1;
@@ -37,7 +33,7 @@ async function createItem(
     materials.preload();
     objLoader.setMaterials(materials);
     objLoader.loadAsync(`/models/${model}.obj`).then((object) => {
-      object.position.copy(item.calcPositionInRoom().add(position));
+      object.position.copy(item.calcPositionInRoom().add(tilePosition));
       //get object size before rotation
       const box = new THREE.Box3().setFromObject(object);
       box.getSize(size);
@@ -51,7 +47,7 @@ async function createItem(
       object.userData = item;
       object.userData.clickable = true;
       object.name = "item " + item.modelName;
-      parent.add(object);
+      tileModel.add(object);
     });
   });
 }
@@ -59,15 +55,15 @@ async function createItem(
 /**
  * creates plane representing tile's floor
  * contains tile position and userData
- * @param position: tile position
- * @param key: index of current tile
- * @param color: floor color in hex-code
- * @returns THREE.Mesh representation of floor
+ * @param tilePosition: tile position
+ * @param tileModel: parent tile to which object should be added after loading
+ * @param tileKey: index of current tile
+ * @param color: color in hex-code
  */
 function createFloor(
-  position: THREE.Vector3,
-  key: number,
-  parent: THREE.Group,
+  tilePosition: THREE.Vector3,
+  tileModel: THREE.Group,
+  tileKey: number,
   color = 0x199eb0
 ) {
   const textureLoader = new TextureLoader();
@@ -81,23 +77,23 @@ function createFloor(
         color: color,
       })
     );
-    object.position.copy(position);
-    object.userData.tileKey = key;
+    object.position.copy(tilePosition);
+    object.userData.tileKey = tileKey;
     object.rotateX(radians(90));
     object.name = "floor";
-    parent.add(object);
+    tileModel.add(object);
   });
 }
 
 /**
  * creates plane representing tile's ceiling
- * @param position: tile position
- * @param color: floor color in hex-code
- * @returns THREE.Mesh representation of ceiling
+ * @param tilePosition: tile position
+ * @param tileModel: parent tile to which object should be added after loading
+ * @param color: color in hex-code
  */
 function createCeiling(
-  position: THREE.Vector3,
-  parent: THREE.Group,
+  tilePosition: THREE.Vector3,
+  tileModel: THREE.Group,
   color = 0x199eb0
 ) {
   const textureLoader = new TextureLoader();
@@ -111,25 +107,28 @@ function createCeiling(
         color: color,
       })
     );
-    object.position.set(position.x, position.y + settings.tileSize, position.z);
+    object.position.set(
+      tilePosition.x,
+      tilePosition.y + settings.tileSize,
+      tilePosition.z
+    );
     object.rotateX(radians(90));
     object.name = "ceiling";
-    parent.add(object);
+    tileModel.add(object);
   });
 }
 
 /**
- * creates plane representing tile's wall on given orientation
- * @param orientation: orientation which wall should be placed and aligned on
+ * creates textured plane representing tile's wall on given orientation
  * @param tilePosition: position of parent tile
+ * @param tileModel: parent tile to which object should be added
+ * @param orientation: orientation which wall should be placed and aligned on
  * @param color: wall color in hex-code
- * @param opacity: opacity as decimal of mesh
- * @returns THREE.Mesh representation of wall
  */
 function createTexturedWall(
-  orientation: Orientation,
   tilePosition: THREE.Vector3,
-  parent: THREE.Group,
+  tileModel: THREE.Group,
+  orientation: Orientation,
   color = 0x199eb0
 ) {
   const wall = new Wall(orientation, tilePosition);
@@ -149,14 +148,22 @@ function createTexturedWall(
     object.rotateY(wall.rotationY());
     object.userData = wall;
     object.name = "wall";
-    parent.add(object);
+    tileModel.add(object);
   });
 }
 
+/**
+ * creates plane representing tile's wall on given orientation
+ * @param tilePosition: position of parent tile
+ * @param tileModel: parent tile to which object should be added after loading
+ * @param orientation: orientation which wall should be placed and aligned on
+ * @param color: wall color in hex-code
+ * @param opacity: opacity as decimal of mesh
+ */
 function createWall(
-  orientation: Orientation,
   tilePosition: THREE.Vector3,
-  parent: THREE.Group,
+  tileModel: THREE.Group,
+  orientation: Orientation,
   color = 0x199eb0,
   opacity = 1
 ) {
@@ -175,22 +182,23 @@ function createWall(
   object.rotateY(wall.rotationY());
   object.userData = wall;
   object.name = "wall";
-  parent.add(object);
+  tileModel.add(object);
 }
 
 /**
  * creates optical restriction wall for user that isn't allowed to enter this area
+ * @param tilePosition position of parent tile
  * @param tileModel contains TileGroup to add image of restriction
  * @param orientation orientation which restriction wall should be placed and aligned on
- * @param tilePosition position of parent tile
+ * @param opacity: opacity as decimal of mesh
  */
 function createRestrictiveWall(
+  tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
   orientation: Orientation,
-  tilePosition: THREE.Vector3,
   color = 0x199eb0
 ) {
-  createWall(orientation, tilePosition, tileModel, color, 0.5);
+  createWall(tilePosition, tileModel, orientation, color, 0.5);
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
@@ -217,15 +225,15 @@ function createRestrictiveWall(
 
 /**
  * creates an arrow object that is aligned and directs to given orientation
- * @param orientation: orientation arrow should direct to
  * @param tilePosition: position of parent tile
- * @param parent group on which arrow is placed
- * @returns: clickable arrow representation
+ * @param tileModel group on which arrow is placed
+ * @param orientation: orientation arrow should direct to
+ * @param role: Role of main player
  */
 function createArrow(
-  orientation: Orientation,
   tilePosition: THREE.Vector3,
-  parent: THREE.Group,
+  tileModel: THREE.Group,
+  orientation: Orientation,
   role: Role | undefined
 ) {
   const arrow = new Arrow(orientation, tilePosition, role);
@@ -242,7 +250,7 @@ function createArrow(
       }
     });
     object.name = "arrow";
-    parent.add(object);
+    tileModel.add(object);
   });
 }
 
@@ -250,12 +258,12 @@ function createArrow(
  * creates a new partner player representation
  * appearance of player is defined by its role
  * @param player: player that should be represented
- * @param position: global position of player
+ * @param tilePosition: global position of player
  * @param parent: scene or group to which player should be added
  */
 async function createPlayer(
   player: PartnerPlayer,
-  position: THREE.Vector3,
+  tilePosition: THREE.Vector3,
   parent: THREE.Scene | THREE.Group
 ) {
   let model = "squirrel";
@@ -275,9 +283,9 @@ async function createPlayer(
     objLoader.loadAsync(`/models/${model}.obj`).then((object) => {
       object.userData.username = player.getUsername();
       object.name = player.getUsername();
-      object.position.copy(position);
+      object.position.copy(tilePosition);
       object.rotateY(90);
-      const newPos = checkIntersect(object, player, position, parent);
+      const newPos = checkIntersect(object, player, tilePosition, parent);
       object.position.copy(newPos);
       parent.add(object);
     });
