@@ -43,7 +43,7 @@ export default defineComponent({
   props: {
     key: { type: String, required: true },
   },
-  setup() {
+  setup(_, { emit }) {
     const { gameState, getGameSessionStorage, updateGameData, setLobbyKey } =
       useGameStore();
     const {
@@ -61,6 +61,7 @@ export default defineComponent({
     const partnerPlayer = computed(() => gameState.partnerPlayer);
 
     onMounted(async () => {
+      emit("volume", 0.1);
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       updateGameData();
