@@ -39,8 +39,8 @@ function setLobbyState(
     lobbyState.selectedLabyrinth = JSON.parse(selectedLabyrinth) as number;
   if (labyrinthOptions)
     lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
-  if (errormessage) lobbyState.errormessage = JSON.parse(errormessage);
-  if (selectedRole) lobbyState.selectedRole = JSON.parse(selectedRole);
+  if (errormessage) lobbyState.errormessage = errormessage;
+  if (selectedRole) lobbyState.selectedRole = selectedRole;
 }
 
 function setLobbySessionStorage() {
@@ -55,11 +55,11 @@ function setLobbySessionStorage() {
   );
   sessionStorage.setItem(
     "errormessage",
-    JSON.stringify(lobbyState.errormessage)
+    lobbyState.errormessage
   );
   sessionStorage.setItem(
     "selectedRole",
-    JSON.stringify(lobbyState.selectedRole)
+    lobbyState.selectedRole
   );
 }
 
