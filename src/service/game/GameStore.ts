@@ -42,22 +42,22 @@ function setGameState(
 }
 
 function setGameSessionStorage() {
-  sessionStorage.setItem("lobbyKey", JSON.stringify(gameState.lobbyKey)),
-    sessionStorage.setItem(
-      "selectedLabyrinth",
-      JSON.stringify(gameState.labyrinthId)
-    ),
-    sessionStorage.setItem("labyrinth", JSON.stringify(gameState.labyrinth)),
-    sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer)),
-    sessionStorage.setItem(
+  sessionStorage.setItem("lobbyKey", JSON.stringify(gameState.lobbyKey));
+  sessionStorage.setItem(
+      "selectedLabyrinthName",
+      JSON.stringify(gameState.labyrinthName)
+  );
+  sessionStorage.setItem("labyrinth", JSON.stringify(gameState.labyrinth));
+  sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer));
+  sessionStorage.setItem(
       "partnerPlayer",
       JSON.stringify(gameState.partnerPlayer)
-    ),
-    sessionStorage.setItem(
+  );
+  sessionStorage.setItem(
       "errormessage",
       JSON.stringify(gameState.errormessage)
-    ),
-    sessionStorage.setItem("score", JSON.stringify(gameState.score));
+  );
+  sessionStorage.setItem("score", JSON.stringify(gameState.score));
 }
 
 function getGameSessionStorage() {
