@@ -227,7 +227,7 @@ export default defineComponent({
 
   &__tool {
     position: absolute;
-    z-index: 2;
+    z-index: 6;
     bottom: 100px;
     right: 0;
     font-size: $headline-xl;

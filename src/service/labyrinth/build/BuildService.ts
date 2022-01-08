@@ -62,7 +62,7 @@ function setDimension(rows: number, columns: number): void {
 }
 
 async function setItemOptions() {
-  await fetch("/api/labyrinth/bodies")
+  await fetch("/api/labyrinth/placeable-bodies")
     .then((response) => response.json())
     .then((jsonData) => {
       for (const name of jsonData) {
