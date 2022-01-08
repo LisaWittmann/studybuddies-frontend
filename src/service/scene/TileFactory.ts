@@ -26,7 +26,7 @@ function createTile(
     createFloor,
     createCeiling,
     createArrow,
-    createWall,
+    createTexturedWall,
     createRestrictiveWall,
     createItem,
   } = useObjectFactory();
@@ -34,6 +34,7 @@ function createTile(
   tileModel.userData = tile;
   tileModel.userData.tileId = tileKey;
   tileModel.name = tileKey.toString();
+  const tileRestricted = tile.isRestrictedFor(role);
 
   //LIGHT-----------------
   tileModel.add(createLight(position));
@@ -41,17 +42,25 @@ function createTile(
   //STATIC-ITEMS----------
   createCeiling(position, tileModel, color);
   createFloor(position, tileKey, tileModel, color);
-  neighbors.forEach((neighbor, orientation) => {
-    if (!neighbor) {
-      createWall(orientation, position, tileModel, color);
-    } else if (!neighbor.isRestrictedFor(role)) {
-      //arrow if there are no restrictions for the player in relation to the current tile
-      createArrow(orientation, position, tileModel);
-    } else {
-      //transparent wall if restricted zone is starting in the current orientation
-      createRestrictiveWall(tileModel, orientation, position, color);
-    }
-  });
+  if (tileRestricted) {
+    neighbors.forEach((neighbor, orientation) => {
+      if (!neighbor) {
+        createTexturedWall(orientation, position, tileModel, color);
+      }
+    });
+  } else {
+    neighbors.forEach((neighbor, orientation) => {
+      if (!neighbor) {
+        createTexturedWall(orientation, position, tileModel, color);
+      } else if (!neighbor.isRestrictedFor(role)) {
+        //arrow if there are no restrictions for the player in relation to the current tile
+        createArrow(orientation, position, tileModel, role);
+      } else {
+        //transparent wall if restricted zone is starting in the current orientation
+        createRestrictiveWall(tileModel, orientation, position, color);
+      }
+    });
+  }
 
   //ITEMS-----------------
   for (const item of tile.objectsInRoom) {

@@ -7,7 +7,11 @@ import { Orientation } from "@/service/labyrinth/Tile";
 import { Arrow, Wall } from "@/service/labyrinth/FixedObject";
 import { PartnerPlayer, Role } from "@/service/game/Player";
 
-import { settings, factors, colors } from "@/service/scene/helper/SceneConstants";
+import {
+  settings,
+  factors,
+  colors,
+} from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 import { DoubleSide, Texture, TextureLoader } from "three";
 
@@ -91,7 +95,11 @@ function createFloor(
  * @param color: floor color in hex-code
  * @returns THREE.Mesh representation of ceiling
  */
-function createCeiling(position: THREE.Vector3, parent: THREE.Group, color = 0x199eb0) {
+function createCeiling(
+  position: THREE.Vector3,
+  parent: THREE.Group,
+  color = 0x199eb0
+) {
   const textureLoader = new TextureLoader();
   textureLoader.load("/textures/CeilingTexture.png", (texture: Texture) => {
     texture.minFilter = THREE.NearestFilter;
@@ -118,7 +126,7 @@ function createCeiling(position: THREE.Vector3, parent: THREE.Group, color = 0x1
  * @param opacity: opacity as decimal of mesh
  * @returns THREE.Mesh representation of wall
  */
-function createWall(
+function createTexturedWall(
   orientation: Orientation,
   tilePosition: THREE.Vector3,
   parent: THREE.Group,
@@ -145,6 +153,31 @@ function createWall(
   });
 }
 
+function createWall(
+  orientation: Orientation,
+  tilePosition: THREE.Vector3,
+  parent: THREE.Group,
+  color = 0x199eb0,
+  opacity = 1
+) {
+  const wall = new Wall(orientation, tilePosition);
+  const position = baseline(wall.position(), settings.tileSize);
+  const object = new THREE.Mesh(
+    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
+    new THREE.MeshStandardMaterial({
+      side: DoubleSide,
+      color: color,
+      transparent: opacity < 1,
+      opacity: opacity,
+    })
+  );
+  object.position.copy(position);
+  object.rotateY(wall.rotationY());
+  object.userData = wall;
+  object.name = "wall";
+  parent.add(object);
+}
+
 /**
  * creates optical restriction wall for user that isn't allowed to enter this area
  * @param tileModel contains TileGroup to add image of restriction
@@ -157,6 +190,7 @@ function createRestrictiveWall(
   tilePosition: THREE.Vector3,
   color = 0x199eb0
 ) {
+  createWall(orientation, tilePosition, tileModel, color, 0.5);
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
@@ -191,9 +225,10 @@ function createRestrictiveWall(
 function createArrow(
   orientation: Orientation,
   tilePosition: THREE.Vector3,
-  parent: THREE.Group
+  parent: THREE.Group,
+  role: Role | undefined
 ) {
-  const arrow = new Arrow(orientation, tilePosition);
+  const arrow = new Arrow(orientation, tilePosition, role);
   const objLoader = new OBJLoader();
   objLoader.loadAsync("/models/arrow.obj").then((object) => {
     object.position.copy(arrow.position());
@@ -365,6 +400,7 @@ export function useObjectFactory() {
   return {
     createArrow,
     createWall,
+    createTexturedWall,
     createRestrictiveWall,
     createCeiling,
     createFloor,
