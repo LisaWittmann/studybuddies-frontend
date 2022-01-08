@@ -15,11 +15,11 @@ export class Vector2 {
   }
 
   getNorth(): Vector2 {
-    return new Vector2(this.x, this.y + 1);
+    return new Vector2(this.x, this.y - 1);
   }
 
   getSouth(): Vector2 {
-    return new Vector2(this.x, this.y - 1);
+    return new Vector2(this.x, this.y + 1);
   }
 
   getEast(): Vector2 {
@@ -79,6 +79,14 @@ export class TileModel {
     );
   }
 
+  getNeighborsAsList(): Array<TileModel> {
+    const neighborList = new Array<TileModel>();
+    for (const tile of this.tileRelationMap.values()) {
+      if (tile?.relationKey) neighborList.push(tile);
+    }
+    return neighborList;
+  }
+
   getNeighborPosition(orientation: Orientation): Vector2 {
     switch (orientation) {
       case Orientation.NORTH:
@@ -97,10 +105,10 @@ export class TileModel {
       [Orientation.NORTH, Orientation.EAST],
       [Orientation.EAST, Orientation.SOUTH],
       [Orientation.SOUTH, Orientation.WEST],
-      [Orientation.WEST, Orientation.NORTH]
+      [Orientation.NORTH, Orientation.WEST]
     );
-    for (const [orientation, relationKey] of this.tileRelationMap) {
-      if (!relationKey) this.placements.push([orientation]);
+    for (const [orientation, tile] of this.tileRelationMap) {
+      if (!tile?.relationKey) this.placements.push([orientation]);
     }
   }
 

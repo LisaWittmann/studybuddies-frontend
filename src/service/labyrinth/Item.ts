@@ -100,13 +100,13 @@ export class Item {
           viewDirection += 0;
           break;
         case Orientation.EAST:
-          viewDirection += 90;
+          viewDirection += 270;
           break;
         case Orientation.SOUTH:
           viewDirection += 180;
           break;
         case Orientation.WEST:
-          viewDirection += 270;
+          viewDirection += 90;
           break;
       }
     });

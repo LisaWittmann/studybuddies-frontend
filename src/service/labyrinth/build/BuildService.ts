@@ -66,7 +66,7 @@ function setDimension(rows: number, columns: number): void {
 }
 
 async function setItemOptions() {
-  await fetch("/api/labyrinth/bodies")
+  await fetch("/api/labyrinth/placeable-bodies")
     .then((response) => response.json())
     .then((jsonData) => {
       for (const name of jsonData) {
@@ -178,12 +178,16 @@ function removeStartTile(model: TileModel) {
  * @param model tile model to set as end tile
  */
 function addEndTile(model: TileModel): void {
-  if (!model.relationKey || model.isStart || model.restrictions.length > 0)
+  if (
+    !model.relationKey ||
+    model.isStart ||
+    model.restrictions.length > 0 ||
+    model.getNeighborsAsList().length > 1
+  ) {
     return;
-  if (!buildState.endPosition) {
-    buildState.endPosition = model.relationKey;
-    model.isEnd = true;
   }
+  buildState.endPosition = model.relationKey;
+  model.isEnd = true;
 }
 
 /**
@@ -217,6 +221,10 @@ function removeRestriction(model: TileModel, role: Role): void {
   model.restrictions = model.restrictions?.filter((element) => element != role);
 }
 
+/**
+ * overwrite current labyrinthName with new one
+ * @param labyrinthName contains the new name for the labyrinth
+ */
 function setName(labyrinthName: string): void {
   buildState.labyrinthName = labyrinthName;
 }
@@ -256,7 +264,6 @@ function removeItem(model: TileModel, item: ItemModel): void {
  * @returns build mode that contains errors or undefined
  */
 function hasErrors(): Mode | undefined {
-  debugger;
   if (selectedTiles.value.length < minTiles) {
     buildState.errorMessage = "Labyrinth ist zu klein";
     return Mode.CREATE;

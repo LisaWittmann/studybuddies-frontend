@@ -85,7 +85,7 @@ function calculatePartnerPositon(
   const directionVector = new Vector3();
 
   //gets all orientations/positions of items in tile
-  if (tileItems && tileItems?.length > 1) {
+  if (tileItems && tileItems?.length >= 1) {
     tileItems.forEach((item) => {
       itemOrientations.push(item.orientations.toString().replace(",", ""));
     });

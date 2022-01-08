@@ -26,11 +26,11 @@ class FixedObject {
       case Orientation.NORTH:
         return radians(0);
       case Orientation.EAST:
-        return radians(90);
+        return radians(270);
       case Orientation.SOUTH:
         return radians(180);
       case Orientation.WEST:
-        return radians(270);
+        return radians(90);
     }
   };
 
