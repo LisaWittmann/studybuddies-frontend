@@ -3,7 +3,7 @@
   <transition name="slide-fade">
     <div class="inventory-box" v-if="isOpen">
         <div class="inventory">
-          <div v-for="item in mainPlayer.inventory" :key="item" class="inventory-item-box">
+          <div v-for="item in inventory" :key="item" class="inventory-item-box">
             <img class="item-img" :src="getImgUrl(item.modelName)" :alt="item.modelName" width="300"/>
           </div>
 
@@ -16,9 +16,6 @@
 import { computed, defineComponent, reactive, ref } from "vue";
 
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "@/service/login/LoginStore";
-import { MainPlayer } from "@/service/game/Player";
-import { Item } from "@/service/labyrinth/Item";
 
 
 export default defineComponent({
@@ -32,7 +29,7 @@ export default defineComponent({
 
     //casting because playerMap only holds type Player -> here we only need MainPlayer
     let mainPlayer = computed(() => gameState.mainPlayer);
-    const inventory = ref(mainPlayer.value.getInventory());  
+    let inventory = computed(() => mainPlayer.value.getInventory());  
 
       //Whats in the inventory -> remove later
       console.log("INVENTAR:");
@@ -62,7 +59,7 @@ export default defineComponent({
 
     return {
       mainPlayer,
-      //inventory,
+      inventory,
       getImgUrl,
       toggleInventoryButton,
       isOpen
