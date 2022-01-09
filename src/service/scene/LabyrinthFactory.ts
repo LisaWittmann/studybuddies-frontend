@@ -11,12 +11,15 @@ import {
   direction,
   settings,
 } from "@/service/scene/helper/SceneConstants";
+import { useGameStore } from "../game/GameStore";
 
 const { createTile } = useTileFactory();
 const { updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
+const { gameState } = useGameStore();
 
 const storedTiles = new Map<number, THREE.Vector3>();
 let labyrinthInitialized = false;
+let gameScene = new THREE.Scene();
 
 /**
  * gets map of all tiles of a Labyrinth
@@ -31,6 +34,8 @@ async function updateLabyrinth(
   player: MainPlayer,
   scene: THREE.Scene
 ) {
+  gameScene = scene;
+
   if (labyrinthInitialized) return;
   labyrinthInitialized = true;
   const position = vector(0, 0, 0);
@@ -42,6 +47,22 @@ async function updateLabyrinth(
       await placeTile(position, value, key, role, neighbors, scene);
     }
   }
+}
+
+// Documentation
+function deleteItemFromTile(itemId: string, objectName: string) {
+  gameScene.children.forEach((tileObject) => {
+    tileObject.children.forEach((itemObject) => {
+      if (
+        itemObject.name.includes(itemId) &&
+        itemObject.name.includes(objectName)
+      ) {
+        gameScene
+          .getObjectByName("item " + objectName + " id " + itemId)
+          ?.clear();
+      }
+    });
+  });
 }
 
 /**
@@ -187,5 +208,6 @@ export function useLabyrinthFactory() {
   return {
     updateLabyrinth,
     updatePlayer,
+    deleteItemFromTile,
   };
 }

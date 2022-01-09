@@ -11,14 +11,6 @@ import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 import { DoubleSide, Texture, TextureLoader } from "three";
 
-const objectLoader = new OBJLoader();
-const materialLoader = new MTLLoader();
-const textureLoader = new TextureLoader();
-
-objectLoader.setPath("/models/");
-materialLoader.setPath("/models/");
-textureLoader.setPath("/models/");
-
 /**
  * creates item by loading its obj representation from models directory
  * @param item: item that should be loaded and added to scene
@@ -34,10 +26,13 @@ async function createItem(
   let factor = 1;
   const size = new THREE.Vector3();
 
-  await materialLoader.loadAsync("materials.mtl").then((materials) => {
+  const objLoader = new OBJLoader();
+  const mtlLoader = new MTLLoader();
+
+  await mtlLoader.loadAsync(`/materials/${model}.mtl`).then((materials) => {
     materials.preload();
-    objectLoader.setMaterials(materials);
-    objectLoader.loadAsync(`${model}.obj`).then((object) => {
+    objLoader.setMaterials(materials);
+    objLoader.loadAsync(`/models/${model}.obj`).then((object) => {
       object.position.copy(item.calcPositionInRoom().add(position));
       //get object size before rotation
       const box = new THREE.Box3().setFromObject(object);
@@ -139,8 +134,9 @@ function createRestrictiveWall(
 ) {
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
+  const textureLoader = new TextureLoader();
   textureLoader.load(
-    "textures/RestrictedTexture.png",
+    "/textures/RestrictedTexture.png",
     function (texture: Texture) {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
@@ -172,7 +168,8 @@ function createArrow(
   parent: THREE.Group
 ) {
   const arrow = new Arrow(orientation, tilePosition);
-  objectLoader.loadAsync("arrow.obj").then((object) => {
+  const objLoader = new OBJLoader();
+  objLoader.loadAsync("/models/arrow.obj").then((object) => {
     object.position.copy(arrow.position());
     object.userData = arrow;
     object.userData.clickable = true;
@@ -201,7 +198,6 @@ async function createPlayer(
   parent: THREE.Scene | THREE.Group
 ) {
   let model = "squirrel";
-
   switch (player.getRole()) {
     case Role.DESIGNER:
       model += "-designer";
@@ -210,10 +206,12 @@ async function createPlayer(
       model += "-hacker";
       break;
   }
-  await materialLoader.loadAsync(`${model}.mtl`).then((materials) => {
+  const objLoader = new OBJLoader();
+  const mtlLoader = new MTLLoader();
+  await mtlLoader.loadAsync(`/materials/${model}.mtl`).then((materials) => {
     materials.preload();
-    objectLoader.setMaterials(materials);
-    objectLoader.loadAsync(`${model}.obj`).then((object) => {
+    objLoader.setMaterials(materials);
+    objLoader.loadAsync(`/models/${model}.obj`).then((object) => {
       object.userData.username = player.getUsername();
       object.name = player.getUsername();
       object.position.copy(position);

@@ -1,8 +1,10 @@
 import { reactive } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "../login/LoginStore";
+import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
+import { useLoginStore } from "@/service/login/LoginStore";
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message } from "@/service/game/Conversation";
+import { Orientation } from "@/service/labyrinth/Tile";
 
 const gameEventMessage = reactive({
   message: "",
@@ -10,23 +12,37 @@ const gameEventMessage = reactive({
   visible: false,
 });
 
-// conversations with interactive game characters
 const conversation = reactive({
   character: "",
   message: new Message("", "", undefined, []),
   visible: false,
 });
 
+const { deleteItemFromTile } = useLabyrinthFactory();
+
 const { gameState } = useGameStore();
 
 const toggleEventMessage = () =>
   (gameEventMessage.visible = !gameEventMessage.visible);
 
-async function playerMovement(evenMessage: EventMessage) {
+/**
+ * function which is used when clicking the arrow in Scene
+ * By receiving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
+ * @param orientation used in the backend to identify the direction to move the player
+ */
+async function movePlayer(orientation: Orientation) {
+  const { gameState } = useGameStore();
+  const { loginState } = useLoginStore();
+  const eventMessage = new EventMessage(
+    Operation[Operation.MOVEMENT],
+    gameState.lobbyKey,
+    loginState.username,
+    Orientation[orientation]
+  );
   fetch("/api/lobby/move", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(evenMessage),
+    body: JSON.stringify(eventMessage),
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
@@ -37,12 +53,20 @@ async function playerMovement(evenMessage: EventMessage) {
     });
 }
 
+/**
+ * start conversation with a game character
+ * @param character modelName of charachter
+ */
 async function startConversation(character: string) {
   conversation.character = character;
   conversation.visible = true;
   getConversationMessage("1.1");
 }
 
+/**
+ * get next message of conversation with game character
+ * @param id message id
+ */
 async function getConversationMessage(id: string) {
   fetch(`/api/body/npc/${conversation.character}/${id}`, {
     method: "GET",
@@ -53,16 +77,14 @@ async function getConversationMessage(id: string) {
     })
     .then((jsonData) => {
       console.log(jsonData);
-
-      if ((jsonData as Message).id == "0.0") {
-        console.log("endConversation");
-        endConversation();
-        return;
-      }
-
       conversation.message = jsonData as Message;
-      if (conversation.message.itemName != null) {
-        console.log("give Item");
+
+      if (conversation.message.id != "0.0") {
+        if (conversation.message.itemName != null) {
+          console.log("give Item");
+        }
+      } else {
+        endConversation();
       }
     })
     .catch(() => {
@@ -70,22 +92,20 @@ async function getConversationMessage(id: string) {
     });
 }
 
+/**
+ * set conversation state to default values to end conversation
+ */
 async function endConversation() {
   conversation.visible = false;
   conversation.message = new Message("", "", undefined, []);
   conversation.character = "";
 }
 
-// fetches the current tileId of both players
-async function updatePlayerPositions(lobbyKey: string) {
-  return fetch("/api/lobby/players/" + lobbyKey, {
-    method: "GET",
-  }).then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  });
-}
-
+/**
+ * request access to clicked item
+ * display incoming data as gameEventMessage
+ * @param modelName name of the clicked item
+ */
 async function checkAccess(modelName: string) {
   const { gameState } = useGameStore();
   const { loginState } = useLoginStore();
@@ -118,32 +138,29 @@ async function checkAccess(modelName: string) {
     });
 }
 
-async function clickItem(objectData: string) {
-  const modelName = objectData.split(" ")[1];
-  const modelId = objectData.split(" ")[3];
-  const itemId = modelId.toString();
-
-  fetch("/api/lobby/click/" + modelName, { method: "GET" })
+/**
+ * request operation of clicked item
+ * @param modelName name of clicked item
+ */
+async function clickItem(modelName: string) {
+  const objectName = modelName.split(" ")[1];
+  const itemId = modelName.split(" ")[3].toString();
+  fetch("/api/lobby/click/" + objectName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((jsonData) => {
       const operation = (<any>Operation)[jsonData];
-      console.log(operation);
       switch (operation) {
         case Operation.ACCESS:
-          checkAccess(modelName);
+          checkAccess(objectName);
           break;
         case Operation.CONVERSATION:
-          console.log("test");
-          startConversation(modelName);
+          startConversation(objectName);
           break;
         case Operation.COLLECT:
-          console.log("Item ", modelId, " deleted");
-          // "/lobby/{lobbyKey}/item/{itemId}"
-          console.log('GameState lobbyKey: ', gameState.lobbyKey)
-          removeItemFromTile(gameState.lobbyKey, itemId);
+          removeItemFromTile(gameState.lobbyKey, objectName, itemId);
           break;
       }
     })
@@ -152,14 +169,24 @@ async function clickItem(objectData: string) {
     });
 }
 
-async function removeItemFromTile(lobbyKey: string, itemId: string) {
-  fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
+/**
+ * Provides functionality to remove an item from a tile.
+ * @param lobbyKey the key of the lobby
+ * @param objectName the name of the object that is to be deleted
+ * @param itemId the id of the object that is to be deleted
+ */
+async function removeItemFromTile(
+  lobbyKey: string,
+  objectName: string,
+  itemId: string
+) {
+  await fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
     method: "DELETE",
     headers: { "Content-Type": "text/plain" },
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
-      return response.json();
+      deleteItemFromTile(itemId, objectName);
     })
     .catch((error) => {
       console.error(error);
@@ -170,8 +197,7 @@ export function useGameService() {
   return {
     gameEventMessage,
     toggleEventMessage,
-    updatePlayerPositions,
-    playerMovement,
+    movePlayer,
     clickItem,
     startConversation,
     getConversationMessage,

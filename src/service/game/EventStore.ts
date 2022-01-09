@@ -2,6 +2,7 @@ import { Client } from "@stomp/stompjs";
 import { EventMessage } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
+import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 
 const { gameState, updatePlayerData, setError } = useGameStore();
 const {
@@ -13,6 +14,8 @@ const {
   setUserReadyState,
   lobbyState,
 } = useLobbyService();
+
+const { deleteItemFromTile } = useLabyrinthFactory();
 
 let wsURL = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -69,6 +72,12 @@ stompClient.onConnect = () => {
         case "CLICK":
           // Item needs to disappear
           updateLabyrinths();
+          break;
+        case "COLLECT":
+          deleteItemFromTile(
+            eventMessage.data.split(" ")[3], // itemId
+            eventMessage.data.split(" ")[1] // objectName
+          );
           break;
         case "CHAT":
           break;
