@@ -27,7 +27,7 @@
     @close="closeInstructions"
   />
   <!--player inventory-->
-  <InventoryComponent/>
+  <InventoryComponent />
 </template>
 
 <script lang="ts">

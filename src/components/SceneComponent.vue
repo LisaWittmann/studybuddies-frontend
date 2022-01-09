@@ -8,10 +8,8 @@ import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 
-
-
 export default defineComponent({
-  name: "SceneComponent", 
+  name: "SceneComponent",
   props: {
     labyrinth: {
       type: Object,
