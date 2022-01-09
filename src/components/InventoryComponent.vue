@@ -132,7 +132,7 @@ export default defineComponent({
 
 .inventory {
   padding: 0 1.5rem 1.5rem 1.5rem;
-  margin-top: 8.5rem;
+  margin-top: calc(15vh + 10px);
   overflow-y: scroll;
   max-height: -webkit-fill-available;
   direction: rtl;
