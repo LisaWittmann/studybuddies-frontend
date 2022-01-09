@@ -1,5 +1,5 @@
 <template>
-  <button class="inventory-button" v-bind:class="[isOpen?'open':'closed']" @click="toggleInventoryButton"></button> 
+    <button id="invbutton" class="inventory-button" v-bind:class="[isOpen?'open':'closed']" @click="toggleInventoryButton"></button>
   <transition name="slide-fade">
     <div class="inventory-box" v-if="isOpen">
         <div class="inventory">
@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref } from "vue";
+import { computed, defineComponent, reactive, ref, watch } from "vue";
 
 import { useGameStore } from "@/service/game/GameStore";
 
@@ -26,6 +26,7 @@ export default defineComponent({
   setup() {
     const { gameState} = useGameStore();
     let isOpen = ref(false);
+    const invbutton = ref(null)
 
     //casting because playerMap only holds type Player -> here we only need MainPlayer
     let mainPlayer = computed(() => gameState.mainPlayer);
@@ -55,6 +56,28 @@ export default defineComponent({
 
       isOpen.value = !isOpen.value;
     }
+  /**
+   * lights up the backpack (inventory button) if item is added to inventory
+   */
+    const lightUpInventoryButton = () => {
+      const button = document.getElementById("invbutton");
+      if(button) {
+        button.classList.add('button--lightup');
+        setTimeout(() => button.classList.remove('button--lightup'), 20000);
+      }
+    }
+  /**
+   * watches changes from inventory to call the lightUpInventoryButton method
+   */
+    watch(
+      [inventory],
+      () => {
+        console.log("watcher inventory");
+        lightUpInventoryButton();
+        
+      },
+      { deep: true }
+    );
 
 
     return {
@@ -62,7 +85,8 @@ export default defineComponent({
       inventory,
       getImgUrl,
       toggleInventoryButton,
-      isOpen
+      isOpen,
+      invbutton
     };
   },
 });
@@ -89,11 +113,6 @@ export default defineComponent({
     height: 15%;
     width: 10%;
     max-width: 120px;
-    transition-duration: .3s;
-  }
-
-  .inventory-button:hover {
-    filter: drop-shadow(0px 0px 10px rgb(255, 205, 42)) brightness(1.75);
   }
   
     .inventory-box {
@@ -107,7 +126,7 @@ export default defineComponent({
         transform-origin: top;
     }
     /* Animation for opening or closing inventory */
-    /* durations and timing functions.              */
+    /* durations and timing functions.            */
     .slide-fade-enter-active {
       animation: fadeInDown .3s;
     }
