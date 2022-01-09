@@ -98,44 +98,38 @@ function calculatePartnerPositon(
     itemOrientations.forEach((o) => {
       //if there is an item in the corner -> move partner clockwise
       if (playerOrientation === o) {
-        switch (o) {
-          case "NORTHWEST" || "WESTNORTH":
+          if (o === "NORTHWEST" || o === "WESTNORTH") {
             playerOrientation = "NORTHEAST";
             directionVector
-              .copy(direction.north)
-              .add(direction.east)
-              .multiplyScalar(factors.partnerTranslateFactor);
-            break;
-          case "NORTHEAST" || "EASTNORTH":
+            .copy(direction.north)
+            .add(direction.east)
+            .multiplyScalar(factors.partnerTranslateFactor);
+          } else if (o === "NORTHEAST" || o === "EASTNORTH") {
             playerOrientation = "SOUTHEAST";
             directionVector
               .copy(direction.south)
               .add(direction.east)
               .multiplyScalar(factors.partnerTranslateFactor);
-            break;
-          case "SOUTHEAST" || "EASTSOUTH":
+          } else if (o === "SOUTHEAST" || o === "EASTSOUTH") {
             playerOrientation = "SOUTHWEST";
             directionVector
               .copy(direction.south)
               .add(direction.west)
               .multiplyScalar(factors.partnerTranslateFactor);
-            break;
-          case "SOUTHWEST" || "WESTSOUTH":
+          } else if (o === "SOUTHWEST" || o === "WESTSOUTH") {
             playerOrientation = "NORTHWEST";
             directionVector
               .copy(direction.north)
               .add(direction.west)
               .multiplyScalar(factors.partnerTranslateFactor);
-            break;
-          default:
+          } else {
             playerOrientation = "NORTHWEST";
             directionVector
               .copy(direction.north)
               .add(direction.west)
               .multiplyScalar(factors.partnerTranslateFactor);
-            break;
+          }
         }
-      }
     });
   }
 
