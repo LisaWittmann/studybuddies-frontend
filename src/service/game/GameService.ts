@@ -145,15 +145,13 @@ async function clickItem(objectData: string) {
           startConversation(modelName);
           break;
         case Operation.COLLECT:
-          console.log("Item ", modelId, " deleted");
-          // "/lobby/{lobbyKey}/item/{itemId}"
           addToInventory(
             gameState.lobbyKey,
             itemId,
             modelName,
             gameState.mainPlayer.getUsername()
           );
-          //removeItemFromTile(gameState.lobbyKey, itemId);
+          removeItemFromTile(gameState.lobbyKey, itemId);
           break;
       }
     })
@@ -179,7 +177,6 @@ async function addToInventory(
       return response.json();
     })
     .then((jsonData) => {
-      console.log(jsonData);
       let inventory = new Array<Item>();
       inventory = jsonData;
       updateInventory(inventory);

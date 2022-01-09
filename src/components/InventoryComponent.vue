@@ -38,11 +38,6 @@ export default defineComponent({
     let mainPlayer = computed(() => gameState.mainPlayer);
     let inventory = computed(() => mainPlayer.value.getInventory());
 
-    //Whats in the inventory -> remove later
-    console.log("INVENTAR:");
-    for (let item of inventory.value) {
-      console.log(item.modelName);
-    }
 
     /**
      * creates image url
@@ -56,11 +51,6 @@ export default defineComponent({
      * shows opened or closed backpack svg (inventory button)
      */
     function toggleInventoryButton() {
-      console.log("INVENTAR player:");
-      for (let item of mainPlayer.value.getInventory()) {
-        console.log(item.modelName);
-      }
-
       isOpen.value = !isOpen.value;
     }
     /**
@@ -73,13 +63,14 @@ export default defineComponent({
         setTimeout(() => button.classList.remove("button--lightup"), 20000);
       }
     };
+
+    
     /**
      * watches changes from inventory to call the lightUpInventoryButton method
      */
     watch(
       [inventory],
       () => {
-        console.log("watcher inventory");
         lightUpInventoryButton();
       },
       { deep: true }
@@ -135,41 +126,12 @@ export default defineComponent({
 /* Animation for opening or closing inventory */
 /* durations and timing functions.            */
 .slide-fade-enter-active {
-  animation: fadeInDown 0.3s;
+  @include fade-in-animation();
 }
 .slide-fade-leave-active {
-  animation: fadeInDown 0.3s reverse;
+  @include fade-out-animation() ;
 }
 
-@-webkit-keyframes fadeInDown {
-  0% {
-    opacity: 0;
-    visibility: hidden;
-    -webkit-transform: translateY(-200px);
-    -webkit-transform: scaleY(0.5);
-  }
-  100% {
-    opacity: 1;
-    visibility: visible;
-    -webkit-transform: translateY(0);
-    -webkit-transform: scaleY(1);
-  }
-}
-
-@keyframes fadeInDown {
-  0% {
-    opacity: 0;
-    visibility: hidden;
-    -webkit-transform: translateY(-200px);
-    -webkit-transform: scaleY(0.5);
-  }
-  100% {
-    opacity: 1;
-    visibility: visible;
-    -webkit-transform: translateY(0);
-    -webkit-transform: scaleY(1);
-  }
-}
 
 .inventory {
   padding: 0 1.5rem 1.5rem 1.5rem;
