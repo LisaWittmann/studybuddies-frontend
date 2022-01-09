@@ -38,6 +38,7 @@ function updatePartnerPlayer(
       tilePosition
     );
     if (!partnerInitialized) {
+      console.log("POSITION IN IF ", position.x, position.y, position.z);
       partnerInitialized = true;
       createPlayer(player, position, scene);
     } else if (playerObject) {
@@ -82,7 +83,10 @@ function calculatePartnerPositon(
   //partner initially placed in the northwest corner
   let playerOrientation = "NORTHWEST";
   const calcPartnerPosition = new Vector3();
-  const directionVector = new Vector3();
+  const directionVector = new Vector3()
+    .copy(direction.north)
+    .add(direction.west)
+    .multiplyScalar(factors.partnerTranslateFactor);
 
   //gets all orientations/positions of items in tile
   if (tileItems && tileItems?.length >= 1) {
@@ -133,14 +137,24 @@ function calculatePartnerPositon(
         }
       }
     });
-  } else {
-    playerOrientation = "NORTHWEST";
-    directionVector
-      .copy(direction.north)
-      .add(direction.west)
-      .multiplyScalar(factors.partnerTranslateFactor);
   }
+
+  console.log(
+    "POSITION AFTER IF & SWITCH ",
+    directionVector.x,
+    directionVector.y,
+    directionVector.z
+  );
+
   calcPartnerPosition.copy(tilePosition).add(directionVector);
+
+  console.log(
+    "calcPartnerPosition ",
+    calcPartnerPosition.x,
+    calcPartnerPosition.y,
+    calcPartnerPosition.z
+  );
+
   return calcPartnerPosition;
 }
 
