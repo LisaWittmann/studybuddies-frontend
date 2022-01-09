@@ -38,7 +38,6 @@ export default defineComponent({
     let mainPlayer = computed(() => gameState.mainPlayer);
     let inventory = computed(() => mainPlayer.value.getInventory());
 
-
     /**
      * creates image url
      */
@@ -64,7 +63,6 @@ export default defineComponent({
       }
     };
 
-    
     /**
      * watches changes from inventory to call the lightUpInventoryButton method
      */
@@ -129,9 +127,8 @@ export default defineComponent({
   @include fade-in-animation();
 }
 .slide-fade-leave-active {
-  @include fade-out-animation() ;
+  @include fade-out-animation();
 }
-
 
 .inventory {
   padding: 0 1.5rem 1.5rem 1.5rem;
