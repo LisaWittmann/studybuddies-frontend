@@ -92,8 +92,7 @@ stompClient.onConnect = () => {
           }
           break;
         case "LABYRINTH_PICK":
-          console.log(Number(eventMessage.data));
-          setLabyrinthSelection(Number(eventMessage.data));
+          setLabyrinthSelection(eventMessage.data);
           break;
         case "UPDATE":
           switch (eventMessage.data) {

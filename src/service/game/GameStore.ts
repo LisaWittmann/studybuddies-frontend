@@ -11,7 +11,7 @@ const { labyrinthState, updateLabyrinthData } = useLabyrinthStore();
  */
 const gameState = reactive({
   lobbyKey: "",
-  labyrinthId: 1,
+  labyrinthName: "",
   labyrinth: labyrinthState,
   mainPlayer: new MainPlayer("", 0),
   partnerPlayer: new PartnerPlayer("", 0),
@@ -21,7 +21,7 @@ const gameState = reactive({
 
 function setGameState(
   lobbyKey: string | null,
-  labyrinthId: string | null,
+  labyrinthName: string | null,
   labyrinth: string | null,
   mainPlayer: string | null,
   partnerPlayer: string | null,
@@ -29,7 +29,7 @@ function setGameState(
   score: string | null
 ) {
   if (lobbyKey) gameState.lobbyKey = lobbyKey;
-  if (labyrinthId) gameState.labyrinthId = JSON.parse(labyrinthId) as number;
+  if (labyrinthName) gameState.labyrinthName = JSON.parse(labyrinthName);
   if (labyrinth) gameState.labyrinth = JSON.parse(labyrinth) as Labyrinth;
   if (mainPlayer) {
     Object.assign(gameState.mainPlayer, JSON.parse(mainPlayer));
@@ -42,22 +42,22 @@ function setGameState(
 }
 
 function setGameSessionStorage() {
-  sessionStorage.setItem("lobbyKey", JSON.stringify(gameState.lobbyKey)),
-    sessionStorage.setItem(
-      "selectedLabyrinth",
-      JSON.stringify(gameState.labyrinthId)
-    ),
-    sessionStorage.setItem("labyrinth", JSON.stringify(gameState.labyrinth)),
-    sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer)),
-    sessionStorage.setItem(
-      "partnerPlayer",
-      JSON.stringify(gameState.partnerPlayer)
-    ),
-    sessionStorage.setItem(
-      "errormessage",
-      JSON.stringify(gameState.errormessage)
-    ),
-    sessionStorage.setItem("score", JSON.stringify(gameState.score));
+  sessionStorage.setItem("lobbyKey", JSON.stringify(gameState.lobbyKey));
+  sessionStorage.setItem(
+    "selectedLabyrinthName",
+    JSON.stringify(gameState.labyrinthName)
+  );
+  sessionStorage.setItem("labyrinth", JSON.stringify(gameState.labyrinth));
+  sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer));
+  sessionStorage.setItem(
+    "partnerPlayer",
+    JSON.stringify(gameState.partnerPlayer)
+  );
+  sessionStorage.setItem(
+    "errormessage",
+    JSON.stringify(gameState.errormessage)
+  );
+  sessionStorage.setItem("score", JSON.stringify(gameState.score));
 }
 
 function getGameSessionStorage() {

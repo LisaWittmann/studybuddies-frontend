@@ -9,7 +9,7 @@
           :class="optionClass(option)"
           @click="select(index)"
         >
-          <img :src="image(index)" />
+          <img :src="image(index)" alt="Missing Option" />
         </button>
       </div>
     </transition>
@@ -86,7 +86,7 @@ export default defineComponent({
     margin-bottom: 20px;
 
     > * {
-      margin: 5px 0px;
+      margin: 5px 0;
     }
   }
 

@@ -15,7 +15,9 @@ const buildState = reactive({
   itemOptions: new Array<ItemModel>(),
   tileModels: new Array<TileModel>(),
   startPositions: new Array<number>(),
-  endposition: 0,
+  endPosition: 0,
+  labyrinthName: "",
+  errorMessage: "",
 });
 
 updateTileModels();
@@ -25,7 +27,7 @@ const maxRows = 20;
 const maxColumns = 30;
 const minTiles = 10;
 const maxItems = 3;
-const startPositons = 2;
+const startPositions = 2;
 
 /**
  * list of all selected tileModels of new labyrinth
@@ -45,12 +47,14 @@ function reset(): void {
   buildState.columns = 25;
   buildState.tileModels = new Array<TileModel>();
   buildState.startPositions = new Array<number>();
-  buildState.endposition = 0;
+  buildState.endPosition = 0;
+  buildState.labyrinthName = "";
+  buildState.errorMessage = "";
 }
 
 /**
  * set dimension of labyrinth builder by changing amount of rows and columns
- * and add new created tile models to buildState's tilemodels
+ * and add new created tile models to buildState's tile models
  *
  * @param rows: number of row of labyrinth builder (size of x-axis)
  * @param columns: number of columns of labyrinth builder (size of y-axis)
@@ -74,12 +78,12 @@ async function setItemOptions() {
 }
 
 /**
- * iterate over rows and columns of labyirnth builder and add
+ * iterate over rows and columns of labyrinth builder and add
  * not existing tile models to list;
  *
- * iterate over tilerelationmap of each tilemodel
+ * iterate over tile relation map of each tile model
  * and calculate position of neighbor for each orientation,
- * add tile model on calculated posititon (or else undefined)
+ * add tile model on calculated position (or else undefined)
  * to relation map if entry is empty
  */
 function updateTileModels(): void {
@@ -101,7 +105,7 @@ function updateTileModels(): void {
 }
 
 /**
- * mark tilemodels as selectable that have a neighbor that is already selected
+ * mark tile models as selectable that have a neighbor that is already selected
  * to prevent invalid tile selection
  */
 function setSelectableTiles(): void {
@@ -117,10 +121,10 @@ function setSelectableTiles(): void {
 }
 
 /**
- * search for tilemodel in list that is placed at the given position
- * @param x: position on x axis
- * @param y: position on y axis
- * @returns tilemodel or undefined
+ * search for tile model in list that is placed at the given position
+ * @param x: position on x-axis
+ * @param y: position on y-axis
+ * @returns tile model or undefined
  */
 function getTileModel(x: number, y: number): TileModel | undefined {
   for (const model of buildState.tileModels) {
@@ -129,8 +133,8 @@ function getTileModel(x: number, y: number): TileModel | undefined {
 }
 
 /**
- * mark tile as selected and set its relationkey so it will be added to labyrinth
- * @param model tilemodel that was selected and therefore added to labyrinth
+ * mark tile as selected and set its relation key that it will be added to labyrinth
+ * @param model tile model that was selected and therefore added to labyrinth
  */
 function selectTile(model: TileModel): void {
   if (!model.isSelectable) return;
@@ -141,8 +145,8 @@ function selectTile(model: TileModel): void {
 }
 
 /**
- * add given tile to starttiles
- * @param model tilemodel to set as a starting position
+ * add given tile to start tiles
+ * @param model tile model to set as a starting position
  */
 function addStartTile(model: TileModel): void {
   if (
@@ -159,8 +163,8 @@ function addStartTile(model: TileModel): void {
 }
 
 /**
- * remove given tile from starttiles
- * @param model tilemodel to reset as a starting postion
+ * remove given tile from start tiles
+ * @param model tile model to reset as a starting position
  */
 function removeStartTile(model: TileModel) {
   model.isStart = false;
@@ -170,36 +174,35 @@ function removeStartTile(model: TileModel) {
 }
 
 /**
- * set given tile as endtile
- * @param model tilemodel to set as endtile
+ * set given tile as end tile
+ * @param model tile model to set as end tile
  */
 function addEndTile(model: TileModel): void {
   if (
     !model.relationKey ||
     model.isStart ||
     model.restrictions.length > 0 ||
-    model.getNeighborsAsList().length > 1 ||
-    buildState.endposition
+    model.getNeighborsAsList().length > 1
   ) {
     return;
   }
-  buildState.endposition = model.relationKey;
+  buildState.endPosition = model.relationKey;
   model.isEnd = true;
 }
 
 /**
- * reset endtile state if tile is already marked as end
- * @param model tilemodel to reset as endtile
+ * reset end tile state if tile is already marked as end
+ * @param model tile model to reset as end tile
  */
 function removeEndTile(model: TileModel): void {
   if (!model.isEnd) return;
-  buildState.endposition = 0;
+  buildState.endPosition = 0;
   model.isEnd = false;
 }
 
 /**
- * set restriction on tilemodel for given role
- * @param model: tilemodel to add  restriction for role
+ * set restriction on tile model for given role
+ * @param model: tile model to add  restriction for role
  * @param role: role that will be restricted for tile
  */
 function addRestriction(model: TileModel, role: Role): void {
@@ -210,8 +213,8 @@ function addRestriction(model: TileModel, role: Role): void {
 }
 
 /**
- * reset restricion on tilemodel for given role
- * @param model: tilemodel to remove restriction for role
+ * reset restriction on tile model for given role
+ * @param model: tile model to remove restriction for role
  * @param role: role that will be tolerated again for tile
  */
 function removeRestriction(model: TileModel, role: Role): void {
@@ -219,9 +222,17 @@ function removeRestriction(model: TileModel, role: Role): void {
 }
 
 /**
- * add itemmodel to tilemodels objectsInRoom
- * @param model: tilemodel to add item to
- * @param item: itemmodel to add
+ * overwrite current labyrinthName with new one
+ * @param labyrinthName contains the new name for the labyrinth
+ */
+function setName(labyrinthName: string): void {
+  buildState.labyrinthName = labyrinthName;
+}
+
+/**
+ * add item model to tile models objectsInRoom
+ * @param model: tile model to add item to
+ * @param item: item model to add
  */
 function addItem(model: TileModel, item: ItemModel): void {
   if (!model.relationKey || model.objectsInRoom.length >= maxItems || !item)
@@ -233,9 +244,9 @@ function addItem(model: TileModel, item: ItemModel): void {
 }
 
 /**
- * remove itemmodel from tilemodels objectsInRoom
- * @param model: tilemodel to remove item from
- * @param item: itemmodel to remove
+ * remove item model from tile models objectsInRoom
+ * @param model: tile model to remove item from
+ * @param item: item model to remove
  */
 function removeItem(model: TileModel, item: ItemModel): void {
   if (!model.relationKey) return;
@@ -248,48 +259,64 @@ function removeItem(model: TileModel, item: ItemModel): void {
 /**
  * validates created labyrinth;
  * min amount of tile models must be selected to save labyrinth,
- * number of start and endpositions must be valid
+ * number of start and end positions must be valid
  * and all items must be places inside of labyrinth
- * @returns build mode that contains errors or undefindes
+ * @returns build mode that contains errors or undefined
  */
 function hasErrors(): Mode | undefined {
-  if (selectedTiles.value.length < minTiles) return Mode.CREATE;
-  if (buildState.startPositions.length != startPositons) return Mode.START;
-  if (!buildState.endposition) return Mode.END;
-  if (buildState.itemOptions.length > 0) return Mode.ITEMS;
+  if (selectedTiles.value.length < minTiles) {
+    buildState.errorMessage = "Labyrinth ist zu klein";
+    return Mode.CREATE;
+  } else if (buildState.startPositions.length != startPositions) {
+    buildState.errorMessage = "Zu wenig Startfelder definiert";
+    return Mode.START_TILES;
+  } else if (!buildState.endPosition) {
+    buildState.errorMessage = "Ende noch nicht definiert";
+    return Mode.END_TILE;
+  } else if (buildState.itemOptions.length > 0) {
+    buildState.errorMessage = "Noch nicht alle Objekte platziert";
+    return Mode.ITEM_PLACEMENT;
+  } else if (
+    buildState.labyrinthName == null ||
+    buildState.labyrinthName.trim().length === 0
+  ) {
+    buildState.errorMessage = "Name noch nicht vergeben";
+    return Mode.LABYRINTH_NAME;
+  }
   return undefined;
 }
 
 /**
- * convert buildState with tilemodels to a labyrinth object
+ * convert buildState with tile models to a labyrinth object
  * @returns data of buildState as labyrinth
  */
 function convert(): Labyrinth {
   const labyrinth = new Labyrinth(
-    buildState.endposition,
+    buildState.labyrinthName,
+    buildState.endPosition,
     buildState.startPositions
   );
 
-  for (const tilemodel of selectedTiles.value) {
-    const key = tilemodel.relationKey as number;
-    const tile = new Tile(key, [], tilemodel.restrictions);
-    for (const [orientation, neighbor] of tilemodel.tileRelationMap) {
+  for (const tileModel of selectedTiles.value) {
+    const key = tileModel.relationKey as number;
+    const tile = new Tile(key, [], tileModel.restrictions);
+    for (const [orientation, neighbor] of tileModel.tileRelationMap) {
       tile.tileRelationMap.set(orientation, neighbor?.relationKey);
     }
-    tilemodel.setPlacements();
-    for (const itemmodel of tilemodel.objectsInRoom) {
+    tileModel.setPlacements();
+    for (const itemModel of tileModel.objectsInRoom) {
       const orientations =
-        tilemodel.placements[
-          Math.floor(Math.random() * tilemodel.placements.length)
+        tileModel.placements[
+          Math.floor(Math.random() * tileModel.placements.length)
         ];
-      itemmodel.orientations = orientations;
-      tilemodel.removePlacement(orientations);
+      itemModel.orientations = orientations;
+      tileModel.removePlacement(orientations);
       tile.objectsInRoom.push(
         new Item(
           0,
-          itemmodel.modelName,
-          itemmodel.positionInRoom,
-          itemmodel.orientations
+          itemModel.modelName,
+          itemModel.positionInRoom,
+          itemModel.orientations
         )
       );
     }
@@ -299,10 +326,10 @@ function convert(): Labyrinth {
 }
 
 /**
- * convert all complex data structures to objects
+ * convert all complex data structures into objects
  * to parse labyrinth object into a JSON string
  * @param labyrinth object to parse into JSON
- * @returns JSON representation of laybrinth
+ * @returns JSON representation of labyrinth
  */
 function parseLabyrinth(labyrinth: Labyrinth): string {
   const tileMapJson = new Map<number, any>();
@@ -315,6 +342,7 @@ function parseLabyrinth(labyrinth: Labyrinth): string {
     });
   }
   return JSON.stringify({
+    labyrinthName: labyrinth.name,
     endTileKey: labyrinth.endTileKey,
     playerStartTileKeys: labyrinth.playerStartTileKeys,
     tileMap: Object.fromEntries(tileMapJson),
@@ -325,20 +353,24 @@ function parseLabyrinth(labyrinth: Labyrinth): string {
  * convert labyrinth and save by API call
  * return promise with id of saved labyrinth
  */
-async function save(): Promise<number> {
+async function save(): Promise<string> {
   const labyrinth = convert();
   return fetch("/api/labyrinth/save", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: parseLabyrinth(labyrinth),
-  })
-    .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
-      return response.json();
-    })
-    .then((jsondata) => {
-      return jsondata as number;
-    });
+  }).then((response) => {
+    if (response.status === 409) {
+      buildState.errorMessage =
+        'Name "' + buildState.labyrinthName + '" bereits vergeben';
+      throw new Error(response.statusText);
+    } else if (!response.ok) {
+      buildState.errorMessage = "Labyrinth ist invalide. Bitte prüfe es erneut";
+      throw new Error(response.statusText);
+    }
+
+    return response.text();
+  });
 }
 
 export function useBuildService() {
@@ -357,6 +389,7 @@ export function useBuildService() {
     removeRestriction,
     addItem,
     removeItem,
+    setName,
     hasErrors,
     save,
     reset,

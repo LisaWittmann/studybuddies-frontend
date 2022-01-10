@@ -38,6 +38,7 @@
           :role="currentRole"
           :item="currentItem"
         />
+        <span class="error" v-if="errorMessage">{{ errorMessage }}</span>
       </div>
     </transition>
     <transition name="delay-fade" appear>
@@ -54,20 +55,21 @@
   <OverlayFeedbackComponent
     :opened="feedback.active"
     :headline="feedback.headline"
-    :subline="feedback.subline"
+    :subLine="feedback.subLine"
     :link="feedback.link"
     :linkText="feedback.linkText"
-    :reload="feedback.reload"
+    :error="feedback.error"
+    @close="closeFeedback"
   />
 </template>
 
 <script lang="ts">
 import {
-  defineComponent,
-  ref,
   computed,
-  reactive,
+  defineComponent,
   onUnmounted,
+  reactive,
+  ref,
   watch,
 } from "vue";
 import { useBuildService } from "@/service/labyrinth/build/BuildService";
@@ -99,10 +101,11 @@ export default defineComponent({
 
     const modes = new Array<Mode>(
       Mode.CREATE,
-      Mode.START,
-      Mode.END,
-      Mode.RESTRICTIONS,
-      Mode.ITEMS
+      Mode.START_TILES,
+      Mode.END_TILE,
+      Mode.RESTRICTION_PLACEMENT,
+      Mode.ITEM_PLACEMENT,
+      Mode.LABYRINTH_NAME
     );
     const currentMode = ref(Mode.CREATE);
     const changeMode = (mode: Mode) => (currentMode.value = mode);
@@ -122,13 +125,13 @@ export default defineComponent({
     };
 
     const restrictionMode = computed(
-      () => currentMode.value == Mode.RESTRICTIONS
+      () => currentMode.value == Mode.RESTRICTION_PLACEMENT
     );
     const roleOptions = new Array<Role>(Role.DESIGNER, Role.HACKER);
     const currentRole = ref(0);
     const changeRole = (role: Role) => (currentRole.value = role);
 
-    const itemsMode = computed(() => currentMode.value == Mode.ITEMS);
+    const itemsMode = computed(() => currentMode.value == Mode.ITEM_PLACEMENT);
     const itemOptions = computed(() => buildState.itemOptions);
     setItemOptions().then(() => (currentItem.value = itemOptions.value[0]));
     const currentItem = ref(new ItemModel(""));
@@ -137,11 +140,12 @@ export default defineComponent({
     const feedback = reactive({
       active: false,
       headline: "",
-      subline: "",
+      subLine: "",
+      error: "",
       link: "",
       linkText: "",
-      reload: false,
     });
+    const errorMessage = computed(() => buildState.errorMessage);
 
     function onComplete() {
       const rollback = hasErrors();
@@ -149,24 +153,38 @@ export default defineComponent({
         currentMode.value = rollback;
       } else {
         save()
-          .then((id) => {
+          .then((name) => {
             feedback.active = true;
             feedback.headline = "Gespeichert";
-            feedback.subline = `Dein Labyrinth wurde gespeichert unter der ID ${id}`;
+            feedback.subLine = `Dein Labyrinth wurde unter dem Namen ${name} gespeichert`;
+            feedback.error = "";
             feedback.link = "/find";
             feedback.linkText = "Jetzt spielen";
-            feedback.reload = false;
+            reset();
           })
           .catch(() => {
             feedback.active = true;
             feedback.headline = "Fehler";
-            feedback.subline =
-              "Leider ist etwas schief gelaufen. Bitte versuche es noch einmal";
-            feedback.link = "/build";
-            feedback.linkText = "Zurück";
-            feedback.reload = true;
+            feedback.error = buildState.errorMessage;
+            feedback.linkText = "Zurück zur Bearbeitung";
           });
       }
+    }
+
+    function resetFeedback() {
+      feedback.active = false;
+      feedback.headline = "";
+      feedback.subLine = "";
+      feedback.error = "";
+      feedback.link = "";
+      feedback.linkText = "";
+    }
+
+    function closeFeedback() {
+      if (buildState.errorMessage.includes("vergeben"))
+        currentMode.value = Mode.LABYRINTH_NAME;
+      else currentMode.value = Mode.CREATE;
+      resetFeedback();
     }
 
     watch(
@@ -178,7 +196,6 @@ export default defineComponent({
     );
 
     onUnmounted(() => {
-      reset();
       updateTileModels();
       feedback.active = false;
     });
@@ -202,6 +219,8 @@ export default defineComponent({
       changeItem,
       onComplete,
       feedback,
+      errorMessage,
+      closeFeedback,
     };
   },
 });
@@ -220,6 +239,7 @@ export default defineComponent({
     z-index: 5;
     right: 0;
     margin: 20px;
+
     i {
       margin: 5px 10px;
     }
@@ -235,6 +255,16 @@ export default defineComponent({
   }
 
   &__stage {
+    span {
+      position: sticky;
+      bottom: 0;
+      font-size: $headline-xxl;
+      font-weight: 500;
+      filter: drop-shadow(0 0 20px $color-black);
+      @include color-scheme(dark) {
+        filter: drop-shadow(0 0 20px $color-white);
+      }
+    }
     height: calc(100% - 100px);
     width: 100%;
     overflow: scroll;

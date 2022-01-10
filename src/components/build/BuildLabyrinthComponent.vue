@@ -1,5 +1,14 @@
 <template>
-  <div class="labyrinth-canvas">
+  <div v-if="nameMode" class="column-wrapper labyrinth-name-mode">
+    <h1>Labyrinth benennen</h1>
+    <input
+      class="input--small"
+      type="text"
+      v-model="labyrinthName"
+      @change="updateName"
+    />
+  </div>
+  <div v-else class="labyrinth-canvas">
     <div class="labyrinth-canvas__row" v-for="row in rows" :key="row">
       <BuildTileComponent
         v-for="column in columns"
@@ -57,6 +66,7 @@ export default defineComponent({
       selectTile,
       addRestriction,
       addItem,
+      setName,
     } = useBuildService();
 
     let mousedown = false;
@@ -66,6 +76,9 @@ export default defineComponent({
     const rows = computed(() => buildState.rows);
     const columns = computed(() => buildState.columns);
     const gutter = computed(() => props.mode == Mode.CREATE);
+    const nameMode = computed(() => props.mode == Mode.LABYRINTH_NAME);
+
+    const labyrinthName = ref(buildState.labyrinthName);
 
     const clickedTile = ref({} as TileModel);
     const showTileOverview = computed(
@@ -76,7 +89,8 @@ export default defineComponent({
     );
 
     const onEnter = (model: TileModel) => {
-      if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTIONS) return;
+      if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTION_PLACEMENT)
+        return;
       if (mousedown) onClick(model);
     };
 
@@ -87,31 +101,38 @@ export default defineComponent({
           selectTile(model);
           break;
         }
-        case Mode.START: {
+        case Mode.START_TILES: {
           addStartTile(model);
           break;
         }
-        case Mode.END: {
+        case Mode.END_TILE: {
           addEndTile(model);
           break;
         }
-        case Mode.RESTRICTIONS: {
+        case Mode.RESTRICTION_PLACEMENT: {
           addRestriction(model, props.role);
           break;
         }
-        case Mode.ITEMS: {
+        case Mode.ITEM_PLACEMENT: {
           addItem(model, props.item);
           break;
         }
       }
     };
 
+    function updateName() {
+      setName(labyrinthName.value);
+    }
+
     return {
       rows,
       columns,
       gutter,
+      nameMode,
       clickedTile,
       showTileOverview,
+      labyrinthName,
+      updateName,
       getTileModel,
       onClick,
       onEnter,
@@ -121,6 +142,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.labyrinth-name-mode {
+  height: 100%;
+}
 .labyrinth-canvas {
   @include flex-center();
   flex-direction: column;
@@ -143,6 +167,15 @@ export default defineComponent({
     bottom: 100px;
     margin-top: auto;
     margin-bottom: auto;
+  }
+
+  h1 {
+    padding-top: $spacing-l;
+    margin-top: 0;
+
+    span {
+      font-weight: inherit;
+    }
   }
 }
 </style>
