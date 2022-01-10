@@ -116,6 +116,9 @@ function setSelectableTiles(): void {
       if (neighbors.some((neighbor) => neighbor && neighbor.relationKey)) {
         model.isSelectable = true;
       }
+      if (neighbors.some((neighbor) => neighbor && neighbor.isEnd)) {
+        model.isSelectable = false;
+      }
     }
   }
 }
@@ -186,8 +189,13 @@ function addEndTile(model: TileModel): void {
   ) {
     return;
   }
+  const endTile = buildState.tileModels.find(
+    (tileModel) => tileModel.relationKey == buildState.endPosition
+  );
+  if (endTile) endTile.isEnd = false;
   buildState.endPosition = model.relationKey;
   model.isEnd = true;
+  setSelectableTiles();
 }
 
 /**
@@ -198,6 +206,7 @@ function removeEndTile(model: TileModel): void {
   if (!model.isEnd) return;
   buildState.endPosition = 0;
   model.isEnd = false;
+  setSelectableTiles();
 }
 
 /**

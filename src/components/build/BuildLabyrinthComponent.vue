@@ -162,11 +162,8 @@ export default defineComponent({
   .tile-overview {
     position: absolute;
     z-index: 1;
-    top: 0;
+    top: 30px;
     left: 0;
-    bottom: 100px;
-    margin-top: auto;
-    margin-bottom: auto;
   }
 
   h1 {
