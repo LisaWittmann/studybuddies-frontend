@@ -7,7 +7,7 @@
       </h1>
       <section>
         <p>{{ users.length }}/2 Spieler verbunden</p>
-        <UserListComponent :users="users"/>
+        <UserListComponent :users="users" />
       </section>
       <section>
         <h2>Rolle auswählen:</h2>
@@ -116,7 +116,7 @@ export default defineComponent({
 
     onbeforeunload = () => {
       if (
-          lobbyState.users.some((user) => user.username === loginState.username)
+        lobbyState.users.some((user) => user.username === loginState.username)
       ) {
         exitLobby(lobbyKey.value, loginState.username);
       }
@@ -125,7 +125,7 @@ export default defineComponent({
 
     onunload = () => {
       if (
-          lobbyState.users.some((user) => user.username === loginState.username)
+        lobbyState.users.some((user) => user.username === loginState.username)
       ) {
         exitLobby(gameState.lobbyKey, loginState.username);
       }

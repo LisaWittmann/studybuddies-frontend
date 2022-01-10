@@ -53,14 +53,8 @@ function setLobbySessionStorage() {
     "labyrinthOptions",
     JSON.stringify(lobbyState.labyrinthOptions)
   );
-  sessionStorage.setItem(
-    "errormessage",
-    lobbyState.errormessage
-  );
-  sessionStorage.setItem(
-    "selectedRole",
-    lobbyState.selectedRole
-  );
+  sessionStorage.setItem("errormessage", lobbyState.errormessage);
+  sessionStorage.setItem("selectedRole", lobbyState.selectedRole);
 }
 
 function getLobbySessionStorage() {
@@ -84,7 +78,8 @@ async function updateRole(role: string, lobbyKey: string, username: string) {
     Operation[Operation.ROLE_PICK],
     lobbyKey,
     username,
-    role);
+    role
+  );
   return fetch("/api/lobby/select-role", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -220,9 +215,11 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
             throw new Error(response.statusText);
           }
           return response.text();
-        }).then((jsonData) => {
-            responseList.push("Upload von " + jsonData + " war erfolgreich");
-        }).catch((error) => {
+        })
+        .then((jsonData) => {
+          responseList.push("Upload von " + jsonData + " war erfolgreich");
+        })
+        .catch((error) => {
           responseList.push("Upload von " + file.name + " ist fehlgeschlagen");
           console.error(error);
         });
@@ -320,8 +317,8 @@ async function updateLabyrinthPick(labyrinthName: string, lobbyKey: string) {
 function setLabyrinthSelection(blueprintLabName: string) {
   lobbyState.selectedLabyrinthName = blueprintLabName;
   sessionStorage.setItem(
-      "selectedLabyrinthName",
-      JSON.stringify(blueprintLabName)
+    "selectedLabyrinthName",
+    JSON.stringify(blueprintLabName)
   );
 }
 

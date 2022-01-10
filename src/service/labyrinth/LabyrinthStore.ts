@@ -31,7 +31,7 @@ async function updateLabyrinthData(lobbyKey: string) {
     })
     .then((jsonData) => {
       const labyrinth = new Labyrinth(
-          jsonData.name,
+        jsonData.name,
         jsonData.endTileKey,
         jsonData.playerStartTileKeys
       );

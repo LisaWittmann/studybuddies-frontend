@@ -3,29 +3,30 @@
     <transition name="fade" appear>
       <div v-if="showOptions" class="tool__options">
         <button
-            v-for="(option, index) in options"
-            :key="index"
-            class="button__icon--circle button--filled"
-            :class="optionClass(option)"
-            @click="select(index)"
+          v-for="(option, index) in options"
+          :key="index"
+          class="button__icon--circle button--filled"
+          :class="optionClass(option)"
+          @click="select(index)"
         >
-          <img :src="image(index)" alt="Missing Option"/>
+          <img :src="image(index)" alt="Missing Option" />
         </button>
       </div>
     </transition>
     <button
-        class="button__icon--circle button--filled"
-        :class="[{ open: showOptions }, optionClass(selected)]"
-        @click="toggleOptions">
-      <img :src="image(selected)"/>
+      class="button__icon--circle button--filled"
+      :class="[{ open: showOptions }, optionClass(selected)]"
+      @click="toggleOptions"
+    >
+      <img :src="image(selected)" />
     </button>
   </div>
 </template>
 
 <script lang="ts">
-import {Role} from "@/service/labyrinth/build/BuildMode";
-import {ItemModel} from "@/service/labyrinth/build/TileModel";
-import {defineComponent, ref} from "vue";
+import { Role } from "@/service/labyrinth/build/BuildMode";
+import { ItemModel } from "@/service/labyrinth/build/TileModel";
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "BuildToolComponent",
@@ -39,7 +40,7 @@ export default defineComponent({
       default: 0,
     },
   },
-  setup(props, {emit}) {
+  setup(props, { emit }) {
     const showOptions = ref(false);
     const toggleOptions = () => (showOptions.value = !showOptions.value);
 
@@ -72,7 +73,7 @@ export default defineComponent({
       }
     };
 
-    return {showOptions, toggleOptions, select, image, optionClass};
+    return { showOptions, toggleOptions, select, image, optionClass };
   },
 });
 </script>

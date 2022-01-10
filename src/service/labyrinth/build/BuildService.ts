@@ -17,7 +17,7 @@ const buildState = reactive({
   startPositions: new Array<number>(),
   endPosition: 0,
   labyrinthName: "",
-  errorMessage: ""
+  errorMessage: "",
 });
 
 updateTileModels();
@@ -276,7 +276,10 @@ function hasErrors(): Mode | undefined {
   } else if (buildState.itemOptions.length > 0) {
     buildState.errorMessage = "Noch nicht alle Objekte platziert";
     return Mode.ITEM_PLACEMENT;
-  } else if (buildState.labyrinthName == null || buildState.labyrinthName.trim().length === 0) {
+  } else if (
+    buildState.labyrinthName == null ||
+    buildState.labyrinthName.trim().length === 0
+  ) {
     buildState.errorMessage = "Name noch nicht vergeben";
     return Mode.LABYRINTH_NAME;
   }
@@ -289,9 +292,9 @@ function hasErrors(): Mode | undefined {
  */
 function convert(): Labyrinth {
   const labyrinth = new Labyrinth(
-      buildState.labyrinthName,
-      buildState.endPosition,
-      buildState.startPositions
+    buildState.labyrinthName,
+    buildState.endPosition,
+    buildState.startPositions
   );
 
   for (const tileModel of selectedTiles.value) {
@@ -356,19 +359,18 @@ async function save(): Promise<string> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: parseLabyrinth(labyrinth),
-  })
-    .then((response) => {
-      if (response.status === 409) {
-        buildState.errorMessage = "Name \"" + buildState.labyrinthName + "\" bereits vergeben";
-        throw new Error(response.statusText)
-      }
-      else if (!response.ok) {
-        buildState.errorMessage = "Labyrinth ist invalide. Bitte prüfe es erneut";
-        throw new Error(response.statusText);
-      }
+  }).then((response) => {
+    if (response.status === 409) {
+      buildState.errorMessage =
+        'Name "' + buildState.labyrinthName + '" bereits vergeben';
+      throw new Error(response.statusText);
+    } else if (!response.ok) {
+      buildState.errorMessage = "Labyrinth ist invalide. Bitte prüfe es erneut";
+      throw new Error(response.statusText);
+    }
 
-      return response.text();
-    });
+    return response.text();
+  });
 }
 
 export function useBuildService() {

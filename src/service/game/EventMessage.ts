@@ -35,5 +35,5 @@ export enum Operation {
   COLLECT,
   ACCESS,
   ROLE_PICK,
-  LABYRINTH_PICK
+  LABYRINTH_PICK,
 }

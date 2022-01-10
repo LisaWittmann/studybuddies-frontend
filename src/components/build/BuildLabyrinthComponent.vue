@@ -1,7 +1,12 @@
 <template>
   <div v-if="nameMode" class="column-wrapper labyrinth-name-mode">
-      <h1>Labyrinth benennen</h1>
-      <input class="input--small" type="text" v-model="labyrinthName" @change="updateName"/>
+    <h1>Labyrinth benennen</h1>
+    <input
+      class="input--small"
+      type="text"
+      v-model="labyrinthName"
+      @change="updateName"
+    />
   </div>
   <div v-else class="labyrinth-canvas">
     <div class="labyrinth-canvas__row" v-for="row in rows" :key="row">
@@ -61,7 +66,7 @@ export default defineComponent({
       selectTile,
       addRestriction,
       addItem,
-      setName
+      setName,
     } = useBuildService();
 
     let mousedown = false;
@@ -84,7 +89,8 @@ export default defineComponent({
     );
 
     const onEnter = (model: TileModel) => {
-      if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTION_PLACEMENT) return;
+      if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTION_PLACEMENT)
+        return;
       if (mousedown) onClick(model);
     };
 

@@ -7,7 +7,7 @@ export enum Mode {
   END_TILE = "Ziel",
   RESTRICTION_PLACEMENT = "Gesperrte Zonen",
   ITEM_PLACEMENT = "Gegenstände und Objekte",
-  LABYRINTH_NAME = "Labyrinth benennen"
+  LABYRINTH_NAME = "Labyrinth benennen",
 }
 
 // temporary filler for roles
