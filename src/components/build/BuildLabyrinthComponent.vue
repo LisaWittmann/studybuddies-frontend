@@ -9,6 +9,7 @@
     />
   </div>
   <div v-else class="labyrinth-canvas">
+    <BuildTileOverviewComponent v-if="showTileOverview" :model="clickedTile" />
     <div class="labyrinth-canvas__row" v-for="row in rows" :key="row">
       <BuildTileComponent
         v-for="column in columns"
@@ -20,7 +21,6 @@
         @entered="onEnter"
       />
     </div>
-    <BuildTileOverviewComponent v-if="showTileOverview" :model="clickedTile" />
   </div>
 </template>
 
@@ -162,11 +162,8 @@ export default defineComponent({
   .tile-overview {
     position: absolute;
     z-index: 1;
-    top: 0;
+    top: 30px;
     left: 0;
-    bottom: 100px;
-    margin-top: auto;
-    margin-bottom: auto;
   }
 
   h1 {

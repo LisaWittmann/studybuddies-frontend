@@ -113,7 +113,7 @@ export default defineComponent({
       font-size: inherit;
       position: absolute;
       top: 35%;
-      z-index: 3;
+      z-index: 0;
 
       @include color-scheme(dark) {
         color: $color-dark-green;
