@@ -1,5 +1,5 @@
 import { reactive } from "vue";
-import { MainPlayer, PartnerPlayer, Player } from "@/service/game/Player";
+import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { Item } from "../labyrinth/Item";
@@ -41,6 +41,37 @@ function setGameState(
   }
   if (errormessage) gameState.errormessage = errormessage;
   if (score) gameState.score = JSON.parse(score) as number;
+}
+
+function setGameSessionStorage() {
+  sessionStorage.setItem("lobbyKey", JSON.stringify(gameState.lobbyKey)),
+    sessionStorage.setItem(
+      "selectedLabyrinth",
+      JSON.stringify(gameState.labyrinthId)
+    ),
+    sessionStorage.setItem("labyrinth", JSON.stringify(gameState.labyrinth)),
+    sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer)),
+    sessionStorage.setItem(
+      "partnerPlayer",
+      JSON.stringify(gameState.partnerPlayer)
+    ),
+    sessionStorage.setItem(
+      "errormessage",
+      JSON.stringify(gameState.errormessage)
+    ),
+    sessionStorage.setItem("score", JSON.stringify(gameState.score));
+}
+
+function getGameSessionStorage() {
+  setGameState(
+    sessionStorage.getItem("lobbyKey"),
+    sessionStorage.getItem("selectedLabyrinth"),
+    sessionStorage.getItem("labyrinth"),
+    sessionStorage.getItem("mainPlayer"),
+    sessionStorage.getItem("partnerPlayer"),
+    sessionStorage.getItem("errormessage"),
+    sessionStorage.getItem("score")
+  );
 }
 
 function updateGameData() {
@@ -90,10 +121,12 @@ async function setPlayerData(username: string, startTileId: number) {
 
 async function setLobbyKey(lobbyKey: string) {
   gameState.lobbyKey = lobbyKey;
+  sessionStorage.setItem("lobbyKey", lobbyKey);
 }
 
 async function setError(error: string) {
   gameState.errormessage = error;
+  sessionStorage.setItem("errormessage", error);
 }
 
 function getPlayer(username: string) {
@@ -115,5 +148,7 @@ export function useGameStore() {
     setLobbyKey,
     setError,
     getPlayer,
+    setGameSessionStorage,
+    getGameSessionStorage,
   };
 }

@@ -143,9 +143,9 @@ function getIntersections(context: SetupContext, x: number, y: number) {
     const object = intersection.object;
     // if parent object is a 'valid' object (no tile)
     if (object.parent?.userData.id != null) {
-      // mock disabled objects
-      if (object.parent.userData.modelName == "COMPUTER") {
-        context.emit("click-disabled");
+      // mock inventory
+      if (object.parent.userData.modelName == "USB") {
+        object.parent.visible = false;
       }
       context.emit("click-object", object.parent.name);
     } else if (object.parent?.userData.showInView) {

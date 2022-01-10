@@ -1,11 +1,10 @@
 import { computed, reactive } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "../login/LoginStore";
+import { useLoginStore } from "@/service/login/LoginStore";
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message } from "@/service/game/Conversation";
-import { Item, Position } from "../labyrinth/Item";
-import { Tile } from "../labyrinth/Tile";
-import { MainPlayer } from "./Player";
+import { Orientation } from "@/service/labyrinth/Tile";
+import { Item } from "../labyrinth/Item";
 
 const { updateInventory } = useGameStore();
 
@@ -15,7 +14,6 @@ const gameEventMessage = reactive({
   visible: false,
 });
 
-// conversations with interactive game characters
 const conversation = reactive({
   character: "",
   message: new Message("", "", undefined, []),
@@ -27,11 +25,24 @@ const { gameState } = useGameStore();
 const toggleEventMessage = () =>
   (gameEventMessage.visible = !gameEventMessage.visible);
 
-async function playerMovement(evenMessage: EventMessage) {
+/**
+ * function which is used when clicking the arrow in Scene
+ * By receiving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
+ * @param orientation used in the backend to identify the direction to move the player
+ */
+async function movePlayer(orientation: Orientation) {
+  const { gameState } = useGameStore();
+  const { loginState } = useLoginStore();
+  const eventMessage = new EventMessage(
+    Operation[Operation.MOVEMENT],
+    gameState.lobbyKey,
+    loginState.username,
+    Orientation[orientation]
+  );
   fetch("/api/lobby/move", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(evenMessage),
+    body: JSON.stringify(eventMessage),
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
@@ -42,12 +53,20 @@ async function playerMovement(evenMessage: EventMessage) {
     });
 }
 
+/**
+ * start conversation with a game character
+ * @param character modelName of charachter
+ */
 async function startConversation(character: string) {
   conversation.character = character;
   conversation.visible = true;
   getConversationMessage("1.1");
 }
 
+/**
+ * get next message of conversation with game character
+ * @param id message id
+ */
 async function getConversationMessage(id: string) {
   fetch(`/api/body/npc/${conversation.character}/${id}`, {
     method: "GET",
@@ -58,16 +77,14 @@ async function getConversationMessage(id: string) {
     })
     .then((jsonData) => {
       console.log(jsonData);
-
-      if ((jsonData as Message).id == "0.0") {
-        console.log("endConversation");
-        endConversation();
-        return;
-      }
-
       conversation.message = jsonData as Message;
-      if (conversation.message.itemName != null) {
-        console.log("give Item");
+
+      if (conversation.message.id != "0.0") {
+        if (conversation.message.itemName != null) {
+          console.log("give Item");
+        }
+      } else {
+        endConversation();
       }
     })
     .catch(() => {
@@ -75,22 +92,20 @@ async function getConversationMessage(id: string) {
     });
 }
 
+/**
+ * set conversation state to default values to end conversation
+ */
 async function endConversation() {
   conversation.visible = false;
   conversation.message = new Message("", "", undefined, []);
   conversation.character = "";
 }
 
-// fetches the current tileId of both players
-async function updatePlayerPositions(lobbyKey: string) {
-  return fetch("/api/lobby/players/" + lobbyKey, {
-    method: "GET",
-  }).then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  });
-}
-
+/**
+ * request access to clicked item
+ * display incoming data as gameEventMessage
+ * @param modelName name of the clicked item
+ */
 async function checkAccess(modelName: string) {
   const { gameState } = useGameStore();
   const { loginState } = useLoginStore();
@@ -135,7 +150,6 @@ async function clickItem(objectData: string) {
     })
     .then((jsonData) => {
       const operation = (<any>Operation)[jsonData];
-      console.log(operation);
       switch (operation) {
         case Operation.ACCESS:
           checkAccess(modelName);
@@ -204,8 +218,7 @@ export function useGameService() {
   return {
     gameEventMessage,
     toggleEventMessage,
-    updatePlayerPositions,
-    playerMovement,
+    movePlayer,
     clickItem,
     startConversation,
     getConversationMessage,

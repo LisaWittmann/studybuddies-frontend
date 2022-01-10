@@ -1,0 +1,12 @@
+# Blender MTL File: 'squirrel.blend'
+# Material Count: 1
+
+newmtl SquirrelMaterial.001
+Ns 0.000000
+Ka 0.119298 0.119298 0.119298
+Kd 0.318547 0.064803 0.006995
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 3
