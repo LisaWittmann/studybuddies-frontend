@@ -123,6 +123,8 @@ async function checkAccess(modelName: string) {
       gameEventMessage.message = jsonData.accesstext;
       if (jsonData.access) {
         gameEventMessage.state = "success";
+        //ToDo: - update Score component
+        //      - trigger opacity of computer model  
       } else {
         gameEventMessage.state = "warning";
       }
