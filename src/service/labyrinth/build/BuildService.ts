@@ -206,7 +206,7 @@ function removeEndTile(model: TileModel): void {
   if (!model.isEnd) return;
   buildState.endPosition = 0;
   model.isEnd = false;
-  updateTileModels();
+  setSelectableTiles();
 }
 
 /**
