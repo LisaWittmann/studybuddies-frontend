@@ -9,17 +9,15 @@
     />
   </div>
   <div v-else class="labyrinth-canvas">
-    <div class="labyrinth-canvas__row" v-for="row in rows" :key="row">
-      <BuildTileComponent
-        v-for="column in columns"
-        :key="column"
-        :size="tileSize"
-        :gutter="gutter"
-        :model="getTileModel(column, row)"
-        @clicked="onClick"
-        @entered="onEnter"
-      />
-    </div>
+    <BuildTileComponent
+      v-for="model of tileModels"
+      :key="model"
+      :size="tileSize"
+      :gutter="gutter"
+      :model="model"
+      @clicked="onClick"
+      @entered="onEnter"
+    />
     <BuildTileOverviewComponent v-if="showTileOverview" :model="clickedTile" />
   </div>
 </template>
@@ -60,7 +58,6 @@ export default defineComponent({
   setup(props) {
     const {
       buildState,
-      getTileModel,
       addStartTile,
       addEndTile,
       selectTile,
@@ -73,13 +70,12 @@ export default defineComponent({
     addEventListener("mousedown", () => (mousedown = true));
     addEventListener("mouseup", () => (mousedown = false));
 
-    const rows = computed(() => buildState.rows);
-    const columns = computed(() => buildState.columns);
     const gutter = computed(() => props.mode == Mode.CREATE);
-    const nameMode = computed(() => props.mode == Mode.LABYRINTH_NAME);
 
+    const nameMode = computed(() => props.mode == Mode.LABYRINTH_NAME);
     const labyrinthName = ref(buildState.labyrinthName);
 
+    const tileModels = computed(() => buildState.tileModels);
     const clickedTile = ref({} as TileModel);
     const showTileOverview = computed(
       () =>
@@ -125,15 +121,13 @@ export default defineComponent({
     }
 
     return {
-      rows,
-      columns,
       gutter,
       nameMode,
       clickedTile,
       showTileOverview,
       labyrinthName,
       updateName,
-      getTileModel,
+      tileModels,
       onClick,
       onEnter,
     };
@@ -146,18 +140,11 @@ export default defineComponent({
   height: 100%;
 }
 .labyrinth-canvas {
-  @include flex-center();
-  flex-direction: column;
-  flex-wrap: wrap;
+  display: grid;
+  justify-content: flex-start;
   min-width: 100%;
   min-height: 100vh;
-
-  &__row {
-    @include flex-center();
-    flex-wrap: nowrap;
-    min-width: 100%;
-    height: auto;
-  }
+  margin: auto;
 
   .tile-overview {
     position: absolute;
