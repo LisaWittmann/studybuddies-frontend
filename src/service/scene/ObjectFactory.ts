@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
+import { DoubleSide, Texture, TextureLoader } from "three";
 
 import { Item } from "@/service/labyrinth/Item";
 import { Orientation } from "@/service/labyrinth/Tile";
@@ -9,7 +10,6 @@ import { PartnerPlayer, Role } from "@/service/game/Player";
 
 import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
-import { DoubleSide, Texture, TextureLoader } from "three";
 
 /**
  * creates item by loading its obj representation from models directory

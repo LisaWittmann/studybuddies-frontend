@@ -85,6 +85,7 @@ function createTile(
 function getTexture(tile: Tile) {
   if (tile.restrictions.length == 1) {
     if (tile.isRestrictedFor(Role.HACKER)) return "designer";
+    if (tile.isRestrictedFor(Role.DESIGNER)) return "hacker";
   }
 }
 
