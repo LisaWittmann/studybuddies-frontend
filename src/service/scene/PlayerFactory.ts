@@ -38,6 +38,7 @@ function updatePartnerPlayer(
       tilePosition
     );
     if (!partnerInitialized) {
+      console.log("POSITION IN IF ", position.x, position.y, position.z);
       partnerInitialized = true;
       createPlayer(player, position, scene);
     } else if (playerObject) {
@@ -82,7 +83,10 @@ function calculatePartnerPositon(
   //partner initially placed in the northwest corner
   let playerOrientation = "NORTHWEST";
   const calcPartnerPosition = new Vector3();
-  const directionVector = new Vector3();
+  const directionVector = new Vector3()
+    .copy(direction.north)
+    .add(direction.west)
+    .multiplyScalar(factors.partnerTranslateFactor);
 
   //gets all orientations/positions of items in tile
   if (tileItems && tileItems?.length >= 1) {
@@ -94,53 +98,57 @@ function calculatePartnerPositon(
     itemOrientations.forEach((o) => {
       //if there is an item in the corner -> move partner clockwise
       if (playerOrientation === o) {
-        switch (o) {
-          case "NORTHWEST" || "WESTNORTH":
+          if (o === "NORTHWEST" || o === "WESTNORTH") {
             playerOrientation = "NORTHEAST";
             directionVector
-              .copy(direction.north)
-              .add(direction.east)
-              .multiplyScalar(factors.partnerTranslateFactor);
-            break;
-          case "NORTHEAST" || "EASTNORTH":
+            .copy(direction.north)
+            .add(direction.east)
+            .multiplyScalar(factors.partnerTranslateFactor);
+          } else if (o === "NORTHEAST" || o === "EASTNORTH") {
             playerOrientation = "SOUTHEAST";
             directionVector
               .copy(direction.south)
               .add(direction.east)
               .multiplyScalar(factors.partnerTranslateFactor);
-            break;
-          case "SOUTHEAST" || "EASTSOUTH":
+          } else if (o === "SOUTHEAST" || o === "EASTSOUTH") {
             playerOrientation = "SOUTHWEST";
             directionVector
               .copy(direction.south)
               .add(direction.west)
               .multiplyScalar(factors.partnerTranslateFactor);
-            break;
-          case "SOUTHWEST" || "WESTSOUTH":
+          } else if (o === "SOUTHWEST" || o === "WESTSOUTH") {
             playerOrientation = "NORTHWEST";
             directionVector
               .copy(direction.north)
               .add(direction.west)
               .multiplyScalar(factors.partnerTranslateFactor);
-            break;
-          default:
+          } else {
             playerOrientation = "NORTHWEST";
             directionVector
               .copy(direction.north)
               .add(direction.west)
               .multiplyScalar(factors.partnerTranslateFactor);
-            break;
+          }
         }
-      }
     });
-  } else {
-    playerOrientation = "NORTHWEST";
-    directionVector
-      .copy(direction.north)
-      .add(direction.west)
-      .multiplyScalar(factors.partnerTranslateFactor);
   }
+
+  console.log(
+    "POSITION AFTER IF & SWITCH ",
+    directionVector.x,
+    directionVector.y,
+    directionVector.z
+  );
+
   calcPartnerPosition.copy(tilePosition).add(directionVector);
+
+  console.log(
+    "calcPartnerPosition ",
+    calcPartnerPosition.x,
+    calcPartnerPosition.y,
+    calcPartnerPosition.z
+  );
+
   return calcPartnerPosition;
 }
 
