@@ -6,7 +6,6 @@ import {
   direction,
   colors,
 } from "@/service/scene/helper/SceneConstants";
-import { Role } from "../game/Player";
 
 /**
  * base class of static items in scene like walls and arrows
@@ -73,16 +72,7 @@ export class Wall extends FixedObject {
 export class Arrow extends FixedObject {
   showInView = true;
   modelName = "arrow";
-  color: number;
-
-  constructor(
-    orientation: Orientation,
-    tilePosition: Vector3,
-    role: Role | undefined
-  ) {
-    super(orientation, tilePosition);
-    this.color = role == Role.HACKER ? colors.hacker : colors.designer;
-  }
+  color = colors.beige;
 
   position = (): Vector3 => {
     return this.getPosition(settings.tileSize / 2 - 2);

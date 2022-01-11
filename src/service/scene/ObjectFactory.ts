@@ -67,7 +67,7 @@ function createFloor(
   color = 0x199eb0
 ) {
   const textureLoader = new TextureLoader();
-  textureLoader.load("/textures/GrasTexture.png", (texture: Texture) => {
+  textureLoader.load("/textures/gras-texture.png", (texture: Texture) => {
     texture.minFilter = THREE.NearestFilter;
     const object = new THREE.Mesh(
       new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
@@ -97,7 +97,7 @@ function createCeiling(
   color = 0x199eb0
 ) {
   const textureLoader = new TextureLoader();
-  textureLoader.load("/textures/CeilingTexture.png", (texture: Texture) => {
+  textureLoader.load("/textures/leaves-texture.png", (texture: Texture) => {
     texture.minFilter = THREE.NearestFilter;
     const object = new THREE.Mesh(
       new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
@@ -129,27 +129,31 @@ function createTexturedWall(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
   orientation: Orientation,
-  color = 0x199eb0
+  color = 0x199eb0,
+  textureName = "bark"
 ) {
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
-  textureLoader.load("/textures/BarkTexture.png", (texture: Texture) => {
-    texture.minFilter = THREE.NearestFilter;
-    const object = new THREE.Mesh(
-      new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-      new THREE.MeshStandardMaterial({
-        side: DoubleSide,
-        map: texture,
-        color: color,
-      })
-    );
-    object.position.copy(position);
-    object.rotateY(wall.rotationY());
-    object.userData = wall;
-    object.name = "wall";
-    tileModel.add(object);
-  });
+  textureLoader.load(
+    `/textures/${textureName}-texture.png`,
+    (texture: Texture) => {
+      texture.minFilter = THREE.NearestFilter;
+      const object = new THREE.Mesh(
+        new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
+        new THREE.MeshStandardMaterial({
+          side: DoubleSide,
+          map: texture,
+          color: color,
+        })
+      );
+      object.position.copy(position);
+      object.rotateY(wall.rotationY());
+      object.userData = wall;
+      object.name = "wall";
+      tileModel.add(object);
+    }
+  );
 }
 
 /**
@@ -203,7 +207,7 @@ function createRestrictiveWall(
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
   textureLoader.load(
-    "/textures/RestrictedTexture.png",
+    "/textures/restricted-texture.png",
     function (texture: Texture) {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
@@ -233,10 +237,9 @@ function createRestrictiveWall(
 function createArrow(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
-  orientation: Orientation,
-  role: Role | undefined
+  orientation: Orientation
 ) {
-  const arrow = new Arrow(orientation, tilePosition, role);
+  const arrow = new Arrow(orientation, tilePosition);
   const objLoader = new OBJLoader();
   objLoader.loadAsync("/models/arrow.obj").then((object) => {
     object.position.copy(arrow.position());

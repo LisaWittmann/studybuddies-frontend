@@ -35,6 +35,7 @@ function createTile(
   tileModel.userData.tileId = tileKey;
   tileModel.name = tileKey.toString();
   const tileRestricted = tile.isRestrictedFor(role);
+  const texture = getTexture(tile);
 
   //LIGHT-----------------
   tileModel.add(createLight(tilePosition));
@@ -45,16 +46,28 @@ function createTile(
   if (tileRestricted) {
     neighbors.forEach((neighbor, orientation) => {
       if (!neighbor) {
-        createTexturedWall(tilePosition, tileModel, orientation, color);
+        createTexturedWall(
+          tilePosition,
+          tileModel,
+          orientation,
+          color,
+          texture
+        );
       }
     });
   } else {
     neighbors.forEach((neighbor, orientation) => {
       if (!neighbor) {
-        createTexturedWall(tilePosition, tileModel, orientation, color);
+        createTexturedWall(
+          tilePosition,
+          tileModel,
+          orientation,
+          color,
+          texture
+        );
       } else if (!neighbor.isRestrictedFor(role)) {
         //arrow if there are no restrictions for the player in relation to the current tile
-        createArrow(tilePosition, tileModel, orientation, role);
+        createArrow(tilePosition, tileModel, orientation);
       } else {
         //transparent wall if restricted zone is starting in the current orientation
         createRestrictiveWall(tilePosition, tileModel, orientation, color);
@@ -67,6 +80,12 @@ function createTile(
     createItem(tilePosition, tileModel, item);
   }
   return tileModel;
+}
+
+function getTexture(tile: Tile) {
+  if (tile.restrictions.length == 1) {
+    if (tile.isRestrictedFor(Role.HACKER)) return "designer";
+  }
 }
 
 /**
