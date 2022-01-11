@@ -14,7 +14,7 @@ import {
 } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
-const { updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
+const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
 let labyrinthData: Labyrinth;
@@ -66,6 +66,7 @@ function updatePlayer(
   labyrinth: Labyrinth,
   scene: THREE.Scene
 ) {
+  if (!requiresUpdate(player)) return;
   console.log("Move player: " + player.getUsername());
   const tilePosition = getTilePosition(player.getPosition(), scene);
   if (tilePosition) {

@@ -1,7 +1,7 @@
 import { Scene, Vector3 } from "three";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
-import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
+import { Player, MainPlayer, PartnerPlayer } from "@/service/game/Player";
 import { direction, factors } from "./helper/SceneConstants";
 import { Labyrinth } from "../labyrinth/Labyrinth";
 
@@ -11,13 +11,21 @@ const { createPlayer, checkIntersect } = useObjectFactory();
 let playerPosition: number;
 let partnerPosition: number;
 
+function requiresUpdate(player: Player) {
+  if (player instanceof MainPlayer) {
+    return player.getPosition() != playerPosition;
+  } else if (player instanceof PartnerPlayer) {
+    return player.getPosition() != partnerPosition;
+  } else return false;
+}
+
 /**
  * update position of main player
  * @param player: main player
  * @param tilePosition: position of tile player should be placed on
  */
 function updateMainPlayer(player: MainPlayer, tilePosition: Vector3) {
-  if (playerPosition != player.getPosition()) {
+  if (requiresUpdate(player)) {
     updateCameraPosition(tilePosition);
     playerPosition = player.getPosition();
   }
@@ -35,10 +43,9 @@ function updatePartnerPlayer(
   labyrinth: Labyrinth,
   scene: Scene
 ) {
-  if (player.getUsername() == "") {
+  if (!player.getUsername() || !requiresUpdate(player)) {
     return;
   } else {
-    if (partnerPosition == player.getPosition()) return;
     const playerObject = scene.getObjectByName(player.getUsername());
     const position = calculatePartnerPositon(
       player.getPosition(),
@@ -146,5 +153,5 @@ function calculatePartnerPositon(
 }
 
 export function usePlayerFactory() {
-  return { updateMainPlayer, updatePartnerPlayer };
+  return { requiresUpdate, updateMainPlayer, updatePartnerPlayer };
 }
