@@ -1,10 +1,12 @@
 <template>
-  <div class="loading">
-    <div class="loader-ring">
-      <div class="loader-ring--light"></div>
-      <div class="loader-ring--track"></div>
+  <transition name="fade" appear>
+    <div class="loading">
+      <div class="loader-ring">
+        <div class="loader-ring--light"></div>
+        <div class="loader-ring--track"></div>
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script lang="ts">

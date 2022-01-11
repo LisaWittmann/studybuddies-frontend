@@ -1,9 +1,6 @@
 <template>
   <transition name="fade" appear>
-    <LoadingComponent v-if="loading" />
-  </transition>
-  <transition name="fade" appear>
-    <div class="container" :class="{ 'container--fixed': loading }">
+    <div class="container">
       <h1>
         Lobby
         <span class="uppercase"> {{ lobbyKey }}</span>
@@ -68,7 +65,6 @@ import { useGameStore } from "@/service/game/GameStore";
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import RadioButtonGroupComponent from "@/components/RadioButtonGroupComponent.vue";
-import LoadingComponent from "@/components/LoadingComponent.vue";
 import router from "@/router";
 
 export default defineComponent({
@@ -77,7 +73,6 @@ export default defineComponent({
     UserListComponent,
     DropdownComponent,
     RadioButtonGroupComponent,
-    LoadingComponent,
   },
   setup() {
     const { loginState } = useLoginStore();
@@ -109,8 +104,6 @@ export default defineComponent({
         lobbyState.users.find((user) => user.username === loginState.username)
           ?.isReady
     );
-
-    const loading = computed(() => gameState.loading);
 
     function selectLabyrinth(id: number) {
       setLabyrinthSelection(id);
@@ -167,18 +160,12 @@ export default defineComponent({
       selectedLabyrinth,
       loginState,
       isReady,
-      loading,
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.container--fixed {
-  height: 100vh;
-  overflow: hidden;
-}
-
 h1 {
   padding-top: $spacing-l;
   margin-top: 0;

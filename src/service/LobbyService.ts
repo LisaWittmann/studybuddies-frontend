@@ -400,8 +400,8 @@ function setupGame() {
           updatePlayerData(user.username, startTile);
           console.log("StartTileId is: " + startTile);
         });
-        gameState.loading = false;
         router.push(`/game/${gameState.lobbyKey}`);
+        gameState.loading = false;
       });
     });
 }
