@@ -1,4 +1,3 @@
-import { reactive } from "vue";
 import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Item } from "@/service/labyrinth/Item";
