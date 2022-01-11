@@ -304,7 +304,7 @@ async function createPlayer(
  * @returns
  */
 function checkIntersect(
-  playerObject: THREE.Group,
+  playerObject: THREE.Object3D,
   player: PartnerPlayer,
   position: THREE.Vector3,
   scene: THREE.Scene | THREE.Group
