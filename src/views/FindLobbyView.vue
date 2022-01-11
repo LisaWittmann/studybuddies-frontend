@@ -93,4 +93,8 @@ export default defineComponent({
   max-width: 600px;
   padding-top: $spacing-l;
 }
+
+input {
+  text-align: center;
+}
 </style>

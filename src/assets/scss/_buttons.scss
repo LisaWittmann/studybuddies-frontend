@@ -55,6 +55,7 @@ button,
 
     &--filled {
         background-color: $color-dark-green;
+        color: $color-white;
         box-shadow: 5px 5px 0 0 rgba(black, 0.04);
 
         @include color-scheme(dark) {

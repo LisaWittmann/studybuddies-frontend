@@ -1,6 +1,6 @@
 <template>
   <transition name="fade" appear>
-    <div class="loading">
+    <div class="loader">
       <div class="loader-ring">
         <div class="loader-ring--light"></div>
         <div class="loader-ring--track"></div>
@@ -18,13 +18,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-$ring-size: 200px;
-$ring-width: 6px;
+$loader-size: 150px;
 
-.loading {
+.loader {
+  @include flex-center();
   position: absolute;
   z-index: 10;
   top: 0;
+  height: 100%;
   bottom: 0;
   left: 0;
   right: 0;
@@ -36,43 +37,33 @@ $ring-width: 6px;
 }
 
 .loader-ring {
-  width: $ring-size;
-  height: $ring-size;
+  width: $loader-size;
+  height: $loader-size;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  margin: $ring-size/-2 0 0 $ring-size/-2;
+  margin: -3px 0 0 -3px;
+
+  > * {
+    height: $loader-size;
+    width: $loader-size;
+    border-radius: 100%;
+  }
 
   &--light {
-    width: $ring-size;
-    height: $ring-size;
-    border-radius: 100%;
-    animation: rotate-360 2s linear infinite;
-    box-shadow: 0 $ring-width 0 lighten($color-light-green, 10%) inset;
+    @include rotate-animation();
+    box-shadow: 0 6px 0 lighten($color-light-green, 10%) inset;
     @include color-scheme(dark) {
-      box-shadow: 0 $ring-width 0 lighten($color-dark-green, 10%) inset;
+      box-shadow: 0 6px 0 lighten($color-dark-green, 10%) inset;
     }
   }
+
   &--track {
     position: absolute;
     top: 0;
     left: 0;
-    width: $ring-size;
-    height: $ring-size;
-    border-radius: 100%;
-    box-shadow: 0 0 10px $ring-width rgba($color-grey, 0.3) inset;
+    box-shadow: 0 0 10px 6px rgba($color-grey, 0.3) inset;
     @include color-scheme(dark) {
-      box-shadow: 0 0 10px $ring-width rgba(black, 0.3) inset;
+      box-shadow: 0 0 10px 6px rgba(black, 0.3) inset;
     }
-  }
-}
-
-@keyframes rotate-360 {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
   }
 }
 </style>
