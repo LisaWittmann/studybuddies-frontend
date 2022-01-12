@@ -186,7 +186,7 @@ async function removeItemFromTile(
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
-      deleteItemFromTile(itemId, objectName);
+      // deleteItemFromTile(itemId, objectName);
     })
     .catch((error) => {
       console.error(error);

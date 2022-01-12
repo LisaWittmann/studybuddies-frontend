@@ -48,6 +48,8 @@ async function initializeLabyrinth(
  * @param scene: scene that contains labyrinth
  */
 async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
+  console.log('labyrinth: ', labyrinth);
+  console.log('labyrinthData: ', labyrinthData);
   if (labyrinthData == labyrinth) return;
   labyrinthData = labyrinth;
   for (const [key, value] of labyrinth.tileMap) {
