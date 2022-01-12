@@ -143,7 +143,6 @@ export default defineComponent({
   display: grid;
   justify-content: flex-start;
   min-width: 100%;
-  min-height: 100vh;
   margin: auto;
 
   .tile-overview {
