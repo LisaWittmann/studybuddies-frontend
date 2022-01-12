@@ -139,10 +139,8 @@ async function checkAccess(modelName: string) {
  * request operation of clicked item
  * @param modelName name of clicked item
  */
-async function clickItem(modelName: string) {
-  const objectName = modelName.split(" ")[1];
-  const itemId = modelName.split(" ")[3].toString();
-  fetch("/api/lobby/click/" + objectName, { method: "GET" })
+async function clickItem(modelName: string, itemId: string) {
+  fetch("/api/lobby/click/" + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
@@ -151,13 +149,13 @@ async function clickItem(modelName: string) {
       const operation = (<any>Operation)[jsonData];
       switch (operation) {
         case Operation.ACCESS:
-          checkAccess(objectName);
+          checkAccess(modelName);
           break;
         case Operation.CONVERSATION:
-          startConversation(objectName);
+          startConversation(modelName);
           break;
         case Operation.COLLECT:
-          removeItemFromTile(gameState.lobbyKey, objectName, itemId);
+          removeItemFromTile(gameState.lobbyKey, itemId);
           break;
       }
     })
@@ -174,7 +172,6 @@ async function clickItem(modelName: string) {
  */
 async function removeItemFromTile(
   lobbyKey: string,
-  objectName: string,
   itemId: string
 ) {
   await fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
