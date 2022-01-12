@@ -19,12 +19,6 @@
     :message="conversation.message"
     @respond="getConversationMessage"
   />
-  <!--instructions for current game quest-->
-  <OverlayInstructionComponent
-    :opened="showInstructions"
-    :instructions="instructions"
-    @close="closeInstructions"
-  />
   <!--player inventory-->
   <InventoryComponent />
 </template>
@@ -36,7 +30,6 @@ import { useGameStore } from "@/service/game/GameStore";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
-import OverlayInstructionComponent from "@/components/overlays/OverlayInstructionComponent.vue";
 import InventoryComponent from "@/components/InventoryComponent.vue";
 
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
