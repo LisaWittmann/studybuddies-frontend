@@ -111,6 +111,6 @@ export default defineComponent({
 .image--header {
   width: 100%;
   max-width: 600px;
-  padding-top: $spacing-l;
+  margin-top: $spacing-l;
 }
 </style>

@@ -1,7 +1,11 @@
 <template>
   <div
     class="tile-canvas"
-    :style="{ width: `${size}px` }"
+    :style="{
+      width: `${size}px`,
+      gridRow: model.position.y + 1,
+      gridColumn: model.position.x + 1,
+    }"
     :class="{ items: model.objectsInRoom.length > 0 }"
   >
     <div
@@ -79,8 +83,8 @@ export default defineComponent({
 
   &__inner {
     @include flex-center();
-    height: 100%;
-    padding-top: 100%;
+    padding-bottom: 100%;
+    height: auto;
 
     &.selectable {
       background: rgba($color-light-green, 0.3);

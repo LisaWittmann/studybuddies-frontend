@@ -11,7 +11,7 @@ import {
 
 const buildState = reactive({
   rows: 15,
-  columns: 25,
+  columns: 30,
   itemOptions: new Array<ItemModel>(),
   tileModels: new Array<TileModel>(),
   startPositions: new Array<number>(),
@@ -24,7 +24,7 @@ updateTileModels();
 
 let counter = 1;
 const maxRows = 20;
-const maxColumns = 30;
+const maxColumns = 40;
 const minTiles = 10;
 const maxItems = 3;
 const startPositions = 2;
@@ -44,7 +44,7 @@ const selectedTiles = computed(() => {
  */
 function reset(): void {
   buildState.rows = 15;
-  buildState.columns = 25;
+  buildState.columns = 30;
   buildState.tileModels = new Array<TileModel>();
   buildState.startPositions = new Array<number>();
   buildState.endPosition = 0;
@@ -116,9 +116,6 @@ function setSelectableTiles(): void {
       if (neighbors.some((neighbor) => neighbor && neighbor.relationKey)) {
         model.isSelectable = true;
       }
-      if (neighbors.some((neighbor) => neighbor && neighbor.isEnd)) {
-        model.isSelectable = false;
-      }
     }
   }
 }
@@ -142,8 +139,11 @@ function getTileModel(x: number, y: number): TileModel | undefined {
 function selectTile(model: TileModel): void {
   if (!model.isSelectable) return;
   model.isSelectable = false;
-  model.relationKey = counter;
-  counter++;
+  model.relationKey = ++counter;
+  const endTile = model
+    .getNeighborsAsList()
+    .find((tileModel) => tileModel.relationKey == buildState.endPosition);
+  if (endTile) removeEndTile(endTile);
   setSelectableTiles();
 }
 
@@ -195,7 +195,6 @@ function addEndTile(model: TileModel): void {
   if (endTile) endTile.isEnd = false;
   buildState.endPosition = model.relationKey;
   model.isEnd = true;
-  setSelectableTiles();
 }
 
 /**
@@ -206,7 +205,6 @@ function removeEndTile(model: TileModel): void {
   if (!model.isEnd) return;
   buildState.endPosition = 0;
   model.isEnd = false;
-  setSelectableTiles();
 }
 
 /**

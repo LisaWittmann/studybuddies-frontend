@@ -111,7 +111,7 @@ export default defineComponent({
     const changeMode = (mode: Mode) => (currentMode.value = mode);
 
     const tileSize = ref(100);
-    const minZoom = 50;
+    const minZoom = 60;
     const maxZoom = 150;
     const zoomFactor = 10;
 
