@@ -1,24 +1,78 @@
 @mixin pulse-animation($color: $color-dark-green, $opacity: 0.4) {
-    animation: pulse 3s infinite;
+  animation: pulse 3s infinite;
 
-    @keyframes pulse {
-        0% {
-            box-shadow: 0 0 0 0px rgba($color, $opacity);
-        }
-        100% {
-            box-shadow: 0 0 0 12px rgba($color, 0);
-        }
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0px rgba($color, $opacity);
     }
+    100% {
+      box-shadow: 0 0 0 12px rgba($color, 0);
+    }
+  }
 }
 
 @mixin float-animation($from: 30px, $to: 20px, $duration: 0.3s) {
-    animation: float $duration ease forwards;
-    @keyframes float {
-        from {
-            transform: translate3d(0, $from, 0);
-        }
-        to {
-            transform: translate3d(0, $to, 0);
-        }
+  animation: float $duration ease forwards;
+  @keyframes float {
+    from {
+      transform: translate3d(0, $from, 0);
+    }
+    to {
+      transform: translate3d(0, $to, 0);
+    }
+  }
+}
+
+@mixin lightup-animation($color: $color-beige, $opacity: 0.8) {
+  animation: lightup 1.5s ease-in-out;
+
+  @keyframes lightup {
+    0% {
+      filter: drop-shadow(0px 0px 0px) brightness(1);
+    }
+    50% {
+      filter: drop-shadow(0px 0px 10px $color) brightness(1.75);
+    }
+    100% {
+      filter: drop-shadow(0px 0px 0px) brightness(1);
+    }
+  }
+}
+
+@mixin fade-in-animation() {
+    animation: fadeindown .3s ease;
+
+    @keyframes fadeindown {
+    0% {
+        opacity: 0;
+        visibility: hidden;
+        -webkit-transform: translateY(-200px);
+        -webkit-transform: scaleY(0.5);
+    }
+    100% {
+        opacity: 1;
+        visibility: visible;
+        -webkit-transform: translateY(0);
+        -webkit-transform: scaleY(1);
+    }
+    }
+}
+
+@mixin fade-out-animation() {
+    animation: fadeoutup .3s ease;
+
+    @keyframes fadeoutup {
+    0% {
+        opacity: 1;
+        visibility: visible;
+        -webkit-transform: translateY(0);
+        -webkit-transform: scaleY(1);
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+        -webkit-transform: translateY(-200px);
+        -webkit-transform: scaleY(0.5);
+    }
     }
 }
