@@ -1,9 +1,12 @@
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
+import { Item } from "../labyrinth/Item";
+
+const { updateInventory } = useGameStore();
 
 const gameEventMessage = reactive({
   message: "",
@@ -16,6 +19,8 @@ const conversation = reactive({
   message: new Message("", "", undefined, []),
   visible: false,
 });
+
+const { gameState } = useGameStore();
 
 const toggleEventMessage = () =>
   (gameEventMessage.visible = !gameEventMessage.visible);
@@ -133,12 +138,11 @@ async function checkAccess(modelName: string) {
     });
 }
 
-/**
- * request operation of clicked item
- * @param modelName name of clicked item
- */
-async function clickItem(modelName: string) {
-  console.log("click", modelName);
+async function clickItem(objectData: string) {
+  const modelName = objectData.split(" ")[1];
+  const modelId = objectData.split(" ")[3];
+  const itemId = modelId.toString();
+
   fetch("/api/lobby/click/" + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
@@ -154,7 +158,56 @@ async function clickItem(modelName: string) {
           console.log("test");
           startConversation(modelName);
           break;
+        case Operation.COLLECT:
+          addToInventory(
+            gameState.lobbyKey,
+            itemId,
+            modelName,
+            gameState.mainPlayer.getUsername()
+          );
+          removeItemFromTile(gameState.lobbyKey, itemId);
+          break;
       }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+async function addToInventory(
+  lobbyKey: string,
+  itemId: string,
+  modelName: string,
+  username: string
+) {
+  //"/lobby/{key}/username/{username}/item/{itemId}"
+
+  fetch("api/lobby/" + lobbyKey + "/username/" + username + "/item/" + itemId, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      let inventory = new Array<Item>();
+      inventory = jsonData;
+      updateInventory(inventory);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+async function removeItemFromTile(lobbyKey: string, itemId: string) {
+  fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
+    method: "DELETE",
+    headers: { "Content-Type": "text/plain" },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
     })
     .catch((error) => {
       console.error(error);

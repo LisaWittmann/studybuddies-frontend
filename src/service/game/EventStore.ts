@@ -2,8 +2,14 @@ import { Client } from "@stomp/stompjs";
 import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
+import router from "@/router";
+import { ref } from "vue";
+import { useLabyrinthStore } from "../labyrinth/LabyrinthStore";
+import { VectorKeyframeTrack } from "three";
+import { Item } from "../labyrinth/Item";
 
-const { gameState, updatePlayerData, setError } = useGameStore();
+const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
+  useGameStore();
 const {
   updateUsers,
   setupGame,
