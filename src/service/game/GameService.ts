@@ -138,11 +138,11 @@ async function checkAccess(modelName: string) {
     });
 }
 
-async function clickItem(objectData: string) {
-  const modelName = objectData.split(" ")[1];
-  const modelId = objectData.split(" ")[3];
-  const itemId = modelId.toString();
-
+/**
+ * request operation of clicked item
+ * @param modelName name of clicked item
+ */
+async function clickItem(modelName: string, itemId: string) {
   fetch("/api/lobby/click/" + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
@@ -155,7 +155,6 @@ async function clickItem(objectData: string) {
           checkAccess(modelName);
           break;
         case Operation.CONVERSATION:
-          console.log("test");
           startConversation(modelName);
           break;
         case Operation.COLLECT:
@@ -165,7 +164,7 @@ async function clickItem(objectData: string) {
             modelName,
             gameState.mainPlayer.getUsername()
           );
-          removeItemFromTile(gameState.lobbyKey, itemId);
+          // removeItemFromTile(gameState.lobbyKey, itemId);
           break;
       }
     })
@@ -182,7 +181,7 @@ async function addToInventory(
 ) {
   //"/lobby/{key}/username/{username}/item/{itemId}"
 
-  fetch("api/lobby/" + lobbyKey + "/username/" + username + "/item/" + itemId, {
+  return fetch("api/lobby/" + lobbyKey + "/username/" + username + "/item/" + itemId, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
   })
@@ -194,20 +193,29 @@ async function addToInventory(
       let inventory = new Array<Item>();
       inventory = jsonData;
       updateInventory(inventory);
+      removeItemFromTile(lobbyKey, itemId);
     })
     .catch((error) => {
       console.error(error);
     });
 }
 
-async function removeItemFromTile(lobbyKey: string, itemId: string) {
-  fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
+/**
+ * Provides functionality to remove an item from a tile.
+ * @param lobbyKey the key of the lobby
+ * @param objectName the name of the object that is to be deleted
+ * @param itemId the id of the object that is to be deleted
+ */
+async function removeItemFromTile(
+  lobbyKey: string,
+  itemId: string
+) {
+  return fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
     method: "DELETE",
     headers: { "Content-Type": "text/plain" },
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
-      return response.json();
     })
     .catch((error) => {
       console.error(error);

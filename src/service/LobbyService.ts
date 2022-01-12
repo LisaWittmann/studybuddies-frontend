@@ -53,14 +53,8 @@ function setLobbySessionStorage() {
     "labyrinthOptions",
     JSON.stringify(lobbyState.labyrinthOptions)
   );
-  sessionStorage.setItem(
-    "errormessage",
-    lobbyState.errormessage
-  );
-  sessionStorage.setItem(
-    "selectedRole",
-    lobbyState.selectedRole
-  );
+  sessionStorage.setItem("errormessage", lobbyState.errormessage);
+  sessionStorage.setItem("selectedRole", lobbyState.selectedRole);
 }
 
 function getLobbySessionStorage() {
@@ -84,7 +78,8 @@ async function updateRole(role: string, lobbyKey: string, username: string) {
     Operation[Operation.ROLE_PICK],
     lobbyKey,
     username,
-    role);
+    role
+  );
   return fetch("/api/lobby/select-role", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

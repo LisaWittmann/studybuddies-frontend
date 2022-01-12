@@ -14,7 +14,8 @@ import {
 } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
-const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
+const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } =
+  usePlayerFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
 let labyrinthData: Labyrinth;
@@ -48,11 +49,27 @@ async function initializeLabyrinth(
  */
 async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
   if (labyrinthData == labyrinth) return;
-  labyrinthData = labyrinth;
+
   for (const [key, value] of labyrinth.tileMap) {
-    const tile = scene.getObjectByName(key.toString());
-    console.log("tile from scene", tile);
+    const labyrinthObjects = value.objectsInRoom;
+    const labyrinthDataObjects = labyrinthData.tileMap.get(key);
+    if (
+      labyrinthDataObjects &&
+      labyrinthDataObjects?.objectsInRoom.length > 0
+    ) {
+      const intersection = labyrinthDataObjects.objectsInRoom.filter(
+        (item) => !labyrinthObjects.some((object) => object.id == item.id)
+      );
+
+      if (intersection.length > 0) {
+        const id = intersection[0].id;
+        const name = intersection[0].modelName;
+
+        scene.getObjectByName("item " + name + " id " + id)?.clear();
+      }
+    }
   }
+  labyrinthData = labyrinth;
 }
 
 /**

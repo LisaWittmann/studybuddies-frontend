@@ -2,13 +2,8 @@ import { Client } from "@stomp/stompjs";
 import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
-import router from "@/router";
-import { ref } from "vue";
-import { useLabyrinthStore } from "../labyrinth/LabyrinthStore";
-import { VectorKeyframeTrack } from "three";
-import { Item } from "../labyrinth/Item";
 
-const { gameState, updatePlayerData, setError, setPlayerData, updateGameData } =
+const { gameState, updatePlayerData, updateGameData, setError } =
   useGameStore();
 const {
   updateUsers,
@@ -59,7 +54,7 @@ stompClient.onConnect = () => {
 
       let destTileID: number;
       let updateData: Update;
-      const operation: Operation = (<any>Operation)[eventMessage.operation]
+      const operation: Operation = (<any>Operation)[eventMessage.operation];
 
       switch (operation) {
         case Operation.MOVEMENT:
@@ -75,6 +70,9 @@ stompClient.onConnect = () => {
 
           break;
         case Operation.CLICK:
+          break;
+        case Operation.COLLECT:
+          updateGameData();
           break;
         case Operation.CHAT:
           break;
