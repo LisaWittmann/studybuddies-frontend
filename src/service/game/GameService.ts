@@ -170,10 +170,7 @@ async function clickItem(modelName: string, itemId: string) {
  * @param objectName the name of the object that is to be deleted
  * @param itemId the id of the object that is to be deleted
  */
-async function removeItemFromTile(
-  lobbyKey: string,
-  itemId: string
-) {
+async function removeItemFromTile(lobbyKey: string, itemId: string) {
   await fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
     method: "DELETE",
     headers: { "Content-Type": "text/plain" },
