@@ -4,6 +4,7 @@ import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { Player, MainPlayer, PartnerPlayer } from "@/service/game/Player";
 import { direction, factors } from "./helper/SceneConstants";
 import { Labyrinth } from "../labyrinth/Labyrinth";
+import { Orientation } from "../labyrinth/Tile";
 
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer, checkIntersect } = useObjectFactory();
@@ -91,7 +92,11 @@ function calculatePartnerPositon(
   //gets all orientations/positions of items in tile
   if (tileItems && tileItems?.length >= 1) {
     tileItems.forEach((item) => {
-      itemOrientations.push(item.orientations.toString().replace(",", ""));
+      const orientationStrings = item.orientations.map(
+        (orientation) => Orientation[orientation]
+      );
+      console.log(orientationStrings.toString());
+      itemOrientations.push(orientationStrings.toString().replace(",", ""));
     });
 
     //iterates over all orientations and checks if the planned corner position is already taken by an item
