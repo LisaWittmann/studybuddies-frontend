@@ -18,8 +18,6 @@ const conversation = reactive({
   visible: false,
 });
 
-const { deleteItemFromTile } = useLabyrinthFactory();
-
 const { gameState } = useGameStore();
 
 const toggleEventMessage = () =>
@@ -186,7 +184,6 @@ async function removeItemFromTile(
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
-      // deleteItemFromTile(itemId, objectName);
     })
     .catch((error) => {
       console.error(error);

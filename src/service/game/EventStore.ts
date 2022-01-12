@@ -15,8 +15,6 @@ const {
   lobbyState,
 } = useLobbyService();
 
-const { deleteItemFromTile } = useLabyrinthFactory();
-
 let wsURL = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
 

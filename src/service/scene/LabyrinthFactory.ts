@@ -12,7 +12,6 @@ import {
   direction,
   settings,
 } from "@/service/scene/helper/SceneConstants";
-import { useGameStore } from "../game/GameStore";
 
 const { createTile } = useTileFactory();
 const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
@@ -48,30 +47,23 @@ async function initializeLabyrinth(
  * @param scene: scene that contains labyrinth
  */
 async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
-  console.log('labyrinth: ', labyrinth);
-  console.log('labyrinthData: ', labyrinthData);
   if (labyrinthData == labyrinth) return;
-  labyrinthData = labyrinth;
-  for (const [key, value] of labyrinth.tileMap) {
-    const tile = scene.getObjectByName(key.toString());
-    console.log("tile from scene", tile);
-  }
-}
 
-// Documentation
-function deleteItemFromTile(gameScene: THREE.Scene, itemId: string, objectName: string) {
-  gameScene.children.forEach((tileObject) => {
-    tileObject.children.forEach((itemObject) => {
-      if (
-        itemObject.name.includes(itemId) &&
-        itemObject.name.includes(objectName)
-      ) {
-        gameScene
-          .getObjectByName("item " + objectName + " id " + itemId)
-          ?.clear();
+  for (const [key, value] of labyrinth.tileMap) {
+    const labyrinthObjects = value.objectsInRoom;
+    const labyrinthDataObjects = labyrinthData.tileMap.get(key);
+    if(labyrinthDataObjects && labyrinthDataObjects?.objectsInRoom.length > 0) {
+      const intersection = labyrinthDataObjects.objectsInRoom.filter((item) => !labyrinthObjects.some((object) => object.id == item.id));
+
+      if(intersection.length > 0) {
+        const id = labyrinthDataObjects.objectsInRoom[0].id
+        const name = labyrinthDataObjects.objectsInRoom[0].modelName
+
+        scene.getObjectByName('item ' + name + ' id ' + id)?.clear();
       }
-    });
-  });
+    }
+  }
+  labyrinthData = labyrinth;
 }
 
 /**
@@ -205,7 +197,6 @@ export function useLabyrinthFactory() {
   return {
     initializeLabyrinth,
     updateLabyrinth,
-    updatePlayer,
-    deleteItemFromTile,
+    updatePlayer
   };
 }
