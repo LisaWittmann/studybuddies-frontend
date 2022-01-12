@@ -1,6 +1,5 @@
 import { reactive } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message } from "@/service/game/Conversation";

@@ -62,8 +62,8 @@ async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
       );
 
       if (intersection.length > 0) {
-        const id = labyrinthDataObjects.objectsInRoom[0].id;
-        const name = labyrinthDataObjects.objectsInRoom[0].modelName;
+        const id = intersection[0].id;
+        const name = intersection[0].modelName;
 
         scene.getObjectByName("item " + name + " id " + id)?.clear();
       }
