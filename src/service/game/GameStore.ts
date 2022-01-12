@@ -4,7 +4,7 @@ import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 
-const { labyrinthState, updateLabyrinthData } = useLabyrinthStore();
+const { updateLabyrinthData } = useLabyrinthStore();
 
 /**
  * Errormessage: To display all kind of Errors in the according scene
@@ -12,7 +12,7 @@ const { labyrinthState, updateLabyrinthData } = useLabyrinthStore();
 const gameState = reactive({
   lobbyKey: "",
   labyrinthId: 1,
-  labyrinth: labyrinthState,
+  labyrinth: new Labyrinth(0, []),
   mainPlayer: new MainPlayer("", 0),
   partnerPlayer: new PartnerPlayer("", 0),
   errormessage: "",
@@ -73,7 +73,9 @@ function getGameSessionStorage() {
 }
 
 function updateGameData() {
-  return updateLabyrinthData(gameState.lobbyKey);
+  return updateLabyrinthData(gameState.lobbyKey).then(
+    (labyrinth) => (gameState.labyrinth = labyrinth)
+  );
 }
 
 /**
