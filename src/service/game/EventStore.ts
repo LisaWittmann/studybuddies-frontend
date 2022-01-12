@@ -4,7 +4,8 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 
-const { gameState, updatePlayerData, updateGameData, setError } = useGameStore();
+const { gameState, updatePlayerData, updateGameData, setError } =
+  useGameStore();
 const {
   updateUsers,
   setupGame,
@@ -54,7 +55,7 @@ stompClient.onConnect = () => {
 
       let destTileID: number;
       let updateData: Update;
-      const operation: Operation = (<any>Operation)[eventMessage.operation]
+      const operation: Operation = (<any>Operation)[eventMessage.operation];
 
       switch (operation) {
         case Operation.MOVEMENT:
