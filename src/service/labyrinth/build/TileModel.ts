@@ -1,6 +1,6 @@
 import { Orientation } from "@/service/labyrinth/Tile";
-import { Role } from "@/service/labyrinth/build/BuildMode";
 import { Position } from "@/service/labyrinth/Item";
+import { Role } from "@/service/game/Player";
 
 /**
  * two dimensional vector

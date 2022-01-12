@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import { Role } from "@/service/labyrinth/build/BuildMode";
+import { Role } from "@/service/game/Player";
 import { TileModel } from "@/service/labyrinth/build/TileModel";
 
 export default defineComponent({

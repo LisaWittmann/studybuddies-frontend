@@ -9,10 +9,3 @@ export enum Mode {
   ITEM_PLACEMENT = "Gegenstände und Objekte",
   LABYRINTH_NAME = "Labyrinth benennen",
 }
-
-// temporary filler for roles
-// TODO: remove after merge of S007
-export enum Role {
-  DESIGNER,
-  HACKER,
-}

@@ -44,9 +44,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Role } from "@/service/labyrinth/build/BuildMode";
-import { ItemModel, TileModel } from "@/service/labyrinth/build/TileModel";
 import { useBuildService } from "@/service/labyrinth/build/BuildService";
+import { ItemModel, TileModel } from "@/service/labyrinth/build/TileModel";
+import { Role } from "@/service/game/Player";
 
 export default defineComponent({
   name: "BuildTileOverviewComponent",

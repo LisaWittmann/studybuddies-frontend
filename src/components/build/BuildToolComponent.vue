@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { Role } from "@/service/labyrinth/build/BuildMode";
+import { Role } from "@/service/game/Player";
 import { ItemModel } from "@/service/labyrinth/build/TileModel";
 import { defineComponent, ref } from "vue";
 

@@ -73,13 +73,14 @@ import {
   watch,
 } from "vue";
 import { useBuildService } from "@/service/labyrinth/build/BuildService";
-import { Mode, Role } from "@/service/labyrinth/build/BuildMode";
+import { ItemModel } from "@/service/labyrinth/build/TileModel";
+import { Mode } from "@/service/labyrinth/build/BuildMode";
+import { Role } from "@/service/game/Player";
 
 import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
 import BuildLabyrinthComponent from "@/components/build/BuildLabyrinthComponent.vue";
 import BuildToolComponent from "@/components/build/BuildToolComponent.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
-import { ItemModel } from "@/service/labyrinth/build/TileModel";
 
 export default defineComponent({
   name: "LabyrinthBuildView",

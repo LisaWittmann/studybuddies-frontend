@@ -2,7 +2,8 @@ import { reactive, computed } from "vue";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Tile } from "@/service/labyrinth/Tile";
 import { Item } from "@/service/labyrinth/Item";
-import { Mode, Role } from "@/service/labyrinth/build/BuildMode";
+import { Mode } from "@/service/labyrinth/build/BuildMode";
+import { Role } from "@/service/game/Player";
 import {
   ItemModel,
   TileModel,
