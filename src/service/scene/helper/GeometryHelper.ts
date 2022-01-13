@@ -10,6 +10,15 @@ export const radians = (angle: number): number => {
 };
 
 /**
+ * coverts angle in radiant to angle in degree
+ * @param angle: angle in radiant
+ * @returns: angle in degree
+ */
+export const degree = (angle: number): number => {
+  return (angle * 180) / Math.PI;
+};
+
+/**
  * helper for object center positioning
  * @param position; 3 dimensional coordinates
  * @param height: height of the object

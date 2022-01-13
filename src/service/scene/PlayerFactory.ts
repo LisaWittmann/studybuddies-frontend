@@ -1,9 +1,10 @@
-import { Scene, Vector3 } from "three";
+import { Object3D, Scene, Vector3 } from "three";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { Player, MainPlayer, PartnerPlayer } from "@/service/game/Player";
 import { direction, factors } from "./helper/SceneConstants";
 import { Labyrinth } from "../labyrinth/Labyrinth";
+import { degree, radians } from "./helper/GeometryHelper";
 
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer, checkIntersect } = useObjectFactory();
@@ -53,17 +54,51 @@ function updatePartnerPlayer(
       tilePosition
     );
     if (!partnerPosition) {
-      console.log("POSITION IN IF ", position.x, position.y, position.z);
       createPlayer(player, position, scene);
     } else if (playerObject) {
-      playerObject.position.copy(position);
-      playerObject.position.copy(
-        checkIntersect(playerObject, player, position, scene)
-      );
+      const angle = new Vector3().copy(playerObject.position).angleTo(position);
+      playerObject.rotateY(angle);
+      movePlayer(playerObject, position, player.getPosition(), scene);
     }
     partnerPosition = player.getPosition();
   }
 }
+
+function movePlayer(
+  object: Object3D,
+  endPosition: Vector3,
+  tileKey: number,
+  scene: Scene
+) {
+  const distance = new Vector3()
+    .copy(endPosition)
+    .addScaledVector(object.position, -1)
+    .normalize();
+  if (distance.x == 0 && distance.y == 0 && distance.z == 0) {
+    object.position.copy(checkIntersect(object, tileKey, endPosition, scene));
+    return;
+  }
+  object.position.add(distance);
+  setTimeout(() => movePlayer(object, endPosition, tileKey, scene), 5);
+}
+
+function rotatePlayer(object: Object3D, difference: Vector3) {
+  let rotationAngle = 0;
+  if (difference.z > 0) rotationAngle = 360;
+  else if (difference.z < 0) rotationAngle = 180;
+  else if (difference.x > 0) rotationAngle = 90;
+  else if (difference.x < 0) rotationAngle = 270;
+  console.log(degree(object.rotation.y));
+  console.log(difference);
+  object.rotateY(angle(object.rotation.y, rotationAngle));
+}
+
+const angle = (rotation: number, destination: number) => {
+  console.log(destination);
+  if (Math.abs(radians(destination) - rotation) < radians(90))
+    return radians(0);
+  return radians(destination) - rotation;
+};
 
 /**
  * calculating position of player in tile
@@ -98,38 +133,38 @@ function calculatePartnerPositon(
     itemOrientations.forEach((o) => {
       //if there is an item in the corner -> move partner clockwise
       if (playerOrientation === o) {
-          if (o === "NORTHWEST" || o === "WESTNORTH") {
-            playerOrientation = "NORTHEAST";
-            directionVector
+        if (o === "NORTHWEST" || o === "WESTNORTH") {
+          playerOrientation = "NORTHEAST";
+          directionVector
             .copy(direction.north)
             .add(direction.east)
             .multiplyScalar(factors.partnerTranslateFactor);
-          } else if (o === "NORTHEAST" || o === "EASTNORTH") {
-            playerOrientation = "SOUTHEAST";
-            directionVector
-              .copy(direction.south)
-              .add(direction.east)
-              .multiplyScalar(factors.partnerTranslateFactor);
-          } else if (o === "SOUTHEAST" || o === "EASTSOUTH") {
-            playerOrientation = "SOUTHWEST";
-            directionVector
-              .copy(direction.south)
-              .add(direction.west)
-              .multiplyScalar(factors.partnerTranslateFactor);
-          } else if (o === "SOUTHWEST" || o === "WESTSOUTH") {
-            playerOrientation = "NORTHWEST";
-            directionVector
-              .copy(direction.north)
-              .add(direction.west)
-              .multiplyScalar(factors.partnerTranslateFactor);
-          } else {
-            playerOrientation = "NORTHWEST";
-            directionVector
-              .copy(direction.north)
-              .add(direction.west)
-              .multiplyScalar(factors.partnerTranslateFactor);
-          }
+        } else if (o === "NORTHEAST" || o === "EASTNORTH") {
+          playerOrientation = "SOUTHEAST";
+          directionVector
+            .copy(direction.south)
+            .add(direction.east)
+            .multiplyScalar(factors.partnerTranslateFactor);
+        } else if (o === "SOUTHEAST" || o === "EASTSOUTH") {
+          playerOrientation = "SOUTHWEST";
+          directionVector
+            .copy(direction.south)
+            .add(direction.west)
+            .multiplyScalar(factors.partnerTranslateFactor);
+        } else if (o === "SOUTHWEST" || o === "WESTSOUTH") {
+          playerOrientation = "NORTHWEST";
+          directionVector
+            .copy(direction.north)
+            .add(direction.west)
+            .multiplyScalar(factors.partnerTranslateFactor);
+        } else {
+          playerOrientation = "NORTHWEST";
+          directionVector
+            .copy(direction.north)
+            .add(direction.west)
+            .multiplyScalar(factors.partnerTranslateFactor);
         }
+      }
     });
   }
 
