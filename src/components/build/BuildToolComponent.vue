@@ -26,7 +26,7 @@
 <script lang="ts">
 import { Role } from "@/service/labyrinth/build/BuildMode";
 import { ItemModel } from "@/service/labyrinth/build/TileModel";
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
 
 export default defineComponent({
   name: "BuildToolComponent",
@@ -73,6 +73,13 @@ export default defineComponent({
       }
     };
 
+    watch(showOptions, () => {
+      setTimeout(() => {
+        const container = document.querySelector(".tool__options");
+        if (container) container.scrollTop = container.scrollHeight;
+      }, 80);
+    });
+
     return { showOptions, toggleOptions, select, image, optionClass };
   },
 });
@@ -83,10 +90,25 @@ export default defineComponent({
   font-size: $headline-xl;
 
   &__options {
-    margin-bottom: 20px;
+    //padding-bottom: 10px;
+    max-height: 77vh;
+    overflow-y: scroll;
+    @include scroll-container(to top);
 
     > * {
       margin: 5px 0;
+
+      &:first-of-type {
+        margin-top: 15px;
+      }
+
+      &:last-of-type {
+        margin-bottom: 10px;
+      }
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
     }
   }
 
