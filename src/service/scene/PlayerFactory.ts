@@ -4,7 +4,7 @@ import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { Player, MainPlayer, PartnerPlayer } from "@/service/game/Player";
 import { direction, factors } from "./helper/SceneConstants";
 import { Labyrinth } from "../labyrinth/Labyrinth";
-import { degree, radians } from "./helper/GeometryHelper";
+import { radians } from "./helper/GeometryHelper";
 
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer, checkIntersect } = useObjectFactory();
@@ -56,8 +56,10 @@ function updatePartnerPlayer(
     if (!partnerPosition) {
       createPlayer(player, position, scene);
     } else if (playerObject) {
-      const angle = new Vector3().copy(playerObject.position).angleTo(position);
-      playerObject.rotateY(angle);
+      const distance = new Vector3()
+        .copy(playerObject.position)
+        .addScaledVector(position, -1);
+      rotatePlayer(playerObject, distance);
       movePlayer(playerObject, position, player.getPosition(), scene);
     }
     partnerPosition = player.getPosition();
@@ -84,21 +86,11 @@ function movePlayer(
 
 function rotatePlayer(object: Object3D, difference: Vector3) {
   let rotationAngle = 0;
-  if (difference.z > 0) rotationAngle = 360;
-  else if (difference.z < 0) rotationAngle = 180;
-  else if (difference.x > 0) rotationAngle = 90;
-  else if (difference.x < 0) rotationAngle = 270;
-  console.log(degree(object.rotation.y));
-  console.log(difference);
-  object.rotateY(angle(object.rotation.y, rotationAngle));
+  if (difference.z < 0) rotationAngle = 180;
+  else if (difference.x > 0) rotationAngle = -90;
+  else if (difference.x < 0) rotationAngle = 90;
+  object.rotation.y = radians(rotationAngle);
 }
-
-const angle = (rotation: number, destination: number) => {
-  console.log(destination);
-  if (Math.abs(radians(destination) - rotation) < radians(90))
-    return radians(0);
-  return radians(destination) - rotation;
-};
 
 /**
  * calculating position of player in tile
