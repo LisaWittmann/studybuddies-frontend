@@ -136,7 +136,7 @@ function getTileModel(x: number, y: number): TileModel | undefined {
  * mark tile as selected and set its relation key that it will be added to labyrinth
  * @param model tile model that was selected and therefore added to labyrinth
  */
-function selectTile(model: TileModel): void {
+function addTile(model: TileModel): void {
   if (!model.isSelectable) return;
   model.isSelectable = false;
   model.relationKey = ++counter;
@@ -144,6 +144,19 @@ function selectTile(model: TileModel): void {
     .getNeighborsAsList()
     .find((tileModel) => tileModel.relationKey == buildState.endPosition);
   if (endTile) removeEndTile(endTile);
+  setSelectableTiles();
+}
+
+function removeTile(model: TileModel): void {
+  console.log("removing Tile", model);
+  model.restrictions = [];
+  removeStartTile(model);
+  removeEndTile(model);
+  for (const itemModel of model.objectsInRoom) {
+    removeItem(model, itemModel);
+  }
+  model.isSelectable = true;
+  model.relationKey = 0;
   setSelectableTiles();
 }
 
@@ -387,11 +400,12 @@ export function useBuildService() {
     setDimension,
     setItemOptions,
     getTileModel,
-    selectTile,
-    addStartTile,
-    removeStartTile,
+    addTile,
+    removeTile,
     addEndTile,
     removeEndTile,
+    addStartTile,
+    removeStartTile,
     addRestriction,
     removeRestriction,
     addItem,
