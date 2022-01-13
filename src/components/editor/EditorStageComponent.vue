@@ -9,33 +9,33 @@
     />
   </div>
   <div v-else class="labyrinth-canvas">
-    <BuildTileComponent
-      v-for="model of tileModels"
-      :key="model"
+    <TileModelComponent
+      v-for="tileModel of tileModels"
+      :key="tileModel"
       :size="tileSize"
       :gutter="gutter"
-      :model="model"
+      :model="tileModel"
       @clicked="onClick"
       @entered="onEnter"
     />
-    <BuildTileOverviewComponent v-if="showTileOverview" :model="clickedTile" />
+    <TileModelOverviewComponent v-if="showTileOverview" :model="clickedTile" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, computed, ref } from "vue";
-import { useBuildService } from "@/service/labyrinth/build/BuildService";
-import { ItemModel, TileModel } from "@/service/labyrinth/build/TileModel";
-import { Mode } from "@/service/labyrinth/build/BuildMode";
+import { useEditorService } from "@/service/editor/EditorService";
+import { ItemModel, TileModel } from "@/service/editor/TileModel";
+import { Mode } from "@/service/editor/EditorMode";
 
-import BuildTileComponent from "@/components/build/BuildTileComponent.vue";
-import BuildTileOverviewComponent from "@/components/build/BuildTileOverviewComponent.vue";
+import TileModelComponent from "@/components/editor/TileModelComponent.vue";
+import TileModelOverviewComponent from "@/components/editor/TileModelOverviewComponent.vue";
 
 export default defineComponent({
-  name: "BuildLabyrinthComponent",
+  name: "EditorStageComponent",
   components: {
-    BuildTileComponent,
-    BuildTileOverviewComponent,
+    TileModelComponent,
+    TileModelOverviewComponent,
   },
   props: {
     tileSize: {
@@ -57,14 +57,14 @@ export default defineComponent({
   },
   setup(props) {
     const {
-      buildState,
+      editorState,
       addStartTile,
       addEndTile,
       selectTile,
       addRestriction,
       addItem,
       setName,
-    } = useBuildService();
+    } = useEditorService();
 
     let mousedown = false;
     addEventListener("mousedown", () => (mousedown = true));
@@ -73,9 +73,9 @@ export default defineComponent({
     const gutter = computed(() => props.mode == Mode.CREATE);
 
     const nameMode = computed(() => props.mode == Mode.LABYRINTH_NAME);
-    const labyrinthName = ref(buildState.labyrinthName);
+    const labyrinthName = ref(editorState.labyrinthName);
 
-    const tileModels = computed(() => buildState.tileModels);
+    const tileModels = computed(() => editorState.tileModels);
     const clickedTile = ref({} as TileModel);
     const showTileOverview = computed(
       () =>

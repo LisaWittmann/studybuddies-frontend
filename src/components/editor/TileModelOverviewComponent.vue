@@ -44,12 +44,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { useBuildService } from "@/service/labyrinth/build/BuildService";
-import { ItemModel, TileModel } from "@/service/labyrinth/build/TileModel";
+import { useEditorService } from "@/service/editor/EditorService";
+import { ItemModel, TileModel } from "@/service/editor/TileModel";
 import { Role } from "@/service/game/Player";
 
 export default defineComponent({
-  name: "BuildTileOverviewComponent",
+  name: "TileModelOverviewComponent",
   props: {
     model: {
       type: TileModel,
@@ -62,7 +62,7 @@ export default defineComponent({
   },
   setup() {
     const { removeItem, removeRestriction, removeEndTile, removeStartTile } =
-      useBuildService();
+      useEditorService();
 
     const itemImage = (item: ItemModel) => {
       return require(`@/assets/img/items/${item.modelName.toLowerCase()}.svg`);

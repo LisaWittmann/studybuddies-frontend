@@ -2,15 +2,11 @@ import { reactive, computed } from "vue";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Tile } from "@/service/labyrinth/Tile";
 import { Item } from "@/service/labyrinth/Item";
-import { Mode } from "@/service/labyrinth/build/BuildMode";
+import { Mode } from "@/service/editor/EditorMode";
 import { Role } from "@/service/game/Player";
-import {
-  ItemModel,
-  TileModel,
-  Vector2,
-} from "@/service/labyrinth/build/TileModel";
+import { ItemModel, TileModel, Vector2 } from "@/service/editor/TileModel";
 
-const buildState = reactive({
+const editorState = reactive({
   rows: 15,
   columns: 30,
   itemOptions: new Array<ItemModel>(),
@@ -34,7 +30,7 @@ const startPositions = 2;
  * list of all selected tileModels of new labyrinth
  */
 const selectedTiles = computed(() => {
-  const selected = buildState.tileModels.filter((model) => model.relationKey);
+  const selected = editorState.tileModels.filter((model) => model.relationKey);
   return selected.sort((a, b) => {
     return (a.relationKey as number) - (b.relationKey as number);
   });
@@ -44,13 +40,13 @@ const selectedTiles = computed(() => {
  * set buildState to initial values
  */
 function reset(): void {
-  buildState.rows = 15;
-  buildState.columns = 30;
-  buildState.tileModels = new Array<TileModel>();
-  buildState.startPositions = new Array<number>();
-  buildState.endPosition = 0;
-  buildState.labyrinthName = "";
-  buildState.errorMessage = "";
+  editorState.rows = 15;
+  editorState.columns = 30;
+  editorState.tileModels = new Array<TileModel>();
+  editorState.startPositions = new Array<number>();
+  editorState.endPosition = 0;
+  editorState.labyrinthName = "";
+  editorState.errorMessage = "";
 }
 
 /**
@@ -61,8 +57,8 @@ function reset(): void {
  * @param columns: number of columns of labyrinth builder (size of y-axis)
  */
 function setDimension(rows: number, columns: number): void {
-  if (buildState.rows < maxRows) buildState.rows = rows;
-  if (buildState.columns < maxColumns) buildState.columns = columns;
+  if (editorState.rows < maxRows) editorState.rows = rows;
+  if (editorState.columns < maxColumns) editorState.columns = columns;
   updateTileModels();
 }
 
@@ -71,8 +67,8 @@ async function setItemOptions() {
     .then((response) => response.json())
     .then((jsonData) => {
       for (const name of jsonData) {
-        if (!buildState.itemOptions.some((i) => i.modelName == name)) {
-          buildState.itemOptions.push(new ItemModel(name));
+        if (!editorState.itemOptions.some((i) => i.modelName == name)) {
+          editorState.itemOptions.push(new ItemModel(name));
         }
       }
     });
@@ -88,14 +84,14 @@ async function setItemOptions() {
  * to relation map if entry is empty
  */
 function updateTileModels(): void {
-  for (let y = 0; y <= buildState.rows; y++) {
-    for (let x = 0; x <= buildState.columns; x++) {
+  for (let y = 0; y <= editorState.rows; y++) {
+    for (let x = 0; x <= editorState.columns; x++) {
       if (!getTileModel(x, y)) {
-        buildState.tileModels.push(new TileModel(new Vector2(x, y)));
+        editorState.tileModels.push(new TileModel(new Vector2(x, y)));
       }
     }
   }
-  for (const model of buildState.tileModels) {
+  for (const model of editorState.tileModels) {
     for (const [key, value] of model.tileRelationMap) {
       const position = model.getNeighborPosition(key);
       if (!value) {
@@ -110,7 +106,7 @@ function updateTileModels(): void {
  * to prevent invalid tile selection
  */
 function setSelectableTiles(): void {
-  for (const model of buildState.tileModels) {
+  for (const model of editorState.tileModels) {
     model.isSelectable = false;
     if (!model.relationKey) {
       const neighbors = [...model.tileRelationMap.values()];
@@ -128,7 +124,7 @@ function setSelectableTiles(): void {
  * @returns tile model or undefined
  */
 function getTileModel(x: number, y: number): TileModel | undefined {
-  for (const model of buildState.tileModels) {
+  for (const model of editorState.tileModels) {
     if (model.hasPosition(x, y)) return model;
   }
 }
@@ -143,7 +139,7 @@ function selectTile(model: TileModel): void {
   model.relationKey = ++counter;
   const endTile = model
     .getNeighborsAsList()
-    .find((tileModel) => tileModel.relationKey == buildState.endPosition);
+    .find((tileModel) => tileModel.relationKey == editorState.endPosition);
   if (endTile) removeEndTile(endTile);
   setSelectableTiles();
 }
@@ -160,8 +156,8 @@ function addStartTile(model: TileModel): void {
     model.restrictions.length > 0
   )
     return;
-  if (buildState.startPositions.length < 2) {
-    buildState.startPositions.push(model.relationKey);
+  if (editorState.startPositions.length < 2) {
+    editorState.startPositions.push(model.relationKey);
     model.isStart = true;
   }
 }
@@ -172,7 +168,7 @@ function addStartTile(model: TileModel): void {
  */
 function removeStartTile(model: TileModel) {
   model.isStart = false;
-  buildState.startPositions = buildState.startPositions.filter(
+  editorState.startPositions = editorState.startPositions.filter(
     (key) => key != model.relationKey
   );
 }
@@ -190,11 +186,11 @@ function addEndTile(model: TileModel): void {
   ) {
     return;
   }
-  const endTile = buildState.tileModels.find(
-    (tileModel) => tileModel.relationKey == buildState.endPosition
+  const endTile = editorState.tileModels.find(
+    (tileModel) => tileModel.relationKey == editorState.endPosition
   );
   if (endTile) endTile.isEnd = false;
-  buildState.endPosition = model.relationKey;
+  editorState.endPosition = model.relationKey;
   model.isEnd = true;
 }
 
@@ -204,7 +200,7 @@ function addEndTile(model: TileModel): void {
  */
 function removeEndTile(model: TileModel): void {
   if (!model.isEnd) return;
-  buildState.endPosition = 0;
+  editorState.endPosition = 0;
   model.isEnd = false;
 }
 
@@ -234,7 +230,7 @@ function removeRestriction(model: TileModel, role: Role): void {
  * @param labyrinthName contains the new name for the labyrinth
  */
 function setName(labyrinthName: string): void {
-  buildState.labyrinthName = labyrinthName;
+  editorState.labyrinthName = labyrinthName;
 }
 
 /**
@@ -246,7 +242,7 @@ function addItem(model: TileModel, item: ItemModel): void {
   if (!model.relationKey || model.objectsInRoom.length >= maxItems || !item)
     return;
   model.objectsInRoom.push(item);
-  buildState.itemOptions = buildState.itemOptions.filter(
+  editorState.itemOptions = editorState.itemOptions.filter(
     (i) => i.modelName != item.modelName
   );
 }
@@ -261,7 +257,7 @@ function removeItem(model: TileModel, item: ItemModel): void {
   model.objectsInRoom = model.objectsInRoom.filter(
     (i) => i.modelName != item.modelName
   );
-  buildState.itemOptions.push(item);
+  editorState.itemOptions.push(item);
 }
 
 /**
@@ -273,22 +269,22 @@ function removeItem(model: TileModel, item: ItemModel): void {
  */
 function hasErrors(): Mode | undefined {
   if (selectedTiles.value.length < minTiles) {
-    buildState.errorMessage = "Labyrinth ist zu klein";
+    editorState.errorMessage = "Labyrinth ist zu klein";
     return Mode.CREATE;
-  } else if (buildState.startPositions.length != startPositions) {
-    buildState.errorMessage = "Zu wenig Startfelder definiert";
+  } else if (editorState.startPositions.length != startPositions) {
+    editorState.errorMessage = "Zu wenig Startfelder definiert";
     return Mode.START_TILES;
-  } else if (!buildState.endPosition) {
-    buildState.errorMessage = "Ende noch nicht definiert";
+  } else if (!editorState.endPosition) {
+    editorState.errorMessage = "Ende noch nicht definiert";
     return Mode.END_TILE;
-  } else if (buildState.itemOptions.length > 0) {
-    buildState.errorMessage = "Noch nicht alle Objekte platziert";
+  } else if (editorState.itemOptions.length > 0) {
+    editorState.errorMessage = "Noch nicht alle Objekte platziert";
     return Mode.ITEM_PLACEMENT;
   } else if (
-    buildState.labyrinthName == null ||
-    buildState.labyrinthName.trim().length === 0
+    editorState.labyrinthName == null ||
+    editorState.labyrinthName.trim().length === 0
   ) {
-    buildState.errorMessage = "Name noch nicht vergeben";
+    editorState.errorMessage = "Name noch nicht vergeben";
     return Mode.LABYRINTH_NAME;
   }
   return undefined;
@@ -300,9 +296,9 @@ function hasErrors(): Mode | undefined {
  */
 function convert(): Labyrinth {
   const labyrinth = new Labyrinth(
-    buildState.labyrinthName,
-    buildState.endPosition,
-    buildState.startPositions
+    editorState.labyrinthName,
+    editorState.endPosition,
+    editorState.startPositions
   );
 
   for (const tileModel of selectedTiles.value) {
@@ -369,11 +365,12 @@ async function save(): Promise<string> {
     body: parseLabyrinth(labyrinth),
   }).then((response) => {
     if (response.status === 409) {
-      buildState.errorMessage =
-        'Name "' + buildState.labyrinthName + '" bereits vergeben';
+      editorState.errorMessage =
+        'Name "' + editorState.labyrinthName + '" bereits vergeben';
       throw new Error(response.statusText);
     } else if (!response.ok) {
-      buildState.errorMessage = "Labyrinth ist invalide. Bitte prüfe es erneut";
+      editorState.errorMessage =
+        "Labyrinth ist invalide. Bitte prüfe es erneut";
       throw new Error(response.statusText);
     }
 
@@ -381,9 +378,9 @@ async function save(): Promise<string> {
   });
 }
 
-export function useBuildService() {
+export function useEditorService() {
   return {
-    buildState,
+    editorState,
     updateTileModels,
     setDimension,
     setItemOptions,

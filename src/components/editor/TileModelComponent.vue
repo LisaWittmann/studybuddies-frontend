@@ -1,6 +1,6 @@
 <template>
   <div
-    class="tile-canvas"
+    class="tile-model"
     :style="{
       width: `${size}px`,
       gridRow: model.position.y + 1,
@@ -9,7 +9,7 @@
     :class="{ items: model.objectsInRoom.length > 0 }"
   >
     <div
-      class="tile-canvas__inner"
+      class="tile-model__inner"
       :class="[
         { selected: selected },
         { selectable: selectable && gutter },
@@ -28,10 +28,10 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import { Role } from "@/service/game/Player";
-import { TileModel } from "@/service/labyrinth/build/TileModel";
+import { TileModel } from "@/service/editor/TileModel";
 
 export default defineComponent({
-  name: "BuildTileComponent",
+  name: "TileModelComponent",
   props: {
     size: {
       type: Number,
@@ -72,7 +72,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.tile-canvas {
+.tile-model {
   height: auto;
   border: 1px solid $color-grey;
   position: relative;

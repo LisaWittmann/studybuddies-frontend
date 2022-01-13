@@ -90,7 +90,7 @@ export default defineComponent({
     }
 
     function createLabyrinth() {
-      router.push("/build");
+      router.push("/editor");
     }
 
     onbeforeunload = () => console.log("overriding previous listener");

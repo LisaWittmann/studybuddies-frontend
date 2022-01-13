@@ -1,7 +1,7 @@
 <template>
-  <div class="builder">
+  <div class="editor">
     <transition name="delay-fade" appear>
-      <div class="builder__zoom">
+      <div class="editor__zoom">
         <button class="button__icon" :disabled="zoomInDisabled" @click="zoomIn">
           <i class="fas fa-search-plus"></i>
         </button>
@@ -15,14 +15,14 @@
       </div>
     </transition>
     <transition name="delay-fade" appear>
-      <div class="builder__tool">
-        <BuildToolComponent
+      <div class="editor__tool">
+        <EditorToolComponent
           v-if="restrictionMode"
           :options="roleOptions"
           :selected="currentRole"
           @select="changeRole"
         />
-        <BuildToolComponent
+        <EditorToolComponent
           v-if="itemsMode && itemOptions.length > 0"
           :options="itemOptions"
           :selected="itemOptions.indexOf(currentItem)"
@@ -31,8 +31,8 @@
       </div>
     </transition>
     <transition name="fade" appear>
-      <div class="builder__stage">
-        <BuildLabyrinthComponent
+      <div class="editor__stage">
+        <EditorStageComponent
           :tile-size="tileSize"
           :mode="currentMode"
           :role="currentRole"
@@ -42,7 +42,7 @@
       </div>
     </transition>
     <transition name="delay-fade" appear>
-      <div class="builder__steps">
+      <div class="editor__steps">
         <PaginationComponent
           :items="modes"
           :activeIndex="modes.indexOf(currentMode)"
@@ -72,33 +72,33 @@ import {
   ref,
   watch,
 } from "vue";
-import { useBuildService } from "@/service/labyrinth/build/BuildService";
-import { ItemModel } from "@/service/labyrinth/build/TileModel";
-import { Mode } from "@/service/labyrinth/build/BuildMode";
+import { useEditorService } from "@/service/editor/EditorService";
+import { ItemModel } from "@/service/editor/TileModel";
+import { Mode } from "@/service/editor/EditorMode";
 import { Role } from "@/service/game/Player";
 
 import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
-import BuildLabyrinthComponent from "@/components/build/BuildLabyrinthComponent.vue";
-import BuildToolComponent from "@/components/build/BuildToolComponent.vue";
+import EditorStageComponent from "@/components/editor/EditorStageComponent.vue";
+import EditorToolComponent from "@/components/editor/EditorToolComponent.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
 
 export default defineComponent({
-  name: "LabyrinthBuildView",
+  name: "EditorView",
   components: {
-    BuildLabyrinthComponent,
-    BuildToolComponent,
+    EditorStageComponent,
+    EditorToolComponent,
     PaginationComponent,
     OverlayFeedbackComponent,
   },
   setup() {
     const {
-      buildState,
+      editorState,
       updateTileModels,
       setItemOptions,
       hasErrors,
       save,
       reset,
-    } = useBuildService();
+    } = useEditorService();
 
     const modes = new Array<Mode>(
       Mode.CREATE,
@@ -133,7 +133,7 @@ export default defineComponent({
     const changeRole = (role: Role) => (currentRole.value = role);
 
     const itemsMode = computed(() => currentMode.value == Mode.ITEM_PLACEMENT);
-    const itemOptions = computed(() => buildState.itemOptions);
+    const itemOptions = computed(() => editorState.itemOptions);
     setItemOptions().then(() => (currentItem.value = itemOptions.value[0]));
     const currentItem = ref(new ItemModel(""));
     const changeItem = (item: ItemModel) => (currentItem.value = item);
@@ -146,7 +146,7 @@ export default defineComponent({
       link: "",
       linkText: "",
     });
-    const errorMessage = computed(() => buildState.errorMessage);
+    const errorMessage = computed(() => editorState.errorMessage);
 
     function onComplete() {
       const rollback = hasErrors();
@@ -166,7 +166,7 @@ export default defineComponent({
           .catch(() => {
             feedback.active = true;
             feedback.headline = "Fehler";
-            feedback.error = buildState.errorMessage;
+            feedback.error = editorState.errorMessage;
             feedback.linkText = "Zurück zur Bearbeitung";
           });
       }
@@ -182,14 +182,14 @@ export default defineComponent({
     }
 
     function closeFeedback() {
-      if (buildState.errorMessage.includes("vergeben"))
+      if (editorState.errorMessage.includes("vergeben"))
         currentMode.value = Mode.LABYRINTH_NAME;
       else currentMode.value = Mode.CREATE;
       resetFeedback();
     }
 
     watch(
-      () => buildState.itemOptions,
+      () => editorState.itemOptions,
       () => {
         currentItem.value = itemOptions.value[0];
       },
@@ -228,7 +228,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.builder {
+.editor {
   width: 100%;
   height: 100vh;
   overflow: hidden;

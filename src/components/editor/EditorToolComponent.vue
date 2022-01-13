@@ -1,7 +1,7 @@
 <template>
-  <div class="tool">
+  <div class="editor-tool">
     <transition name="fade" appear>
-      <div v-if="showOptions" class="tool__options">
+      <div v-if="showOptions" class="editor-tool__options">
         <button
           v-for="(option, index) in options"
           :key="index"
@@ -25,11 +25,11 @@
 
 <script lang="ts">
 import { Role } from "@/service/game/Player";
-import { ItemModel } from "@/service/labyrinth/build/TileModel";
+import { ItemModel } from "@/service/editor/TileModel";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
-  name: "BuildToolComponent",
+  name: "EditorToolComponent",
   props: {
     options: {
       type: Array,
@@ -79,7 +79,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.tool {
+.editor-tool {
   font-size: $headline-xl;
 
   &__options {
