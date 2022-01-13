@@ -6,6 +6,7 @@
     @click-object="clickItem"
     @move-player="movePlayer"
   />
+  <div class="score-box"><p>{{score}} CP</p></div>
   <!--warning and error messages-->
   <OverlayTerminalComponent
     :opened="gameEventMessage.visible"
@@ -59,6 +60,7 @@ export default defineComponent({
     const labyrinth = computed(() => gameState.labyrinth);
     const mainPlayer = computed(() => gameState.mainPlayer);
     const partnerPlayer = computed(() => gameState.partnerPlayer);
+    const score = computed(() => gameState.score);
 
     onMounted(async () => {
       const route = router.currentRoute.value;
@@ -76,9 +78,29 @@ export default defineComponent({
       mainPlayer,
       partnerPlayer,
       labyrinth,
+      score,
       conversation,
       getConversationMessage,
     };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+  .score-box {
+    position: absolute;
+    top: 0;
+    right: 0;
+    max-width: fit-content;
+    max-height: fit-content;
+    margin: 1rem;
+    background: $color-white;
+    padding: $spacing-xs $spacing-s;
+
+    p {
+      padding: 0 1rem;
+    }
+  }
+  
+
+</style>
