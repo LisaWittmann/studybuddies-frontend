@@ -94,7 +94,10 @@ export class Item {
    */
   rotationY = (): number => {
     let viewDirection = 0;
-    const fullOri = this.orientations.map(o => Orientation[o]).toString().replace(",", "");
+    const fullOri = this.orientations
+      .map((o) => Orientation[o])
+      .toString()
+      .replace(",", "");
     console.log("ORI", fullOri);
 
     if (fullOri === "NORTH") {
@@ -123,7 +126,6 @@ export class Item {
     if (fullOri.includes("EAST")) {
       viewDirection = viewDirection * -1;
     }
-
 
     return radians(viewDirection);
   };
