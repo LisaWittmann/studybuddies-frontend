@@ -161,10 +161,8 @@ async function clickItem(modelName: string, itemId: string) {
           addToInventory(
             gameState.lobbyKey,
             itemId,
-            modelName,
             gameState.mainPlayer.getUsername()
           );
-          // removeItemFromTile(gameState.lobbyKey, itemId);
           break;
       }
     })
@@ -173,18 +171,25 @@ async function clickItem(modelName: string, itemId: string) {
     });
 }
 
+/**
+ * adds item to inventory via fetch and updates frontend representation accordingly
+ * calls method to delete collected item from tile
+ * @param lobbyKey the key of the lobby
+ * @param itemId id of the clicked item
+ * @param username username of player that collects item
+ */
 async function addToInventory(
   lobbyKey: string,
   itemId: string,
-  modelName: string,
   username: string
 ) {
-  //"/lobby/{key}/username/{username}/item/{itemId}"
-
-  return fetch("api/lobby/" + lobbyKey + "/username/" + username + "/item/" + itemId, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  })
+  return fetch(
+    "api/lobby/" + lobbyKey + "/username/" + username + "/item/" + itemId,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }
+  )
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();

@@ -53,7 +53,6 @@ function updatePartnerPlayer(
       tilePosition
     );
     if (!partnerPosition) {
-      console.log("POSITION IN IF ", position.x, position.y, position.z);
       createPlayer(player, position, scene);
     } else if (playerObject) {
       playerObject.position.copy(position);
@@ -133,21 +132,7 @@ function calculatePartnerPositon(
     });
   }
 
-  console.log(
-    "POSITION AFTER IF & SWITCH ",
-    directionVector.x,
-    directionVector.y,
-    directionVector.z
-  );
-
   calcPartnerPosition.copy(tilePosition).add(directionVector);
-
-  console.log(
-    "calcPartnerPosition ",
-    calcPartnerPosition.x,
-    calcPartnerPosition.y,
-    calcPartnerPosition.z
-  );
 
   return calcPartnerPosition;
 }
