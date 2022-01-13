@@ -51,7 +51,7 @@ export const position = {
 export const colors = {
   lightGreen: 0x94a878,
   green: 0x5d702f,
-  darkGreen: 0x39432f,
+  darkGreen: 0x30431f,
   beige: 0xe6bf5f,
   brown: 0x994814,
   darkBrown: 0x56341a,
@@ -59,5 +59,5 @@ export const colors = {
   grey: 0xd7d9d5,
   black: 0x1a1e16,
   designer: 0xe6bf5f,
-  hacker: 0x5d702f,
+  hacker: 0x30431f,
 };

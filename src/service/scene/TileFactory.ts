@@ -32,7 +32,6 @@ function createTile(
   } = useObjectFactory();
   const tileModel = new THREE.Group();
   tileModel.userData = tile;
-  tileModel.userData.tileId = tileKey;
   tileModel.name = tileKey.toString();
   const tileRestricted = tile.isRestrictedFor(role);
   const texture = getTexture(tile);
@@ -41,7 +40,7 @@ function createTile(
   tileModel.add(createLight(tilePosition));
 
   //STATIC-ITEMS----------
-  createCeiling(tilePosition, tileModel, color);
+  createCeiling(tilePosition, tileModel, texture, color);
   createFloor(tilePosition, tileModel, tileKey, color);
   if (tileRestricted) {
     neighbors.forEach((neighbor, orientation) => {

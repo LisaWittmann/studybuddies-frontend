@@ -94,28 +94,31 @@ function createFloor(
 function createCeiling(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
+  textureName = "leaves",
   color = 0x199eb0
 ) {
   const textureLoader = new TextureLoader();
-  textureLoader.load("/textures/leaves-texture.png", (texture: Texture) => {
-    texture.minFilter = THREE.NearestFilter;
-    const object = new THREE.Mesh(
-      new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-      new THREE.MeshStandardMaterial({
-        side: DoubleSide,
-        map: texture,
-        color: color,
-      })
-    );
-    object.position.set(
-      tilePosition.x,
-      tilePosition.y + settings.tileSize,
-      tilePosition.z
-    );
-    object.rotateX(radians(90));
-    object.name = "ceiling";
-    tileModel.add(object);
-  });
+  textureLoader.load(
+    `/textures/${textureName}-texture.png`,
+    (texture: Texture) => {
+      texture.minFilter = THREE.NearestFilter;
+      const object = new THREE.Mesh(
+        new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
+        new THREE.MeshStandardMaterial({
+          side: DoubleSide,
+          map: texture,
+          color: color,
+        })
+      );
+      object.position.set(
+        tilePosition.x,
+        tilePosition.y + settings.tileSize,
+        tilePosition.z
+      );
+      object.rotateX(radians(90));
+      tileModel.add(object);
+    }
+  );
 }
 
 /**
