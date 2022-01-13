@@ -37,7 +37,7 @@ const selectedTiles = computed(() => {
 });
 
 /**
- * set buildState to initial values
+ * set editorState to initial values
  */
 function reset(): void {
   editorState.rows = 15;
@@ -50,11 +50,11 @@ function reset(): void {
 }
 
 /**
- * set dimension of labyrinth builder by changing amount of rows and columns
- * and add new created tile models to buildState's tile models
+ * set dimension of labyrinth editor by changing amount of rows and columns
+ * and add new created tile models to editorState's tile models
  *
- * @param rows: number of row of labyrinth builder (size of x-axis)
- * @param columns: number of columns of labyrinth builder (size of y-axis)
+ * @param rows: number of row of labyrinth editor (size of x-axis)
+ * @param columns: number of columns of labyrinth editor (size of y-axis)
  */
 function setDimension(rows: number, columns: number): void {
   if (editorState.rows < maxRows) editorState.rows = rows;
@@ -75,7 +75,7 @@ async function setItemOptions() {
 }
 
 /**
- * iterate over rows and columns of labyrinth builder and add
+ * iterate over rows and columns of labyrinth editor and add
  * not existing tile models to list;
  *
  * iterate over tile relation map of each tile model
@@ -265,7 +265,7 @@ function removeItem(model: TileModel, item: ItemModel): void {
  * min amount of tile models must be selected to save labyrinth,
  * number of start and end positions must be valid
  * and all items must be places inside of labyrinth
- * @returns build mode that contains errors or undefined
+ * @returns editor mode that contains errors or undefined
  */
 function hasErrors(): Mode | undefined {
   if (selectedTiles.value.length < minTiles) {
@@ -291,8 +291,8 @@ function hasErrors(): Mode | undefined {
 }
 
 /**
- * convert buildState with tile models to a labyrinth object
- * @returns data of buildState as labyrinth
+ * convert editorState with tile models to a labyrinth object
+ * @returns data of editorState as labyrinth
  */
 function convert(): Labyrinth {
   const labyrinth = new Labyrinth(
