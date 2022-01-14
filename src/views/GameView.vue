@@ -62,6 +62,7 @@ export default defineComponent({
     const partnerPlayer = computed(() => gameState.partnerPlayer);
     const score = computed(() => gameState.score);
 
+
     onMounted(async () => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
@@ -91,14 +92,21 @@ export default defineComponent({
     position: absolute;
     top: 0;
     right: 0;
-    max-width: fit-content;
+    width: 7rem;
     max-height: fit-content;
     margin: 1rem;
-    background: $color-white;
     padding: $spacing-xs $spacing-s;
+    background-image: url("../../src/assets/img/score-bg.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
 
     p {
+      font-family: $font-inconsolata;
+      font-weight: bold;
+      color: $color-beige;
       padding: 0 1rem;
+      text-align: center;
     }
   }
   
