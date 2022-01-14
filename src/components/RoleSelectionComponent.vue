@@ -59,19 +59,19 @@ export default defineComponent({
     opacity: 0;
 
     & + label {
-      @include flex-center();
-      flex-direction: column;
-      padding-top: 20px;
-      padding-bottom: 20px;
+      @include flex-center($direction: column);
+      padding-top: $spacing-s;
+      padding-bottom: $spacing-s;
+      cursor: pointer;
 
       img {
-        width: 80%;
-        margin-bottom: 10px;
+        width: $pref-width;
+        margin-bottom: $spacing-xs;
       }
     }
 
     &:checked + label {
-      border: solid $color-beige;
+      @include border($color-beige, 2px);
     }
 
     &:disabled {
