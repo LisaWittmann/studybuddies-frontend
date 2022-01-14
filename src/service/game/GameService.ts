@@ -6,7 +6,8 @@ import { Message } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { Item } from "../labyrinth/Item";
 
-const { updateInventory } = useGameStore();
+const { updateInventory} = useGameStore();
+const { loginState } = useLoginStore();
 
 const gameEventMessage = reactive({
   message: "",
@@ -107,8 +108,8 @@ async function endConversation() {
  * @param modelName name of the clicked item
  */
 async function checkAccess(modelName: string) {
-  const { gameState } = useGameStore();
   const { loginState } = useLoginStore();
+  const { gameState } = useGameStore();
   const eventMessage = new EventMessage(
     Operation[Operation.ACCESS],
     gameState.lobbyKey,
@@ -128,6 +129,7 @@ async function checkAccess(modelName: string) {
       gameEventMessage.message = jsonData.accesstext;
       if (jsonData.access) {
         gameEventMessage.state = "success";
+        deleteFromInventory()
         //ToDo: - update Score component
         //      - trigger opacity of computer model  
       } else {
@@ -206,6 +208,39 @@ async function addToInventory(
       console.error(error);
     });
 }
+
+async function deleteFromInventory() {
+  const { loginState } = useLoginStore();
+  const { gameState } = useGameStore();  
+  const eventMessage = new EventMessage(
+    Operation[Operation.DELETE],
+    gameState.lobbyKey,
+    loginState.username,
+    ""
+  );   
+  fetch(
+    "api/lobby/current-inventory",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(eventMessage),
+    }
+  )
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      let inventory = new Array<Item>();
+      inventory = jsonData;
+      updateInventory(inventory);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+
 
 /**
  * Provides functionality to remove an item from a tile.
