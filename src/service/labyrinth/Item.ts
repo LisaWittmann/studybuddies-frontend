@@ -94,27 +94,39 @@ export class Item {
    */
   rotationY = (): number => {
     let viewDirection = 0;
-    this.orientations.forEach((orientation) => {
-      switch (orientation) {
-        case Orientation.NORTH:
-          viewDirection += 0;
-          break;
-        case Orientation.EAST:
-          viewDirection += 270;
-          break;
-        case Orientation.SOUTH:
-          viewDirection += 180;
-          break;
-        case Orientation.WEST:
-          viewDirection += 90;
-          break;
-      }
-    });
+    const fullOri = this.orientations
+      .map((o) => Orientation[o])
+      .toString()
+      .replace(",", "");
+    console.log("ORI", fullOri);
 
-    //bisect angle of orientation to get view direction into corners
-    if (this.orientations.length == 2) {
-      viewDirection = viewDirection / 2;
+    if (fullOri === "NORTH") {
+      viewDirection = 0;
+    } else if (fullOri === "EAST" || fullOri === "WEST") {
+      viewDirection = 90;
+    } else if (fullOri === "SOUTH") {
+      viewDirection = 180;
+    } else if (
+      fullOri === "NORTHEAST" ||
+      fullOri === "EASTNORTH" ||
+      fullOri === "NORTHWEST" ||
+      fullOri === "WESTNORTH"
+    ) {
+      viewDirection = 45;
+    } else if (
+      fullOri === "SOUTHEAST" ||
+      fullOri === "EASTSOUTH" ||
+      fullOri === "SOUTHWEST" ||
+      fullOri === "WESTSOUTH"
+    ) {
+      viewDirection = 135;
     }
+
+    //check direction of rotation; EAST -> rotate clockwise
+    if (fullOri.includes("EAST")) {
+      viewDirection = viewDirection * -1;
+    }
+
     return radians(viewDirection);
   };
 

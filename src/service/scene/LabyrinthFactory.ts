@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { useTileFactory } from "@/service/scene/TileFactory";
 import { usePlayerFactory } from "@/service/scene/PlayerFactory";
 
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Orientation, Tile } from "@/service/labyrinth/Tile";
 import { MainPlayer, PartnerPlayer, Player, Role } from "@/service/game/Player";
 
@@ -13,34 +14,45 @@ import {
 } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
-const { updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
+const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } =
+  usePlayerFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
-let labyrinthInitialized = false;
+let labyrinthData: Labyrinth;
 
 /**
  * gets map of all tiles of a Labyrinth
  * creates or updates them using TileFactory
  * adds Tiles to scene
- * @param labyrinth: reactive labyrinth object
+ * @param labyrinth: labyrinth object
  * @param player: main player
  * @param scene: scene that contains labyrinth
  */
-async function updateLabyrinth(
-  labyrinth: any,
+async function initializeLabyrinth(
+  labyrinth: Labyrinth,
   player: MainPlayer,
   scene: THREE.Scene
 ) {
-  if (labyrinthInitialized) return;
-  labyrinthInitialized = true;
+  labyrinthData = labyrinth;
   const position = vector(0, 0, 0);
   for (const [key, value] of labyrinth.tileMap) {
-    const tile = getTile(value.tileId, scene);
-    if (!tile) {
-      const neighbors = getNeighbors(value, labyrinth.tileMap);
-      const role = player.getRole();
-      await placeTile(position, value, key, role, neighbors, scene);
-    }
+    const neighbors = getNeighbors(value, labyrinth.tileMap);
+    const role = player.getRole();
+    await placeTile(position, value, key, role, neighbors, scene);
+  }
+}
+
+/**
+ * updates tile
+ * @param labyrinth: labyrinth object
+ * @param scene: scene that contains labyrinth
+ */
+async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
+  if (labyrinthData == labyrinth) return;
+  labyrinthData = labyrinth;
+  for (const [key, value] of labyrinth.tileMap) {
+    const tile = scene.getObjectByName(key.toString());
+    console.log("tile from scene", tile);
   }
 }
 
@@ -50,15 +62,20 @@ async function updateLabyrinth(
  * @param player: main or partner player
  * @param scene: scene that contains player
  */
-function updatePlayer(player: Player, scene: THREE.Scene) {
+function updatePlayer(
+  player: Player,
+  labyrinth: Labyrinth,
+  scene: THREE.Scene
+) {
+  if (!requiresUpdate(player)) return;
   console.log("Move player: " + player.getUsername());
   const tilePosition = getTilePosition(player.getPosition(), scene);
   if (tilePosition) {
     if (player instanceof MainPlayer) {
-      updateMainPlayer(tilePosition);
+      updateMainPlayer(player, tilePosition);
     }
     if (player instanceof PartnerPlayer) {
-      updatePartnerPlayer(player, tilePosition, scene);
+      updatePartnerPlayer(player, tilePosition, labyrinth, scene);
     }
   }
 }
@@ -106,23 +123,6 @@ function getTileColor(tile: Tile) {
   if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
   //default - this case shouldn't appear
   return colors.darkBrown;
-}
-
-/**
- * get tile 3D object by tileKey
- * @param tileKey: unique relation key of tile in scene
- * @param scene: scene that might contain tile
- * @returns 3D representation of tile with key
- */
-function getTile(
-  tileKey: number,
-  scene: THREE.Scene
-): THREE.Object3D | undefined {
-  let tile = undefined;
-  for (const child of scene.children) {
-    if (child.userData.tileId == tileKey) tile = child;
-  }
-  return tile;
 }
 
 /**
@@ -184,6 +184,7 @@ function getNeighbors(tile: Tile, tileMap: Map<number, Tile>) {
 
 export function useLabyrinthFactory() {
   return {
+    initializeLabyrinth,
     updateLabyrinth,
     updatePlayer,
   };

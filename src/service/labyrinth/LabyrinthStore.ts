@@ -1,28 +1,17 @@
-import { reactive } from "vue";
 import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Item, Position } from "@/service/labyrinth/Item";
 import { Role } from "@/service/game/Player";
 
 /**
- * constant to keep the tiles or store an errormessage
- */
-const labyrinthState: Labyrinth = reactive<Labyrinth>({
-  tileMap: new Map<number, Tile>([]),
-  name: "",
-  endTileKey: 0,
-  playerStartTileKeys: new Array<number>(),
-});
-
-/**
  * update the tiles for getting them initially and every time something changes
  * fetches labyrinth object of api and converts response into labyrinth data
  * creates simple fallback labyrinth if fetch fails
  */
-async function updateLabyrinthData(lobbyKey: string) {
+async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
   console.log("Requested lab of lobby " + lobbyKey);
   //TODO change this to the game api
-  await fetch(`/api/lobby/${lobbyKey}`, {
+  return fetch(`/api/lobby/${lobbyKey}`, {
     method: "GET",
   })
     .then((response) => {
@@ -87,12 +76,7 @@ async function updateLabyrinthData(lobbyKey: string) {
         }
       }
 
-      labyrinthState.tileMap = labyrinth.tileMap;
-      labyrinthState.endTileKey = labyrinth.endTileKey;
-      labyrinthState.playerStartTileKeys = labyrinth.playerStartTileKeys;
-    })
-    .catch((error) => {
-      console.error(error);
+      return labyrinth;
     });
 }
 
@@ -113,7 +97,6 @@ function connectTiles(
 
 export function useLabyrinthStore() {
   return {
-    labyrinthState,
     updateLabyrinthData,
   };
 }

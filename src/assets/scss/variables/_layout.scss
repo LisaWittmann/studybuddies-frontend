@@ -3,10 +3,19 @@ $spacing-s: 20px;
 $spacing-m: 40px;
 $spacing-l: 60px;
 
-@mixin flex-center() {
+$width-xs: 200px;
+$width-s: 300px;
+$width-m: 500px;
+$width-l: 600px;
+$width-xl: 800px;
+
+$pref-width: 80%;
+
+@mixin flex-center($justify: center, $direction: row) {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: $justify;
+    flex-direction: $direction;
 }
 
 @mixin text-break() {

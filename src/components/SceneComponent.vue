@@ -7,12 +7,13 @@ import { defineComponent, onBeforeUnmount, onMounted, watch } from "vue";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 
 export default defineComponent({
   name: "SceneComponent",
   props: {
     labyrinth: {
-      type: Object,
+      type: Labyrinth,
       required: true,
     },
     player: {
@@ -32,9 +33,12 @@ export default defineComponent({
       updateScene,
       getIntersections,
     } = useSceneFactory();
-    const { updateLabyrinth, updatePlayer } = useLabyrinthFactory();
+    const { initializeLabyrinth, updateLabyrinth, updatePlayer } =
+      useLabyrinthFactory();
 
     const scene = createScene();
+    initializeLabyrinth(props.labyrinth, props.player, scene);
+
     const render = () => {
       renderScene();
       requestAnimationFrame(render);
@@ -51,7 +55,6 @@ export default defineComponent({
     onMounted(() => {
       insertCanvas("scene");
       requestAnimationFrame(render);
-
       addEventListener("resize", updateScene);
     });
 
@@ -59,12 +62,15 @@ export default defineComponent({
       removeEventListener("resize", updateScene);
     });
 
-    watch([props.labyrinth, props.player, props.partner], () => {
-      console.log("updating scene");
-      updateLabyrinth(props.labyrinth, props.player, scene);
-      updatePlayer(props.player, scene);
-      updatePlayer(props.partner, scene);
-    });
+    watch(
+      [props.labyrinth, props.player, props.partner],
+      () => {
+        updateLabyrinth(props.labyrinth, scene);
+        updatePlayer(props.player, props.labyrinth, scene);
+        updatePlayer(props.partner, props.labyrinth, scene);
+      },
+      { deep: true }
+    );
 
     return { onClick };
   },
