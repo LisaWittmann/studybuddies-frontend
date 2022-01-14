@@ -45,7 +45,7 @@ button,
 
     &--pulse {
         border: 0;
-        font-size: 18px;
+        font-size: $text-l;
         background: $color-dark-green;
         color: $color-white;
         @include pulse-animation($color-dark-green);
