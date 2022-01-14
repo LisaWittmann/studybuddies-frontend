@@ -1,58 +1,46 @@
 button,
 .button {
     background: transparent;
-    box-shadow: 5px 5px 0 0 rgba(black, 0.03);
-    border-radius: 8px;
+    border-radius: $border-radius-m;
     font-size: $text-m;
-    font-weight: 300;
-    font-weight: 300;
+    font-weight: $outfit-light;
     display: inline-block;
-    border: 1px solid $color-grey;
-    cursor: pointer;
     min-height: 35px;
-    width: 80%;
-    padding: 10px 12px;
-
-    @include color-scheme(dark) {
-        box-shadow: 5px 5px 0 0 rgba(grey, 0.03);
-    }
+    width: $pref-width;
+    padding: $spacing-xs;
+    @include box-shadow();
+    @include border();
 
     &:hover {
-        font-weight: 400;
+        font-weight: $outfit-regular;
     }
 }
 
 .button {
     &--small {
-        max-width: 200px;
+        max-width: $width-xs;
     }
 
     &--medium {
         min-height: 45px;
-        max-width: 350px;
+        max-width: $width-s;
     }
 
     &--large {
-        width: 80%;
-        max-width: 500px;
+        width: $pref-width;
+        max-width: $width-m;
         min-height: 70px;
-        box-shadow: 10px 10px 0 0 rgba(black, 0.03);
-        
-        @include color-scheme(dark) {
-            box-shadow: 10px 10px 0 0 rgba(grey, 0.03);
-        }
+        @include box-shadow();
     }
 
     &--pulse {
         border: 0;
         font-size: $text-l;
-        background: $color-dark-green;
-        color: $color-white;
+        @include background-secondary();
+        @include color-primary-inverted();
         @include pulse-animation($color-dark-green);
 
         @include color-scheme(dark) {
-            color: $color-black;
-            background: $color-white;
             @include pulse-animation($color-white, 0.3);
 
             &:hover {
@@ -62,15 +50,9 @@ button,
     }
 
     &--filled {
-        background-color: $color-dark-green;
-        color: $color-white;
-        box-shadow: 5px 5px 0 0 rgba(black, 0.04);
-
-        @include color-scheme(dark) {
-            background: $color-white;
-            color: $color-black;
-            box-shadow: 5px 5px 0 0 rgba(grey, 0.04);
-        }
+        @include background-secondary();
+        @include color-primary-inverted();
+        @include box-shadow();
     }
 
     &__upload {
@@ -84,7 +66,7 @@ button,
     &__exit {
         &:hover,
         &:active {
-            color: darkred;
+            @include color-error();
         }
     }
     

@@ -68,7 +68,7 @@ export default defineComponent({
 
   &__header {
     width: 100%;
-    max-width: 800px;
+    max-width: $width-xl;
 
     @include color-scheme(dark) {
       filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));

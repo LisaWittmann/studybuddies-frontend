@@ -4,16 +4,14 @@
       <img class="image--header" :src="header" alt="logo" />
       <section>
         <h2>Spiel finden</h2>
-        <div class="column-wrapper">
+        <form class="column-wrapper" @submit.prevent="joinGame">
           <input
-            class="input--small uppercase"
+            class="input--medium uppercase"
             type="text"
             v-model="lobbyKey"
           />
-          <button class="button--small" @click="joinGame">
-            Spiel beitreten
-          </button>
-        </div>
+          <button type="submit" class="button--small">Spiel beitreten</button>
+        </form>
         <span class="error" v-if="errorMessage">{{ errorMessage }}</span>
       </section>
       <transition name="delay-fade">
@@ -110,7 +108,11 @@ export default defineComponent({
 <style lang="scss" scoped>
 .image--header {
   width: 100%;
-  max-width: 600px;
-  margin-top: $spacing-l;
+  max-width: $width-l;
+  padding-top: $spacing-l;
+}
+
+input {
+  text-align: center;
 }
 </style>
