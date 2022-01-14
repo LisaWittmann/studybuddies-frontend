@@ -40,9 +40,6 @@ export default defineComponent({
     OverlayTerminalComponent,
     OverlayConversationComponent,
   },
-  props: {
-    key: { type: String, required: true },
-  },
   setup() {
     const { gameState, getGameSessionStorage, updateGameData, setLobbyKey } =
       useGameStore();

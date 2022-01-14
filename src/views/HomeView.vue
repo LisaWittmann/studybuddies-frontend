@@ -68,7 +68,7 @@ export default defineComponent({
 
   &__header {
     width: 100%;
-    max-width: 800px;
+    max-width: $width-xl;
 
     @include color-scheme(dark) {
       filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
@@ -77,12 +77,10 @@ export default defineComponent({
 
   a {
     color: $color-white;
-    font-size: 18px;
-    display: flex;
-    font-weight: 300;
-    align-items: center;
-    justify-content: center;
+    font-size: $text-l;
+    font-weight: $outfit-light;
     text-decoration: none;
+    @include flex-center();
 
     @include color-scheme(dark) {
       color: $color-black;
