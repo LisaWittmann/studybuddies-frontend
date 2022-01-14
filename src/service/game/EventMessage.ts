@@ -36,11 +36,11 @@ export enum Operation {
   ACCESS,
   ROLE_PICK,
   LABYRINTH_PICK,
-  UPDATE
+  UPDATE,
 }
 
 export enum Update {
   LABYRINTHS,
   USERS,
-  ROLE
+  ROLE,
 }
