@@ -154,7 +154,7 @@ async function checkEndGame(modelName: string) {
           console.log("Zu Geringer Score")
         }
         else if (response.status == 405) {
-          console.log("Nicht zusamme im Tile")
+          console.log("Nicht zusammen im Tile")
         }
         else if (response.status == 418) {
           console.log("Falsche Trophäe mein liebes Hörnchen")
