@@ -59,5 +59,5 @@ export const colors = {
   grey: 0xd7d9d5,
   black: 0x1a1e16,
   designer: 0xe6bf5f,
-  hacker: 0x30431f,
+  hacker: 0x5d702f,
 };

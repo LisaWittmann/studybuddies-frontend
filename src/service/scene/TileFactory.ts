@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { Orientation, Tile } from "@/service/labyrinth/Tile";
 import { Role } from "@/service/game/Player";
-import { settings } from "@/service/scene/helper/SceneConstants";
+import { colors, settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * creates a group of objects representing a tile
@@ -19,8 +19,7 @@ function createTile(
   tile: Tile,
   tilePosition: THREE.Vector3,
   role: Role | undefined,
-  neighbors: Map<Orientation, Tile | undefined>,
-  color = 0xa9a9a9
+  neighbors: Map<Orientation, Tile | undefined>
 ): THREE.Group {
   const {
     createFloor,
@@ -35,6 +34,7 @@ function createTile(
   tileModel.name = tileKey.toString();
   const tileRestricted = tile.isRestrictedFor(role);
   const texture = getTexture(tile);
+  const color = getColor(tile);
 
   //LIGHT-----------------
   tileModel.add(createLight(tilePosition));
@@ -69,7 +69,13 @@ function createTile(
         createArrow(tilePosition, tileModel, orientation);
       } else {
         //transparent wall if restricted zone is starting in the current orientation
-        createRestrictiveWall(tilePosition, tileModel, orientation, color);
+        createRestrictiveWall(
+          tilePosition,
+          tileModel,
+          orientation,
+          getTexture(neighbor),
+          getColor(neighbor)
+        );
       }
     });
   }
@@ -86,6 +92,22 @@ function getTexture(tile: Tile) {
     if (tile.isRestrictedFor(Role.HACKER)) return "designer";
     if (tile.isRestrictedFor(Role.DESIGNER)) return "hacker";
   }
+}
+
+/**
+ * get color of tile according to role restrictions
+ * @param tile: tile to get color for
+ * @returns color of tile as hexadecimal number
+ */
+function getColor(tile: Tile) {
+  //both players have access to this tile
+  if (tile.getRestrictions().length == 0) return colors.darkBrown;
+  //only the designer has access to this tile
+  if (tile.isRestrictedFor(Role.HACKER)) return colors.designer;
+  //only the hacker has access to this tile
+  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.hacker;
+  //default - this case shouldn't appear
+  return colors.grey;
 }
 
 /**

@@ -7,14 +7,11 @@ import { Orientation, Tile } from "@/service/labyrinth/Tile";
 import { MainPlayer, PartnerPlayer, Player, Role } from "@/service/game/Player";
 
 import { vector } from "@/service/scene/helper/GeometryHelper";
-import {
-  colors,
-  direction,
-  settings,
-} from "@/service/scene/helper/SceneConstants";
+import { direction, settings } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
-const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
+const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } =
+  usePlayerFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
 let labyrinthData: Labyrinth;
@@ -104,24 +101,7 @@ async function placeTile(
   }
   // store placed tile with position to calculate position of next tiles
   storedTiles.set(tileKey, position);
-  const color = getTileColor(tile);
-  scene.add(createTile(tileKey, tile, position, role, neighbors, color));
-}
-
-/**
- * get color of tile according to role restrictions
- * @param tile: tile to get color for
- * @returns color of tile as hexadecimal number
- */
-function getTileColor(tile: Tile) {
-  //both players have access to this tile
-  if (tile.getRestrictions().length == 0) return colors.darkBrown;
-  //only the designer has access to this tile
-  if (tile.isRestrictedFor(Role.HACKER)) return colors.designer;
-  //only the hacker has access to this tile
-  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.hacker;
-  //default - this case shouldn't appear
-  return colors.grey;
+  scene.add(createTile(tileKey, tile, position, role, neighbors));
 }
 
 /**

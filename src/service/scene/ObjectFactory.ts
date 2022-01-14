@@ -99,7 +99,7 @@ function createCeiling(
 ) {
   const textureLoader = new TextureLoader();
   textureLoader.load(
-    `/textures/${textureName}-texture.png`,
+    `/textures/${textureName}-ceiling-texture.png`,
     (texture: Texture) => {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
@@ -203,14 +203,14 @@ function createRestrictiveWall(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
   orientation: Orientation,
+  textureName = "restricted",
   color = 0x199eb0
 ) {
-  createWall(tilePosition, tileModel, orientation, color, 0.5);
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
   textureLoader.load(
-    "/textures/restricted-texture.png",
+    `/textures/${textureName}-texture.png`,
     function (texture: Texture) {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
@@ -219,6 +219,7 @@ function createRestrictiveWall(
           side: DoubleSide,
           map: texture,
           transparent: true,
+          opacity: 0.5,
           color: color,
         })
       );
