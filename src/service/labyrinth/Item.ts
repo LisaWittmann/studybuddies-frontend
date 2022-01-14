@@ -1,20 +1,7 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { radians } from "@/service/scene/helper/GeometryHelper";
-import {
-  direction,
-  position,
-  settings,
-} from "@/service/scene/helper/SceneConstants";
-
-/**
- * enumeration of vertical object position in tile
- */
-export enum Position {
-  WALL,
-  FLOOR,
-  CEILING,
-}
+import { direction, settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * interactive items in tile
@@ -25,20 +12,17 @@ export enum Position {
 export class Item {
   id: number;
   modelName: string;
-  positionInRoom: Position;
   orientations: Array<string>;
   calcPosition: Vector3;
 
   constructor(
     id: number,
     modelName: string,
-    positionInRoom: string,
     orientations: Array<string>,
     calcPosition: Vector3
   ) {
     this.id = id;
     this.modelName = modelName;
-    this.positionInRoom = (<any>Position)[positionInRoom];
     this.orientations = orientations;
     this.calcPosition = calcPosition;
   }
@@ -48,19 +32,6 @@ export class Item {
    * @returns height where item is positioned
    */
   calcPositionInRoom = (): Vector3 => {
-    //set vertical position
-    switch (this.positionInRoom) {
-      case Position.FLOOR:
-        this.calcPosition.copy(position.floor);
-        break;
-      case Position.WALL:
-        this.calcPosition.copy(position.wall);
-        break;
-      case Position.CEILING:
-        this.calcPosition.copy(position.ceiling);
-        break;
-    }
-
     //calculation for object positioning
     //set horizontal position
     this.orientations.forEach((orientation) => {
@@ -98,7 +69,6 @@ export class Item {
   rotationY = (): number => {
     let viewDirection = 0;
     const fullOri = this.orientations.toString().replace(",", "");
-    console.log("ORI", fullOri);
 
     if (fullOri === "NORTH") {
       viewDirection = 0;
@@ -126,7 +96,6 @@ export class Item {
     if (fullOri.includes("EAST")) {
       viewDirection = viewDirection * -1;
     }
-
 
     return radians(viewDirection);
   };
