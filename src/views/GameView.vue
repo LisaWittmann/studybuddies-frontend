@@ -6,7 +6,9 @@
     @click-object="clickItem"
     @move-player="movePlayer"
   />
-  <div class="score-box"><p>{{score}} CP</p></div>
+  <div class="score-box">
+    <p>{{ score }} CP</p>
+  </div>
   <!--warning and error messages-->
   <OverlayTerminalComponent
     :opened="gameEventMessage.visible"
@@ -62,7 +64,6 @@ export default defineComponent({
     const partnerPlayer = computed(() => gameState.partnerPlayer);
     const score = computed(() => gameState.score);
 
-
     onMounted(async () => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
@@ -88,27 +89,25 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-  .score-box {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 7rem;
-    max-height: fit-content;
-    margin: 1rem;
-    padding: $spacing-xs $spacing-s;
-    background-image: url("../../src/assets/img/score-bg.svg");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
+.score-box {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 7rem;
+  max-height: fit-content;
+  margin: 1rem;
+  padding: $spacing-xs $spacing-s;
+  background-image: url("../../src/assets/img/score-bg.svg");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 
-    p {
-      font-family: $font-inconsolata;
-      font-weight: bold;
-      color: $color-beige;
-      padding: 0 1rem;
-      text-align: center;
-    }
+  p {
+    font-family: $font-inconsolata;
+    font-weight: bold;
+    color: $color-beige;
+    padding: 0 1rem;
+    text-align: center;
   }
-  
-
+}
 </style>

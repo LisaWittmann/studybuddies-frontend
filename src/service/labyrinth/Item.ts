@@ -127,7 +127,6 @@ export class Item {
       viewDirection = viewDirection * -1;
     }
 
-
     return radians(viewDirection);
   };
 }
