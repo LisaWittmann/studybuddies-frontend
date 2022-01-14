@@ -154,6 +154,7 @@ async function clickItem(modelName: string, itemId: string) {
     })
     .then((jsonData) => {
       const operation = (<any>Operation)[jsonData];
+      console.log("click");
       switch (operation) {
         case Operation.ACCESS:
           checkAccess(modelName);

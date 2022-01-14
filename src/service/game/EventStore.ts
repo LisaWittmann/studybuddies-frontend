@@ -3,7 +3,7 @@ import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
 
-const { gameState, updatePlayerData, updateGameData, setError } =
+const { gameState, updatePlayerData, updateGameData, setError, setScore } =
   useGameStore();
 const {
   updateUsers,
@@ -78,6 +78,10 @@ stompClient.onConnect = () => {
           break;
         case Operation.TRADE:
           break;
+        case Operation.ACCESS:
+          console.log("ACCESS Nachricht kommt an")
+          setScore(eventMessage.data);
+          break;  
         case Operation.READY:
           console.log(eventMessage);
           if (
