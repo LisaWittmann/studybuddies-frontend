@@ -33,13 +33,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/lobby/:key",
     name: "LobbySettingsView",
     component: LobbySettingsView,
-    props: true,
   },
   {
     path: "/game/:key",
     name: "GameView",
     component: GameView,
-    props: true,
   },
   {
     path: "/upload",
