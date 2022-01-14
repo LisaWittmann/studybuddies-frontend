@@ -1,10 +1,12 @@
 import { Object3D, Scene, Vector3 } from "three";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
+
 import { Player, MainPlayer, PartnerPlayer } from "@/service/game/Player";
-import { direction, factors } from "./helper/SceneConstants";
-import { Labyrinth } from "../labyrinth/Labyrinth";
-import { radians } from "./helper/GeometryHelper";
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
+
+import { direction, factors } from "@/service/scene/helper/SceneConstants";
+import { radians } from "@/service/scene/helper/GeometryHelper";
 
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer, checkIntersect } = useObjectFactory();
@@ -12,6 +14,11 @@ const { createPlayer, checkIntersect } = useObjectFactory();
 let playerPosition: number;
 let partnerPosition: number;
 
+/**
+ * check if stored data of players needs to be updated
+ * @param player playerObject that might contain new data
+ * @returns true if stored data is outdated
+ */
 function requiresUpdate(player: Player) {
   if (player instanceof MainPlayer) {
     return player.getPosition() != playerPosition;
@@ -56,39 +63,32 @@ function updatePartnerPlayer(
     if (!partnerPosition) {
       createPlayer(player, position, scene);
     } else if (playerObject) {
-      const distance = new Vector3()
-        .copy(playerObject.position)
-        .addScaledVector(position, -1);
-      rotatePlayer(playerObject, distance);
-      movePlayer(playerObject, position, player.getPosition(), scene);
+      rotatePlayer(playerObject, position);
+      playerObject.position.copy(position);
+      playerObject.position.copy(
+        checkIntersect(playerObject, player.getPosition(), position, scene)
+      );
     }
     partnerPosition = player.getPosition();
   }
 }
 
-function movePlayer(
-  object: Object3D,
-  endPosition: Vector3,
-  tileKey: number,
-  scene: Scene
-) {
-  const distance = new Vector3()
-    .copy(endPosition)
-    .addScaledVector(object.position, -1)
+/**
+ * rotate playerObject to direction it will be translated to
+ * @param object object of partnerPlayer
+ * @param position position of tile that player should be placed in
+ */
+function rotatePlayer(object: Object3D, position: Vector3) {
+  const direction = new Vector3()
+    .copy(object.position)
+    .addScaledVector(position, -1)
     .normalize();
-  if (distance.x == 0 && distance.y == 0 && distance.z == 0) {
-    object.position.copy(checkIntersect(object, tileKey, endPosition, scene));
-    return;
-  }
-  object.position.add(distance);
-  setTimeout(() => movePlayer(object, endPosition, tileKey, scene), 5);
-}
 
-function rotatePlayer(object: Object3D, difference: Vector3) {
   let rotationAngle = 0;
-  if (difference.z < 0) rotationAngle = 180;
-  else if (difference.x > 0) rotationAngle = -90;
-  else if (difference.x < 0) rotationAngle = 90;
+  if (direction.z < 0) rotationAngle = 180;
+  else if (direction.x > 0) rotationAngle = -90;
+  else if (direction.x < 0) rotationAngle = 90;
+
   object.rotation.y = radians(rotationAngle);
 }
 
