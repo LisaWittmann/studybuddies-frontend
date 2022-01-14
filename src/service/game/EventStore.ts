@@ -1,5 +1,5 @@
 import { Client } from "@stomp/stompjs";
-import { EventMessage } from "@/service/game/EventMessage";
+import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
 
@@ -52,9 +52,11 @@ stompClient.onConnect = () => {
       console.log("new Message for the Lobby");
 
       let destTileID: number;
+      let updateData: Update;
+      const operation: Operation = (<any>Operation)[eventMessage.operation];
 
-      switch (eventMessage.operation) {
-        case "MOVEMENT":
+      switch (operation) {
+        case Operation.MOVEMENT:
           destTileID = Number.parseInt(eventMessage.data);
 
           if (destTileID) {
@@ -66,13 +68,13 @@ stompClient.onConnect = () => {
           }
 
           break;
-        case "CLICK":
+        case Operation.CLICK:
           break;
-        case "CHAT":
+        case Operation.CHAT:
           break;
-        case "TRADE":
+        case Operation.TRADE:
           break;
-        case "READY":
+        case Operation.READY:
           console.log(eventMessage);
           if (
             eventMessage.username === "ALL_OF_LOBBY" &&
@@ -91,19 +93,20 @@ stompClient.onConnect = () => {
             );
           }
           break;
-        case "LABYRINTH_PICK":
+        case Operation.LABYRINTH_PICK:
           console.log(Number(eventMessage.data));
           setLabyrinthSelection(Number(eventMessage.data));
           break;
-        case "UPDATE":
-          switch (eventMessage.data) {
-            case "LABYRINTHS":
+        case Operation.UPDATE:
+          updateData = (<any>Update)[eventMessage.data];
+          switch (updateData) {
+            case Update.LABYRINTHS:
               updateLabyrinths();
               break;
-            case "USERS":
+            case Update.USERS:
               updateUsers(eventMessage.lobbyKey);
               break;
-            case "ROLE":
+            case Update.ROLE:
               console.log("RoleOptions holen");
               getRoleOptions(eventMessage.lobbyKey);
               break;
