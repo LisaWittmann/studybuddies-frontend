@@ -28,6 +28,11 @@
 
 .container {
     position: relative;
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
+}
+
+.container--fixed {
+    height: 100vh;
+    overflow: hidden;
 }
