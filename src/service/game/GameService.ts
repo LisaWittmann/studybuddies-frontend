@@ -83,9 +83,9 @@ async function getConversationMessage(id: string) {
         if (conversation.message.itemName != null) {
           console.log("give Item");
           givePlayerItem(
-              gameState.lobbyKey,
-              conversation.message.itemName,
-              gameState.mainPlayer.getUsername()
+            gameState.lobbyKey,
+            conversation.message.itemName,
+            gameState.mainPlayer.getUsername()
           );
         }
       } else {
@@ -211,28 +211,36 @@ async function addToInventory(
 }
 
 async function givePlayerItem(
-    lobbyKey: string,
-    itemName: string,
-    username: string
+  lobbyKey: string,
+  itemName: string,
+  username: string
 ) {
   //"/lobby/{key}/username/{username}/give/item/{itemName}"
 
-  return fetch("api/lobby/" + lobbyKey + "/username/" + username + "/give/item/" + itemName, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  })
-      .then((response) => {
-        if (!response.ok) throw new Error(response.statusText);
-        return response.json();
-      })
-      .then((jsonData) => {
-        let inventory = new Array<Item>();
-        inventory = jsonData;
-        updateInventory(inventory);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  return fetch(
+    "api/lobby/" +
+      lobbyKey +
+      "/username/" +
+      username +
+      "/give/item/" +
+      itemName,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      let inventory = new Array<Item>();
+      inventory = jsonData;
+      updateInventory(inventory);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 }
 
 /**
@@ -241,10 +249,7 @@ async function givePlayerItem(
  * @param objectName the name of the object that is to be deleted
  * @param itemId the id of the object that is to be deleted
  */
-async function removeItemFromTile(
-  lobbyKey: string,
-  itemId: string
-) {
+async function removeItemFromTile(lobbyKey: string, itemId: string) {
   return fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
     method: "DELETE",
     headers: { "Content-Type": "text/plain" },
