@@ -127,11 +127,12 @@ async function checkAccess(modelName: string) {
     })
     .then((jsonData) => {
       gameEventMessage.message = jsonData.accesstext;
-      if (jsonData.access) {
+      if (jsonData.firstAccess) {
         gameEventMessage.state = "success";
-        deleteFromInventory()
-        //ToDo: - update Score component
-        //      - trigger opacity of computer model  
+        deleteFromInventory();        
+      }else if (jsonData.access) {
+        gameEventMessage.state = "success";
+        //- trigger opacity of computer model  
       } else {
         gameEventMessage.state = "warning";
       }
