@@ -35,11 +35,17 @@ button,
 
     &--pulse {
         border: 0;
+        font-size: $text-l;
         @include background-secondary();
         @include color-primary-inverted();
         @include pulse-animation($color-dark-green);
+
         @include color-scheme(dark) {
             @include pulse-animation($color-white, 0.3);
+
+            &:hover {
+                color: $color-green;
+            }
         }
     }
 
@@ -74,5 +80,25 @@ button,
     &__ready {
         background-color: $color-light-green;
         color: rgb(56, 56, 56);
+    }
+
+    &__icon {
+        background: transparent;
+        font-size: $headline-xl;
+        border: none;
+        width: auto;
+        min-height: auto;
+        box-shadow: none;
+
+        &--circle {
+            @include flex-center();
+            border: none;
+            border-radius: 100%;
+            width: 80px;
+            height: 80px;
+            min-height: auto;
+            padding: 15px;
+            font-size: $headline-xl;
+        }
     }
 }

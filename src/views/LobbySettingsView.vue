@@ -91,7 +91,7 @@ export default defineComponent({
     const { gameState, setLobbyKey } = useGameStore();
 
     const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
-    const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinth);
+    const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinthName);
     const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
@@ -107,10 +107,10 @@ export default defineComponent({
     const loading = computed(() => gameState.loading);
 
     const copy = (text: string) => navigator.clipboard.writeText(text);
- 
-    function selectLabyrinth(id: number) {
-      setLabyrinthSelection(id);
-      updateLabyrinthPick(id, gameState.lobbyKey);
+    
+    function selectLabyrinth(labyrinthName: string) {
+      setLabyrinthSelection(labyrinthName);
+      updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
     }
 
     function selectRole(name: string) {
@@ -118,6 +118,11 @@ export default defineComponent({
     }
 
     onbeforeunload = () => {
+      if (
+        lobbyState.users.some((user) => user.username === loginState.username)
+      ) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
       return "Leaving Lobby";
     };
 

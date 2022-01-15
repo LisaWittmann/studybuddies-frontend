@@ -53,7 +53,7 @@ stompClient.onConnect = () => {
 
       let destTileID: number;
       let updateData: Update;
-      const operation: Operation = (<any>Operation)[eventMessage.operation]
+      const operation: Operation = (<any>Operation)[eventMessage.operation];
 
       switch (operation) {
         case Operation.MOVEMENT:
@@ -94,8 +94,7 @@ stompClient.onConnect = () => {
           }
           break;
         case Operation.LABYRINTH_PICK:
-          console.log(Number(eventMessage.data));
-          setLabyrinthSelection(Number(eventMessage.data));
+          setLabyrinthSelection(eventMessage.data);
           break;
         case Operation.UPDATE:
           updateData = (<any>Update)[eventMessage.data];

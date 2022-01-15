@@ -2,7 +2,7 @@
   <section class="dropdown">
     <button class="dropdown__button button--large" @click="openClose">
       <div class="text-wrapper">
-        <span v-if="selectedItem">Labyrinth {{ selectedItem }}</span>
+        <span v-if="selectedItem">Labyrinth: {{ selectedItem }}</span>
         <span v-else>Labyrinth auswählen</span>
       </div>
       <div class="icon-wrapper">
@@ -23,7 +23,7 @@
         :key="index"
         @click="selectItem(item)"
       >
-        <div>Labyrinth {{ item }}</div>
+        <div>{{ item }}</div>
       </div>
       <div
         class="dropdown__menu-option dropdown__menu-option--disabled"
@@ -45,7 +45,7 @@ export default defineComponent({
       type: Array,
     },
     selectedItem: {
-      type: Number,
+      type: String,
     },
   },
   name: "DropdownComponent",
@@ -59,8 +59,8 @@ export default defineComponent({
       isOpen.value = !isOpen.value;
     }
 
-    function selectItem(item: number) {
-      if (item != lobbyState.selectedLabyrinth) {
+    function selectItem(item: string) {
+      if (item != lobbyState.selectedLabyrinthName) {
         context.emit("select", item);
       }
       isOpen.value = false;
