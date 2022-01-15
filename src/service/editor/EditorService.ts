@@ -64,7 +64,10 @@ function setDimension(rows: number, columns: number): void {
 
 async function setItemOptions() {
   await fetch("/api/labyrinth/placeable-bodies")
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
     .then((jsonData) => {
       for (const name of jsonData) {
         if (!editorState.itemOptions.some((i) => i.modelName == name)) {
