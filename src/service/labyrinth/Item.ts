@@ -2,7 +2,7 @@ import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { radians } from "@/service/scene/helper/GeometryHelper";
 import {
-  directions,
+  directionMap,
   position,
   settings,
 } from "@/service/scene/helper/SceneConstants";
@@ -67,7 +67,7 @@ export class Item {
       //cast string from array to enum for simple use of enum in switch
       const currentOrientation: Orientation = (<any>Orientation)[orientation];
       const directionVector = new Vector3();
-      const direction = directions.get(currentOrientation);
+      const direction = directionMap.get(currentOrientation);
 
       if (direction) directionVector.copy(direction);
       this.calcPosition.copy(this.calcPosition.clone().add(directionVector));

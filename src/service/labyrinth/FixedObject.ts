@@ -1,10 +1,9 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
-import { radians } from "@/service/scene/helper/GeometryHelper";
 import {
   settings,
   colors,
-  directions,
+  directionMap,
   rotations,
 } from "@/service/scene/helper/SceneConstants";
 
@@ -24,7 +23,7 @@ class FixedObject {
 
   rotationY = (): number => {
     const rotation = rotations.get(this.orientation);
-    return rotation ? radians(rotation) : radians(0);
+    return rotation ? rotation : 0;
   };
 
   /**
@@ -34,7 +33,7 @@ class FixedObject {
    */
   protected getPosition(distance: number): Vector3 {
     const position = new Vector3().copy(this.tilePosition);
-    const direction = directions.get(this.orientation);
+    const direction = directionMap.get(this.orientation);
     if (direction) position.addScaledVector(direction, distance);
     return position;
   }

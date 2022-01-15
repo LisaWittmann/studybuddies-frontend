@@ -24,9 +24,3 @@ export const baseline = (position: Vector3, height: number): Vector3 => {
 export const vector = (x: number, y: number, z: number): Vector3 => {
   return new Vector3(x, y, z);
 };
-
-export const equals = (vec1: Vector3, vec2: Vector3): boolean => {
-  vec1.normalize();
-  vec2.normalize();
-  return vec1.x == vec2.x && vec1.y == vec2.y && vec1.z == vec2.z;
-};

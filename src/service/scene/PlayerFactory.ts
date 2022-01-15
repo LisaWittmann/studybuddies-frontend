@@ -5,12 +5,11 @@ import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { Player, MainPlayer, PartnerPlayer } from "@/service/game/Player";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 
-import { radians, equals } from "@/service/scene/helper/GeometryHelper";
 import {
   direction,
-  directions,
+  directionMap,
   factors,
-  rotations,
+  movementRotations,
 } from "@/service/scene/helper/SceneConstants";
 
 const { updateCameraPosition } = useSceneFactory();
@@ -89,10 +88,10 @@ function rotatePlayer(object: Object3D, position: Vector3) {
     .addScaledVector(position, -1)
     .normalize();
 
-  for (const [orientation, direction] of directions) {
-    if (equals(direction, moveDirection)) {
-      const rotationAngle = rotations.get(orientation) as number;
-      object.rotation.y = radians(rotationAngle);
+  for (const [orientation, direction] of directionMap) {
+    if (direction.equals(moveDirection)) {
+      const rotationAngle = movementRotations.get(orientation) as number;
+      object.rotation.y = rotationAngle;
       return;
     }
   }
