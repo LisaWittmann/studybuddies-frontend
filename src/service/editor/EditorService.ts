@@ -24,7 +24,7 @@ const maxRows = 20;
 const maxColumns = 40;
 const minTiles = 10;
 const maxItems = 3;
-const startPositions = 2;
+const startPositions = 1;
 
 /**
  * list of all selected tileModels of new labyrinth
@@ -312,6 +312,9 @@ function hasErrors(): Mode | undefined {
  * @returns data of editorState as labyrinth
  */
 function convert(): Labyrinth {
+  if (editorState.startPositions.length == 1) {
+    editorState.startPositions.push(editorState.startPositions[0]);
+  }
   const labyrinth = new Labyrinth(
     editorState.labyrinthName,
     editorState.endPosition,
