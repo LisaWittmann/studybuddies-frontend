@@ -53,7 +53,10 @@ export default defineComponent({
   width: $pref-width;
   max-width: $width-l;
   font-size: $text-l;
-  color: $color-black;
+
+  * {
+    color: $color-black;
+  }
 
   &__content {
     @include flex-center();
