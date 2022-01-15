@@ -73,13 +73,6 @@ export default defineComponent({
       }
     };
 
-    watch(showOptions, () => {
-      setTimeout(() => {
-        const container = document.querySelector(".tool__options");
-        if (container) container.scrollTop = container.scrollHeight;
-      }, 80);
-    });
-
     return { showOptions, toggleOptions, select, image, optionClass };
   },
 });
