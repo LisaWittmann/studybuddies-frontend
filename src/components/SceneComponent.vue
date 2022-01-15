@@ -83,3 +83,11 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+#scene {
+  overflow: hidden;
+  height: -webkit-fill-available;
+  width: 100vw;
+}
+</style>

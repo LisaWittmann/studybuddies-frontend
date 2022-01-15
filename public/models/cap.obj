@@ -1,6 +1,6 @@
 # Blender v2.93.5 OBJ File: ''
 # www.blender.org
-mtllib gratuation.mtl
+mtllib cap.mtl
 o grad_hat
 v -0.743218 0.354248 1.540791
 v 0.743218 0.354248 1.540791
