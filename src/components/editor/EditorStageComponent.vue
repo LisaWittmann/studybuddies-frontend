@@ -85,9 +85,9 @@ export default defineComponent({
     );
 
     const onEnter = (model: TileModel) => {
-      if (props.mode != Mode.CREATE && props.mode != Mode.RESTRICTION_PLACEMENT)
-        return;
-      if (mousedown) onClick(model);
+      if (mousedown && (props.mode == Mode.CREATE || props.mode == Mode.RESTRICTION_PLACEMENT)) 
+        onClick(model);
+      return
     };
 
     const onClick = (model: TileModel) => {
