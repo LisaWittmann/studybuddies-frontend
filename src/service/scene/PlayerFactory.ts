@@ -5,8 +5,13 @@ import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { Player, MainPlayer, PartnerPlayer } from "@/service/game/Player";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 
-import { direction, factors } from "@/service/scene/helper/SceneConstants";
-import { radians } from "@/service/scene/helper/GeometryHelper";
+import { radians, equals } from "@/service/scene/helper/GeometryHelper";
+import {
+  direction,
+  directions,
+  factors,
+  rotations,
+} from "@/service/scene/helper/SceneConstants";
 
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer, checkIntersect } = useObjectFactory();
@@ -79,17 +84,18 @@ function updatePartnerPlayer(
  * @param position position of tile that player should be placed in
  */
 function rotatePlayer(object: Object3D, position: Vector3) {
-  const direction = new Vector3()
+  const moveDirection = new Vector3()
     .copy(object.position)
     .addScaledVector(position, -1)
     .normalize();
 
-  let rotationAngle = 0;
-  if (direction.z < 0) rotationAngle = 180;
-  else if (direction.x > 0) rotationAngle = -90;
-  else if (direction.x < 0) rotationAngle = 90;
-
-  object.rotation.y = radians(rotationAngle);
+  for (const [orientation, direction] of directions) {
+    if (equals(direction, moveDirection)) {
+      const rotationAngle = rotations.get(orientation) as number;
+      object.rotation.y = radians(rotationAngle);
+      return;
+    }
+  }
 }
 
 /**

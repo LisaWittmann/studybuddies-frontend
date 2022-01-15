@@ -1,5 +1,7 @@
 import { readonly } from "vue";
 import { vector } from "@/service/scene/helper/GeometryHelper";
+import { Orientation } from "@/service/labyrinth/Tile";
+import { Vector3 } from "three";
 
 /**
  * scene settings
@@ -34,7 +36,21 @@ export const direction = {
   east: readonly(vector(1, 0, 0)),
   south: readonly(vector(0, 0, 1)),
   west: readonly(vector(-1, 0, 0)),
-};
+}
+
+export const directions = new Map([
+  [Orientation.NORTH, direction.north],
+  [Orientation.EAST, direction.east],
+  [Orientation.SOUTH, direction.south],
+  [Orientation.WEST, direction.west],
+]);
+
+export const rotations = new Map([
+  [Orientation.NORTH, 0],
+  [Orientation.EAST, 270],
+  [Orientation.SOUTH, 180],
+  [Orientation.WEST, 90],
+]);
 
 /**
  * vertical positions of objects in room
