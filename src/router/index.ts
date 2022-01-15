@@ -6,6 +6,7 @@ import GameView from "@/views/GameView.vue";
 import LobbySettingsView from "@/views/LobbySettingsView.vue";
 import LabyrinthUploadView from "@/views/LabyrinthUploadView.vue";
 import FindLobbyView from "@/views/FindLobbyView.vue";
+import EditorView from "@/views/EditorView.vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 
 const routes: Array<RouteRecordRaw> = [
@@ -38,6 +39,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/game/:key",
     name: "GameView",
     component: GameView,
+  },
+  {
+    path: "/editor",
+    name: "Editor",
+    component: EditorView,
   },
   {
     path: "/upload",

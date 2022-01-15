@@ -1,9 +1,7 @@
 import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
-import { Item } from "@/service/labyrinth/Item";
-
+import { Item, Position } from "@/service/labyrinth/Item";
 import { Role } from "@/service/game/Player";
-import { Vector3 } from "three";
 
 /**
  * update the tiles for getting them initially and every time something changes
@@ -22,23 +20,30 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
     })
     .then((jsonData) => {
       const labyrinth = new Labyrinth(
+        jsonData.name,
         jsonData.endTileKey,
         jsonData.playerStartTileKeys
       );
 
       //iterate over the tiles in the json data tileMap to create tiles for every tile in json object
-      for (const key in jsonData.tileMap) {
-        const tile = jsonData.tileMap[key];
-        const id = parseInt(key);
+      for (const tileKey in jsonData.tileMap) {
+        const tile = jsonData.tileMap[tileKey];
+        const id = parseInt(tileKey);
         const objectsInRoom = new Array<Item>();
-        for (const item of tile.objectsInRoom) {
+
+        for (const itemKey in tile.objectsInRoom) {
+          const item = tile.objectsInRoom[itemKey];
+          const orientations = new Array<Orientation>();
+
+          for (const orientation of item.orientations) {
+            orientations.push((<any>Orientation)[orientation]);
+          }
           objectsInRoom.push(
             new Item(
               item.id,
               item.modelName,
-              item.positionInRoom,
-              item.orientations,
-              new Vector3()
+              (<any>Position)[item.positionInRoom],
+              orientations
             )
           );
         }
