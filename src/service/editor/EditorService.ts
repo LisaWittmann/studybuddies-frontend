@@ -64,7 +64,10 @@ function setDimension(rows: number, columns: number): void {
 
 async function setItemOptions() {
   await fetch("/api/labyrinth/placeable-bodies")
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
     .then((jsonData) => {
       for (const name of jsonData) {
         if (!editorState.itemOptions.some((i) => i.modelName == name)) {
@@ -169,7 +172,7 @@ function addStartTile(model: TileModel): void {
     model.restrictions.length > 0
   )
     return;
-  if (editorState.startPositions.length < 2) {
+  if (editorState.startPositions.length < startPositions) {
     editorState.startPositions.push(model.relationKey);
     model.isStart = true;
   }
@@ -194,6 +197,7 @@ function addEndTile(model: TileModel): void {
   if (
     !model.relationKey ||
     model.isStart ||
+    model.isEnd ||
     model.restrictions.length > 0 ||
     model.getNeighborsAsList().length > 1
   ) {
