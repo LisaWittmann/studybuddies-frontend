@@ -1,9 +1,9 @@
 <template>
   <transition name="fade" appear>
-    <div class="container">
+    <div class="container" :class="{ 'container--fixed': loading }">
       <h1>
         Lobby
-        <span class="uppercase"> {{ lobbyKey }}</span>
+        <span class="uppercase" @click="copy(lobbyKey)"> {{ lobbyKey }}</span>
       </h1>
       <section>
         <p>{{ users.length }}/2 Spieler verbunden</p>
@@ -104,7 +104,10 @@ export default defineComponent({
         lobbyState.users.find((user) => user.username === loginState.username)
           ?.isReady
     );
+    const loading = computed(() => gameState.loading);
 
+    const copy = (text: string) => navigator.clipboard.writeText(text);
+    
     function selectLabyrinth(labyrinthName: string) {
       setLabyrinthSelection(labyrinthName);
       updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
@@ -165,6 +168,8 @@ export default defineComponent({
       selectedLabyrinth,
       loginState,
       isReady,
+      loading,
+      copy,
     };
   },
 });
@@ -177,6 +182,11 @@ h1 {
 
   span {
     font-weight: inherit;
+    cursor: copy;
+
+    &:hover {
+      color: $color-light-green;
+    }
   }
 }
 </style>

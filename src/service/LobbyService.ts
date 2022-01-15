@@ -374,6 +374,7 @@ function setUserReadyState(username: string, readyState: boolean) {
 function setupGame() {
   const { updateGameData, gameState, setPlayerData, updatePlayerData } =
     useGameStore();
+  gameState.loading = true;
   updateUsers(gameState.lobbyKey)
     .then(() => {
       lobbyState.users.forEach((user) => {
@@ -396,6 +397,7 @@ function setupGame() {
           console.log("StartTileId is: " + startTile);
         });
         router.push(`/game/${gameState.lobbyKey}`);
+        gameState.loading = false;
       });
     });
 }

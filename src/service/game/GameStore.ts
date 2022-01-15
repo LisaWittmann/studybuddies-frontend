@@ -15,6 +15,7 @@ const gameState = reactive({
   labyrinth: new Labyrinth("", 0, []),
   mainPlayer: new MainPlayer("", 0),
   partnerPlayer: new PartnerPlayer("", 0),
+  loading: false,
   errormessage: "",
   score: 0,
 });
