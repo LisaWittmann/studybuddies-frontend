@@ -156,7 +156,7 @@ function addStartTile(model: TileModel): void {
     model.restrictions.length > 0
   )
     return;
-  if (editorState.startPositions.length < 2) {
+  if (editorState.startPositions.length < startPositions) {
     editorState.startPositions.push(model.relationKey);
     model.isStart = true;
   }
@@ -181,6 +181,7 @@ function addEndTile(model: TileModel): void {
   if (
     !model.relationKey ||
     model.isStart ||
+    model.isEnd ||
     model.restrictions.length > 0 ||
     model.getNeighborsAsList().length > 1
   ) {

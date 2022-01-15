@@ -128,6 +128,7 @@ export default defineComponent({
     h2 {
       font-size: $text-m;
       font-weight: 300;
+      @include color-primary-inverted();
     }
   }
 
