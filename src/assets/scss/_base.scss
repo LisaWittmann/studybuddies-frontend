@@ -53,6 +53,11 @@ section {
 
 i, a, button {
     cursor: pointer;
+
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.4;
+    }
 }
 
 a {
@@ -60,6 +65,14 @@ a {
     color: $color-dark-green;
     &:hover {
         color: $color-light-green;
+    }
+
+    &.button {
+        display: flex;
+        font-weight: 300;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
     }
    
    @include color-scheme(dark) {

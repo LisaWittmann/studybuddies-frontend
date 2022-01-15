@@ -118,7 +118,6 @@ function getTilePosition(
   scene.traverse((child) => {
     if (child.userData.tileKey == id) {
       position = child.position;
-      console.log(child);
     }
   });
   return position;
