@@ -33,7 +33,7 @@ export const instructions = readonly(
     ],
     [
       Mode.ITEM_PLACEMENT,
-      `Nun darfst du entscheiden, wo die begehrten Gegenstände zu finden sind. Damit es ein bisschen mehr zu suchen gibt, darfst du allerdings maximal ${editorConfig.maxItems} Objekte in einer Kachel platzieren.`,
+      `Nun darfst du entscheiden, wo die begehrten Gegenstände zu finden sind. Damit es ein bisschen mehr zu suchen gibt, darfst du allerdings maximal ${editorConfig.maxItems} Objekte in einer Kachel platzieren. Objekte, die von einer bestimmten Rolle nicht genutzt werden können, sind farbig markiert. Diese dürfen auf den Felder platziert werden, die für alle Rollen zugänglich sind oder auf einem Feld der entsprechenden Farbe.`,
     ],
     [
       Mode.LABYRINTH_NAME,
