@@ -3,6 +3,7 @@ import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
+import { User } from "@/service/login/User";
 
 const { gameState, updatePlayerData, setError } = useGameStore();
 const {
@@ -97,13 +98,13 @@ stompClient.onConnect = () => {
           break;
         case Operation.CHECK_END:
           lobbyState.users.forEach((user) => {
-            if(user.username == eventMessage.data) {
+            if (user.username == eventMessage.data) {
               setUserFinishedState(user.username, true);
             }
-          })
+          });
 
           // If both users are finished, redirect to endscreen
-          if(lobbyState.users[0].finished && lobbyState.users[1].finished) {
+          if (lobbyState.users.every((user: User) => user.finished)) {
             router.push("/end");
           }
           break;
