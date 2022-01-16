@@ -5,6 +5,8 @@ import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
 
+const { endGame } = useGameStore();
+
 const gameEventMessage = reactive({
   message: "",
   state: "",
@@ -171,6 +173,7 @@ async function clickItem(modelName: string) {
 }
 
 function playerLeftGame(username: string) {
+  endGame();
   gameFeedback.headline = `Spieler ${username} hat das Spiel verlassen.`;
   gameFeedback.link = "/find";
   gameFeedback.linkText = "Zurück zur Lobbyfindung";
