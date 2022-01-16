@@ -107,7 +107,7 @@ export default defineComponent({
     const loading = computed(() => gameState.loading);
 
     const copy = (text: string) => navigator.clipboard.writeText(text);
-    
+
     function selectLabyrinth(labyrinthName: string) {
       setLabyrinthSelection(labyrinthName);
       updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
@@ -125,25 +125,6 @@ export default defineComponent({
       }
       return "Leaving Lobby";
     };
-
-    onunload = () => {
-      if (
-        lobbyState.users.some((user) => user.username === loginState.username)
-      ) {
-        exitLobby(gameState.lobbyKey, loginState.username);
-      }
-    };
-
-    // exit lobby if any other page than game is opened
-    onBeforeRouteLeave((to) => {
-      const nextKey = to.params.key as string;
-      if (
-        nextKey != gameState.lobbyKey &&
-        lobbyState.users.some((user) => user.username === loginState.username)
-      ) {
-        exitLobby(gameState.lobbyKey, loginState.username);
-      }
-    });
 
     onMounted(() => {
       const route = router.currentRoute.value;

@@ -180,6 +180,7 @@ async function createLobby(username: string) {
  * @param username: identifying name of user that should be removed
  */
 async function exitLobby(lobbyKey: string, username: string) {
+  if (!lobbyState.users.some((user) => user.username === username)) return;
   fetch("/api/lobby/leave/" + lobbyKey, {
     method: "POST",
     headers: {
