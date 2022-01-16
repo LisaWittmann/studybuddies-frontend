@@ -243,7 +243,12 @@ function setName(labyrinthName: string): void {
  * @param item: item model to add
  */
 function addItem(model: TileModel, item: ItemModel): void {
-  if (!model.relationKey || model.objectsInRoom.length >= maxItems || !item)
+  if (
+    !model.relationKey ||
+    model.isEnd ||
+    model.objectsInRoom.length >= maxItems ||
+    !item
+  )
     return;
   model.objectsInRoom.push(item);
   editorState.itemOptions = editorState.itemOptions.filter(
