@@ -68,27 +68,10 @@ export default defineComponent({
 
   &__header {
     width: 100%;
-    max-width: 800px;
+    max-width: $width-xl;
 
     @include color-scheme(dark) {
       filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
-    }
-  }
-
-  a {
-    color: $color-white;
-    font-size: 18px;
-    display: flex;
-    font-weight: 300;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-
-    @include color-scheme(dark) {
-      color: $color-black;
-      &:hover {
-        color: $color-green;
-      }
     }
   }
 
