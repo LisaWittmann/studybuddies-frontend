@@ -1,3 +1,4 @@
+import { readonly } from "vue";
 /**
  * enumeration of steps during labyrinth creation
  */

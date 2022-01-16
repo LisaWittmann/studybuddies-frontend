@@ -18,6 +18,7 @@
       :style="{ fontSize: `${size / 3}px` }"
       @click="onClick"
       @mouseenter="onEnter"
+      @contextmenu.prevent="onRightClick"
     >
       <i v-if="model.isStart" class="fas fa-map-marker"></i>
       <i v-if="model.isEnd" class="fas fa-map-marker-alt"></i>
@@ -59,6 +60,7 @@ export default defineComponent({
 
     const onClick = () => emit("clicked", props.model);
     const onEnter = () => emit("entered", props.model);
+    const onRightClick = () => emit("clicked-right", props.model);
 
     return {
       selected,
@@ -66,6 +68,7 @@ export default defineComponent({
       color,
       onClick,
       onEnter,
+      onRightClick,
     };
   },
 });

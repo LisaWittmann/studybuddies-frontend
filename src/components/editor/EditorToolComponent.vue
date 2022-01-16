@@ -24,9 +24,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, ref, watch } from "vue";
 import { Role } from "@/service/game/Player";
 import { ItemModel } from "@/service/editor/TileModel";
-import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "EditorToolComponent",
@@ -91,10 +91,24 @@ export default defineComponent({
   font-size: $headline-xl;
 
   &__options {
-    margin-bottom: 20px;
+    max-height: 77vh;
+    overflow-y: scroll;
+    @include scroll-container(to top);
 
     > * {
       margin: 5px 0;
+
+      &:first-of-type {
+        margin-top: 15px;
+      }
+
+      &:last-of-type {
+        margin-bottom: 10px;
+      }
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
     }
   }
 
