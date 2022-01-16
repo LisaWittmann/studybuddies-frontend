@@ -1,8 +1,10 @@
 import { Client } from "@stomp/stompjs";
 import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
+import { useGameService } from "@/service/game/GameService";
 import { useLobbyService } from "@/service/LobbyService";
 
+const { playerLeftGame } = useGameService();
 const { gameState, updatePlayerData, setError } = useGameStore();
 const {
   updateUsers,
@@ -104,6 +106,7 @@ stompClient.onConnect = () => {
               break;
             case Update.USERS:
               updateUsers(eventMessage.lobbyKey);
+              if (gameState.started) playerLeftGame(eventMessage.username);
               break;
             case Update.ROLE:
               console.log("RoleOptions holen");

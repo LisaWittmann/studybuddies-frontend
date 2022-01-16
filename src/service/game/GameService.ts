@@ -17,6 +17,15 @@ const conversation = reactive({
   visible: false,
 });
 
+const gameFeedback = reactive({
+  opened: false,
+  headline: "",
+  subline: "",
+  error: false,
+  link: "",
+  linkText: "",
+});
+
 const toggleEventMessage = () =>
   (gameEventMessage.visible = !gameEventMessage.visible);
 
@@ -161,14 +170,33 @@ async function clickItem(modelName: string) {
     });
 }
 
+function playerLeftGame(username: string) {
+  gameFeedback.headline = `Spieler ${username} hat das Spiel verlassen.`;
+  gameFeedback.link = "/find";
+  gameFeedback.linkText = "Zurück zur Lobbyfindung";
+  gameFeedback.opened = true;
+}
+
+function resetGameFeedback() {
+  gameFeedback.opened = false;
+  gameFeedback.headline = "";
+  gameFeedback.subline = "";
+  gameFeedback.error = false;
+  gameFeedback.link = "";
+  gameFeedback.linkText = "";
+}
+
 export function useGameService() {
   return {
     gameEventMessage,
+    gameFeedback,
     toggleEventMessage,
     movePlayer,
     clickItem,
     startConversation,
     getConversationMessage,
     conversation,
+    playerLeftGame,
+    resetGameFeedback,
   };
 }

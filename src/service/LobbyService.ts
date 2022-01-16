@@ -372,8 +372,13 @@ function setUserReadyState(username: string, readyState: boolean) {
  * 4. Overwriting the page history by replacing the url to the game view
  */
 function setupGame() {
-  const { updateGameData, gameState, setPlayerData, updatePlayerData } =
-    useGameStore();
+  const {
+    updateGameData,
+    gameState,
+    setPlayerData,
+    updatePlayerData,
+    startGame,
+  } = useGameStore();
   gameState.loading = true;
   updateUsers(gameState.lobbyKey)
     .then(() => {
@@ -398,6 +403,7 @@ function setupGame() {
         });
         router.push(`/game/${gameState.lobbyKey}`);
         gameState.loading = false;
+        startGame();
       });
     });
 }

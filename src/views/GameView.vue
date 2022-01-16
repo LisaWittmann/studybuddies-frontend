@@ -19,6 +19,14 @@
     :message="conversation.message"
     @respond="getConversationMessage"
   />
+  <OverlayFeedbackComponent
+    :opened="gameFeedback.opened"
+    :headline="gameFeedback.headline"
+    :subLine="gameFeedback.subline"
+    :link="gameFeedback.link"
+    :linkText="gameFeedback.linkText"
+    :error="gameFeedback.error"
+  />
 </template>
 
 <script lang="ts">
@@ -29,6 +37,7 @@ import { useGameStore } from "@/service/game/GameStore";
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
+import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
 
 import router from "@/router";
 import "@/service/game/EventStore";
@@ -39,17 +48,19 @@ export default defineComponent({
     SceneComponent,
     OverlayTerminalComponent,
     OverlayConversationComponent,
+    OverlayFeedbackComponent,
   },
   setup() {
-    const { gameState, getGameSessionStorage, updateGameData, setLobbyKey } =
-      useGameStore();
+    const { gameState, updateGameData, setLobbyKey } = useGameStore();
     const {
       gameEventMessage,
+      gameFeedback,
       toggleEventMessage,
       movePlayer,
       clickItem,
       conversation,
       getConversationMessage,
+      resetGameFeedback,
     } = useGameService();
     updateGameData();
 
@@ -61,7 +72,7 @@ export default defineComponent({
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       updateGameData();
-      getGameSessionStorage();
+      resetGameFeedback();
     });
 
     return {
@@ -69,7 +80,7 @@ export default defineComponent({
       clickItem,
       toggleEventMessage,
       gameEventMessage,
-      gameState,
+      gameFeedback,
       mainPlayer,
       partnerPlayer,
       labyrinth,

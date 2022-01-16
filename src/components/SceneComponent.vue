@@ -60,6 +60,7 @@ export default defineComponent({
 
     onBeforeUnmount(() => {
       removeEventListener("resize", updateScene);
+      scene.clear();
     });
 
     watch(
