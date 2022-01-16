@@ -14,7 +14,8 @@ import {
 } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
-const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
+const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } =
+  usePlayerFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
 let labyrinthData: Labyrinth;
