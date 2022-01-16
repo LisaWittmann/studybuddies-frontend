@@ -67,6 +67,7 @@ async function getConversationMessage(id: string) {
     method: "GET",
   })
     .then((response) => {
+      console.log("Requested new lines")
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
