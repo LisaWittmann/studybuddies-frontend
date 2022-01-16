@@ -22,3 +22,26 @@ $pref-width: 80%;
     word-wrap: break-word;
     hyphens: auto;
 }
+
+@mixin scroll-container($orientation: to right) {
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    mask-image: linear-gradient(
+      $orientation,
+      transparent 0%,
+      #000 3%,
+      #000 97%,
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      $orientation,
+      transparent 0%,
+      #000 3%,
+      #000 97%,
+      transparent
+    );
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
