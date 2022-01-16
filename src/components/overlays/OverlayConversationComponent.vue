@@ -39,8 +39,10 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     function clickOption(id: string) {
-      console.log(id);
-      emit("respond", id);
+      if (props.message.id != '') {
+        console.log(id);
+        emit("respond", id)
+      } else emit("close")
     }
 
     return { clickOption };

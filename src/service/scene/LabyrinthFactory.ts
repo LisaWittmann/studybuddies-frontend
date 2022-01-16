@@ -46,7 +46,7 @@ async function initializeLabyrinth(
 async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
   if (labyrinthData == labyrinth) return;
   labyrinthData = labyrinth;
-  for (const [key, value] of labyrinth.tileMap) {
+  for (const [key] of labyrinth.tileMap) {
     const tile = scene.getObjectByName(key.toString());
     console.log("tile from scene", tile);
   }
@@ -56,6 +56,7 @@ async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
  * updates player position of main or partner player
  * or initially creates partner player
  * @param player: main or partner player
+ * @param labyrinth current labyrinth that should be rendered for player
  * @param scene: scene that contains player
  */
 function updatePlayer(
@@ -101,7 +102,8 @@ async function placeTile(
   }
   // store placed tile with position to calculate position of next tiles
   storedTiles.set(tileKey, position);
-  scene.add(createTile(tileKey, tile, position, role, neighbors));
+  const isEnd = tileKey == labyrinthData.endTileKey;
+  scene.add(createTile(tileKey, tile, position, role, neighbors, isEnd));
 }
 
 /**

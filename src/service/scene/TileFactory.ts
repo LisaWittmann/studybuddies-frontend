@@ -19,7 +19,8 @@ function createTile(
   tile: Tile,
   tilePosition: THREE.Vector3,
   role: Role | undefined,
-  neighbors: Map<Orientation, Tile | undefined>
+  neighbors: Map<Orientation, Tile | undefined>,
+  isEnd: boolean,
 ): THREE.Group {
   const {
     createFloor,
@@ -34,7 +35,7 @@ function createTile(
   tileModel.name = tileKey.toString();
   const tileRestricted = tile.isRestrictedFor(role);
   const texture = getTexture(tile);
-  const color = getColor(tile);
+  const color = getColor(tile, isEnd);
 
   //LIGHT-----------------
   tileModel.add(createLight(tilePosition));
@@ -99,7 +100,8 @@ function getTexture(tile: Tile) {
  * @param tile: tile to get color for
  * @returns color of tile as hexadecimal number
  */
-function getColor(tile: Tile) {
+function getColor(tile: Tile, isEnd = false) {
+  if (isEnd) return colors.pink;
   //both players have access to this tile
   if (tile.getRestrictions().length == 0) return colors.darkBrown;
   //only the designer has access to this tile
