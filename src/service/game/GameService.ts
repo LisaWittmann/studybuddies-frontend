@@ -137,10 +137,10 @@ async function checkEndGame(modelName: string) {
   const { gameState } = useGameStore();
   const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
-      Operation[Operation.CHECK_END],
-      gameState.lobbyKey,
-      loginState.username,
-      modelName.toUpperCase()
+    Operation[Operation.CHECK_END],
+    gameState.lobbyKey,
+    loginState.username,
+    modelName.toUpperCase()
   );
   fetch("/api/lobby/end", {
     method: "POST",
@@ -172,7 +172,6 @@ async function checkEndGame(modelName: string) {
       });
 }
 
-
 /**
  * request operation of clicked item
  * @param modelName name of clicked item
@@ -195,7 +194,7 @@ async function clickItem(modelName: string) {
           break;
         case Operation.CHECK_END:
           checkEndGame(modelName);
-          break
+          break;
       }
     })
     .catch((error) => {
