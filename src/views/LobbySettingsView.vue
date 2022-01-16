@@ -23,8 +23,12 @@
       </section>
       <section>
         <h2>Labyrinth auswählen:</h2>
-        <button @click="download(selectedItem)">
-          Download
+        <button 
+          id="downloadButton" 
+          class="dwnBtn" 
+          v-bind:class="[isVisible ? 'hide' : 'unhide']" 
+          @click="download(selectedItem)">
+            Download
         </button>
         <DropdownComponent
           :items="labyrinthOptions"
@@ -93,6 +97,8 @@ export default defineComponent({
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
+    let isVisible = ref(true);
+    
     const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
     const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinthName);
     const users = computed(() => lobbyState.users);
@@ -114,6 +120,7 @@ export default defineComponent({
     function selectLabyrinth(labyrinthName: string) {
       setLabyrinthSelection(labyrinthName);
       updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
+      showDownloadButton();
     }
 
     function selectRole(name: string) {
@@ -178,6 +185,10 @@ export default defineComponent({
       );
     }
 
+    function showDownloadButton(){
+      isVisible.value = !isVisible.value;
+    }
+
     return {
       selectedRole,
       readyCheck,
@@ -195,6 +206,8 @@ export default defineComponent({
       loading,
       copy,
       download,
+      isVisible,
+      showDownloadButton
     };
   },
 });
@@ -213,5 +226,13 @@ h1 {
       color: $color-light-green;
     }
   }
+}
+
+.hide {
+  visibility: hidden;
+}
+
+.unhide {
+  visibility: visible;
 }
 </style>
