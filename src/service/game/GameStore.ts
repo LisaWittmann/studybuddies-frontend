@@ -131,6 +131,9 @@ async function setPlayerData(username: string, startTileId: number) {
   }
 }
 
+/**
+ * Provides a way to check if both players are in the same tile
+ */
 function checkPlayerProximity() {
   if (gameState.mainPlayer.position == gameState.partnerPlayer.position) {
     gameState.playersInSameTile = true;
