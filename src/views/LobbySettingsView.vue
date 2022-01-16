@@ -23,6 +23,9 @@
       </section>
       <section>
         <h2>Labyrinth auswählen:</h2>
+        <button @click="download(selectedItem)">
+          Download
+        </button>
         <DropdownComponent
           :items="labyrinthOptions"
           :selectedItem="selectedLabyrinth"
@@ -154,6 +157,27 @@ export default defineComponent({
       getRoleOptions(gameState.lobbyKey);
     });
 
+    async function download() {
+      const labyrinthName = lobbyState.selectedLabyrinthName;
+      fetch("/api/labyrinth/export?labyrinthName=" + labyrinthName, {
+        method: "GET",
+        headers: { 
+          "Content-Type": "text/plain",
+        }
+      })
+      .then( response => response.blob() )
+        .then(blob => {
+          var url = window.URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = labyrinthName + ".json";
+          document.body.appendChild(a); 
+          a.click();    
+          a.remove();        
+        }
+      );
+    }
+
     return {
       selectedRole,
       readyCheck,
@@ -170,6 +194,7 @@ export default defineComponent({
       isReady,
       loading,
       copy,
+      download,
     };
   },
 });
