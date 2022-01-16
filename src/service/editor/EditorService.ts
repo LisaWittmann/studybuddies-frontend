@@ -63,17 +63,21 @@ function setDimension(rows: number, columns: number): void {
 }
 
 async function setItemOptions() {
-  await fetch("/api/labyrinth/placeable-bodies")
+  await fetch("/api/body/placeable-bodies")
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((jsonData) => {
-      for (const name of jsonData) {
+      console.log(jsonData);
+      for (const name in jsonData) {
         if (!editorState.itemOptions.some((i) => i.modelName == name)) {
-          editorState.itemOptions.push(new ItemModel(name));
+          editorState.itemOptions.push(
+            new ItemModel(name, (<any>Role)[jsonData[name]])
+          );
         }
       }
+      console.log(editorState.itemOptions);
     });
 }
 

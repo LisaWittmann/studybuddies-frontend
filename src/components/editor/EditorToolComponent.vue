@@ -62,14 +62,21 @@ export default defineComponent({
       }
     };
 
-    const optionClass = (index: number) => {
-      switch (props.options[index]) {
+    const getClass = (role: Role | undefined) => {
+      switch (role) {
         case Role.DESIGNER:
           return "button__option-designer";
         case Role.HACKER:
           return "button__option-hacker";
-        default:
-          return "";
+      }
+    };
+
+    const optionClass = (index: number) => {
+      const option = props.options[index];
+      if (option instanceof ItemModel) {
+        return getClass(option.blockedRole);
+      } else {
+        return getClass(option as Role);
       }
     };
 
