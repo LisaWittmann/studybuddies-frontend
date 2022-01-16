@@ -82,8 +82,9 @@ import {
 } from "vue";
 import { useEditorService } from "@/service/editor/EditorService";
 import { ItemModel } from "@/service/editor/TileModel";
-import { Mode, instructions } from "@/service/editor/EditorMode";
+import { Mode } from "@/service/editor/EditorMode";
 import { Role } from "@/service/game/Player";
+import { instructions } from "@/service/editor/EditorConstants";
 
 import OverlayInstructionComponent from "@/components/overlays/OverlayInstructionComponent.vue";
 import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
