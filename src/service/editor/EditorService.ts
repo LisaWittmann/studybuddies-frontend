@@ -247,12 +247,23 @@ function setName(labyrinthName: string): void {
  * @param item: item model to add
  */
 function addItem(model: TileModel, item: ItemModel): void {
-  if (!model.relationKey || model.objectsInRoom.length >= maxItems || !item)
+  if (
+    !item ||
+    !model.relationKey ||
+    model.objectsInRoom.length >= maxItems ||
+    !isAccessable(item, model)
+  )
     return;
   model.objectsInRoom.push(item);
   editorState.itemOptions = editorState.itemOptions.filter(
     (i) => i.modelName != item.modelName
   );
+}
+
+function isAccessable(item: ItemModel, tile: TileModel) {
+  if (item.blockedRole == undefined) return true;
+  if (tile.restrictions.length == 0) return true;
+  else return tile.restrictions.includes(item.blockedRole);
 }
 
 /**
