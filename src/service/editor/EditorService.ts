@@ -5,6 +5,7 @@ import { Item } from "@/service/labyrinth/Item";
 import { Mode } from "@/service/editor/EditorMode";
 import { Role } from "@/service/game/Player";
 import { ItemModel, TileModel, Vector2 } from "@/service/editor/TileModel";
+import { editorConfig } from "@/service/editor/EditorConstants";
 
 const editorState = reactive({
   rows: 15,
@@ -20,11 +21,6 @@ const editorState = reactive({
 updateTileModels();
 
 let counter = 1;
-const maxRows = 20;
-const maxColumns = 40;
-const minTiles = 10;
-const maxItems = 3;
-const startPositions = 1;
 
 /**
  * list of all selected tileModels of new labyrinth
@@ -57,8 +53,9 @@ function reset(): void {
  * @param columns: number of columns of labyrinth editor (size of y-axis)
  */
 function setDimension(rows: number, columns: number): void {
-  if (editorState.rows < maxRows) editorState.rows = rows;
-  if (editorState.columns < maxColumns) editorState.columns = columns;
+  if (editorState.rows < editorConfig.maxRows) editorState.rows = rows;
+  if (editorState.columns < editorConfig.maxColumns)
+    editorState.columns = columns;
   updateTileModels();
 }
 
@@ -172,7 +169,7 @@ function addStartTile(model: TileModel): void {
     model.restrictions.length > 0
   )
     return;
-  if (editorState.startPositions.length < startPositions) {
+  if (editorState.startPositions.length < editorConfig.minStartPositions) {
     editorState.startPositions.push(model.relationKey);
     model.isStart = true;
   }
@@ -256,7 +253,12 @@ function setName(labyrinthName: string): void {
  * @param item: item model to add
  */
 function addItem(model: TileModel, item: ItemModel): void {
-  if (!model.relationKey || model.objectsInRoom.length >= maxItems || !item)
+  if (
+    !model.relationKey ||
+    model.isEnd ||
+    model.objectsInRoom.length >= editorConfig.maxItems ||
+    !item
+  )
     return;
   model.objectsInRoom.push(item);
   editorState.itemOptions = editorState.itemOptions.filter(
@@ -285,10 +287,12 @@ function removeItem(model: TileModel, item: ItemModel): void {
  * @returns editor mode that contains errors or undefined
  */
 function hasErrors(): Mode | undefined {
-  if (selectedTiles.value.length < minTiles) {
+  if (selectedTiles.value.length < editorConfig.minTiles) {
     editorState.errorMessage = "Labyrinth ist zu klein";
     return Mode.CREATE;
-  } else if (editorState.startPositions.length != startPositions) {
+  } else if (
+    editorState.startPositions.length != editorConfig.minStartPositions
+  ) {
     editorState.errorMessage = "Zu wenig Startfelder definiert";
     return Mode.START_TILES;
   } else if (!editorState.endPosition) {
@@ -312,7 +316,11 @@ function hasErrors(): Mode | undefined {
  * @returns data of editorState as labyrinth
  */
 function convert(): Labyrinth {
-  if (editorState.startPositions.length == 1) {
+  for (
+    let i = editorState.startPositions.length;
+    i < editorConfig.maxStartPositions;
+    i++
+  ) {
     editorState.startPositions.push(editorState.startPositions[0]);
   }
   const labyrinth = new Labyrinth(
