@@ -3,7 +3,8 @@ import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
 
-const { gameState, updatePlayerData, setError } = useGameStore();
+const { gameState, updatePlayerData, updateGameData, setError } =
+  useGameStore();
 const {
   updateUsers,
   setupGame,
@@ -69,6 +70,9 @@ stompClient.onConnect = () => {
 
           break;
         case Operation.CLICK:
+          break;
+        case Operation.COLLECT:
+          updateGameData();
           break;
         case Operation.CHAT:
           break;

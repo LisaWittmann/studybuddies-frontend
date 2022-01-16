@@ -19,6 +19,8 @@
     :message="conversation.message"
     @respond="getConversationMessage"
   />
+  <!--player inventory-->
+  <InventoryComponent />
 </template>
 
 <script lang="ts">
@@ -28,6 +30,8 @@ import { useGameStore } from "@/service/game/GameStore";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
+import InventoryComponent from "@/components/InventoryComponent.vue";
+
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import router from "@/router";
@@ -38,6 +42,7 @@ export default defineComponent({
   components: {
     SceneComponent,
     OverlayTerminalComponent,
+    InventoryComponent,
     OverlayConversationComponent,
   },
   setup() {
