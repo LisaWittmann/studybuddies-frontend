@@ -19,6 +19,7 @@ const gameState = reactive({
   loading: false,
   errormessage: "",
   score: 0,
+  playersInSameTile: false,
 });
 
 function setGameState(
@@ -28,7 +29,8 @@ function setGameState(
   mainPlayer: string | null,
   partnerPlayer: string | null,
   errormessage: string | null,
-  score: string | null
+  score: string | null,
+  playersInSameTile: string | null
 ) {
   if (lobbyKey) gameState.lobbyKey = lobbyKey;
   if (labyrinthName) gameState.labyrinthName = JSON.parse(labyrinthName);
@@ -40,7 +42,10 @@ function setGameState(
     Object.assign(gameState.partnerPlayer, JSON.parse(partnerPlayer));
   }
   if (errormessage) gameState.errormessage = errormessage;
+
   if (score) gameState.score = JSON.parse(score) as number;
+  if (playersInSameTile)
+    gameState.playersInSameTile = JSON.parse(playersInSameTile) as boolean;
 }
 
 function setGameSessionStorage() {
@@ -60,6 +65,10 @@ function setGameSessionStorage() {
     JSON.stringify(gameState.errormessage)
   );
   sessionStorage.setItem("score", JSON.stringify(gameState.score));
+  sessionStorage.setItem(
+    "playersInSameTile",
+    JSON.stringify(gameState.playersInSameTile)
+  );
 }
 
 function getGameSessionStorage() {
@@ -70,7 +79,8 @@ function getGameSessionStorage() {
     sessionStorage.getItem("mainPlayer"),
     sessionStorage.getItem("partnerPlayer"),
     sessionStorage.getItem("errormessage"),
-    sessionStorage.getItem("score")
+    sessionStorage.getItem("score"),
+    sessionStorage.getItem("playersInSameTile")
   );
 }
 
@@ -98,6 +108,7 @@ function updatePlayerData(username: string, newPosition: number) {
       JSON.stringify(gameState.partnerPlayer)
     );
   }
+  checkPlayerProximity();
 }
 
 async function updateInventory(inventory: Array<Item>) {
@@ -118,6 +129,17 @@ async function setPlayerData(username: string, startTileId: number) {
     gameState.mainPlayer = new MainPlayer(username, startTileId);
   } else {
     gameState.partnerPlayer = new PartnerPlayer(username, startTileId);
+  }
+}
+
+/**
+ * Provides a way to check if both players are in the same tile
+ */
+function checkPlayerProximity() {
+  if (gameState.mainPlayer.position == gameState.partnerPlayer.position) {
+    gameState.playersInSameTile = true;
+  } else {
+    gameState.playersInSameTile = false;
   }
 }
 
