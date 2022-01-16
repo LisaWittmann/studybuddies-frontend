@@ -18,6 +18,7 @@
     :opened="conversation.visible"
     :message="conversation.message"
     @respond="getConversationMessage"
+    @close="endConversation"
   />
 </template>
 
@@ -52,6 +53,7 @@ export default defineComponent({
       movePlayer,
       clickItem,
       conversation,
+      endConversation,
       getConversationMessage,
     } = useGameService();
     updateGameData();
@@ -77,6 +79,7 @@ export default defineComponent({
       partnerPlayer,
       labyrinth,
       conversation,
+      endConversation,
       getConversationMessage,
     };
   },
