@@ -17,7 +17,7 @@
   <OverlayConversationComponent
     :opened="conversation.visible"
     :message="conversation.message"
-    :opened-for-end="conversation.message.id===''"
+    :opened-for-end="conversation.message.id === ''"
     @respond="getConversationMessage"
     @close="endConversation"
   />
@@ -46,7 +46,8 @@ export default defineComponent({
     key: { type: String, required: true },
   },
   setup() {
-    const { gameState, getGameSessionStorage, updateGameData, setLobbyKey } = useGameStore();
+    const { gameState, getGameSessionStorage, updateGameData, setLobbyKey } =
+      useGameStore();
     const {
       gameEventMessage,
       toggleEventMessage,

@@ -2,7 +2,7 @@ import { reactive } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { EventMessage, Operation } from "@/service/game/EventMessage";
-import {Message, Response} from "@/service/game/Conversation";
+import { Message, Response } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
 
 const gameEventMessage = reactive({
@@ -147,29 +147,36 @@ async function checkEndGame(modelName: string) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
   })
-      .then((response) => {
-        conversation.visible = true;
-        conversation.message = new Message("", "", undefined, Array.of(new Response("", "", "")));
-        if (response.ok) {
-          conversation.message.text = "Herzlichen Glückwunsch. Du kannst das Labyrinth verlassen. Warte bis dein Partner die Trophäe gesammelt hat."
-          conversation.message.responses = []
-        } else {
-          conversation.message.responses[0].text = "Ich komme später wieder."
-          if (response.status == 409) {
-            conversation.message.text = "Du hast noch nicht die zu erreichende Mindestpunktzahl erreicht."
-          }
-          else if (response.status == 405) {
-            conversation.message.text = "Du bist noch nicht zusammen mit deinem Partner am Ende angekommen."
-          }
-          else if (response.status == 418) {
-            conversation.message.text = "Tut mir leid, aber ich glaube die Trophäe ist für jemand anderen vorgesehen."
-          }
-          conversation.message.text += " Versuch's später noch einmal."
+    .then((response) => {
+      conversation.visible = true;
+      conversation.message = new Message(
+        "",
+        "",
+        undefined,
+        Array.of(new Response("", "", ""))
+      );
+      if (response.ok) {
+        conversation.message.text =
+          "Herzlichen Glückwunsch. Du kannst das Labyrinth verlassen. Warte bis dein Partner die Trophäe gesammelt hat.";
+        conversation.message.responses = [];
+      } else {
+        conversation.message.responses[0].text = "Ich komme später wieder.";
+        if (response.status == 409) {
+          conversation.message.text =
+            "Du hast noch nicht die zu erreichende Mindestpunktzahl erreicht.";
+        } else if (response.status == 405) {
+          conversation.message.text =
+            "Du bist noch nicht zusammen mit deinem Partner am Ende angekommen.";
+        } else if (response.status == 418) {
+          conversation.message.text =
+            "Tut mir leid, aber ich glaube die Trophäe ist für jemand anderen vorgesehen.";
         }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+        conversation.message.text += " Versuch's später noch einmal.";
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 }
 
 /**

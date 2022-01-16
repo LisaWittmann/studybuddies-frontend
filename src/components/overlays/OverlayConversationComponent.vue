@@ -40,10 +40,10 @@ export default defineComponent({
       type: Boolean,
       required: false,
       default: false,
-    }
+    },
   },
   setup(props, { emit }) {
-    const message = props.openedForEnd ? "close": "respond";
+    const message = props.openedForEnd ? "close" : "respond";
     function clickOption(id: string) {
       console.log(id);
       emit(message, id);
