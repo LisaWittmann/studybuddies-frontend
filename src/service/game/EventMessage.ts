@@ -34,13 +34,14 @@ export enum Operation {
   CONVERSATION,
   COLLECT,
   ACCESS,
+  CHECK_END,
   ROLE_PICK,
   LABYRINTH_PICK,
-  UPDATE
+  UPDATE,
 }
 
 export enum Update {
   LABYRINTHS,
   USERS,
-  ROLE
+  ROLE,
 }

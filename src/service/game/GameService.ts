@@ -133,6 +133,36 @@ async function checkAccess(modelName: string) {
     });
 }
 
+async function checkEndGame(modelName: string) {
+  const { gameState } = useGameStore();
+  const { loginState } = useLoginStore();
+  const eventMessage = new EventMessage(
+    Operation[Operation.CHECK_END],
+    gameState.lobbyKey,
+    loginState.username,
+    modelName.toUpperCase()
+  );
+  fetch("/api/lobby/end", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(eventMessage),
+  })
+    .then((response) => {
+      if (response.ok) {
+        console.log("Ende erreicht");
+      } else if (response.status == 409) {
+        console.log("Zu Geringer Score");
+      } else if (response.status == 405) {
+        console.log("Nicht zusammen im Tile");
+      } else if (response.status == 418) {
+        console.log("Falsche Trophäe mein liebes Hörnchen");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
 /**
  * request operation of clicked item
  * @param modelName name of clicked item
@@ -151,8 +181,10 @@ async function clickItem(modelName: string) {
           checkAccess(modelName);
           break;
         case Operation.CONVERSATION:
-          console.log("test");
           startConversation(modelName);
+          break;
+        case Operation.CHECK_END:
+          checkEndGame(modelName);
           break;
       }
     })
