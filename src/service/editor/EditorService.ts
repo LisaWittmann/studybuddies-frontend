@@ -156,7 +156,7 @@ function removeTile(model: TileModel): void {
     removeItem(model, itemModel);
   }
   model.isSelectable = true;
-  model.relationKey = 0;
+  model.relationKey = undefined;
   setSelectableTiles();
 }
 
