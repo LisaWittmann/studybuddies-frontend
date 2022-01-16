@@ -145,7 +145,7 @@ function addTile(model: TileModel): void {
 }
 
 function removeTile(model: TileModel): void {
-  if (model.getNeighborsAsList().length > 1) return;
+  if (model.getNeighborsAsList().length > 1 || !model.relationKey) return;
   model.restrictions = [];
   removeStartTile(model);
   removeEndTile(model);
