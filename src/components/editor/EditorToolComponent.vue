@@ -83,7 +83,6 @@ export default defineComponent({
   font-size: $headline-xl;
 
   &__options {
-    //padding-bottom: 10px;
     max-height: 77vh;
     overflow-y: scroll;
     @include scroll-container(to top);
