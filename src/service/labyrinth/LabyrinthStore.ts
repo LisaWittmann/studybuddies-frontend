@@ -19,6 +19,7 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
       return response.json();
     })
     .then((jsonData) => {
+      console.log("creating new labyrinth");
       const labyrinth = new Labyrinth(
         jsonData.name,
         jsonData.endTileKey,

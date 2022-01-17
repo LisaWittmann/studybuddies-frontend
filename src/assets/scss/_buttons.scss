@@ -49,6 +49,11 @@ button,
         }
     }
 
+    &--lightup {
+        border: 0;
+        @include lightup-animation($color-beige);
+    }
+
     &--filled {
         @include background-secondary();
         @include color-primary-inverted();
