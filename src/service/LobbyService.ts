@@ -402,6 +402,10 @@ function setupGame() {
     });
 }
 
+/**
+ * Request to Backend to get a JSON represented Labyrinth by given name and
+ * download it to Client's local storage as JSON-File.
+ */
 async function download() {
   const labyrinthName = lobbyState.selectedLabyrinthName;
   fetch("/api/labyrinth/export?labyrinthName=" + labyrinthName, {
