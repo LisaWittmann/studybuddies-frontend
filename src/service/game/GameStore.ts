@@ -1,15 +1,13 @@
 import { reactive } from "vue";
 
-import { useAppService } from "@/service/AppService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 
-import { Item } from "../labyrinth/Item";
+import { Item } from "@/service/labyrinth/Item";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 
 const { updateLabyrinthData } = useLabyrinthStore();
-const { startLoading, endLoading } = useAppService();
 
 /**
  * Errormessage: To display all kind of Errors in the according scene
@@ -23,6 +21,7 @@ const gameState = reactive({
   started: false,
   errormessage: "",
   score: 0,
+  playersInSameTile: false,
 });
 
 function updateGameData() {
@@ -51,12 +50,24 @@ function updatePlayerData(username: string, newPosition: number) {
     gameState.partnerPlayer.setPosition(newPosition);
     console.log("NEW POSITION: ", newPosition);
   }
+  checkPlayerProximity();
 }
 
+/**
+ * Updates complete inventory after delete or collect
+ * @param inventory 
+ */
 async function updateInventory(inventory: Array<Item>) {
   console.log(inventory);
   gameState.mainPlayer.setInventory(inventory);
-  console.log("INVENTORY", gameState.mainPlayer.getInventory());
+}
+
+/**
+ * Adds a single traded item to inventory after eventmessage was sent
+ * @param item
+ */
+async function addItemToInventory(item: Item) {
+  gameState.mainPlayer.addItem(item);
 }
 
 /**
@@ -71,6 +82,17 @@ async function setPlayerData(username: string, startTileId: number) {
     gameState.mainPlayer = new MainPlayer(username, startTileId);
   } else {
     gameState.partnerPlayer = new PartnerPlayer(username, startTileId);
+  }
+}
+
+/**
+ * Provides a way to check if both players are in the same tile
+ */
+function checkPlayerProximity() {
+  if (gameState.mainPlayer.position == gameState.partnerPlayer.position) {
+    gameState.playersInSameTile = true;
+  } else {
+    gameState.playersInSameTile = false;
   }
 }
 
@@ -96,6 +118,7 @@ export function useGameStore() {
     updateGameData,
     updatePlayerData,
     updateInventory,
+    addItemToInventory,
     setPlayerData,
     setLobbyKey,
     setError,

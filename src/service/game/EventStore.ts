@@ -3,10 +3,16 @@ import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useGameService } from "@/service/game/GameService";
 import { useLobbyService } from "@/service/lobby/LobbyService";
+import { Item } from "@/service/labyrinth/Item";
 
 const { playerLeftGame } = useGameService();
-const { gameState, updatePlayerData, updateGameData, setError } =
-  useGameStore();
+const {
+  gameState,
+  updatePlayerData,
+  updateGameData,
+  setError,
+  addItemToInventory,
+} = useGameStore();
 const {
   updateUsers,
   setupGame,
@@ -61,15 +67,11 @@ stompClient.onConnect = () => {
       switch (operation) {
         case Operation.MOVEMENT:
           destTileID = Number.parseInt(eventMessage.data);
-
           if (destTileID) {
             updatePlayerData(eventMessage.username, destTileID);
-            // -> now the watcher can update the 3D Room
-            // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
             setError("There is no tile reference for this definition of data");
           }
-
           break;
         case Operation.CLICK:
           break;
@@ -79,6 +81,21 @@ stompClient.onConnect = () => {
         case Operation.CHAT:
           break;
         case Operation.TRADE:
+          console.log(
+            "USERNAME GAMESTATE",
+            gameState.mainPlayer.getUsername(),
+            "USERNAME MESSAGE",
+            eventMessage.username
+          );
+          if (eventMessage.username === gameState.mainPlayer.getUsername()) {
+            addItemToInventory(JSON.parse(eventMessage.data) as Item);
+            console.log(
+              "TRADE OPERATION AT",
+              eventMessage.data,
+              "TO USER",
+              eventMessage.username
+            );
+          }
           break;
         case Operation.READY:
           console.log(eventMessage);
