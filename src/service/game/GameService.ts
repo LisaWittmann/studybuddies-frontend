@@ -211,8 +211,6 @@ async function addToInventory(
 }
 
 async function deleteFromInventory() {
-  const { loginState } = useLoginStore();
-  const { gameState } = useGameStore();  
   const eventMessage = new EventMessage(
     Operation[Operation.DELETE],
     gameState.lobbyKey,
