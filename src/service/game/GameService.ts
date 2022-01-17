@@ -132,7 +132,6 @@ async function checkAccess(modelName: string) {
         deleteFromInventory();        
       }else if (jsonData.access) {
         gameEventMessage.state = "success";
-        //- trigger opacity of computer model  
       } else {
         gameEventMessage.state = "warning";
       }
@@ -211,6 +210,8 @@ async function addToInventory(
 }
 
 async function deleteFromInventory() {
+  const { gameState } = useGameStore();
+  const { loginState } = useLoginStore();  
   const eventMessage = new EventMessage(
     Operation[Operation.DELETE],
     gameState.lobbyKey,
