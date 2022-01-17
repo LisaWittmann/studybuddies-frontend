@@ -111,10 +111,23 @@ function updatePlayerData(username: string, newPosition: number) {
   checkPlayerProximity();
 }
 
+/**
+ * updates complete inventory after delete or collect
+ * @param inventory 
+ */
 async function updateInventory(inventory: Array<Item>) {
   console.log(inventory);
   gameState.mainPlayer.setInventory(inventory);
   console.log("INVENTORY", gameState.mainPlayer.getInventory());
+}
+
+/**
+ * adds single traded item to inventory after evenmessage was sent
+ * @param item 
+ */
+async function addItemToInventory(item: Item) {
+  console.log("ADD ITEM", item);
+  gameState.mainPlayer.addItem(item);
 }
 
 /**
@@ -168,6 +181,7 @@ export function useGameStore() {
     updateGameData,
     updatePlayerData,
     updateInventory,
+    addItemToInventory,
     setPlayerData,
     setLobbyKey,
     setError,

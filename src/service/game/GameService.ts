@@ -243,6 +243,7 @@ async function givePlayerItem(
     });
 }
 
+
 /**
  * Provides functionality to remove an item from a tile.
  * @param lobbyKey the key of the lobby
@@ -262,6 +263,37 @@ async function removeItemFromTile(lobbyKey: string, itemId: string) {
     });
 }
 
+async function tradeItem(username: string, itemId: string) {
+  //"/lobby/{key}/username/{username}/trade/item/{itemName}"
+  console.log("MAIN PLAYER ", gameState.mainPlayer.getUsername());
+  console.log("TRADE ITEM ", itemId, " LOBBY ", gameState.lobbyKey, " FROM ", username, " TO ", gameState.partnerPlayer.getUsername());
+
+  return fetch(
+    "api/lobby/" +
+      gameState.lobbyKey +
+      "/username/" +
+      username +
+      "/trade/item/" +
+      itemId,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      let inventory = new Array<Item>();
+      inventory = jsonData;
+      updateInventory(inventory);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
 export function useGameService() {
   return {
     gameEventMessage,
@@ -271,5 +303,6 @@ export function useGameService() {
     startConversation,
     getConversationMessage,
     conversation,
+    tradeItem,
   };
 }
