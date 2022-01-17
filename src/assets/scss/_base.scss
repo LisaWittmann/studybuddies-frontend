@@ -1,13 +1,18 @@
+html, body {
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: none;
+}
+
 body {
     margin: 0;
     font-family: $font-outfit;
-    background: $color-white;
-    color: $color-black;
+    min-width: 320px;
+    @include color-primary();
+    @include background-primary();
 
-    @include color-scheme(dark) {
-        background: $color-black-background;
-        color: $color-white;
-    }
+    * {
+        @include color-primary();
+    } 
 }
 
 #app {
@@ -17,22 +22,28 @@ body {
 
 input, button {
     font-family: $font-outfit;
-    font-weight: 300;
+    font-weight: $outfit-light;
 }
 
 p, span, a {
     font-family: $font-outfit;
-    font-weight: 300;
+    font-weight: $outfit-light;
 }
 
 h1 {
-    font-weight: 500;
+    font-weight: $outfit-medium;
     font-size: $headline-xl;
 }
 
 h2 {
-    font-weight: 500;
+    font-weight: $outfit-medium;
     font-size: $headline-l;
+}
+
+ul {
+    list-style: none;
+    padding-inline-start: 0;
+    margin: 0;
 }
 
 section {
@@ -40,16 +51,28 @@ section {
     width: 100%;
 }
 
-i {
+i, a, button {
     cursor: pointer;
+
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.4;
+    }
 }
 
 a {
     text-decoration: underline;
-    cursor: pointer;
     color: $color-dark-green;
     &:hover {
         color: $color-light-green;
+    }
+
+    &.button {
+        display: flex;
+        font-weight: 300;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
     }
    
    @include color-scheme(dark) {
