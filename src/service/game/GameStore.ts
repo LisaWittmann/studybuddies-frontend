@@ -104,6 +104,11 @@ async function setError(error: string) {
   gameState.errormessage = error;
 }
 
+async function setScore(score: string) {
+  gameState.score = Number(score);
+  sessionStorage.setItem("score", score);
+}
+
 function getPlayer(username: string) {
   if (gameState.mainPlayer.username == username) {
     return gameState.mainPlayer;
@@ -122,6 +127,7 @@ export function useGameStore() {
     setPlayerData,
     setLobbyKey,
     setError,
+    setScore,
     getPlayer,
     startGame,
     endGame,
