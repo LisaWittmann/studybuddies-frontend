@@ -260,8 +260,30 @@ async function updateUsers(lobbyKey: string) {
           lobbyState.users.push(new User(username));
         }
       });
-      sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+      updateReadyStates(lobbyKey).then(() => {
+        sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+      })
+    })
+    .catch((error) => {
+      console.error(error);
     });
+}
+
+async function updateReadyStates(lobbyKey: string) {
+  fetch("/api/lobby/users/ready/" + lobbyKey, {
+    method: "GET",
+  }).then((response) => {
+    if(!response.ok) throw new Error(response.statusText);
+    return response.json();
+  })
+  .then((jsonData) => {
+    lobbyState.users.forEach(user => {
+      user.setReady(jsonData[user.username]);
+    })
+  })
+  .catch((error) => {
+    console.error(error);
+  });
 }
 
 /**
