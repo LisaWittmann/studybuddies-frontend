@@ -84,7 +84,7 @@ export default defineComponent({
     &__header {
         width: 100%;
         max-width: $width-xl;
-        
+
         @include color-scheme(dark) {
         filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
         }
@@ -119,11 +119,15 @@ export default defineComponent({
     .role-box {
       display: flex;
       flex-direction: row;
-      width: 75%;
+      width: 100%;
       margin: 0 auto;
       justify-content: space-between;
       position: absolute;
       bottom: 0;
+
+      div {
+        padding: 0 3rem;
+      }
 
       img {
         height: 100%;
@@ -158,7 +162,7 @@ export default defineComponent({
   }
 }
 
-@media (max-width: 1050px){
+@media (min-width:601px) and (max-width: 1050px){
 
   .end {
      &__header {
@@ -182,6 +186,13 @@ export default defineComponent({
     }
 
   }
+}
+
+@media (max-width: 600px){
+   .role-box {
+      height: 15vh;
+  }
+
 }
 
 </style>
