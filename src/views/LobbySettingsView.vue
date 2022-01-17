@@ -28,15 +28,6 @@
           :selectedItem="selectedLabyrinth"
           @select="selectLabyrinth"
         />
-        <button
-          type="submit"
-          id="downloadButton"
-          class="dwnBtn"
-          v-bind:class="[isVisibleLab ? 'unhide' : 'hide']"
-          @click="download(selectedItem)"
-        >
-          <i class="fas fa-download"></i>
-        </button>
       </section>
       <section>
         <div class="column-wrapper">
@@ -96,11 +87,8 @@ export default defineComponent({
       updateRole,
       getRoles,
       getRoleOptions,
-      download,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
-
-    let isVisibleLab = ref(false);
 
     const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
     const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinthName);
@@ -123,15 +111,10 @@ export default defineComponent({
     function selectLabyrinth(labyrinthName: string) {
       setLabyrinthSelection(labyrinthName);
       updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
-      showDownloadButton();
     }
 
     function selectRole(name: string) {
       updateRole(name, gameState.lobbyKey, loginState.username);
-    }
-
-    function showDownloadButton() {
-      if (!isVisibleLab.value) isVisibleLab.value = true;
     }
 
     onbeforeunload = () => {
@@ -188,9 +171,6 @@ export default defineComponent({
       isReady,
       loading,
       copy,
-      download,
-      isVisibleLab,
-      showDownloadButton,
     };
   },
 });
@@ -209,19 +189,5 @@ h1 {
       color: $color-light-green;
     }
   }
-}
-
-.dwnBtn {
-  height: 9%;
-  width: 7%;
-  padding: 2px 16px;
-}
-
-.hide {
-  visibility: hidden;
-}
-
-.unhide {
-  visibility: visible;
 }
 </style>
