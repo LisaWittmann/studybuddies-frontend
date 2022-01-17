@@ -141,13 +141,12 @@ function getIntersections(context: SetupContext, x: number, y: number) {
 
   for (const intersection of intersects) {
     const object = intersection.object;
-    // if parent object is a 'valid' object (no tile)
     if (object.parent?.userData.id != null) {
-      // mock inventory
-      if (object.parent.userData.modelName == "USB") {
-        object.parent.visible = false;
-      }
-      context.emit("click-object", object.parent.userData.modelName);
+      context.emit(
+        "click-object",
+        object.parent.userData.modelName,
+        object.parent.userData.id
+      );
     } else if (object.parent?.userData.showInView) {
       context.emit("move-player", object.parent.userData.orientation);
     }
