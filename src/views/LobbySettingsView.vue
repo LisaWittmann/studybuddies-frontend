@@ -23,18 +23,18 @@
       </section>
       <section>
         <h2>Labyrinth auswählen:</h2>
-        <button 
-          id="downloadButton" 
-          class="dwnBtn" 
-          v-bind:class="[isVisible ? 'hide' : 'unhide']" 
-          @click="download(selectedItem)">
-            Download
-        </button>
         <DropdownComponent
           :items="labyrinthOptions"
           :selectedItem="selectedLabyrinth"
           @select="selectLabyrinth"
         />
+        <button
+          type="submit"
+          id="downloadButton"
+          class="dwnBtn"
+          v-bind:class="[isVisibleLab ? 'unhide' : 'hide']"
+          @click="download(selectedItem)"
+        ></button>
       </section>
       <section>
         <div class="column-wrapper">
@@ -97,8 +97,8 @@ export default defineComponent({
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
-    let isVisible = ref(true);
-    
+    let isVisibleLab = ref(false);
+
     const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
     const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinthName);
     const users = computed(() => lobbyState.users);
@@ -116,7 +116,7 @@ export default defineComponent({
     const loading = computed(() => gameState.loading);
 
     const copy = (text: string) => navigator.clipboard.writeText(text);
-    
+
     function selectLabyrinth(labyrinthName: string) {
       setLabyrinthSelection(labyrinthName);
       updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
@@ -125,6 +125,30 @@ export default defineComponent({
 
     function selectRole(name: string) {
       updateRole(name, gameState.lobbyKey, loginState.username);
+    }
+
+    async function download() {
+      const labyrinthName = lobbyState.selectedLabyrinthName;
+      fetch("/api/labyrinth/export?labyrinthName=" + labyrinthName, {
+        method: "GET",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      })
+        .then((response) => response.blob())
+        .then((blob) => {
+          let url = window.URL.createObjectURL(blob);
+          let a = document.createElement("a");
+          a.href = url;
+          a.download = labyrinthName + ".json";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        });
+    }
+
+    function showDownloadButton() {
+      if (!isVisibleLab.value) isVisibleLab.value = true;
     }
 
     onbeforeunload = () => {
@@ -164,30 +188,6 @@ export default defineComponent({
       getRoleOptions(gameState.lobbyKey);
     });
 
-    async function download() {
-      const labyrinthName = lobbyState.selectedLabyrinthName;
-      fetch("/api/labyrinth/export?labyrinthName=" + labyrinthName, {
-        method: "GET",
-        headers: { 
-          "Content-Type": "text/plain",
-        }
-      })
-      .then( response => response.blob() )
-        .then(blob => {
-          var url = window.URL.createObjectURL(blob);
-          var a = document.createElement('a');
-          a.href = url;
-          a.download = labyrinthName + ".json";
-          document.body.appendChild(a); 
-          a.click();    
-          a.remove();        
-        }
-      );
-    }
-
-    function showDownloadButton(){
-      isVisible.value = !isVisible.value;
-    }
 
     return {
       selectedRole,
@@ -206,8 +206,8 @@ export default defineComponent({
       loading,
       copy,
       download,
-      isVisible,
-      showDownloadButton
+      isVisibleLab,
+      showDownloadButton,
     };
   },
 });
@@ -226,6 +226,16 @@ h1 {
       color: $color-light-green;
     }
   }
+}
+
+.dwnBtn {
+  background: no-repeat center/50% url(../assets/img/download-solid.svg);
+  background-position: 50% 50%;
+  background-origin: content-box;
+  background-size: auto;
+  height: 9%;
+  width: 7%;
+  padding: 2px 16px;
 }
 
 .hide {
