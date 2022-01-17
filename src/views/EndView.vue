@@ -58,6 +58,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+
+
+
 .end {
     &__background {
         position: relative;
@@ -80,16 +83,14 @@ export default defineComponent({
 
     &__header {
         width: 100%;
-        max-width: 500px;
-        margin-top: 10%;
-
+        max-width: $width-xl;
+        
         @include color-scheme(dark) {
         filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
         }
     }
 
     .text-wrapper {
-      height: 50vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -97,8 +98,7 @@ export default defineComponent({
 
     
     h1 {
-        font-size: 5rem;
-        color: $color-dark-brown;
+        color: $color-black;
         margin: 0;
 
         @include color-scheme(dark) {
@@ -107,7 +107,6 @@ export default defineComponent({
     }
 
     p {
-      font-size: 3rem;
       margin: 0;
     }
 
@@ -121,7 +120,6 @@ export default defineComponent({
       display: flex;
       flex-direction: row;
       width: 75%;
-      height: 30vh;
       margin: 0 auto;
       justify-content: space-between;
       position: absolute;
@@ -133,4 +131,57 @@ export default defineComponent({
       }
     }
 }
+
+@media (min-width: 1051px){
+
+  .end {
+     &__header {
+        margin-top: 10%;
+     }
+
+    .text-wrapper {
+      height: 50vh;
+    }
+
+     h1 {
+      font-size: 5rem;
+    }
+
+    p {
+      font-size: 3rem;
+    }
+
+    .role-box {
+      height: 30vh;
+    }
+
+  }
+}
+
+@media (max-width: 1050px){
+
+  .end {
+     &__header {
+        margin-top: 0;
+     }
+
+    .text-wrapper {
+      height: 15vh;
+    }
+
+    h1 {
+      font-size: 3rem;
+    }
+
+    p {
+      font-size: 1.5rem;
+    }
+
+    .role-box {
+      height: 20vh;
+    }
+
+  }
+}
+
 </style>
