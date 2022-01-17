@@ -215,8 +215,6 @@ async function givePlayerItem(
   itemName: string,
   username: string
 ) {
-  //"/lobby/{key}/username/{username}/give/item/{itemName}"
-
   return fetch(
     "api/lobby/" +
       lobbyKey +
@@ -243,11 +241,9 @@ async function givePlayerItem(
     });
 }
 
-
 /**
  * Provides functionality to remove an item from a tile.
  * @param lobbyKey the key of the lobby
- * @param objectName the name of the object that is to be deleted
  * @param itemId the id of the object that is to be deleted
  */
 async function removeItemFromTile(lobbyKey: string, itemId: string) {
