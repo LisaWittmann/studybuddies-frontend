@@ -94,6 +94,7 @@ export default defineComponent({
       updateRole,
       getRoles,
       getRoleOptions,
+      download,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
@@ -125,26 +126,6 @@ export default defineComponent({
 
     function selectRole(name: string) {
       updateRole(name, gameState.lobbyKey, loginState.username);
-    }
-
-    async function download() {
-      const labyrinthName = lobbyState.selectedLabyrinthName;
-      fetch("/api/labyrinth/export?labyrinthName=" + labyrinthName, {
-        method: "GET",
-        headers: {
-          "Content-Type": "text/plain",
-        },
-      })
-        .then((response) => response.blob())
-        .then((blob) => {
-          let url = window.URL.createObjectURL(blob);
-          let a = document.createElement("a");
-          a.href = url;
-          a.download = labyrinthName + ".json";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-        });
     }
 
     function showDownloadButton() {

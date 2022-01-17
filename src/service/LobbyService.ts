@@ -402,6 +402,26 @@ function setupGame() {
     });
 }
 
+async function download() {
+  const labyrinthName = lobbyState.selectedLabyrinthName;
+  fetch("/api/labyrinth/export?labyrinthName=" + labyrinthName, {
+    method: "GET",
+    headers: {
+      "Content-Type": "text/plain",
+    },
+  })
+    .then((response) => response.blob())
+    .then((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = labyrinthName + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+}
+
 export function useLobbyService() {
   return {
     updateRole,
@@ -421,6 +441,7 @@ export function useLobbyService() {
     setUserReadyState,
     setLobbySessionStorage,
     getLobbySessionStorage,
+    download,
     lobbyState: readonly(lobbyState),
   };
 }
