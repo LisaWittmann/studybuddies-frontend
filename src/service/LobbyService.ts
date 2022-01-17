@@ -271,20 +271,23 @@ async function updateReadyStates(lobbyKey: string) {
   if (lobbyState.users.length > 1) {
     return fetch("/api/lobby/users/ready/" + lobbyKey, {
       method: "GET",
-    }).then((response) => {
-      if(!response.ok) throw new Error(response.statusText);
-      return response.json();
     })
-        .then((jsonData) => {
-          jsonData.forEach((userThatIsReady:string) => {
-            const foundUser = lobbyState.users.find(user => user.username == userThatIsReady);
-            foundUser?.setReady(true);
-          });
-          sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
-        })
-        .catch((error) => {
-          console.error(error);
+      .then((response) => {
+        if (!response.ok) throw new Error(response.statusText);
+        return response.json();
+      })
+      .then((jsonData) => {
+        jsonData.forEach((userThatIsReady: string) => {
+          const foundUser = lobbyState.users.find(
+            (user) => user.username == userThatIsReady
+          );
+          foundUser?.setReady(true);
         });
+        sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 }
 

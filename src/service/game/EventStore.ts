@@ -104,9 +104,9 @@ stompClient.onConnect = () => {
           }
           break;
         case Operation.ACCESS:
-          console.log("ACCESS Nachricht kommt an")
+          console.log("ACCESS Nachricht kommt an");
           setScore(eventMessage.data);
-          break;  
+          break;
         case Operation.READY:
           console.log(eventMessage);
           if (

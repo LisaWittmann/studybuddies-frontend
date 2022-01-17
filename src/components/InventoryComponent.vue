@@ -8,12 +8,8 @@
   <transition name="slide-fade">
     <div class="inventory-box" v-if="isOpen">
       <div class="inventory">
-        <div
-          v-for="item in inventory"
-          :key="item"
-          class="inventory-item-box"
-        >
-        <InventoryItemEntryComponent :item="item" />
+        <div v-for="item in inventory" :key="item" class="inventory-item-box">
+          <InventoryItemEntryComponent :item="item" />
         </div>
       </div>
     </div>
@@ -21,13 +17,18 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, ref, watch } from "vue";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from "vue";
 
 import { useGameStore } from "@/service/game/GameStore";
 
 import InventoryItemEntryComponent from "@/components/InventoryItemEntryComponent.vue";
-
-
 
 export default defineComponent({
   name: "InventoryComponent",
@@ -41,14 +42,14 @@ export default defineComponent({
     const invbutton = ref(null);
     let mainPlayer = computed(() => gameState.mainPlayer);
     let inventory = computed(() => mainPlayer.value.getInventory());
-    
+
     /**
      * shows opened or closed backpack svg (inventory button)
      */
     function toggleInventoryButton() {
       isOpen.value = !isOpen.value;
     }
-    
+
     /**
      * lights up the backpack (inventory button) if item is added to inventory
      */

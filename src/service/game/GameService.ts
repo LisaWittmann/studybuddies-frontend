@@ -6,7 +6,7 @@ import { Message } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { Item } from "../labyrinth/Item";
 
-const { updateInventory} = useGameStore();
+const { updateInventory } = useGameStore();
 const { loginState } = useLoginStore();
 
 const gameEventMessage = reactive({
@@ -134,8 +134,8 @@ async function checkAccess(modelName: string) {
       gameEventMessage.message = jsonData.accesstext;
       if (jsonData.firstAccess) {
         gameEventMessage.state = "success";
-        deleteFromInventory();        
-      }else if (jsonData.access) {
+        deleteFromInventory();
+      } else if (jsonData.access) {
         gameEventMessage.state = "success";
       } else {
         gameEventMessage.state = "warning";
@@ -216,22 +216,18 @@ async function addToInventory(
 
 async function deleteFromInventory() {
   const { gameState } = useGameStore();
-  const { loginState } = useLoginStore();  
+  const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
     Operation[Operation.DELETE],
     gameState.lobbyKey,
     loginState.username,
     ""
-  );   
-  fetch(
-    "api/lobby/current-inventory",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(eventMessage),
-    }
-  )
-
+  );
+  fetch("api/lobby/current-inventory", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(eventMessage),
+  })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
@@ -262,7 +258,7 @@ async function givePlayerItem(
       method: "POST",
       headers: { "Content-Type": "application/json" },
     }
-  )
+  );
 }
 
 /**
