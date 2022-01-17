@@ -21,6 +21,11 @@
             <h1>Bachelor</h1>
           </div>
         </transition>
+        <transition name="slow-fade" appear>
+          <div class="text-wrapper">
+            <p>– Spielende –</p>
+          </div>
+        </transition>
       </div>
       <div class="role-box">
         <div>
@@ -76,6 +81,7 @@ export default defineComponent({
     &__header {
         width: 100%;
         max-width: 500px;
+        margin-top: 10%;
 
         @include color-scheme(dark) {
         filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
