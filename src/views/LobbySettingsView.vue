@@ -34,7 +34,9 @@
           class="dwnBtn"
           v-bind:class="[isVisibleLab ? 'unhide' : 'hide']"
           @click="download(selectedItem)"
-        ></button>
+        >
+          <i class="fas fa-download"></i>
+        </button>
       </section>
       <section>
         <div class="column-wrapper">
@@ -210,10 +212,6 @@ h1 {
 }
 
 .dwnBtn {
-  background: no-repeat center/50% url(../assets/img/download-solid.svg);
-  background-position: 50% 50%;
-  background-origin: content-box;
-  background-size: auto;
   height: 9%;
   width: 7%;
   padding: 2px 16px;
