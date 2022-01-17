@@ -4,16 +4,14 @@
       <img class="image--header" :src="header" alt="logo" />
       <section>
         <h2>Spiel finden</h2>
-        <div class="column-wrapper">
+        <form class="column-wrapper" @submit.prevent="joinGame">
           <input
-            class="input--small uppercase"
+            class="input--medium uppercase"
             type="text"
             v-model="lobbyKey"
           />
-          <button class="button--small" @click="joinGame">
-            Spiel beitreten
-          </button>
-        </div>
+          <button type="submit" class="button--small">Spiel beitreten</button>
+        </form>
         <span class="error" v-if="errorMessage">{{ errorMessage }}</span>
       </section>
       <transition name="delay-fade">
@@ -21,6 +19,14 @@
           <h2>Spiel erstellen</h2>
           <button class="button--small" @click="createGame">
             Spiel erstellen
+          </button>
+        </section>
+      </transition>
+      <transition name="delay-slow-fade" appear>
+        <section>
+          <h2>Labyrinth erstellen</h2>
+          <button class="button--small" @click="createLabyrinth">
+            Labyrinth erstellen
           </button>
         </section>
       </transition>
@@ -81,8 +87,20 @@ export default defineComponent({
         .catch((err) => console.log(err));
     }
 
+    function createLabyrinth() {
+      router.push("/editor");
+    }
+
     onbeforeunload = () => console.log("overriding previous listener");
-    return { lobbyKey, createGame, joinGame, header, errorMessage };
+
+    return {
+      lobbyKey,
+      createGame,
+      createLabyrinth,
+      joinGame,
+      header,
+      errorMessage,
+    };
   },
 });
 </script>
@@ -90,7 +108,11 @@ export default defineComponent({
 <style lang="scss" scoped>
 .image--header {
   width: 100%;
-  max-width: 600px;
+  max-width: $width-l;
   padding-top: $spacing-l;
+}
+
+input {
+  text-align: center;
 }
 </style>
