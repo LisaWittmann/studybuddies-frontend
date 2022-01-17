@@ -108,7 +108,7 @@ export default defineComponent({
     const loading = computed(() => gameState.loading);
 
     const copy = (text: string) => navigator.clipboard.writeText(text);
-    
+
     function selectLabyrinth(labyrinthName: string) {
       setLabyrinthSelection(labyrinthName);
       updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
