@@ -32,8 +32,6 @@ const toggleEventMessage = () =>
  * @param orientation used in the backend to identify the direction to move the player
  */
 async function movePlayer(orientation: Orientation) {
-  const { gameState } = useGameStore();
-  const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
     Operation[Operation.MOVEMENT],
     gameState.lobbyKey,
@@ -108,8 +106,6 @@ async function endConversation() {
  * @param modelName name of the clicked item
  */
 async function checkAccess(modelName: string) {
-  const { loginState } = useLoginStore();
-  const { gameState } = useGameStore();
   const eventMessage = new EventMessage(
     Operation[Operation.ACCESS],
     gameState.lobbyKey,
@@ -201,8 +197,7 @@ async function addToInventory(
       return response.json();
     })
     .then((jsonData) => {
-      let inventory = new Array<Item>();
-      inventory = jsonData;
+      let inventory = jsonData;
       updateInventory(inventory);
       removeItemFromTile(lobbyKey, itemId);
     })
@@ -212,8 +207,6 @@ async function addToInventory(
 }
 
 async function deleteFromInventory() {
-  const { loginState } = useLoginStore();
-  const { gameState } = useGameStore();  
   const eventMessage = new EventMessage(
     Operation[Operation.DELETE],
     gameState.lobbyKey,
@@ -233,8 +226,7 @@ async function deleteFromInventory() {
       return response.json();
     })
     .then((jsonData) => {
-      let inventory = new Array<Item>();
-      inventory = jsonData;
+      let inventory = jsonData;
       updateInventory(inventory);
     })
     .catch((error) => {
