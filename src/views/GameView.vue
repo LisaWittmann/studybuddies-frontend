@@ -7,7 +7,7 @@
     @move-player="movePlayer"
   />
   <div class="score-box">
-    <p>{{ score }} CP</p>
+    <p>{{ score }}/210 CP</p>
   </div>
   <!--warning and error messages-->
   <OverlayTerminalComponent
@@ -30,6 +30,8 @@
     :linkText="gameFeedback.linkText"
     :error="gameFeedback.error"
   />
+  <!--player inventory-->
+  <InventoryComponent />
 </template>
 
 <script lang="ts">
@@ -39,6 +41,8 @@ import { useGameStore } from "@/service/game/GameStore";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
+import InventoryComponent from "@/components/InventoryComponent.vue";
+
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
 
@@ -50,6 +54,7 @@ export default defineComponent({
   components: {
     SceneComponent,
     OverlayTerminalComponent,
+    InventoryComponent,
     OverlayConversationComponent,
     OverlayFeedbackComponent,
   },
@@ -101,14 +106,16 @@ export default defineComponent({
   position: absolute;
   top: 0;
   right: 0;
-  width: 7rem;
-  max-height: fit-content;
+  width: 8rem;
+  height: 4rem;
   margin: 1rem;
   padding: $spacing-xs $spacing-s;
   background-image: url("../../src/assets/img/score-bg.svg");
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
+  display: flex;
+  justify-content:center;
 
   p {
     font-family: $font-inconsolata;
@@ -116,6 +123,7 @@ export default defineComponent({
     color: $color-beige;
     padding: 0 1rem;
     text-align: center;
+    margin: auto 0;
   }
 }
 </style>

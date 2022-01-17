@@ -87,6 +87,7 @@ export default defineComponent({
       updateRole,
       getRoles,
       getRoleOptions,
+      updateReadyStates,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
@@ -126,10 +127,23 @@ export default defineComponent({
       return "Leaving Lobby";
     };
 
+    // exit lobby if any other page than game is opened
+    onBeforeRouteLeave((to) => {
+      const nextKey = to.params.key as string;
+      if (
+        nextKey != gameState.lobbyKey &&
+        lobbyState.users.some((user) => user.username === loginState.username)
+      ) {
+        exitLobby(gameState.lobbyKey, loginState.username);
+      }
+    });
+
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey).catch(() => router.push("/find"));
+      updateUsers(gameState.lobbyKey)
+        .then(() => updateReadyStates(gameState.lobbyKey))
+        .catch(() => router.push("/find"));
       updateLabyrinths();
       getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
       getRoleOptions(gameState.lobbyKey);

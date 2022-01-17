@@ -144,6 +144,7 @@ async function joinLobby(lobbyKey: string, username: string) {
       else throw new Error("Diese Lobby konnte nicht gefunden werden.");
     }
     router.push("/lobby/" + lobbyKey);
+    updateReadyStates(lobbyKey);
   });
 }
 
@@ -180,7 +181,6 @@ async function createLobby(username: string) {
  * @param username: identifying name of user that should be removed
  */
 async function exitLobby(lobbyKey: string, username: string) {
-  if (!lobbyState.users.some((user) => user.username === username)) return;
   fetch("/api/lobby/leave/" + lobbyKey, {
     method: "POST",
     headers: {
@@ -261,8 +261,31 @@ async function updateUsers(lobbyKey: string) {
           lobbyState.users.push(new User(username));
         }
       });
-      sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+    })
+    .catch((error) => {
+      console.error(error);
     });
+}
+
+async function updateReadyStates(lobbyKey: string) {
+  if (lobbyState.users.length > 1) {
+    return fetch("/api/lobby/users/ready/" + lobbyKey, {
+      method: "GET",
+    }).then((response) => {
+      if(!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+        .then((jsonData) => {
+          jsonData.forEach((userThatIsReady:string) => {
+            const foundUser = lobbyState.users.find(user => user.username == userThatIsReady);
+            foundUser?.setReady(true);
+          });
+          sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+  }
 }
 
 /**
@@ -421,6 +444,7 @@ export function useLobbyService() {
     uploadJsonFiles,
     updateUsers,
     updateLabyrinths,
+    updateReadyStates,
     setLabyrinthSelection,
     updateLabyrinthPick,
     readyCheck,

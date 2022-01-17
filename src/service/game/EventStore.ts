@@ -5,7 +5,8 @@ import { useGameService } from "@/service/game/GameService";
 import { useLobbyService } from "@/service/LobbyService";
 
 const { playerLeftGame } = useGameService();
-const { gameState, updatePlayerData, setError } = useGameStore();
+const { gameState, updatePlayerData, updateGameData, setError } =
+  useGameStore();
 const {
   updateUsers,
   setupGame,
@@ -71,6 +72,9 @@ stompClient.onConnect = () => {
 
           break;
         case Operation.CLICK:
+          break;
+        case Operation.COLLECT:
+          updateGameData();
           break;
         case Operation.CHAT:
           break;
