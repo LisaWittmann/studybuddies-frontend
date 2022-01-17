@@ -108,8 +108,8 @@ async function endConversation() {
  * @param modelName name of the clicked item
  */
 async function checkAccess(modelName: string) {
-  const { loginState } = useLoginStore();
   const { gameState } = useGameStore();
+  const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
     Operation[Operation.ACCESS],
     gameState.lobbyKey,
@@ -201,8 +201,7 @@ async function addToInventory(
       return response.json();
     })
     .then((jsonData) => {
-      let inventory = new Array<Item>();
-      inventory = jsonData;
+      const inventory = jsonData;
       updateInventory(inventory);
       removeItemFromTile(lobbyKey, itemId);
     })
@@ -233,8 +232,7 @@ async function deleteFromInventory() {
       return response.json();
     })
     .then((jsonData) => {
-      let inventory = new Array<Item>();
-      inventory = jsonData;
+      const inventory = jsonData;
       updateInventory(inventory);
     })
     .catch((error) => {
