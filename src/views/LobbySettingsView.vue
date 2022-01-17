@@ -122,6 +122,13 @@ export default defineComponent({
       return "Leaving Lobby";
     };
 
+    onBeforeRouteLeave((to) => {
+      const nextKey = to.params.key as string;
+      if (nextKey != gameState.lobbyKey) {
+        exitLobby(gameState.lobbyKey, loginState.username);
+      }
+    });
+
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
