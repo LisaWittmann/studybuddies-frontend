@@ -6,7 +6,7 @@
           v-for="(option, index) in options"
           :key="index"
           class="button__icon--circle button--filled"
-          :class="optionClass(option)"
+          :class="optionClass(index)"
           @click="select(index)"
         >
           <img :src="image(index)" alt="Missing Option" />
@@ -62,14 +62,22 @@ export default defineComponent({
       }
     };
 
-    const optionClass = (index: number) => {
-      switch (props.options[index]) {
+    const getClass = (role: Role | undefined) => {
+      switch (role) {
         case Role.DESIGNER:
           return "button__option-designer";
         case Role.HACKER:
           return "button__option-hacker";
-        default:
-          return "";
+        default: return "";
+      }
+    };
+
+    const optionClass = (index: number) => {
+      const option = props.options[index];
+      if (option instanceof ItemModel) {
+        return getClass(option.blockedRole);
+      } else {
+        return getClass(option as Role);
       }
     };
 

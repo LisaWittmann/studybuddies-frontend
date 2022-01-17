@@ -60,17 +60,21 @@ function setDimension(rows: number, columns: number): void {
 }
 
 async function setItemOptions() {
-  await fetch("/api/labyrinth/placeable-bodies")
+  await fetch("/api/body/placeable-bodies")
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((jsonData) => {
-      for (const name of jsonData) {
+      console.log(jsonData);
+      for (const name in jsonData) {
         if (!editorState.itemOptions.some((i) => i.modelName == name)) {
-          editorState.itemOptions.push(new ItemModel(name));
+          editorState.itemOptions.push(
+            new ItemModel(name, (<any>Role)[jsonData[name]])
+          );
         }
       }
+      console.log(editorState.itemOptions);
     });
 }
 
@@ -254,16 +258,23 @@ function setName(labyrinthName: string): void {
  */
 function addItem(model: TileModel, item: ItemModel): void {
   if (
+    !item ||
     !model.relationKey ||
     model.isEnd ||
     model.objectsInRoom.length >= editorConfig.maxItems ||
-    !item
+    !isAccessable(item, model)
   )
     return;
   model.objectsInRoom.push(item);
   editorState.itemOptions = editorState.itemOptions.filter(
     (i) => i.modelName != item.modelName
   );
+}
+
+function isAccessable(item: ItemModel, tile: TileModel) {
+  if (item.blockedRole == undefined) return true;
+  if (tile.restrictions.length == 0) return true;
+  else return tile.restrictions.includes(item.blockedRole);
 }
 
 /**
