@@ -112,21 +112,19 @@ function updatePlayerData(username: string, newPosition: number) {
 }
 
 /**
- * updates complete inventory after delete or collect
+ * Updates complete inventory after delete or collect
  * @param inventory 
  */
 async function updateInventory(inventory: Array<Item>) {
   console.log(inventory);
   gameState.mainPlayer.setInventory(inventory);
-  console.log("INVENTORY", gameState.mainPlayer.getInventory());
 }
 
 /**
- * adds single traded item to inventory after evenmessage was sent
- * @param item 
+ * Adds a single traded item to inventory after eventmessage was sent
+ * @param item
  */
 async function addItemToInventory(item: Item) {
-  console.log("ADD ITEM", item);
   gameState.mainPlayer.addItem(item);
 }
 

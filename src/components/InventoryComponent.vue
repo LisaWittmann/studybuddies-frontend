@@ -67,7 +67,6 @@ export default defineComponent({
       [inventory],
       () => {
         lightUpInventoryButton();
-        //updateInventory();
       },
       { deep: true }
     );

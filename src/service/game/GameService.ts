@@ -264,10 +264,6 @@ async function removeItemFromTile(lobbyKey: string, itemId: string) {
 }
 
 async function tradeItem(username: string, itemId: string) {
-  //"/lobby/{key}/username/{username}/trade/item/{itemName}"
-  console.log("MAIN PLAYER ", gameState.mainPlayer.getUsername());
-  console.log("TRADE ITEM ", itemId, " LOBBY ", gameState.lobbyKey, " FROM ", username, " TO ", gameState.partnerPlayer.getUsername());
-
   return fetch(
     "api/lobby/" +
       gameState.lobbyKey +
