@@ -13,20 +13,7 @@
           :key="item"
           class="inventory-item-box"
         >
-          <button
-            class="trade-button"
-            v-if="playersInSameTile"
-            v-bind:class="[isVisible ? 'show' : 'hide']"
-            :title="getTradeValue(item.modelName)"
-            @click="giveItemToPartner(item)"
-          ></button>
-          <img
-            class="item-img"
-            :src="getImgUrl(item.modelName)"
-            :alt="item.modelName"
-            width="300"
-            @contextmenu.prevent="showTradeButton(item)"
-          />
+        <InventoryItemEntryComponent :item="item" />
         </div>
       </div>
     </div>
@@ -37,53 +24,31 @@
 import { computed, defineComponent, onMounted, reactive, ref, watch } from "vue";
 
 import { useGameStore } from "@/service/game/GameStore";
-import { Item } from "@/service/labyrinth/Item";
-import { useGameService } from "@/service/game/GameService";
+
+import InventoryItemEntryComponent from "@/components/InventoryItemEntryComponent.vue";
+
 
 
 export default defineComponent({
   name: "InventoryComponent",
   props: {},
+  components: {
+    InventoryItemEntryComponent,
+  },
   setup() {
     const { gameState } = useGameStore();
-    const { tradeItem } = useGameService();
     let isOpen = ref(false);
-    let isVisible = ref(false);
     const invbutton = ref(null);
     let mainPlayer = computed(() => gameState.mainPlayer);
     let inventory = computed(() => mainPlayer.value.getInventory());
-    let playersInSameTile = computed(() => gameState.playersInSameTile);
-
-/*     let inventoryTradeable: Array<{item : Item, tradeable: boolean}> = reactive([]);
-
-    function updateInventory() {
-      inventory.value.forEach((item: Item) => {
-      if (!inventoryTradeable.filter(entry => {return entry.item.id = item.id;}) {
-
-        } 
-        if (!inventoryTradeable.find(obj => {return obj.item.id = item.id;})) {
-          console.log("ENTRY NOT INCLUDED");
-          inventoryTradeable.push({ item: item, tradeable: false });
-        } else {
-          console.log("ENTRY INCLUDED");
-        } 
-      });
-    }
- */
-    /**
-     * creates image url
-     */
-    function getImgUrl(imgName: string) {
-      return require("../assets/img/inventory/" +
-        imgName.toLowerCase() +
-        ".svg");
-    }
+    
     /**
      * shows opened or closed backpack svg (inventory button)
      */
     function toggleInventoryButton() {
       isOpen.value = !isOpen.value;
     }
+    
     /**
      * lights up the backpack (inventory button) if item is added to inventory
      */
@@ -94,28 +59,6 @@ export default defineComponent({
         setTimeout(() => button.classList.remove("button--lightup"), 20000);
       }
     };
-
-    function showTradeButton(item: string) {
-      isVisible.value = !isVisible.value;
-      console.log(item, "VISIBLE", isVisible.value);
-    }
-
-    function getTradeValue(modelName: string): string {
-      console.log(modelName);
-      if (modelName === "USB") {
-        return modelName + " übergeben";
-      } else {
-        return (
-          modelName.charAt(0) + modelName.slice(1).toLowerCase() + " übergeben"
-        );
-      }
-    }
-
-
-    function giveItemToPartner(item: Item) {
-      console.log("ITEM TO TRADE FROM", mainPlayer.value.username, item.id.toString());
-      tradeItem(mainPlayer.value.username, item.id.toString());
-    }
 
     /**
      * watches changes from inventory to call the lightUpInventoryButton method
@@ -132,15 +75,9 @@ export default defineComponent({
     return {
       mainPlayer,
       inventory,
-      playersInSameTile,
-      getImgUrl,
       toggleInventoryButton,
       isOpen,
-      isVisible,
       invbutton,
-      showTradeButton,
-      getTradeValue,
-      giveItemToPartner,
     };
   },
 });
@@ -210,38 +147,6 @@ export default defineComponent({
 
 .inventory-item-box:first-child {
   margin-top: 0;
-}
-
-.item-img {
-  width: 100%;
-  height: auto;
-  transition-duration: 0.3s;
-  margin: 1rem;
-}
-
-.inventory-item-box:hover .item-img {
-  transform: scale(1.05);
-  filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.5));
-}
-
-.trade-button {
-  position: absolute;
-  left: 120%;
-  width: 4rem;
-  height: 50%;
-  padding: 0;
-  margin-top: 25%;
-  background: url(../assets/img/inventory/trade-button.svg) no-repeat center;
-  border: none;
-  box-shadow: none;
-}
-
-.show {
-  display: block;
-}
-
-.hide {
-  display: none;
 }
 
 /*SCROLLBAR----*/
