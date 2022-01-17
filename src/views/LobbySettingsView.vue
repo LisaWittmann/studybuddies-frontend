@@ -119,11 +119,7 @@ export default defineComponent({
     }
 
     onbeforeunload = () => {
-      if (
-        lobbyState.users.some((user) => user.username === loginState.username)
-      ) {
-        exitLobby(lobbyKey.value, loginState.username);
-      }
+      exitLobby(lobbyKey.value, loginState.username);
       return "Leaving Lobby";
     };
 
