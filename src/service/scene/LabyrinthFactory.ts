@@ -131,14 +131,14 @@ async function placeTile(
  * @returns color of tile as hexadecimal number
  */
 function getTileColor(tile: Tile) {
-  //both players have access to this tile
-  if (tile.getRestrictions().length == 0) return colors.darkBrown;
+  //both players have no access to this tile
+  if (tile.getRestrictions().length == 2) return colors.grey;
   //only the designer has access to this tile
   if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
   //only the hacker has access to this tile
   if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
   //default - this case shouldn't appear
-  return colors.grey;
+  return colors.darkBrown;
 }
 
 /**
@@ -155,7 +155,6 @@ function getTilePosition(
   scene.traverse((child) => {
     if (child.userData.tileKey == id) {
       position = child.position;
-      console.log(child);
     }
   });
   return position;

@@ -11,8 +11,53 @@ $color-beige: #e6bf5f;
 $color-brown: #994814;
 $color-dark-brown: #56341a;
 
+$color-error: darkred;
+$color-error-dark: hotpink;
+
 @mixin color-scheme($value: light) {
     @media (prefers-color-scheme: $value) {
-        @content
+        @content;
     }
+}
+
+@mixin color-error() {
+    color: $color-error;
+    @include color-scheme(dark) {
+        color: $color-error-dark;
+    } 
+}
+
+@mixin color-primary() {
+    color: $color-black;
+    @include color-scheme(dark) {
+        color: $color-white;
+    } 
+}
+
+@mixin color-primary-inverted() {
+    color: $color-white;
+    @include color-scheme(dark) {
+        color: $color-black;
+    } 
+}
+
+@mixin color-secondary() {
+    color: $color-green;
+    @include color-scheme(dark) {
+        color: $color-grey;
+    }
+}
+
+@mixin background-primary() {
+    background-color: $color-white;
+    @include color-scheme(dark) {
+        background-color: $color-black-background;
+    } 
+}
+
+@mixin background-secondary() {
+    background-color: $color-dark-green;
+    @include color-scheme(dark) {
+        background-color: $color-white;
+    } 
 }
