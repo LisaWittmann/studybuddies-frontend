@@ -12,6 +12,7 @@ const {
   updateGameData,
   setError,
   addItemToInventory,
+  setScore,
 } = useGameStore();
 const {
   updateUsers,
@@ -101,6 +102,10 @@ stompClient.onConnect = () => {
               eventMessage.username
             );
           }
+          break;
+        case Operation.ACCESS:
+          console.log("ACCESS Nachricht kommt an");
+          setScore(eventMessage.data);
           break;
         case Operation.READY:
           console.log(eventMessage);

@@ -104,7 +104,7 @@ export default defineComponent({
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
-  justify-content:center;
+  justify-content: center;
 
   p {
     font-family: $font-inconsolata;

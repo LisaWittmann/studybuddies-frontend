@@ -29,10 +29,10 @@
       </div>
       <div class="role-box">
         <div>
-          <img src="../assets/img/roles/designer-role-cap.svg">
+          <img src="../assets/img/roles/designer-role-cap.svg" />
         </div>
         <div>
-          <img src="../assets/img/roles/hacker-role-cap.svg">
+          <img src="../assets/img/roles/hacker-role-cap.svg" />
         </div>
       </div>
     </div>
@@ -58,96 +58,91 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-
-
-
 .end {
-    &__background {
-        position: relative;
-        overflow: hidden;
-        height: 100vh;
+  &__background {
+    position: relative;
+    overflow: hidden;
+    height: 100vh;
 
-        &-image {
-            width: 100%;
-            min-height: 100%;
-            object-fit: cover;
-            filter: grayscale(20%) brightness(70%);
-            opacity: 0.2;
-
-            @include color-scheme(dark) {
-                opacity: 0.15;
-                filter: grayscale(0%) brightness(90%);
-            }
-        }
-    }
-
-    &__header {
-        width: 100%;
-        max-width: $width-xl;
-
-        @include color-scheme(dark) {
-        filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
-        }
-    }
-
-    .text-wrapper {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    
-    h1 {
-        color: $color-black;
-        margin: 0;
-
-        @include color-scheme(dark) {
-            color: $color-white;
-        }
-    }
-
-    p {
-      margin: 0;
-    }
-
-    .flex-container {
-        position: absolute;
-        z-index: 2;
-        top: 0;
-    }
-
-    .role-box {
-      display: flex;
-      flex-direction: row;
+    &-image {
       width: 100%;
-      margin: 0 auto;
-      justify-content: space-between;
-      position: absolute;
-      bottom: 0;
+      min-height: 100%;
+      object-fit: cover;
+      filter: grayscale(20%) brightness(70%);
+      opacity: 0.2;
 
-      div {
-        padding: 0 3rem;
-      }
-
-      img {
-        height: 100%;
-        width: auto;
+      @include color-scheme(dark) {
+        opacity: 0.15;
+        filter: grayscale(0%) brightness(90%);
       }
     }
+  }
+
+  &__header {
+    width: 100%;
+    max-width: $width-xl;
+
+    @include color-scheme(dark) {
+      filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
+    }
+  }
+
+  .text-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  h1 {
+    color: $color-black;
+    margin: 0;
+
+    @include color-scheme(dark) {
+      color: $color-white;
+    }
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .flex-container {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+  }
+
+  .role-box {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin: 0 auto;
+    justify-content: space-between;
+    position: absolute;
+    bottom: 0;
+
+    div {
+      padding: 0 3rem;
+    }
+
+    img {
+      height: 100%;
+      width: auto;
+    }
+  }
 }
 
-@media (min-width: 1051px){
-
+@media (min-width: 1051px) {
   .end {
-     &__header {
-        margin-top: 10%;
-     }
+    &__header {
+      margin-top: 10%;
+    }
 
     .text-wrapper {
       height: 50vh;
     }
 
-     h1 {
+    h1 {
       font-size: 5rem;
     }
 
@@ -158,16 +153,14 @@ export default defineComponent({
     .role-box {
       height: 30vh;
     }
-
   }
 }
 
-@media (min-width:601px) and (max-width: 1050px){
-
+@media (min-width: 601px) and (max-width: 1050px) {
   .end {
-     &__header {
-        margin-top: 0;
-     }
+    &__header {
+      margin-top: 0;
+    }
 
     .text-wrapper {
       height: 15vh;
@@ -184,15 +177,12 @@ export default defineComponent({
     .role-box {
       height: 20vh;
     }
-
   }
 }
 
-@media (max-width: 600px){
-   .role-box {
-      height: 15vh;
+@media (max-width: 600px) {
+  .role-box {
+    height: 15vh;
   }
-
 }
-
 </style>
