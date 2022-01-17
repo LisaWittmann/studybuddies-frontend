@@ -32,6 +32,16 @@
         <div>Noch keine Labyrinthe verfügbar</div>
       </div>
     </div>
+
+    <button
+          type="submit"
+          id="downloadButton"
+          class="dwnBtn"
+          v-bind:class="[isVisibleLab ? 'unhide' : 'hide']"
+          @click="download(selectedItem)"
+    >
+          <i class="fas fa-download"></i>
+    </button>
   </section>
 </template>
 
@@ -50,9 +60,10 @@ export default defineComponent({
   },
   name: "DropdownComponent",
   setup(props, context) {
-    const { lobbyState } = useLobbyService();
+    const { download, lobbyState } = useLobbyService();
 
     let isOpen = ref(false);
+    let isVisibleLab = ref(false);
 
     // open or close the dropdown menu
     function openClose() {
@@ -62,11 +73,16 @@ export default defineComponent({
     function selectItem(item: string) {
       if (item != lobbyState.selectedLabyrinthName) {
         context.emit("select", item);
+        showDownloadButton();
       }
       isOpen.value = false;
     }
 
-    return { isOpen, openClose, selectItem, props };
+    function showDownloadButton() {
+      if (!isVisibleLab.value) isVisibleLab.value = true;
+    }
+
+    return { isOpen, openClose, selectItem, download, isVisibleLab, showDownloadButton, props };
   },
 });
 </script>
@@ -178,5 +194,21 @@ export default defineComponent({
       }
     }
   }
+}
+
+.dwnBtn {
+  border: none;
+  padding: none;
+  box-shadow: none;
+  height: 9%;
+  width: 7%;
+}
+
+.hide {
+  visibility: hidden;
+}
+
+.unhide {
+  visibility: visible;
 }
 </style>
