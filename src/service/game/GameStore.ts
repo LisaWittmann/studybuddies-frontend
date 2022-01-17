@@ -2,6 +2,7 @@ import { reactive } from "vue";
 import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
 import { useLoginStore } from "@/service/login/LoginStore";
+import { Item } from "../labyrinth/Item";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 
 const { updateLabyrinthData } = useLabyrinthStore();
@@ -99,6 +100,12 @@ function updatePlayerData(username: string, newPosition: number) {
   }
 }
 
+async function updateInventory(inventory: Array<Item>) {
+  console.log(inventory);
+  gameState.mainPlayer.setInventory(inventory);
+  console.log("INVENTORY", gameState.mainPlayer.getInventory());
+}
+
 /**
  * sets a Player with its username and the startTileId
  * @param username : name of the user to improve identification between Main- and Partnerplayer
@@ -138,6 +145,7 @@ export function useGameStore() {
     setGameState,
     updateGameData,
     updatePlayerData,
+    updateInventory,
     setPlayerData,
     setLobbyKey,
     setError,
