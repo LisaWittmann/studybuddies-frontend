@@ -83,6 +83,11 @@ async function getConversationMessage(id: string) {
       if (conversation.message.id != "0.0") {
         if (conversation.message.itemName != null) {
           console.log("give Item");
+          givePlayerItem(
+            gameState.lobbyKey,
+            conversation.message.itemName,
+            gameState.mainPlayer.getUsername()
+          );
         }
       } else {
         endConversation();
@@ -226,12 +231,14 @@ async function deleteFromInventory() {
       body: JSON.stringify(eventMessage),
     }
   )
+
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((jsonData) => {
-      const inventory = jsonData;
+      let inventory = new Array<Item>();
+      inventory = jsonData;
       updateInventory(inventory);
     })
     .catch((error) => {
@@ -239,24 +246,64 @@ async function deleteFromInventory() {
     });
 }
 
-
+async function givePlayerItem(
+  lobbyKey: string,
+  itemName: string,
+  username: string
+) {
+  return fetch(
+    "api/lobby/" +
+      lobbyKey +
+      "/username/" +
+      username +
+      "/give/item/" +
+      itemName,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+}
 
 /**
  * Provides functionality to remove an item from a tile.
  * @param lobbyKey the key of the lobby
- * @param objectName the name of the object that is to be deleted
  * @param itemId the id of the object that is to be deleted
  */
-async function removeItemFromTile(
-  lobbyKey: string,
-  itemId: string
-) {
+async function removeItemFromTile(lobbyKey: string, itemId: string) {
   return fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
     method: "DELETE",
     headers: { "Content-Type": "text/plain" },
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+async function tradeItem(username: string, itemId: string) {
+  return fetch(
+    "api/lobby/" +
+      gameState.lobbyKey +
+      "/username/" +
+      username +
+      "/trade/item/" +
+      itemId,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      let inventory = new Array<Item>();
+      inventory = jsonData;
+      updateInventory(inventory);
     })
     .catch((error) => {
       console.error(error);
@@ -272,5 +319,6 @@ export function useGameService() {
     startConversation,
     getConversationMessage,
     conversation,
+    tradeItem,
   };
 }
