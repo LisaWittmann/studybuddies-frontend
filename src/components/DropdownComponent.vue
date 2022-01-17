@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import { useLobbyService } from "@/service/LobbyService";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({

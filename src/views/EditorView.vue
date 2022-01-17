@@ -52,32 +52,16 @@
       </div>
     </transition>
   </div>
-  <OverlayFeedbackComponent
-    :opened="feedback.active"
-    :headline="feedback.headline"
-    :subLine="feedback.subLine"
-    :link="feedback.link"
-    :linkText="feedback.linkText"
-    :error="feedback.error"
-    @close="closeFeedback"
-  />
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onUnmounted,
-  reactive,
-  ref,
-  watch,
-} from "vue";
+import { computed, defineComponent, onUnmounted, ref, watch } from "vue";
+import { useAppService } from "@/service/AppService";
 import { useEditorService } from "@/service/editor/EditorService";
 import { ItemModel } from "@/service/editor/TileModel";
 import { Mode } from "@/service/editor/EditorMode";
 import { Role } from "@/service/game/Player";
 
-import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
 import EditorStageComponent from "@/components/editor/EditorStageComponent.vue";
 import EditorToolComponent from "@/components/editor/EditorToolComponent.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
@@ -88,7 +72,6 @@ export default defineComponent({
     EditorStageComponent,
     EditorToolComponent,
     PaginationComponent,
-    OverlayFeedbackComponent,
   },
   setup() {
     const {
@@ -99,6 +82,7 @@ export default defineComponent({
       save,
       reset,
     } = useEditorService();
+    const { setFeedback, setFeedbackError, resetFeedback } = useAppService();
 
     const modes = new Array<Mode>(
       Mode.CREATE,
@@ -138,14 +122,6 @@ export default defineComponent({
     const currentItem = ref(new ItemModel(""));
     const changeItem = (item: ItemModel) => (currentItem.value = item);
 
-    const feedback = reactive({
-      active: false,
-      headline: "",
-      subLine: "",
-      error: "",
-      link: "",
-      linkText: "",
-    });
     const errorMessage = computed(() => editorState.errorMessage);
 
     function onComplete() {
@@ -155,37 +131,25 @@ export default defineComponent({
       } else {
         save()
           .then((name) => {
-            feedback.active = true;
-            feedback.headline = "Gespeichert";
-            feedback.subLine = `Dein Labyrinth wurde unter dem Namen ${name} gespeichert`;
-            feedback.error = "";
-            feedback.link = "/find";
-            feedback.linkText = "Jetzt spielen";
+            setFeedback(
+              "Gespeichert",
+              `Dein Labyrinth wurde unter dem Namen ${name} gespeichert`,
+              "/find",
+              "Jetzt spielen"
+            );
             reset();
           })
           .catch(() => {
-            feedback.active = true;
-            feedback.headline = "Fehler";
-            feedback.error = editorState.errorMessage;
-            feedback.linkText = "Zurück zur Bearbeitung";
+            setFeedbackError(
+              "Fehler",
+              editorState.errorMessage,
+              "Zurück zur Bearbeitung"
+            );
+            if (editorState.errorMessage.includes("vergeben"))
+              currentMode.value = Mode.LABYRINTH_NAME;
+            else currentMode.value = Mode.CREATE;
           });
       }
-    }
-
-    function resetFeedback() {
-      feedback.active = false;
-      feedback.headline = "";
-      feedback.subLine = "";
-      feedback.error = "";
-      feedback.link = "";
-      feedback.linkText = "";
-    }
-
-    function closeFeedback() {
-      if (editorState.errorMessage.includes("vergeben"))
-        currentMode.value = Mode.LABYRINTH_NAME;
-      else currentMode.value = Mode.CREATE;
-      resetFeedback();
     }
 
     watch(
@@ -198,7 +162,6 @@ export default defineComponent({
 
     onUnmounted(() => {
       updateTileModels();
-      feedback.active = false;
     });
 
     return {
@@ -219,9 +182,7 @@ export default defineComponent({
       currentItem,
       changeItem,
       onComplete,
-      feedback,
       errorMessage,
-      closeFeedback,
     };
   },
 });

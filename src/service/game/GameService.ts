@@ -1,12 +1,15 @@
 import { reactive } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "@/service/login/LoginStore";
+import { useAppService } from "@/service/AppService";
+
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
-import { Item } from "../labyrinth/Item";
+import { Item } from "@/service/labyrinth/Item";
 
 const { gameState, updateInventory, endGame } = useGameStore();
+const { setFeedback } = useAppService();
 
 const gameEventMessage = reactive({
   message: "",
@@ -18,15 +21,6 @@ const conversation = reactive({
   character: "",
   message: new Message("", "", undefined, []),
   visible: false,
-});
-
-const gameFeedback = reactive({
-  opened: false,
-  headline: "",
-  subline: "",
-  error: false,
-  link: "",
-  linkText: "",
 });
 
 const toggleEventMessage = () =>
@@ -185,19 +179,12 @@ async function clickItem(modelName: string, itemId: string) {
 
 function playerLeftGame(username: string) {
   endGame();
-  gameFeedback.headline = `Spieler ${username} hat das Spiel verlassen.`;
-  gameFeedback.link = "/find";
-  gameFeedback.linkText = "Zurück zur Lobbyfindung";
-  gameFeedback.opened = true;
-}
-
-function resetGameFeedback() {
-  gameFeedback.opened = false;
-  gameFeedback.headline = "";
-  gameFeedback.subline = "";
-  gameFeedback.error = false;
-  gameFeedback.link = "";
-  gameFeedback.linkText = "";
+  setFeedback(
+    `Spieler ${username} hat das Spiel verlassen.`,
+    undefined,
+    "/find",
+    "Zurück zur Lobbyfindung"
+  );
 }
 
 /**
@@ -286,7 +273,6 @@ async function removeItemFromTile(lobbyKey: string, itemId: string) {
 export function useGameService() {
   return {
     gameEventMessage,
-    gameFeedback,
     toggleEventMessage,
     movePlayer,
     clickItem,
@@ -294,6 +280,5 @@ export function useGameService() {
     getConversationMessage,
     conversation,
     playerLeftGame,
-    resetGameFeedback,
   };
 }

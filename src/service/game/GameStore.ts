@@ -1,11 +1,15 @@
 import { reactive } from "vue";
-import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
-import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
+
+import { useAppService } from "@/service/AppService";
 import { useLoginStore } from "@/service/login/LoginStore";
+import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
+
 import { Item } from "../labyrinth/Item";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
+import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 
 const { updateLabyrinthData } = useLabyrinthStore();
+const { startLoading, endLoading } = useAppService();
 
 /**
  * Errormessage: To display all kind of Errors in the according scene
@@ -16,7 +20,6 @@ const gameState = reactive({
   labyrinth: new Labyrinth("", 0, []),
   mainPlayer: new MainPlayer("", 0),
   partnerPlayer: new PartnerPlayer("", 0),
-  loading: false,
   started: false,
   errormessage: "",
   score: 0,
@@ -38,21 +41,15 @@ function endGame() {
 
 /**
  * Updates the Player so, the watcher can build the changes
- * Adds changed Player to sessionStorage
  * @param username: username of the player which position will be updated
  * @param newPosition: sets new position of player
  */
 function updatePlayerData(username: string, newPosition: number) {
   if (username == gameState.mainPlayer.getUsername()) {
     gameState.mainPlayer.setPosition(newPosition);
-    sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer));
   } else if (username == gameState.partnerPlayer.getUsername()) {
     gameState.partnerPlayer.setPosition(newPosition);
     console.log("NEW POSITION: ", newPosition);
-    sessionStorage.setItem(
-      "partnerPlayer",
-      JSON.stringify(gameState.partnerPlayer)
-    );
   }
 }
 
@@ -79,12 +76,10 @@ async function setPlayerData(username: string, startTileId: number) {
 
 async function setLobbyKey(lobbyKey: string) {
   gameState.lobbyKey = lobbyKey;
-  sessionStorage.setItem("lobbyKey", lobbyKey);
 }
 
 async function setError(error: string) {
   gameState.errormessage = error;
-  sessionStorage.setItem("errormessage", error);
 }
 
 function getPlayer(username: string) {

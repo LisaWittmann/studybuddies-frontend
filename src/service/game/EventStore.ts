@@ -2,7 +2,7 @@ import { Client } from "@stomp/stompjs";
 import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useGameService } from "@/service/game/GameService";
-import { useLobbyService } from "@/service/LobbyService";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 
 const { playerLeftGame } = useGameService();
 const { gameState, updatePlayerData, updateGameData, setError } =

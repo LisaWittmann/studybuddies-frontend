@@ -59,8 +59,8 @@ export default defineComponent({
   },
   setup(props, context) {
     const onClick = () => {
-      if (props.error) context.emit("close");
-      else router.push(props.link);
+      context.emit("close");
+      if (!props.error) router.push(props.link);
     };
     return { onClick };
   },

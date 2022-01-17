@@ -22,14 +22,6 @@
     :message="conversation.message"
     @respond="getConversationMessage"
   />
-  <OverlayFeedbackComponent
-    :opened="gameFeedback.opened"
-    :headline="gameFeedback.headline"
-    :subLine="gameFeedback.subline"
-    :link="gameFeedback.link"
-    :linkText="gameFeedback.linkText"
-    :error="gameFeedback.error"
-  />
   <!--player inventory-->
   <InventoryComponent />
 </template>
@@ -38,16 +30,16 @@
 import { computed, defineComponent, onMounted } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useGameStore } from "@/service/game/GameStore";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
 import InventoryComponent from "@/components/InventoryComponent.vue";
-
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
-import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
 
 import router from "@/router";
 import "@/service/game/EventStore";
+import { onBeforeRouteLeave } from "vue-router";
 
 export default defineComponent({
   name: "GameView",
@@ -56,19 +48,17 @@ export default defineComponent({
     OverlayTerminalComponent,
     InventoryComponent,
     OverlayConversationComponent,
-    OverlayFeedbackComponent,
   },
   setup() {
+    const { exitLobby } = useLobbyService();
     const { gameState, updateGameData, setLobbyKey } = useGameStore();
     const {
       gameEventMessage,
-      gameFeedback,
       toggleEventMessage,
       movePlayer,
       clickItem,
       conversation,
       getConversationMessage,
-      resetGameFeedback,
     } = useGameService();
     updateGameData();
 
@@ -77,11 +67,17 @@ export default defineComponent({
     const partnerPlayer = computed(() => gameState.partnerPlayer);
     const score = computed(() => gameState.score);
 
+    onBeforeRouteLeave((to) => {
+      const nextKey = to.params.key as string;
+      if (nextKey != gameState.lobbyKey) {
+        exitLobby(gameState.lobbyKey);
+      }
+    });
+
     onMounted(async () => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       updateGameData();
-      resetGameFeedback();
     });
 
     return {
@@ -89,7 +85,6 @@ export default defineComponent({
       clickItem,
       toggleEventMessage,
       gameEventMessage,
-      gameFeedback,
       mainPlayer,
       partnerPlayer,
       labyrinth,
@@ -115,7 +110,7 @@ export default defineComponent({
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
-  justify-content:center;
+  justify-content: center;
 
   p {
     font-family: $font-inconsolata;

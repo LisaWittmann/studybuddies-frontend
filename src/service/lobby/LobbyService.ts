@@ -1,8 +1,11 @@
 import { reactive, readonly } from "vue";
+
+import { useAppService } from "@/service/AppService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
+
 import { EventMessage, Operation } from "@/service/game/EventMessage";
-import { User } from "./login/User";
+import { User } from "../login/User";
 import { Role } from "@/service/game/Player";
 import router from "@/router";
 
@@ -15,6 +18,8 @@ const lobbyState = reactive({
   errormessage: "",
 });
 
+const { startLoading, endLoading } = useAppService();
+
 function resetLobbyState() {
   const { setLobbyKey } = useGameStore();
   lobbyState.users = new Array<User>();
@@ -24,49 +29,7 @@ function resetLobbyState() {
   lobbyState.labyrinthOptions = new Array<string>();
   lobbyState.errormessage = "";
   setLobbyKey("");
-  setLobbySessionStorage();
 }
-
-function setLobbyState(
-  users: string | null,
-  selectedLabyrinthName: string | null,
-  labyrinthOptions: string | null,
-  errormessage: string | null,
-  selectedRole: string | null
-) {
-  if (users) lobbyState.users = JSON.parse(users);
-  if (selectedLabyrinthName)
-    lobbyState.selectedLabyrinthName = JSON.parse(selectedLabyrinthName);
-  if (labyrinthOptions)
-    lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
-  if (errormessage) lobbyState.errormessage = errormessage;
-  if (selectedRole) lobbyState.selectedRole = selectedRole;
-}
-
-function setLobbySessionStorage() {
-  sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
-  sessionStorage.setItem(
-    "selectedLabyrinthName",
-    JSON.stringify(lobbyState.selectedLabyrinthName)
-  );
-  sessionStorage.setItem(
-    "labyrinthOptions",
-    JSON.stringify(lobbyState.labyrinthOptions)
-  );
-  sessionStorage.setItem("errormessage", lobbyState.errormessage);
-  sessionStorage.setItem("selectedRole", lobbyState.selectedRole);
-}
-
-function getLobbySessionStorage() {
-  setLobbyState(
-    sessionStorage.getItem("users"),
-    sessionStorage.getItem("selectedLabyrinthName"),
-    sessionStorage.getItem("labyrinthOptions"),
-    sessionStorage.getItem("errormessage"),
-    sessionStorage.getItem("selectedRole")
-  );
-}
-
 /**
  * send request to pick an available role
  * @param role: the role which was picked from the user
@@ -91,7 +54,6 @@ async function updateRole(role: string, lobbyKey: string, username: string) {
       else throw new Error("Die Rolle konnte nicht gefunden werden.");
     }
     lobbyState.selectedRole = role;
-    sessionStorage.setItem("selectedRole", JSON.stringify(role));
   });
 }
 
@@ -178,20 +140,23 @@ async function createLobby(username: string) {
  * send request to remove user with given username from lobby
  * redirects back to find lobby view if request was successful
  * @param lobbyKey: identifying key of lobby from which user should be removed
- * @param username: identifying name of user that should be removed
  */
-async function exitLobby(lobbyKey: string, username: string) {
+async function exitLobby(lobbyKey: string) {
+  const { loginState } = useLoginStore();
+  if (!lobbyState.users.some((user) => user.username === loginState.username)) {
+    return;
+  }
   fetch("/api/lobby/leave/" + lobbyKey, {
     method: "POST",
     headers: {
       "Content-Type": "html/text;charset=utf-8",
     },
-    body: username,
+    body: loginState.username,
   })
     .then((response) => {
       if (response.ok) {
-        resetLobbyState();
         router.push("/find");
+        resetLobbyState();
       } else throw new Error(response.statusText);
     })
     .catch((error) => console.error(error));
@@ -261,9 +226,6 @@ async function updateUsers(lobbyKey: string) {
           lobbyState.users.push(new User(username));
         }
       });
-    })
-    .catch((error) => {
-      console.error(error);
     });
 }
 
@@ -271,20 +233,22 @@ async function updateReadyStates(lobbyKey: string) {
   if (lobbyState.users.length > 1) {
     return fetch("/api/lobby/users/ready/" + lobbyKey, {
       method: "GET",
-    }).then((response) => {
-      if(!response.ok) throw new Error(response.statusText);
-      return response.json();
     })
-        .then((jsonData) => {
-          jsonData.forEach((userThatIsReady:string) => {
-            const foundUser = lobbyState.users.find(user => user.username == userThatIsReady);
-            foundUser?.setReady(true);
-          });
-          sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
-        })
-        .catch((error) => {
-          console.error(error);
+      .then((response) => {
+        if (!response.ok) throw new Error(response.statusText);
+        return response.json();
+      })
+      .then((jsonData) => {
+        jsonData.forEach((userThatIsReady: string) => {
+          const foundUser = lobbyState.users.find(
+            (user) => user.username == userThatIsReady
+          );
+          foundUser?.setReady(true);
         });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 }
 
@@ -301,10 +265,6 @@ async function updateLabyrinths() {
     })
     .then((response) => {
       lobbyState.labyrinthOptions = response;
-      sessionStorage.setItem(
-        "labyrinthOptions",
-        JSON.stringify(lobbyState.labyrinthOptions)
-      );
     });
 }
 
@@ -340,10 +300,6 @@ async function updateLabyrinthPick(labyrinthName: string, lobbyKey: string) {
  */
 function setLabyrinthSelection(blueprintLabName: string) {
   lobbyState.selectedLabyrinthName = blueprintLabName;
-  sessionStorage.setItem(
-    "selectedLabyrinthName",
-    JSON.stringify(blueprintLabName)
-  );
 }
 
 /**
@@ -385,7 +341,6 @@ function setUserReadyState(username: string, readyState: boolean) {
   lobbyState.users
     .find((user) => user.username == username)
     ?.setReady(readyState);
-  sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
 }
 
 /**
@@ -403,7 +358,7 @@ function setupGame() {
     updatePlayerData,
     startGame,
   } = useGameStore();
-  gameState.loading = true;
+  startLoading();
   updateUsers(gameState.lobbyKey)
     .then(() => {
       lobbyState.users.forEach((user) => {
@@ -426,7 +381,7 @@ function setupGame() {
           console.log("StartTileId is: " + startTile);
         });
         router.push(`/game/${gameState.lobbyKey}`);
-        gameState.loading = false;
+        endLoading();
         startGame();
       });
     });
@@ -436,8 +391,8 @@ export function useLobbyService() {
   return {
     updateRole,
     getRoles,
+    resetLobbyState,
     getRoleOptions,
-    setLobbyState,
     joinLobby,
     createLobby,
     exitLobby,
@@ -450,8 +405,6 @@ export function useLobbyService() {
     readyCheck,
     setupGame,
     setUserReadyState,
-    setLobbySessionStorage,
-    getLobbySessionStorage,
     lobbyState: readonly(lobbyState),
   };
 }
