@@ -302,7 +302,7 @@ function hasErrors(): Mode | undefined {
     editorState.errorMessage = "Labyrinth ist zu klein";
     return Mode.CREATE;
   } else if (
-    editorState.startPositions.length != editorConfig.minStartPositions
+    editorState.startPositions.length < editorConfig.minStartPositions
   ) {
     editorState.errorMessage = "Zu wenig Startfelder definiert";
     return Mode.START_TILES;
