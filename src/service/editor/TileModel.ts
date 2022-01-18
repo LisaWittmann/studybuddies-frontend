@@ -119,9 +119,11 @@ export class TileModel {
 export class ItemModel {
   modelName: string;
   orientations: Array<Orientation>;
+  blockedRole: Role | undefined;
 
-  constructor(modelName: string) {
+  constructor(modelName: string, blockedRole?: Role) {
     this.modelName = modelName;
     this.orientations = new Array<Orientation>();
+    this.blockedRole = blockedRole;
   }
 }

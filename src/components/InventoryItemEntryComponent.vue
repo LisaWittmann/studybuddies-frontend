@@ -2,7 +2,7 @@
   <button
     class="trade-button"
     v-if="playersInSameTile"
-    v-bind:class="[isVisible ? 'show' : 'hide']"
+    :class="[isVisible ? 'show' : 'hide']"
     :title="getTradeValue(item.modelName)"
     @click="giveItemToPartner(item)"
   ></button>
@@ -11,7 +11,7 @@
     :src="getImgUrl(item.modelName)"
     :alt="item.modelName"
     width="300"
-    @contextmenu.prevent="toggleTradeButton(item)"
+    @contextmenu.prevent="toggleTradeButton()"
   />
 </template>
 
@@ -29,7 +29,7 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  setup() {
     const { gameState } = useGameStore();
     const { tradeItem } = useGameService();
     let playersInSameTile = computed(() => gameState.playersInSameTile);
@@ -46,7 +46,7 @@ export default defineComponent({
     /**
      * shows or hides trade button for single item
      */
-    function toggleTradeButton(item: string) {
+    function toggleTradeButton() {
       isVisible.value = !isVisible.value;
     }
 
