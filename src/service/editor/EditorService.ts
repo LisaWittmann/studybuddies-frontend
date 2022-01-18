@@ -173,7 +173,7 @@ function addStartTile(model: TileModel): void {
     model.restrictions.length > 0
   )
     return;
-  if (editorState.startPositions.length < editorConfig.minStartPositions) {
+  if (editorState.startPositions.length < editorConfig.maxStartPositions) {
     editorState.startPositions.push(model.relationKey);
     model.isStart = true;
   }
