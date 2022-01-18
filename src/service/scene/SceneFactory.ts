@@ -139,15 +139,14 @@ function getIntersections(context: SetupContext, x: number, y: number) {
   rayCaster.setFromCamera({ x: x, y: y }, camera);
   const intersects = rayCaster.intersectObjects(scene.children);
 
-  for (const intersection of intersects) {
-    const object = intersection.object;
-    // if parent object is a 'valid' object (no tile)
+  if (intersects.length > 0) {
+    const object = intersects[0].object;
     if (object.parent?.userData.id != null) {
-      // mock inventory
-      if (object.parent.userData.modelName == "USB") {
-        object.parent.visible = false;
-      }
-      context.emit("click-object", object.parent.userData.modelName);
+      context.emit(
+        "click-object",
+        object.parent.userData.modelName,
+        object.parent.userData.id
+      );
     } else if (object.parent?.userData.showInView) {
       context.emit("move-player", object.parent.userData.orientation);
     }
