@@ -406,8 +406,7 @@ function setupGame() {
  * Request to Backend to get a JSON represented Labyrinth by given name and
  * download it to Client's local storage as JSON-File.
  */
-async function download() {
-  const labyrinthName = lobbyState.selectedLabyrinthName;
+async function download(labyrinthName: string) {
   fetch("/api/labyrinth/export?labyrinthName=" + labyrinthName, {
     method: "GET",
     headers: {

@@ -21,9 +21,11 @@
         class="dropdown__menu-option"
         v-for="(item, index) of items"
         :key="index"
-        @click="selectItem(item)"
       >
-        <div>{{ item }}</div>
+        <div @click="selectItem(item)">{{ item }}</div>
+        <button class="button__download" @click="download(item)">
+          <i class="fas fa-download"></i>
+        </button>
       </div>
       <div
         class="dropdown__menu-option dropdown__menu-option--disabled"
@@ -32,16 +34,6 @@
         <div>Noch keine Labyrinthe verfügbar</div>
       </div>
     </div>
-
-    <button
-          type="submit"
-          id="downloadButton"
-          class="dwnBtn"
-          v-bind:class="[isVisibleLab ? 'unhide' : 'hide']"
-          @click="download(selectedItem)"
-    >
-          <i class="fas fa-download"></i>
-    </button>
   </section>
 </template>
 
@@ -62,8 +54,7 @@ export default defineComponent({
   setup(props, context) {
     const { download, lobbyState } = useLobbyService();
 
-    let isOpen = ref(false);
-    let isVisibleLab = ref(false);
+    const isOpen = ref(false);
 
     // open or close the dropdown menu
     function openClose() {
@@ -73,16 +64,16 @@ export default defineComponent({
     function selectItem(item: string) {
       if (item != lobbyState.selectedLabyrinthName) {
         context.emit("select", item);
-        showDownloadButton();
       }
       isOpen.value = false;
     }
 
-    function showDownloadButton() {
-      if (!isVisibleLab.value) isVisibleLab.value = true;
-    }
-
-    return { isOpen, openClose, selectItem, download, isVisibleLab, showDownloadButton, props };
+    return {
+      isOpen,
+      openClose,
+      selectItem,
+      download,
+    };
   },
 });
 </script>
@@ -173,6 +164,7 @@ export default defineComponent({
     }
 
     &-option {
+      @include flex-center(space-between, row);
       width: 100%;
 
       &--disabled {
@@ -192,23 +184,15 @@ export default defineComponent({
       &:hover {
         color: $color-beige;
       }
+
+      .button__download {
+        border: none;
+        padding: none;
+        box-shadow: none;
+        flex-basis: 10%;
+        @include color-primary();
+      }
     }
   }
-}
-
-.dwnBtn {
-  border: none;
-  padding: none;
-  box-shadow: none;
-  height: 9%;
-  width: 7%;
-}
-
-.hide {
-  visibility: hidden;
-}
-
-.unhide {
-  visibility: visible;
 }
 </style>
