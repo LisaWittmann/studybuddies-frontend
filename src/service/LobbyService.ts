@@ -364,6 +364,18 @@ function setUserReadyState(username: string, readyState: boolean) {
 }
 
 /**
+ * Provides functionality to set a users state to finished, if he/she completed the labyrinth
+ * @param username name of the user who finished the labyrinth
+ * @param finishedState the state as boolean
+ */
+function setUserFinishedState(username: string, finishedState: boolean) {
+  lobbyState.users
+    .find((user) => user.username == username)
+    ?.setFinished(finishedState);
+  sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+}
+
+/**
  * Initial game setup when all users are ready:
  * 1. Gathering the labyrinth information from the BE
  * 2. Updating the Users one last time, so they can get transferred to the gameState properly
@@ -416,6 +428,7 @@ export function useLobbyService() {
     readyCheck,
     setupGame,
     setUserReadyState,
+    setUserFinishedState,
     setLobbySessionStorage,
     getLobbySessionStorage,
     lobbyState: readonly(lobbyState),

@@ -4,6 +4,7 @@ import { useLoginStore } from "@/service/login/LoginStore";
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message, Response } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
+import router from "@/router";
 
 const gameEventMessage = reactive({
   message: "",
