@@ -68,7 +68,8 @@ export default defineComponent({
           return "button__option-designer";
         case Role.HACKER:
           return "button__option-hacker";
-        default: return "";
+        default:
+          return "";
       }
     };
 
