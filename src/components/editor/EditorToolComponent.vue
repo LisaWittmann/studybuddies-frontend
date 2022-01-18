@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, ref } from "vue";
 import { Role } from "@/service/game/Player";
 import { ItemModel } from "@/service/editor/TileModel";
 

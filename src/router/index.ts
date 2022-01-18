@@ -42,6 +42,11 @@ const routes: Array<RouteRecordRaw> = [
     component: GameView,
   },
   {
+    path: "/end/:key",
+    name: "EndView",
+    component: EndView,
+  },
+  {
     path: "/editor",
     name: "Editor",
     component: EditorView,
@@ -50,11 +55,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/upload",
     name: "LabyrinthUploadView",
     component: LabyrinthUploadView,
-  },
-  {
-    path: "/end",
-    name: "EndView",
-    component: EndView,
   },
 ];
 

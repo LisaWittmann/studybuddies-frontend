@@ -41,15 +41,28 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
+import { onBeforeRouteLeave } from "vue-router";
+import { useGameStore } from "@/service/game/GameStore";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 
 export default defineComponent({
   name: "EndView",
   setup() {
+    const { gameState } = useGameStore();
+    const { exitLobby } = useLobbyService();
+
     const header = computed(() => {
       if (matchMedia("(prefers-color-scheme: dark)").matches) {
         return require("@/assets/img/logo_header_dark.png");
       }
       return require("@/assets/img/logo_header.png");
+    });
+
+    onBeforeRouteLeave((to) => {
+      const nextKey = to.params.key as string;
+      if (nextKey != gameState.lobbyKey) {
+        exitLobby(gameState.lobbyKey);
+      }
     });
 
     return { header };

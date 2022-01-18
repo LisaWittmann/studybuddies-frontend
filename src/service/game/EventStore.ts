@@ -14,6 +14,7 @@ const {
   setError,
   addItemToInventory,
   setScore,
+  endGame,
 } = useGameStore();
 const {
   updateUsers,
@@ -132,7 +133,8 @@ stompClient.onConnect = () => {
 
           // If both users are finished, redirect to endscreen
           if (lobbyState.users[0].finished && lobbyState.users[1].finished) {
-            router.push("/end");
+            endGame();
+            router.replace(`/end/${gameState.lobbyKey}`);
           }
           break;
         case Operation.LABYRINTH_PICK:
