@@ -6,6 +6,8 @@ import GameView from "@/views/GameView.vue";
 import LobbySettingsView from "@/views/LobbySettingsView.vue";
 import LabyrinthUploadView from "@/views/LabyrinthUploadView.vue";
 import FindLobbyView from "@/views/FindLobbyView.vue";
+import EndView from "@/views/EndView.vue";
+import EditorView from "@/views/EditorView.vue";
 import { useLoginStore } from "@/service/login/LoginStore";
 
 const routes: Array<RouteRecordRaw> = [
@@ -33,18 +35,26 @@ const routes: Array<RouteRecordRaw> = [
     path: "/lobby/:key",
     name: "LobbySettingsView",
     component: LobbySettingsView,
-    props: true,
   },
   {
     path: "/game/:key",
     name: "GameView",
     component: GameView,
-    props: true,
+  },
+  {
+    path: "/editor",
+    name: "Editor",
+    component: EditorView,
   },
   {
     path: "/upload",
     name: "LabyrinthUploadView",
     component: LabyrinthUploadView,
+  },
+  {
+    path: "/end",
+    name: "EndView",
+    component: EndView,
   },
 ];
 
@@ -53,6 +63,7 @@ const noAuthentication = [
   "RegisterView",
   "LoginView",
   "LabyrinthUploadView",
+  "EndView",
 ];
 
 const router = createRouter({

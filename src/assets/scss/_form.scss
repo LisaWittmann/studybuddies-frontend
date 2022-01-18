@@ -1,22 +1,17 @@
 input {
-    border: 1px solid $color-grey;
+    @include border();
     background: transparent;
-    border-radius: 8px;
-    font-weight: 300;
+    border-radius: $border-radius-m;
+    font-weight: $outfit-light;
     font-size: $text-m;
-    width: 80%;
+    width: $pref-width;
     display: inline-block;
     padding: 10px 12px;
-    cursor: pointer;
 
     &::placeholder,
     &::-moz-placeholder {
         opacity: 1;
-        color: $color-green;
-
-        @include color-scheme(dark) {
-            color: $color-grey;
-        }
+        @include color-secondary();
     }
     
     &:focus {
@@ -27,33 +22,25 @@ input {
     }
 
     &:focus:invalid {
-        border-color: darkred;
-    
-        @include color-scheme(dark) {
-            border-color: hotpink;
-        }
+        @include color-error();
     }
 
     &.input {
         &--small {
         min-height: 20px;
-        max-width: 300px;
+        max-width: $width-xs;
 
         }
         &--medium {
-            max-width: 350px;
+            max-width: $width-s;
         }
         &--large {
             min-height: 40px;
-            max-width: 500px;
+            max-width: $width-m;
         }
     }
 }
 
 .error {
-    color: darkred;
-
-    @include color-scheme(dark) {
-        color: hotpink;
-    }
+    @include color-error();
 }

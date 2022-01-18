@@ -1,9 +1,9 @@
 <template>
   <transition name="fade" appear>
-    <div class="container">
+    <div class="container" :class="{ 'container--fixed': loading }">
       <h1>
         Lobby
-        <span class="uppercase"> {{ lobbyKey }}</span>
+        <span class="uppercase" @click="copy(lobbyKey)"> {{ lobbyKey }}</span>
       </h1>
       <section>
         <p>{{ users.length }}/2 Spieler verbunden</p>
@@ -87,11 +87,12 @@ export default defineComponent({
       updateRole,
       getRoles,
       getRoleOptions,
+      updateReadyStates,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
     const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
-    const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinth);
+    const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinthName);
     const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
@@ -104,10 +105,13 @@ export default defineComponent({
         lobbyState.users.find((user) => user.username === loginState.username)
           ?.isReady
     );
+    const loading = computed(() => gameState.loading);
 
-    function selectLabyrinth(id: number) {
-      setLabyrinthSelection(id);
-      updateLabyrinthPick(id, gameState.lobbyKey);
+    const copy = (text: string) => navigator.clipboard.writeText(text);
+
+    function selectLabyrinth(labyrinthName: string) {
+      setLabyrinthSelection(labyrinthName);
+      updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
     }
 
     function selectRole(name: string) {
@@ -115,6 +119,11 @@ export default defineComponent({
     }
 
     onbeforeunload = () => {
+      if (
+        lobbyState.users.some((user) => user.username === loginState.username)
+      ) {
+        exitLobby(lobbyKey.value, loginState.username);
+      }
       return "Leaving Lobby";
     };
 
@@ -140,7 +149,9 @@ export default defineComponent({
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey).catch(() => router.push("/find"));
+      updateUsers(gameState.lobbyKey)
+        .then(() => updateReadyStates(gameState.lobbyKey))
+        .catch(() => router.push("/find"));
       updateLabyrinths();
       getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
       getRoleOptions(gameState.lobbyKey);
@@ -160,6 +171,8 @@ export default defineComponent({
       selectedLabyrinth,
       loginState,
       isReady,
+      loading,
+      copy,
     };
   },
 });
@@ -172,6 +185,11 @@ h1 {
 
   span {
     font-weight: inherit;
+    cursor: copy;
+
+    &:hover {
+      color: $color-light-green;
+    }
   }
 }
 </style>

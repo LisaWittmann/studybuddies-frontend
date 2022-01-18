@@ -3,8 +3,18 @@ import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
 import router from "@/router";
+import { Item } from "../labyrinth/Item";
+import { useLoginStore } from "@/service/login/LoginStore";
+import { MainPlayer } from "./Player";
 
-const { gameState, updatePlayerData, setError } = useGameStore();
+const {
+  gameState,
+  updatePlayerData,
+  updateGameData,
+  setError,
+  addItemToInventory,
+  setScore,
+} = useGameStore();
 const {
   updateUsers,
   setupGame,
@@ -15,6 +25,7 @@ const {
   setUserFinishedState,
   lobbyState,
 } = useLobbyService();
+const { loginState } = useLoginStore();
 
 let wsURL = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -72,9 +83,31 @@ stompClient.onConnect = () => {
           break;
         case Operation.CLICK:
           break;
+        case Operation.COLLECT:
+          updateGameData();
+          break;
         case Operation.CHAT:
           break;
         case Operation.TRADE:
+          console.log(
+            "USERNAME GAMESTATE",
+            gameState.mainPlayer.getUsername(),
+            "USERNAME MESSAGE",
+            eventMessage.username
+          );
+          if (eventMessage.username === gameState.mainPlayer.getUsername()) {
+            addItemToInventory(JSON.parse(eventMessage.data) as Item);
+            console.log(
+              "TRADE OPERATION AT",
+              eventMessage.data,
+              "TO USER",
+              eventMessage.username
+            );
+          }
+          break;
+        case Operation.ACCESS:
+          console.log("ACCESS Nachricht kommt an");
+          setScore(eventMessage.data);
           break;
         case Operation.READY:
           console.log(eventMessage);
@@ -108,8 +141,7 @@ stompClient.onConnect = () => {
           }
           break;
         case Operation.LABYRINTH_PICK:
-          console.log(Number(eventMessage.data));
-          setLabyrinthSelection(Number(eventMessage.data));
+          setLabyrinthSelection(eventMessage.data);
           break;
         case Operation.UPDATE:
           updateData = (<any>Update)[eventMessage.data];

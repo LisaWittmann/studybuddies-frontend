@@ -2,7 +2,7 @@
   <section class="dropdown">
     <button class="dropdown__button button--large" @click="openClose">
       <div class="text-wrapper">
-        <span v-if="selectedItem">Labyrinth {{ selectedItem }}</span>
+        <span v-if="selectedItem">Labyrinth: {{ selectedItem }}</span>
         <span v-else>Labyrinth auswählen</span>
       </div>
       <div class="icon-wrapper">
@@ -23,7 +23,7 @@
         :key="index"
         @click="selectItem(item)"
       >
-        <div>Labyrinth {{ item }}</div>
+        <div>{{ item }}</div>
       </div>
       <div
         class="dropdown__menu-option dropdown__menu-option--disabled"
@@ -45,7 +45,7 @@ export default defineComponent({
       type: Array,
     },
     selectedItem: {
-      type: Number,
+      type: String,
     },
   },
   name: "DropdownComponent",
@@ -59,8 +59,8 @@ export default defineComponent({
       isOpen.value = !isOpen.value;
     }
 
-    function selectItem(item: number) {
-      if (item != lobbyState.selectedLabyrinth) {
+    function selectItem(item: string) {
+      if (item != lobbyState.selectedLabyrinthName) {
         context.emit("select", item);
       }
       isOpen.value = false;
@@ -77,12 +77,11 @@ export default defineComponent({
   position: relative;
 
   button {
-    @include flex-center();
-    justify-content: space-between;
-    padding: 25px;
+    @include flex-center(space-between);
+    padding: $spacing-s;
 
     &:hover {
-      font-weight: 300;
+      font-weight: $outfit-regular;
     }
   }
 
@@ -100,14 +99,7 @@ export default defineComponent({
       left: 50%;
       border-radius: 9999px;
       transition: all 0.2s ease;
-
-      @include color-scheme(light) {
-        background: $color-dark-green;
-      }
-
-      @include color-scheme(dark) {
-        background: $color-white;
-      }
+      @include background-secondary();
     }
 
     .bar-1 {
@@ -115,7 +107,7 @@ export default defineComponent({
       &--open {
         transform: translate(-50%, -50%) rotate(45deg);
         margin-top: 0;
-        background: $color-beige;
+        background-color: $color-beige;
       }
     }
 
@@ -131,50 +123,37 @@ export default defineComponent({
       &--open {
         top: 50%;
         transform: translate(-50%, -50%) rotate(-45deg);
-        background: $color-beige;
+        background-color: $color-beige;
       }
     }
   }
 
   &__menu {
     @include float-animation();
+    @include background-primary();
+    @include color-primary();
     position: absolute;
     flex-direction: column;
     text-align: left;
     top: 100%;
 
     &.button {
-      padding: 10px 0px;
-    }
-
-    @include color-scheme(light) {
-      background: $color-white;
-      color: $color-black;
-      box-shadow: 10px 10px 0 0 rgba(black, 0.03);
-      &-arrow {
-        background: $color-white;
-      }
-    }
-
-    @include color-scheme(dark) {
-      background: $color-black-background;
-      color: $color-white;
-      box-shadow: 10px 10px 0 0 rgba(grey, 0.03);
-      &-arrow {
-        background: $color-black-background;
-      }
+      padding: $spacing-xs 0;
+      display: flex;
+      justify-content: center;
     }
 
     &-arrow {
       width: 20px;
       height: 20px;
       position: absolute;
-      border-left: 1px solid $color-grey;
-      border-top: 1px solid $color-grey;
+      @include border-left();
+      @include border-top();
       top: -10px;
       left: 20px;
       transform: rotate(45deg);
       border-radius: 4px 0 0 0;
+      @include background-primary();
     }
 
     &-option {
@@ -185,9 +164,9 @@ export default defineComponent({
       }
 
       > * {
-        margin: 0px 20px;
-        padding: 25px 0px;
-        border-bottom: 1px solid $color-grey;
+        margin: 0 $spacing-s;
+        padding: $spacing-s 0;
+        @include border-bottom();
       }
 
       &:last-child > * {

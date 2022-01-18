@@ -6,6 +6,9 @@
     @click-object="clickItem"
     @move-player="movePlayer"
   />
+  <div class="score-box">
+    <p>{{ score }}/210 CP</p>
+  </div>
   <!--warning and error messages-->
   <OverlayTerminalComponent
     :opened="gameEventMessage.visible"
@@ -20,6 +23,8 @@
     @respond="getConversationMessage"
     @close="endConversation"
   />
+  <!--player inventory-->
+  <InventoryComponent />
 </template>
 
 <script lang="ts">
@@ -29,6 +34,8 @@ import { useGameStore } from "@/service/game/GameStore";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
+import InventoryComponent from "@/components/InventoryComponent.vue";
+
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import router from "@/router";
@@ -39,10 +46,8 @@ export default defineComponent({
   components: {
     SceneComponent,
     OverlayTerminalComponent,
+    InventoryComponent,
     OverlayConversationComponent,
-  },
-  props: {
-    key: { type: String, required: true },
   },
   setup() {
     const { gameState, getGameSessionStorage, updateGameData, setLobbyKey } =
@@ -61,6 +66,7 @@ export default defineComponent({
     const labyrinth = computed(() => gameState.labyrinth);
     const mainPlayer = computed(() => gameState.mainPlayer);
     const partnerPlayer = computed(() => gameState.partnerPlayer);
+    const score = computed(() => gameState.score);
 
     onMounted(async () => {
       const route = router.currentRoute.value;
@@ -78,6 +84,7 @@ export default defineComponent({
       mainPlayer,
       partnerPlayer,
       labyrinth,
+      score,
       conversation,
       endConversation,
       getConversationMessage,
@@ -85,3 +92,30 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.score-box {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8rem;
+  height: 4rem;
+  margin: 1rem;
+  padding: $spacing-xs $spacing-s;
+  background-image: url("../../src/assets/img/score-bg.svg");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+
+  p {
+    font-family: $font-inconsolata;
+    font-weight: bold;
+    color: $color-beige;
+    padding: 0 1rem;
+    text-align: center;
+    margin: auto 0;
+  }
+}
+</style>

@@ -10,8 +10,8 @@ const lobbyState = reactive({
   users: new Array<User>(),
   selectedRole: "",
   openRoles: new Array<string>(),
-  selectedLabyrinth: 0,
-  labyrinthOptions: new Array<number>(),
+  selectedLabyrinthName: "",
+  labyrinthOptions: new Array<string>(),
   errormessage: "",
 });
 
@@ -20,8 +20,8 @@ function resetLobbyState() {
   lobbyState.users = new Array<User>();
   lobbyState.selectedRole = "";
   lobbyState.openRoles = new Array<string>();
-  lobbyState.selectedLabyrinth = 0;
-  lobbyState.labyrinthOptions = new Array<number>();
+  lobbyState.selectedLabyrinthName = "";
+  lobbyState.labyrinthOptions = new Array<string>();
   lobbyState.errormessage = "";
   setLobbyKey("");
   setLobbySessionStorage();
@@ -29,14 +29,14 @@ function resetLobbyState() {
 
 function setLobbyState(
   users: string | null,
-  selectedLabyrinth: string | null,
+  selectedLabyrinthName: string | null,
   labyrinthOptions: string | null,
   errormessage: string | null,
   selectedRole: string | null
 ) {
   if (users) lobbyState.users = JSON.parse(users);
-  if (selectedLabyrinth)
-    lobbyState.selectedLabyrinth = JSON.parse(selectedLabyrinth) as number;
+  if (selectedLabyrinthName)
+    lobbyState.selectedLabyrinthName = JSON.parse(selectedLabyrinthName);
   if (labyrinthOptions)
     lobbyState.labyrinthOptions = JSON.parse(labyrinthOptions);
   if (errormessage) lobbyState.errormessage = errormessage;
@@ -46,8 +46,8 @@ function setLobbyState(
 function setLobbySessionStorage() {
   sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
   sessionStorage.setItem(
-    "selectedLabyrinth",
-    JSON.stringify(lobbyState.selectedLabyrinth)
+    "selectedLabyrinthName",
+    JSON.stringify(lobbyState.selectedLabyrinthName)
   );
   sessionStorage.setItem(
     "labyrinthOptions",
@@ -60,7 +60,7 @@ function setLobbySessionStorage() {
 function getLobbySessionStorage() {
   setLobbyState(
     sessionStorage.getItem("users"),
-    sessionStorage.getItem("selectedLabyrinth"),
+    sessionStorage.getItem("selectedLabyrinthName"),
     sessionStorage.getItem("labyrinthOptions"),
     sessionStorage.getItem("errormessage"),
     sessionStorage.getItem("selectedRole")
@@ -144,6 +144,7 @@ async function joinLobby(lobbyKey: string, username: string) {
       else throw new Error("Diese Lobby konnte nicht gefunden werden.");
     }
     router.push("/lobby/" + lobbyKey);
+    updateReadyStates(lobbyKey);
   });
 }
 
@@ -214,8 +215,10 @@ async function uploadJsonFiles(fileList: FileList): Promise<string[]> {
           if (!response.ok) {
             throw new Error(response.statusText);
           }
-          responseList.push("Upload von " + file.name + " war erfolgreich");
-          return response.json();
+          return response.text();
+        })
+        .then((jsonData) => {
+          responseList.push("Upload von " + jsonData + " war erfolgreich");
         })
         .catch((error) => {
           responseList.push("Upload von " + file.name + " ist fehlgeschlagen");
@@ -258,8 +261,34 @@ async function updateUsers(lobbyKey: string) {
           lobbyState.users.push(new User(username));
         }
       });
-      sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+    })
+    .catch((error) => {
+      console.error(error);
     });
+}
+
+async function updateReadyStates(lobbyKey: string) {
+  if (lobbyState.users.length > 1) {
+    return fetch("/api/lobby/users/ready/" + lobbyKey, {
+      method: "GET",
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error(response.statusText);
+        return response.json();
+      })
+      .then((jsonData) => {
+        jsonData.forEach((userThatIsReady: string) => {
+          const foundUser = lobbyState.users.find(
+            (user) => user.username == userThatIsReady
+          );
+          foundUser?.setReady(true);
+        });
+        sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 }
 
 /**
@@ -268,13 +297,12 @@ async function updateUsers(lobbyKey: string) {
  * @throws error if request was not successful
  */
 async function updateLabyrinths() {
-  fetch("/api/labyrinth/ids")
+  fetch("/api/labyrinth/names")
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((response) => {
-      console.log(response);
       lobbyState.labyrinthOptions = response;
       sessionStorage.setItem(
         "labyrinthOptions",
@@ -288,13 +316,13 @@ async function updateLabyrinths() {
  * @returns promise containing evenMessage with selectedLabyrinth
  * @throws error if request was not successful
  */
-async function updateLabyrinthPick(labId: number, lobbyKey: string) {
+async function updateLabyrinthPick(labyrinthName: string, lobbyKey: string) {
   const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
     Operation[Operation.LABYRINTH_PICK],
     lobbyKey,
     loginState.username,
-    labId.toString()
+    labyrinthName
   );
   fetch("/api/lobby/labyrinth-pick", {
     method: "POST",
@@ -311,28 +339,28 @@ async function updateLabyrinthPick(labId: number, lobbyKey: string) {
 
 /**
  * sets the new Labyrinth in the DropdownMenuComponent
- * @param selectedLabyrinth : id of the new selected Labyrinth
+ * @param blueprintLabName name of the new selected Labyrinth
  */
-function setLabyrinthSelection(selectedLabyrinth: number) {
-  lobbyState.selectedLabyrinth = selectedLabyrinth;
+function setLabyrinthSelection(blueprintLabName: string) {
+  lobbyState.selectedLabyrinthName = blueprintLabName;
   sessionStorage.setItem(
-    "selectedLabyrinth",
-    JSON.stringify(selectedLabyrinth)
+    "selectedLabyrinthName",
+    JSON.stringify(blueprintLabName)
   );
 }
 
 /**
  * sends a List of two Arguments to the BE, so there can be checked, whether every Player is ready or not
  * (and reacts to a wrong respond after receiving it)
- * @param username: name of the user in the backend, which shall be taken out of the lobby
- * @param labId : id of the blueprint labyrinth, used for the Game Progression
+ * @param username name of the user in the backend, which shall be taken out of the lobby
+ * @param labName name of the blueprint labyrinth, used for the Game Progression
  */
-function readyCheck(username: string, labId: number) {
-  if (!lobbyState.selectedLabyrinth || !lobbyState.selectedRole) return;
+function readyCheck(username: string, labName: string) {
+  if (!lobbyState.selectedLabyrinthName || !lobbyState.selectedRole) return;
   const { gameState } = useGameStore();
   const args: string[] = [];
   args.push(username);
-  args.push(String(labId));
+  args.push(labName);
 
   fetch(`/api/lobby/ready/${gameState.lobbyKey}`, {
     method: "POST",
@@ -385,6 +413,7 @@ function setUserFinishedState(username: string, finishedState: boolean) {
 function setupGame() {
   const { updateGameData, gameState, setPlayerData, updatePlayerData } =
     useGameStore();
+  gameState.loading = true;
   updateUsers(gameState.lobbyKey)
     .then(() => {
       lobbyState.users.forEach((user) => {
@@ -407,6 +436,7 @@ function setupGame() {
           console.log("StartTileId is: " + startTile);
         });
         router.push(`/game/${gameState.lobbyKey}`);
+        gameState.loading = false;
       });
     });
 }
@@ -423,6 +453,7 @@ export function useLobbyService() {
     uploadJsonFiles,
     updateUsers,
     updateLabyrinths,
+    updateReadyStates,
     setLabyrinthSelection,
     updateLabyrinthPick,
     readyCheck,
