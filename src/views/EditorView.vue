@@ -93,7 +93,7 @@ export default defineComponent({
       save,
       reset,
     } = useEditorService();
-    const { setFeedback, setFeedbackError, resetFeedback } = useAppService();
+    const { setFeedback, setFeedbackError } = useAppService();
 
     const modes = new Array<Mode>(
       Mode.CREATE,
