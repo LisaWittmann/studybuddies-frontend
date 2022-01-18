@@ -2,6 +2,7 @@ import { Client } from "@stomp/stompjs";
 import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
+import router from "@/router";
 
 const { gameState, updatePlayerData, setError } = useGameStore();
 const {
@@ -11,6 +12,7 @@ const {
   updateLabyrinths,
   getRoleOptions,
   setUserReadyState,
+  setUserFinishedState,
   lobbyState,
 } = useLobbyService();
 
@@ -91,6 +93,18 @@ stompClient.onConnect = () => {
                 (user) => user.username == eventMessage.username
               )
             );
+          }
+          break;
+        case Operation.CHECK_END:
+          lobbyState.users.forEach((user) => {
+            if(user.username == eventMessage.data) {
+              setUserFinishedState(user.username, true);
+            }
+          })
+
+          // If both users are finished, redirect to endscreen
+          if(lobbyState.users[0].finished && lobbyState.users[1].finished) {
+            router.push("/end");
           }
           break;
         case Operation.LABYRINTH_PICK:
