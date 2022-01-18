@@ -23,7 +23,7 @@
         :key="index"
       >
         <div>
-          <div @click="selectItem(item)">{{ item }}</div>
+          <div @click="selectItem(item)" class="option__name">{{ item }}</div>
           <button class="button__download" @click="download(item)">
             <i class="fas fa-download"></i>
           </button>
@@ -186,6 +186,11 @@ export default defineComponent({
 
       &:hover {
         color: $color-beige;
+      }
+
+      .option__name {
+        flex-basis: 90%;
+        @include text-break();
       }
 
       .button__download {
