@@ -214,6 +214,9 @@ async function addToInventory(
     });
 }
 
+/**
+ * deletes item from inventory after pc was activated
+ */
 async function deleteFromInventory() {
   const { gameState } = useGameStore();
   const { loginState } = useLoginStore();
@@ -242,6 +245,15 @@ async function deleteFromInventory() {
     });
 }
 
+
+/**
+ * 
+ * Adds items from NPC to inventory of player
+ * 
+ * @param lobbyKey 
+ * @param itemName 
+ * @param username 
+ */
 async function givePlayerItem(
   lobbyKey: string,
   itemName: string,
@@ -291,6 +303,13 @@ async function removeItemFromTile(lobbyKey: string, itemId: string) {
     });
 }
 
+/**
+ * 
+ * Moves item from mainplayer to partner
+ * 
+ * @param username 
+ * @param itemId 
+ */
 async function tradeItem(username: string, itemId: string) {
   return fetch(
     "api/lobby/" +

@@ -35,22 +35,7 @@ export class MainPlayer implements Player {
   position!: number;
   role: Role | undefined;
   inventory: Item[];
-  /*dummydata for development
-    -> wait for Task #100 to be finished
-  */
-  /* inventory: Item[] = [
-    new Item(1, "usb", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(2, "mouse", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(3, "keyboard", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(4, "vr-glasses", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(5, "cap", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(6, "tablet", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(7, "touchpen", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(8, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(9, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(10, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-    new Item(11, "mug", "EAST", ["NORTH", "WEST"], new Vector3(0, 0, 0)),
-  ]; */
+
 
   constructor(username: string, role: Role | undefined) {
     this.username = username;
