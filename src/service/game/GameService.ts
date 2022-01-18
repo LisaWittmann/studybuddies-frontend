@@ -131,7 +131,8 @@ async function checkAccess(modelName: string) {
       return response.json();
     })
     .then((jsonData) => {
-      gameEventMessage.message = jsonData.accesstext;
+      console.log(jsonData);
+      gameEventMessage.message = jsonData.accessText;
       if (jsonData.firstAccess) {
         gameEventMessage.state = "success";
         deleteFromInventory();
