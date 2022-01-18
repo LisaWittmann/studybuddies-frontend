@@ -1,13 +1,15 @@
-import { computed, reactive } from "vue";
+import { reactive } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "@/service/login/LoginStore";
+import { useAppService } from "@/service/AppService";
+
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
-import { Item } from "../labyrinth/Item";
+import { Item } from "@/service/labyrinth/Item";
 
-const { updateInventory } = useGameStore();
-const { loginState } = useLoginStore();
+const { gameState, updateInventory, endGame } = useGameStore();
+const { setFeedback } = useAppService();
 
 const gameEventMessage = reactive({
   message: "",
@@ -20,8 +22,6 @@ const conversation = reactive({
   message: new Message("", "", undefined, []),
   visible: false,
 });
-
-const { gameState } = useGameStore();
 
 const toggleEventMessage = () =>
   (gameEventMessage.visible = !gameEventMessage.visible);
@@ -179,6 +179,16 @@ async function clickItem(modelName: string, itemId: string) {
     .catch((error) => {
       console.error(error);
     });
+}
+
+function playerLeftGame(username: string) {
+  endGame();
+  setFeedback(
+    `Spieler ${username} hat das Spiel verlassen.`,
+    undefined,
+    "/find",
+    "Zurück zur Lobbyfindung"
+  );
 }
 
 /**
@@ -346,6 +356,7 @@ export function useGameService() {
     startConversation,
     getConversationMessage,
     conversation,
+    playerLeftGame,
     tradeItem,
   };
 }

@@ -1,11 +1,11 @@
 import { Client } from "@stomp/stompjs";
 import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLobbyService } from "@/service/LobbyService";
-import { Item } from "../labyrinth/Item";
-import { useLoginStore } from "@/service/login/LoginStore";
-import { MainPlayer } from "./Player";
+import { useGameService } from "@/service/game/GameService";
+import { useLobbyService } from "@/service/lobby/LobbyService";
+import { Item } from "@/service/labyrinth/Item";
 
+const { playerLeftGame } = useGameService();
 const {
   gameState,
   updatePlayerData,
@@ -23,7 +23,6 @@ const {
   setUserReadyState,
   lobbyState,
 } = useLobbyService();
-const { loginState } = useLoginStore();
 
 let wsURL = "ws://localhost:9090/messagebroker";
 const DEST = "/event/respond";
@@ -69,15 +68,11 @@ stompClient.onConnect = () => {
       switch (operation) {
         case Operation.MOVEMENT:
           destTileID = Number.parseInt(eventMessage.data);
-
           if (destTileID) {
             updatePlayerData(eventMessage.username, destTileID);
-            // -> now the watcher can update the 3D Room
-            // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
             setError("There is no tile reference for this definition of data");
           }
-
           break;
         case Operation.CLICK:
           break;
@@ -137,6 +132,7 @@ stompClient.onConnect = () => {
               break;
             case Update.USERS:
               updateUsers(eventMessage.lobbyKey);
+              if (gameState.started) playerLeftGame(eventMessage.username);
               break;
             case Update.ROLE:
               console.log("RoleOptions holen");
