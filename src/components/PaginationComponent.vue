@@ -100,11 +100,9 @@ export default defineComponent({
   &__item-wrapper {
     display: inline-flex;
     overflow-x: scroll;
-    scroll-behavior: smooth;
-    width: 70%;
+    @include scroll-container();
+    width: 80%;
     max-width: 800px;
-    scrollbar-width: none;
-    margin: 0 50px;
     padding-inline-start: 0;
 
     > * {
@@ -131,6 +129,12 @@ export default defineComponent({
 
       &:first-of-type::before {
         content: "";
+        margin-left: 50px;
+      }
+
+      &:last-of-type::after {
+        content: "";
+        margin-right: 50px;
       }
     }
   }

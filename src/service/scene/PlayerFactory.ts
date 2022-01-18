@@ -1,10 +1,17 @@
-import { Scene, Vector3 } from "three";
+import { Object3D, Scene, Vector3 } from "three";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
+
 import { Player, MainPlayer, PartnerPlayer } from "@/service/game/Player";
-import { direction, factors } from "./helper/SceneConstants";
-import { Labyrinth } from "../labyrinth/Labyrinth";
-import { Orientation } from "../labyrinth/Tile";
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
+import { Orientation } from "@/service/labyrinth/Tile";
+
+import {
+  direction,
+  directionMap,
+  factors,
+  movementRotations,
+} from "@/service/scene/helper/SceneConstants";
 
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer, checkIntersect } = useObjectFactory();
@@ -12,6 +19,11 @@ const { createPlayer, checkIntersect } = useObjectFactory();
 let playerPosition: number;
 let partnerPosition: number;
 
+/**
+ * check if stored data of players needs to be updated
+ * @param player playerObject that might contain new data
+ * @returns true if stored data is outdated
+ */
 function requiresUpdate(player: Player) {
   if (player instanceof MainPlayer) {
     return player.getPosition() != playerPosition;
@@ -56,12 +68,33 @@ function updatePartnerPlayer(
     if (!partnerPosition) {
       createPlayer(player, position, scene);
     } else if (playerObject) {
+      rotatePlayer(playerObject, position);
       playerObject.position.copy(position);
       playerObject.position.copy(
-        checkIntersect(playerObject, player, position, scene)
+        checkIntersect(playerObject, player.getPosition(), position, scene)
       );
     }
     partnerPosition = player.getPosition();
+  }
+}
+
+/**
+ * rotate playerObject to direction it will be translated to
+ * @param object object of partnerPlayer
+ * @param position position of tile that player should be placed in
+ */
+function rotatePlayer(object: Object3D, position: Vector3) {
+  const moveDirection = new Vector3()
+    .copy(object.position)
+    .addScaledVector(position, -1)
+    .normalize();
+
+  for (const [orientation, direction] of directionMap) {
+    if (direction.equals(moveDirection)) {
+      const rotationAngle = movementRotations.get(orientation) as number;
+      object.rotation.y = rotationAngle;
+      return;
+    }
   }
 }
 

@@ -387,6 +387,29 @@ function setupGame() {
     });
 }
 
+/**
+ * Request to Backend to get a JSON represented Labyrinth by given name and
+ * download it to Client's local storage as JSON-File.
+ */
+async function download(labyrinthName: string) {
+  fetch("/api/labyrinth/export?labyrinthName=" + labyrinthName, {
+    method: "GET",
+    headers: {
+      "Content-Type": "text/plain",
+    },
+  })
+    .then((response) => response.blob())
+    .then((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = labyrinthName + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+}
+
 export function useLobbyService() {
   return {
     updateRole,
@@ -405,6 +428,7 @@ export function useLobbyService() {
     readyCheck,
     setupGame,
     setUserReadyState,
+    download,
     lobbyState: readonly(lobbyState),
   };
 }

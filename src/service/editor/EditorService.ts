@@ -5,6 +5,7 @@ import { Item } from "@/service/labyrinth/Item";
 import { Mode } from "@/service/editor/EditorMode";
 import { Role } from "@/service/game/Player";
 import { ItemModel, TileModel, Vector2 } from "@/service/editor/TileModel";
+import { editorConfig } from "@/service/editor/EditorConstants";
 
 const editorState = reactive({
   rows: 15,
@@ -20,11 +21,6 @@ const editorState = reactive({
 updateTileModels();
 
 let counter = 1;
-const maxRows = 20;
-const maxColumns = 40;
-const minTiles = 10;
-const maxItems = 3;
-const startPositions = 2;
 
 /**
  * list of all selected tileModels of new labyrinth
@@ -57,23 +53,28 @@ function reset(): void {
  * @param columns: number of columns of labyrinth editor (size of y-axis)
  */
 function setDimension(rows: number, columns: number): void {
-  if (editorState.rows < maxRows) editorState.rows = rows;
-  if (editorState.columns < maxColumns) editorState.columns = columns;
+  if (editorState.rows < editorConfig.maxRows) editorState.rows = rows;
+  if (editorState.columns < editorConfig.maxColumns)
+    editorState.columns = columns;
   updateTileModels();
 }
 
 async function setItemOptions() {
-  await fetch("/api/labyrinth/placeable-bodies")
+  await fetch("/api/body/placeable-bodies")
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((jsonData) => {
-      for (const name of jsonData) {
+      console.log(jsonData);
+      for (const name in jsonData) {
         if (!editorState.itemOptions.some((i) => i.modelName == name)) {
-          editorState.itemOptions.push(new ItemModel(name));
+          editorState.itemOptions.push(
+            new ItemModel(name, (<any>Role)[jsonData[name]])
+          );
         }
       }
+      console.log(editorState.itemOptions);
     });
 }
 
@@ -136,7 +137,7 @@ function getTileModel(x: number, y: number): TileModel | undefined {
  * mark tile as selected and set its relation key that it will be added to labyrinth
  * @param model tile model that was selected and therefore added to labyrinth
  */
-function selectTile(model: TileModel): void {
+function addTile(model: TileModel): void {
   if (!model.isSelectable) return;
   model.isSelectable = false;
   model.relationKey = ++counter;
@@ -144,6 +145,19 @@ function selectTile(model: TileModel): void {
     .getNeighborsAsList()
     .find((tileModel) => tileModel.relationKey == editorState.endPosition);
   if (endTile) removeEndTile(endTile);
+  setSelectableTiles();
+}
+
+function removeTile(model: TileModel): void {
+  if (!model.relationKey || model.getNeighborsAsList().length > 1) return;
+  model.restrictions = [];
+  removeStartTile(model);
+  removeEndTile(model);
+  for (const itemModel of model.objectsInRoom) {
+    removeItem(model, itemModel);
+  }
+  model.isSelectable = true;
+  model.relationKey = undefined;
   setSelectableTiles();
 }
 
@@ -159,7 +173,7 @@ function addStartTile(model: TileModel): void {
     model.restrictions.length > 0
   )
     return;
-  if (editorState.startPositions.length < startPositions) {
+  if (editorState.startPositions.length < editorConfig.maxStartPositions) {
     editorState.startPositions.push(model.relationKey);
     model.isStart = true;
   }
@@ -243,12 +257,24 @@ function setName(labyrinthName: string): void {
  * @param item: item model to add
  */
 function addItem(model: TileModel, item: ItemModel): void {
-  if (!model.relationKey || model.objectsInRoom.length >= maxItems || !item)
+  if (
+    !item ||
+    !model.relationKey ||
+    model.isEnd ||
+    model.objectsInRoom.length >= editorConfig.maxItems ||
+    !isAccessable(item, model)
+  )
     return;
   model.objectsInRoom.push(item);
   editorState.itemOptions = editorState.itemOptions.filter(
     (i) => i.modelName != item.modelName
   );
+}
+
+function isAccessable(item: ItemModel, tile: TileModel) {
+  if (item.blockedRole == undefined) return true;
+  if (tile.restrictions.length == 0) return true;
+  else return tile.restrictions.includes(item.blockedRole);
 }
 
 /**
@@ -272,10 +298,12 @@ function removeItem(model: TileModel, item: ItemModel): void {
  * @returns editor mode that contains errors or undefined
  */
 function hasErrors(): Mode | undefined {
-  if (selectedTiles.value.length < minTiles) {
+  if (selectedTiles.value.length < editorConfig.minTiles) {
     editorState.errorMessage = "Labyrinth ist zu klein";
     return Mode.CREATE;
-  } else if (editorState.startPositions.length != startPositions) {
+  } else if (
+    editorState.startPositions.length < editorConfig.minStartPositions
+  ) {
     editorState.errorMessage = "Zu wenig Startfelder definiert";
     return Mode.START_TILES;
   } else if (!editorState.endPosition) {
@@ -299,6 +327,13 @@ function hasErrors(): Mode | undefined {
  * @returns data of editorState as labyrinth
  */
 function convert(): Labyrinth {
+  for (
+    let i = editorState.startPositions.length;
+    i < editorConfig.maxStartPositions;
+    i++
+  ) {
+    editorState.startPositions.push(editorState.startPositions[0]);
+  }
   const labyrinth = new Labyrinth(
     editorState.labyrinthName,
     editorState.endPosition,
@@ -389,11 +424,12 @@ export function useEditorService() {
     setDimension,
     setItemOptions,
     getTileModel,
-    selectTile,
-    addStartTile,
-    removeStartTile,
+    addTile,
+    removeTile,
     addEndTile,
     removeEndTile,
+    addStartTile,
+    removeStartTile,
     addRestriction,
     removeRestriction,
     addItem,
