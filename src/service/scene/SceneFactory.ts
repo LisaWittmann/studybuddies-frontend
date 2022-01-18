@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Orientation } from "@/service/labyrinth/Tile";
 import { Vector3 } from "three";
-import { settings, direction } from "@/service/scene/helper/SceneConstants";
 import { SetupContext } from "vue";
+import { Orientation } from "@/service/labyrinth/Tile";
+import { settings, directionMap } from "@/service/scene/helper/SceneConstants";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -47,6 +47,7 @@ function createScene(debug = false): THREE.Scene {
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.enableZoom = false;
   orbitControls.enablePan = true;
+  orbitControls.target = new THREE.Vector3(0, settings.cameraHeight, 0);
   orbitControls.update();
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
@@ -103,20 +104,8 @@ function updateCameraPosition(
 
 function updateCameraTarget(orientation: Orientation) {
   const target = new Vector3().copy(camera.position);
-  switch (orientation) {
-    case Orientation.NORTH:
-      orbitControls.target = target.add(direction.north);
-      break;
-    case Orientation.EAST:
-      orbitControls.target = target.add(direction.east);
-      break;
-    case Orientation.SOUTH:
-      orbitControls.target = target.add(direction.south);
-      break;
-    case Orientation.WEST:
-      orbitControls.target = target.add(direction.west);
-      break;
-  }
+  const direction = directionMap.get(orientation);
+  if (direction) target.add(direction);
 }
 
 /**
