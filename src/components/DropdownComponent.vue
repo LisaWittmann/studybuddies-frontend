@@ -22,10 +22,12 @@
         v-for="(item, index) of items"
         :key="index"
       >
-        <div @click="selectItem(item)">{{ item }}</div>
-        <button class="button__download" @click="download(item)">
-          <i class="fas fa-download"></i>
-        </button>
+        <div>
+          <div @click="selectItem(item)">{{ item }}</div>
+          <button class="button__download" @click="download(item)">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
       </div>
       <div
         class="dropdown__menu-option dropdown__menu-option--disabled"
@@ -145,7 +147,7 @@ export default defineComponent({
     top: 100%;
 
     &.button {
-      padding: $spacing-xs 0;
+      padding: 0;
       display: flex;
       justify-content: center;
     }
@@ -164,7 +166,6 @@ export default defineComponent({
     }
 
     &-option {
-      @include flex-center(space-between, row);
       width: 100%;
 
       &--disabled {
@@ -172,9 +173,11 @@ export default defineComponent({
       }
 
       > * {
+        cursor: pointer;
         margin: 0 $spacing-s;
         padding: $spacing-s 0;
         @include border-bottom();
+        @include flex-center(space-between, row);
       }
 
       &:last-child > * {
@@ -187,10 +190,14 @@ export default defineComponent({
 
       .button__download {
         border: none;
-        padding: none;
         box-shadow: none;
+        padding: 0;
         flex-basis: 10%;
-        @include color-primary();
+        justify-content: flex-end;
+
+        &:hover i {
+          color: $color-beige;
+        }
       }
     }
   }
