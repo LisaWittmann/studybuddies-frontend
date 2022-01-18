@@ -19,6 +19,7 @@ const gameState = reactive({
   loading: false,
   errormessage: "",
   score: 0,
+  playersInSameTile: false,
 });
 
 function setGameState(
@@ -28,7 +29,8 @@ function setGameState(
   mainPlayer: string | null,
   partnerPlayer: string | null,
   errormessage: string | null,
-  score: string | null
+  score: string | null,
+  playersInSameTile: string | null
 ) {
   if (lobbyKey) gameState.lobbyKey = lobbyKey;
   if (labyrinthName) gameState.labyrinthName = JSON.parse(labyrinthName);
@@ -40,7 +42,10 @@ function setGameState(
     Object.assign(gameState.partnerPlayer, JSON.parse(partnerPlayer));
   }
   if (errormessage) gameState.errormessage = errormessage;
+
   if (score) gameState.score = JSON.parse(score) as number;
+  if (playersInSameTile)
+    gameState.playersInSameTile = JSON.parse(playersInSameTile) as boolean;
 }
 
 function setGameSessionStorage() {
@@ -60,6 +65,10 @@ function setGameSessionStorage() {
     JSON.stringify(gameState.errormessage)
   );
   sessionStorage.setItem("score", JSON.stringify(gameState.score));
+  sessionStorage.setItem(
+    "playersInSameTile",
+    JSON.stringify(gameState.playersInSameTile)
+  );
 }
 
 function getGameSessionStorage() {
@@ -70,7 +79,8 @@ function getGameSessionStorage() {
     sessionStorage.getItem("mainPlayer"),
     sessionStorage.getItem("partnerPlayer"),
     sessionStorage.getItem("errormessage"),
-    sessionStorage.getItem("score")
+    sessionStorage.getItem("score"),
+    sessionStorage.getItem("playersInSameTile")
   );
 }
 
@@ -98,12 +108,24 @@ function updatePlayerData(username: string, newPosition: number) {
       JSON.stringify(gameState.partnerPlayer)
     );
   }
+  checkPlayerProximity();
 }
 
+/**
+ * Updates complete inventory after delete or collect
+ * @param inventory 
+ */
 async function updateInventory(inventory: Array<Item>) {
   console.log(inventory);
   gameState.mainPlayer.setInventory(inventory);
-  console.log("INVENTORY", gameState.mainPlayer.getInventory());
+}
+
+/**
+ * Adds a single traded item to inventory after eventmessage was sent
+ * @param item
+ */
+async function addItemToInventory(item: Item) {
+  gameState.mainPlayer.addItem(item);
 }
 
 /**
@@ -121,6 +143,17 @@ async function setPlayerData(username: string, startTileId: number) {
   }
 }
 
+/**
+ * Provides a way to check if both players are in the same tile
+ */
+function checkPlayerProximity() {
+  if (gameState.mainPlayer.position == gameState.partnerPlayer.position) {
+    gameState.playersInSameTile = true;
+  } else {
+    gameState.playersInSameTile = false;
+  }
+}
+
 async function setLobbyKey(lobbyKey: string) {
   gameState.lobbyKey = lobbyKey;
   sessionStorage.setItem("lobbyKey", lobbyKey);
@@ -129,6 +162,11 @@ async function setLobbyKey(lobbyKey: string) {
 async function setError(error: string) {
   gameState.errormessage = error;
   sessionStorage.setItem("errormessage", error);
+}
+
+async function setScore(score: string) {
+  gameState.score = Number(score);
+  sessionStorage.setItem("score", score);
 }
 
 function getPlayer(username: string) {
@@ -146,9 +184,11 @@ export function useGameStore() {
     updateGameData,
     updatePlayerData,
     updateInventory,
+    addItemToInventory,
     setPlayerData,
     setLobbyKey,
     setError,
+    setScore,
     getPlayer,
     setGameSessionStorage,
     getGameSessionStorage,

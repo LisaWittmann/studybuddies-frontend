@@ -139,8 +139,8 @@ function getIntersections(context: SetupContext, x: number, y: number) {
   rayCaster.setFromCamera({ x: x, y: y }, camera);
   const intersects = rayCaster.intersectObjects(scene.children);
 
-  for (const intersection of intersects) {
-    const object = intersection.object;
+  if (intersects.length > 0) {
+    const object = intersects[0].object;
     if (object.parent?.userData.id != null) {
       context.emit(
         "click-object",

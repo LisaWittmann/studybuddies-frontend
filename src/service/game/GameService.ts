@@ -7,6 +7,7 @@ import { Orientation } from "@/service/labyrinth/Tile";
 import { Item } from "../labyrinth/Item";
 
 const { updateInventory } = useGameStore();
+const { loginState } = useLoginStore();
 
 const gameEventMessage = reactive({
   message: "",
@@ -131,7 +132,10 @@ async function checkAccess(modelName: string) {
     })
     .then((jsonData) => {
       gameEventMessage.message = jsonData.accesstext;
-      if (jsonData.access) {
+      if (jsonData.firstAccess) {
+        gameEventMessage.state = "success";
+        deleteFromInventory();
+      } else if (jsonData.access) {
         gameEventMessage.state = "success";
       } else {
         gameEventMessage.state = "warning";
@@ -155,6 +159,7 @@ async function clickItem(modelName: string, itemId: string) {
     })
     .then((jsonData) => {
       const operation = (<any>Operation)[jsonData];
+      console.log("click");
       switch (operation) {
         case Operation.ACCESS:
           checkAccess(modelName);
@@ -200,10 +205,37 @@ async function addToInventory(
       return response.json();
     })
     .then((jsonData) => {
+      const inventory = jsonData;
+      updateInventory(inventory);
+      removeItemFromTile(lobbyKey, itemId);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+async function deleteFromInventory() {
+  const { gameState } = useGameStore();
+  const { loginState } = useLoginStore();
+  const eventMessage = new EventMessage(
+    Operation[Operation.DELETE],
+    gameState.lobbyKey,
+    loginState.username,
+    ""
+  );
+  fetch("api/lobby/current-inventory", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(eventMessage),
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
       let inventory = new Array<Item>();
       inventory = jsonData;
       updateInventory(inventory);
-      removeItemFromTile(lobbyKey, itemId);
     })
     .catch((error) => {
       console.error(error);
@@ -226,19 +258,7 @@ async function givePlayerItem(
       method: "POST",
       headers: { "Content-Type": "application/json" },
     }
-  )
-    .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
-      return response.json();
-    })
-    .then((jsonData) => {
-      let inventory = new Array<Item>();
-      inventory = jsonData;
-      updateInventory(inventory);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  );
 }
 
 /**
@@ -259,6 +279,33 @@ async function removeItemFromTile(lobbyKey: string, itemId: string) {
     });
 }
 
+async function tradeItem(username: string, itemId: string) {
+  return fetch(
+    "api/lobby/" +
+      gameState.lobbyKey +
+      "/username/" +
+      username +
+      "/trade/item/" +
+      itemId,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      let inventory = new Array<Item>();
+      inventory = jsonData;
+      updateInventory(inventory);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
 export function useGameService() {
   return {
     gameEventMessage,
@@ -268,5 +315,6 @@ export function useGameService() {
     startConversation,
     getConversationMessage,
     conversation,
+    tradeItem,
   };
 }
