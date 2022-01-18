@@ -13,7 +13,6 @@ import {
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
-import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { useGameStore } from "@/service/game/GameStore";
 
 export default defineComponent({
@@ -66,6 +65,7 @@ export default defineComponent({
 
     onBeforeUnmount(() => {
       removeEventListener("resize", updateScene);
+      scene.clear();
     });
 
     watch(
