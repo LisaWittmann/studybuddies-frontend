@@ -87,6 +87,7 @@ export default defineComponent({
       updateRole,
       getRoles,
       getRoleOptions,
+      updateReadyStates,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
@@ -107,7 +108,7 @@ export default defineComponent({
     const loading = computed(() => gameState.loading);
 
     const copy = (text: string) => navigator.clipboard.writeText(text);
-    
+
     function selectLabyrinth(labyrinthName: string) {
       setLabyrinthSelection(labyrinthName);
       updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
@@ -148,7 +149,9 @@ export default defineComponent({
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey).catch(() => router.push("/find"));
+      updateUsers(gameState.lobbyKey)
+        .then(() => updateReadyStates(gameState.lobbyKey))
+        .catch(() => router.push("/find"));
       updateLabyrinths();
       getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
       getRoleOptions(gameState.lobbyKey);

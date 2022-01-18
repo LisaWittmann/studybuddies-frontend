@@ -170,21 +170,7 @@ function calculatePartnerPositon(
     });
   }
 
-  console.log(
-    "POSITION AFTER IF & SWITCH ",
-    directionVector.x,
-    directionVector.y,
-    directionVector.z
-  );
-
   calcPartnerPosition.copy(tilePosition).add(directionVector);
-
-  console.log(
-    "calcPartnerPosition ",
-    calcPartnerPosition.x,
-    calcPartnerPosition.y,
-    calcPartnerPosition.z
-  );
 
   return calcPartnerPosition;
 }
