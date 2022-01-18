@@ -344,6 +344,18 @@ function setUserReadyState(username: string, readyState: boolean) {
 }
 
 /**
+ * Provides functionality to set a users state to finished, if he/she completed the labyrinth
+ * @param username name of the user who finished the labyrinth
+ * @param finishedState the state as boolean
+ */
+function setUserFinishedState(username: string, finishedState: boolean) {
+  lobbyState.users
+    .find((user) => user.username == username)
+    ?.setFinished(finishedState);
+  sessionStorage.setItem("users", JSON.stringify(lobbyState.users));
+}
+
+/**
  * Initial game setup when all users are ready:
  * 1. Gathering the labyrinth information from the BE
  * 2. Updating the Users one last time, so they can get transferred to the gameState properly
@@ -387,6 +399,29 @@ function setupGame() {
     });
 }
 
+/**
+ * Request to Backend to get a JSON represented Labyrinth by given name and
+ * download it to Client's local storage as JSON-File.
+ */
+async function download(labyrinthName: string) {
+  fetch("/api/labyrinth/export?labyrinthName=" + labyrinthName, {
+    method: "GET",
+    headers: {
+      "Content-Type": "text/plain",
+    },
+  })
+    .then((response) => response.blob())
+    .then((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = labyrinthName + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+}
+
 export function useLobbyService() {
   return {
     updateRole,
@@ -405,6 +440,8 @@ export function useLobbyService() {
     readyCheck,
     setupGame,
     setUserReadyState,
+    setUserFinishedState,
+    download,
     lobbyState: readonly(lobbyState),
   };
 }

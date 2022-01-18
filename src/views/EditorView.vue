@@ -12,6 +12,9 @@
         >
           <i class="fas fa-search-minus"></i>
         </button>
+        <button class="button__icon" @click="openInstruction">
+          <i class="fas fa-question-circle"></i>
+        </button>
       </div>
     </transition>
     <transition name="delay-fade" appear>
@@ -52,6 +55,11 @@
       </div>
     </transition>
   </div>
+  <OverlayInstructionComponent
+    :opened="showInstruction"
+    :text="instruction"
+    @close="closeInstruction"
+  />
 </template>
 
 <script lang="ts">
@@ -61,7 +69,9 @@ import { useEditorService } from "@/service/editor/EditorService";
 import { ItemModel } from "@/service/editor/TileModel";
 import { Mode } from "@/service/editor/EditorMode";
 import { Role } from "@/service/game/Player";
+import { instructions } from "@/service/editor/EditorConstants";
 
+import OverlayInstructionComponent from "@/components/overlays/OverlayInstructionComponent.vue";
 import EditorStageComponent from "@/components/editor/EditorStageComponent.vue";
 import EditorToolComponent from "@/components/editor/EditorToolComponent.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
@@ -72,6 +82,7 @@ export default defineComponent({
     EditorStageComponent,
     EditorToolComponent,
     PaginationComponent,
+    OverlayInstructionComponent,
   },
   setup() {
     const {
@@ -82,7 +93,7 @@ export default defineComponent({
       save,
       reset,
     } = useEditorService();
-    const { setFeedback, setFeedbackError, resetFeedback } = useAppService();
+    const { setFeedback, setFeedbackError } = useAppService();
 
     const modes = new Array<Mode>(
       Mode.CREATE,
@@ -122,6 +133,10 @@ export default defineComponent({
     const currentItem = ref(new ItemModel(""));
     const changeItem = (item: ItemModel) => (currentItem.value = item);
 
+    const showInstruction = ref(false);
+    const instruction = computed(() => instructions.get(currentMode.value));
+    const openInstruction = () => (showInstruction.value = true);
+    const closeInstruction = () => (showInstruction.value = false);
     const errorMessage = computed(() => editorState.errorMessage);
 
     function onComplete() {
@@ -168,6 +183,10 @@ export default defineComponent({
       modes,
       currentMode,
       changeMode,
+      instruction,
+      showInstruction,
+      openInstruction,
+      closeInstruction,
       restrictionMode,
       itemsMode,
       zoomIn,

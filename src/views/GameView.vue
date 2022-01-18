@@ -21,6 +21,7 @@
     :opened="conversation.visible"
     :message="conversation.message"
     @respond="getConversationMessage"
+    @close="endConversation"
   />
   <!--player inventory-->
   <InventoryComponent />
@@ -58,6 +59,7 @@ export default defineComponent({
       movePlayer,
       clickItem,
       conversation,
+      endConversation,
       getConversationMessage,
     } = useGameService();
     updateGameData();
@@ -90,6 +92,7 @@ export default defineComponent({
       labyrinth,
       score,
       conversation,
+      endConversation,
       getConversationMessage,
     };
   },

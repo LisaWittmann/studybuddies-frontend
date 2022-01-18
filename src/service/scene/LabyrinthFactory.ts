@@ -76,6 +76,7 @@ async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
  * updates player position of main or partner player
  * or initially creates partner player
  * @param player: main or partner player
+ * @param labyrinth current labyrinth that should be rendered for player
  * @param scene: scene that contains player
  */
 function updatePlayer(
@@ -131,12 +132,17 @@ async function placeTile(
  * @returns color of tile as hexadecimal number
  */
 function getTileColor(tile: Tile) {
+  //end tile color
+  const endTile = labyrinthData.tileMap.get(labyrinthData.endTileKey);
+  if (endTile != undefined && endTile.tileId == tile.tileId) return colors.pink;
+  //both players have access to this tile
+  else if (tile.getRestrictions().length == 0) return colors.darkBrown;
   //both players have no access to this tile
   if (tile.getRestrictions().length == 2) return colors.grey;
   //only the designer has access to this tile
-  if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
+  else if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
   //only the hacker has access to this tile
-  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
+  else if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
   //default - this case shouldn't appear
   return colors.darkBrown;
 }

@@ -37,15 +37,6 @@ export const direction = {
 };
 
 /**
- * vertical positions of objects in room
- */
-export const position = {
-  floor: readonly(vector(0, 0, 0)),
-  wall: readonly(vector(0, settings.tileSize / 2, 0)),
-  ceiling: readonly(vector(0, settings.tileSize, 0)),
-};
-
-/**
  * styleguide colors
  */
 export const colors = {
@@ -58,4 +49,5 @@ export const colors = {
   white: 0xf8f7f5,
   grey: 0xd7d9d5,
   black: 0x1a1e16,
+  pink: 0xd874d8,
 };

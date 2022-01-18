@@ -17,14 +17,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  reactive,
-  ref,
-  watch,
-} from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
 
 import { useGameStore } from "@/service/game/GameStore";
 

@@ -1,6 +1,6 @@
 import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
-import { Item, Position } from "@/service/labyrinth/Item";
+import { Item } from "@/service/labyrinth/Item";
 import { Role } from "@/service/game/Player";
 
 /**
@@ -43,7 +43,6 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
             new Item(
               item.id,
               item.modelName,
-              (<any>Position)[item.positionInRoom],
               orientations
             )
           );
