@@ -108,7 +108,7 @@ export default defineComponent({
     const loading = computed(() => gameState.loading);
 
     const copy = (text: string) => navigator.clipboard.writeText(text);
-    
+
     function selectLabyrinth(labyrinthName: string) {
       setLabyrinthSelection(labyrinthName);
       updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
@@ -119,14 +119,18 @@ export default defineComponent({
     }
 
     onbeforeunload = () => {
-      if (lobbyState.users.some((user) => user.username === loginState.username)) {
+      if (
+        lobbyState.users.some((user) => user.username === loginState.username)
+      ) {
         exitLobby(lobbyKey.value, loginState.username);
       }
       return "Leaving Lobby";
     };
 
     onunload = () => {
-      if (lobbyState.users.some((user) => user.username === loginState.username)) {
+      if (
+        lobbyState.users.some((user) => user.username === loginState.username)
+      ) {
         exitLobby(gameState.lobbyKey, loginState.username);
       }
     };
@@ -134,7 +138,10 @@ export default defineComponent({
     // exit lobby if any other page than game is opened
     onBeforeRouteLeave((to) => {
       const nextKey = to.params.key as string;
-      if (nextKey != gameState.lobbyKey && lobbyState.users.some((user) => user.username === loginState.username)) {
+      if (
+        nextKey != gameState.lobbyKey &&
+        lobbyState.users.some((user) => user.username === loginState.username)
+      ) {
         exitLobby(gameState.lobbyKey, loginState.username);
       }
     });
@@ -142,7 +149,9 @@ export default defineComponent({
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey).then(() => updateReadyStates(gameState.lobbyKey)).catch(() => router.push("/find"));
+      updateUsers(gameState.lobbyKey)
+        .then(() => updateReadyStates(gameState.lobbyKey))
+        .catch(() => router.push("/find"));
       updateLabyrinths();
       getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
       getRoleOptions(gameState.lobbyKey);
