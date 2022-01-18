@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, watch } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
 
 import { useGameStore } from "@/service/game/GameStore";
 
@@ -42,9 +42,7 @@ export default defineComponent({
      * creates image url
      */
     function getImgUrl(imgName: string) {
-      return require("../assets/img/inventory/" +
-        imgName.toLowerCase() +
-        ".svg");
+      return require("../assets/img/item/" + imgName.toLowerCase() + ".svg");
     }
     /**
      * shows opened or closed backpack svg (inventory button)
