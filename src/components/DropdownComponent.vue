@@ -21,9 +21,11 @@
         class="dropdown__menu-option"
         v-for="(item, index) of items"
         :key="index"
-        @click="selectItem(item)"
       >
-        <div>{{ item }}</div>
+        <div @click="selectItem(item)">{{ item }}</div>
+        <button class="button__download" @click="download(item)">
+          <i class="fas fa-download"></i>
+        </button>
       </div>
       <div
         class="dropdown__menu-option dropdown__menu-option--disabled"
@@ -50,9 +52,9 @@ export default defineComponent({
   },
   name: "DropdownComponent",
   setup(props, context) {
-    const { lobbyState } = useLobbyService();
+    const { download, lobbyState } = useLobbyService();
 
-    let isOpen = ref(false);
+    const isOpen = ref(false);
 
     // open or close the dropdown menu
     function openClose() {
@@ -66,7 +68,12 @@ export default defineComponent({
       isOpen.value = false;
     }
 
-    return { isOpen, openClose, selectItem, props };
+    return {
+      isOpen,
+      openClose,
+      selectItem,
+      download,
+    };
   },
 });
 </script>
@@ -157,6 +164,7 @@ export default defineComponent({
     }
 
     &-option {
+      @include flex-center(space-between, row);
       width: 100%;
 
       &--disabled {
@@ -175,6 +183,14 @@ export default defineComponent({
 
       &:hover {
         color: $color-beige;
+      }
+
+      .button__download {
+        border: none;
+        padding: none;
+        box-shadow: none;
+        flex-basis: 10%;
+        @include color-primary();
       }
     }
   }
