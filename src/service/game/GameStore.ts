@@ -36,6 +36,13 @@ function startGame() {
 
 function endGame() {
   gameState.started = false;
+  gameState.labyrinthName = "";
+  gameState.labyrinth = new Labyrinth("", 0, []);
+  gameState.mainPlayer = new MainPlayer("", 0);
+  gameState.partnerPlayer = new PartnerPlayer("", 0);
+  gameState.errormessage = "";
+  gameState.score = 0;
+  gameState.playersInSameTile = false;
 }
 
 /**
