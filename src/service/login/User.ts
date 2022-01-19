@@ -5,10 +5,12 @@ export class User {
   username: string;
   password!: string;
   isReady: boolean;
+  finished: boolean;
 
   constructor(username: string) {
     this.username = username;
     this.isReady = false;
+    this.finished = false;
   }
 
   setUsername(username: string): void {
@@ -21,5 +23,9 @@ export class User {
 
   setReady(isReady: boolean): void {
     this.isReady = isReady;
+  }
+
+  setFinished(isFinished: boolean): void {
+    this.finished = isFinished;
   }
 }

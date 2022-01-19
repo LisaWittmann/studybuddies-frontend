@@ -38,7 +38,6 @@ export class MainPlayer implements Player {
 
   constructor(username: string, role: Role | undefined) {
     this.username = username;
-    //this.position = playerPosition;
     this.role = role;
     this.inventory = new Array<Item>();
   }
@@ -71,8 +70,8 @@ export class MainPlayer implements Player {
     this.position = position;
   }
 
-  setInventory(invenory: Array<Item>) {
-    this.inventory = invenory;
+  setInventory(inventory: Array<Item>) {
+    this.inventory = inventory;
   }
 }
 

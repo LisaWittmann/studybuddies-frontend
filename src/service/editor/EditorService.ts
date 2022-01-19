@@ -361,12 +361,7 @@ function convert(): Labyrinth {
       itemModel.orientations = orientations;
       tileModel.removePlacement(orientations);
       tile.objectsInRoom.push(
-        new Item(
-          0,
-          itemModel.modelName,
-          itemModel.positionInRoom,
-          itemModel.orientations
-        )
+        new Item(0, itemModel.modelName, itemModel.orientations)
       );
     }
     labyrinth.tileMap.set(key, tile);
@@ -427,9 +422,7 @@ export function useEditorService() {
   return {
     editorState,
     updateTileModels,
-    setDimension,
     setItemOptions,
-    getTileModel,
     addTile,
     removeTile,
     addEndTile,

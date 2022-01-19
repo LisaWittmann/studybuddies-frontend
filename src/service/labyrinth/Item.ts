@@ -1,20 +1,7 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { radians } from "@/service/scene/helper/GeometryHelper";
-import {
-  directionMap,
-  position,
-  settings,
-} from "@/service/scene/helper/SceneConstants";
-
-/**
- * enumeration of vertical object position in tile
- */
-export enum Position {
-  WALL,
-  FLOOR,
-  CEILING,
-}
+import { directionMap, settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * interactive items in tile
@@ -25,19 +12,12 @@ export enum Position {
 export class Item {
   id: number;
   modelName: string;
-  positionInRoom: Position;
   orientations: Array<Orientation>;
   calcPosition: Vector3;
 
-  constructor(
-    id: number,
-    modelName: string,
-    positionInRoom: Position,
-    orientations: Array<Orientation>
-  ) {
+  constructor(id: number, modelName: string, orientations: Array<Orientation>) {
     this.id = id;
     this.modelName = modelName;
-    this.positionInRoom = positionInRoom;
     this.orientations = orientations;
     this.calcPosition = new Vector3();
   }
@@ -47,19 +27,6 @@ export class Item {
    * @returns height where item is positioned
    */
   calcPositionInRoom = (): Vector3 => {
-    //set vertical position
-    switch (this.positionInRoom) {
-      case Position.FLOOR:
-        this.calcPosition.copy(position.floor);
-        break;
-      case Position.WALL:
-        this.calcPosition.copy(position.wall);
-        break;
-      case Position.CEILING:
-        this.calcPosition.copy(position.ceiling);
-        break;
-    }
-
     //calculation for object positioning
     //set horizontal position
     this.orientations.forEach((orientation) => {
@@ -123,7 +90,6 @@ export class Item {
     return {
       id: this.id,
       modelName: this.modelName,
-      positionInRoom: Position[this.positionInRoom],
       orientations: this.orientations.map(
         (orientation) => Orientation[orientation]
       ),
