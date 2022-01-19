@@ -36,7 +36,6 @@ export class MainPlayer implements Player {
   role: Role | undefined;
   inventory: Item[];
 
-
   constructor(username: string, role: Role | undefined) {
     this.username = username;
     //this.position = playerPosition;

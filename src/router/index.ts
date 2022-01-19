@@ -47,7 +47,7 @@ const routes: Array<RouteRecordRaw> = [
     component: EditorView,
   },
   {
-    path: "/upload",
+    path: "/upload-labyrinth",
     name: "LabyrinthUploadView",
     component: LabyrinthUploadView,
   },

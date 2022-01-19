@@ -62,7 +62,7 @@ function updatePlayerData(username: string, newPosition: number) {
 
 /**
  * Updates complete inventory after delete or collect
- * @param inventory 
+ * @param inventory
  */
 async function updateInventory(inventory: Array<Item>) {
   console.log(inventory);
