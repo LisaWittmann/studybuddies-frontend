@@ -38,13 +38,7 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
           for (const orientation of item.orientations) {
             orientations.push((<any>Orientation)[orientation]);
           }
-          objectsInRoom.push(
-            new Item(
-              item.id,
-              item.modelName,
-              orientations
-            )
-          );
+          objectsInRoom.push(new Item(item.id, item.modelName, orientations));
         }
         const restrictions = new Array<Role>();
         for (const role of tile.restrictions) {

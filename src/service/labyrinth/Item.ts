@@ -1,10 +1,7 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { radians } from "@/service/scene/helper/GeometryHelper";
-import {
-  directionMap,
-  settings,
-} from "@/service/scene/helper/SceneConstants";
+import { directionMap, settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * interactive items in tile
@@ -18,11 +15,7 @@ export class Item {
   orientations: Array<Orientation>;
   calcPosition: Vector3;
 
-  constructor(
-    id: number,
-    modelName: string,
-    orientations: Array<Orientation>
-  ) {
+  constructor(id: number, modelName: string, orientations: Array<Orientation>) {
     this.id = id;
     this.modelName = modelName;
     this.orientations = orientations;
@@ -97,7 +90,9 @@ export class Item {
     return {
       id: this.id,
       modelName: this.modelName,
-      orientations: this.orientations.map((orientation) => Orientation[orientation]),
+      orientations: this.orientations.map(
+        (orientation) => Orientation[orientation]
+      ),
     };
   }
 }

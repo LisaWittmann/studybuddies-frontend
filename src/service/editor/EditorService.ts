@@ -355,11 +355,7 @@ function convert(): Labyrinth {
       itemModel.orientations = orientations;
       tileModel.removePlacement(orientations);
       tile.objectsInRoom.push(
-        new Item(
-          0,
-          itemModel.modelName,
-          itemModel.orientations
-        )
+        new Item(0, itemModel.modelName, itemModel.orientations)
       );
     }
     labyrinth.tileMap.set(key, tile);

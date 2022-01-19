@@ -41,9 +41,9 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import {onBeforeRouteLeave} from "vue-router";
-import {useGameStore} from "@/service/game/GameStore";
-import {useLobbyService} from "@/service/lobby/LobbyService";
+import { onBeforeRouteLeave } from "vue-router";
+import { useGameStore } from "@/service/game/GameStore";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 
 export default defineComponent({
   name: "EndView",

@@ -350,8 +350,8 @@ function setUserReadyState(username: string, readyState: boolean) {
  */
 function setUserFinishState(username: string, finished: boolean) {
   lobbyState.users
-      .find((user) => user.username == username)
-      ?.setFinished(finished);
+    .find((user) => user.username == username)
+    ?.setFinished(finished);
 }
 
 /**

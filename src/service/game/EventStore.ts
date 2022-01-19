@@ -1,7 +1,7 @@
 import { Client } from "@stomp/stompjs";
 import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
-  import router from "@/router";
+import router from "@/router";
 import { User } from "@/service/login/User";
 import { useGameService } from "@/service/game/GameService";
 import { useLobbyService } from "@/service/lobby/LobbyService";
@@ -124,18 +124,18 @@ stompClient.onConnect = () => {
             );
           }
           break;
-          case Operation.CHECK_END:
-            lobbyState.users.forEach((user) => {
-              if (user.username == eventMessage.data) {
-                setUserFinishState(user.username, true);
-              }
-            });
-
-            // If both users are finished, redirect to endscreen
-            if (lobbyState.users.every((user: User) => user.finished)) {
-              router.push(`/end/${gameState.lobbyKey}`);
+        case Operation.CHECK_END:
+          lobbyState.users.forEach((user) => {
+            if (user.username == eventMessage.data) {
+              setUserFinishState(user.username, true);
             }
-            break;
+          });
+
+          // If both users are finished, redirect to endscreen
+          if (lobbyState.users.every((user: User) => user.finished)) {
+            router.push(`/end/${gameState.lobbyKey}`);
+          }
+          break;
         case Operation.LABYRINTH_PICK:
           setLabyrinthSelection(eventMessage.data);
           break;
@@ -154,12 +154,16 @@ stompClient.onConnect = () => {
               getRoleOptions(eventMessage.lobbyKey);
               break;
             default:
-              console.info("No List was updated with Data: " + eventMessage.data);
+              console.info(
+                "No List was updated with Data: " + eventMessage.data
+              );
               break;
           }
           break;
         default:
-          console.error(eventMessage.operation + " is no valid EventMessage Operation.");
+          console.error(
+            eventMessage.operation + " is no valid EventMessage Operation."
+          );
           break;
       }
     }
