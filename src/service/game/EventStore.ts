@@ -2,7 +2,7 @@ import { Client } from "@stomp/stompjs";
 import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/LobbyService";
-import router from "@/router";
+  import router from "@/router";
 import { User } from "@/service/login/User";
 
 const { gameState, updatePlayerData, setError } = useGameStore();
@@ -96,18 +96,18 @@ stompClient.onConnect = () => {
             );
           }
           break;
-        case Operation.CHECK_END:
-          lobbyState.users.forEach((user) => {
-            if (user.username == eventMessage.data) {
-              setUserFinishedState(user.username, true);
-            }
-          });
+          case Operation.CHECK_END:
+            lobbyState.users.forEach((user) => {
+              if (user.username == eventMessage.data) {
+                setUserFinishedState(user.username, true);
+              }
+            });
 
-          // If both users are finished, redirect to endscreen
-          if (lobbyState.users.every((user: User) => user.finished)) {
-            router.push("/end");
-          }
-          break;
+            // If both users are finished, redirect to endscreen
+            if (lobbyState.users.every((user: User) => user.finished)) {
+              router.push("/end");
+            }
+            break;
         case Operation.LABYRINTH_PICK:
           console.log(Number(eventMessage.data));
           setLabyrinthSelection(Number(eventMessage.data));

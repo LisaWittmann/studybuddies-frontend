@@ -135,49 +135,49 @@ async function checkAccess(modelName: string) {
 }
 
 async function checkEndGame(modelName: string) {
-  const { gameState } = useGameStore();
-  const { loginState } = useLoginStore();
+  const {gameState} = useGameStore();
+  const {loginState} = useLoginStore();
   const eventMessage = new EventMessage(
-    Operation[Operation.CHECK_END],
-    gameState.lobbyKey,
-    loginState.username,
-    modelName.toUpperCase()
+      Operation[Operation.CHECK_END],
+      gameState.lobbyKey,
+      loginState.username,
+      modelName.toUpperCase()
   );
   fetch("/api/lobby/end", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {"Content-Type": "application/json"},
     body: JSON.stringify(eventMessage),
   })
-    .then((response) => {
-      conversation.visible = true;
-      conversation.message = new Message(
-        "",
-        "",
-        undefined,
-        Array.of(new Response("", "", ""))
-      );
-      if (response.ok) {
-        conversation.message.text =
-          "Herzlichen Glückwunsch. Du kannst das Labyrinth verlassen. Warte bis dein Partner die Trophäe gesammelt hat.";
-        conversation.message.responses = [];
-      } else {
-        conversation.message.responses[0].text = "Ich komme später wieder.";
-        if (response.status == 409) {
+      .then((response) => {
+        conversation.visible = true;
+        conversation.message = new Message(
+            "",
+            "",
+            undefined,
+            Array.of(new Response("", "", ""))
+        );
+        if (response.ok) {
           conversation.message.text =
-            "Du hast noch nicht die zu erreichende Mindestpunktzahl erreicht.";
-        } else if (response.status == 405) {
-          conversation.message.text =
-            "Du bist noch nicht zusammen mit deinem Partner am Ende angekommen.";
-        } else if (response.status == 418) {
-          conversation.message.text =
-            "Tut mir leid, aber ich glaube die Trophäe ist für jemand anderen vorgesehen.";
+              "Herzlichen Glückwunsch. Du kannst das Labyrinth verlassen. Warte bis dein Partner die Trophäe gesammelt hat.";
+          conversation.message.responses = [];
+        } else {
+          conversation.message.responses[0].text = "Ich komme später wieder.";
+          if (response.status == 409) {
+            conversation.message.text =
+                "Du hast noch nicht die zu erreichende Mindestpunktzahl erreicht.";
+          } else if (response.status == 405) {
+            conversation.message.text =
+                "Du bist noch nicht zusammen mit deinem Partner am Ende angekommen.";
+          } else if (response.status == 418) {
+            conversation.message.text =
+                "Tut mir leid, aber ich glaube die Trophäe ist für jemand anderen vorgesehen.";
+          }
+          conversation.message.text += " Versuch's später noch einmal.";
         }
-        conversation.message.text += " Versuch's später noch einmal.";
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 }
 
 /**
@@ -200,9 +200,9 @@ async function clickItem(modelName: string) {
         case Operation.CONVERSATION:
           startConversation(modelName);
           break;
-        case Operation.CHECK_END:
-          checkEndGame(modelName);
-          break;
+          case Operation.CHECK_END:
+            checkEndGame(modelName);
+            break;
       }
     })
     .catch((error) => {
