@@ -228,7 +228,13 @@ function removeEndTile(model: TileModel): void {
  * @param role: role that will be restricted for tile
  */
 function addRestriction(model: TileModel, role: Role): void {
-  if (!model.relationKey || model.isEnd || model.isStart) return;
+  if (
+    !model.relationKey ||
+    model.isEnd ||
+    model.isStart ||
+    model.objectsInRoom.some((item) => item.blockedRole == role)
+  )
+    return;
   if (!model.restrictions?.includes(role)) {
     model.restrictions?.push(role);
   }
