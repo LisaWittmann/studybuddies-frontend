@@ -129,7 +129,7 @@ async function checkAccess(modelName: string) {
       return response.json();
     })
     .then((jsonData) => {
-      gameEventMessage.message = jsonData.accesstext;
+      gameEventMessage.message = jsonData.accessText;
       if (jsonData.firstAccess) {
         gameEventMessage.state = "success";
         deleteFromInventory();
@@ -382,8 +382,7 @@ async function tradeItem(username: string, itemId: string) {
       return response.json();
     })
     .then((jsonData) => {
-      let inventory: Item[];
-      inventory = jsonData;
+      const inventory: Item[] = jsonData;
       updateInventory(inventory);
     })
     .catch((error) => {

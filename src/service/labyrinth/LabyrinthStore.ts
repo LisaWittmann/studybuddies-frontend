@@ -1,6 +1,6 @@
 import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
-import { Item, Position } from "@/service/labyrinth/Item";
+import { Item } from "@/service/labyrinth/Item";
 import { Role } from "@/service/game/Player";
 
 /**
@@ -10,7 +10,6 @@ import { Role } from "@/service/game/Player";
  */
 async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
   console.log("Requested lab of lobby " + lobbyKey);
-  //TODO change this to the game api
   return fetch(`/api/lobby/${lobbyKey}`, {
     method: "GET",
   })
@@ -43,7 +42,6 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
             new Item(
               item.id,
               item.modelName,
-              (<any>Position)[item.positionInRoom],
               orientations
             )
           );

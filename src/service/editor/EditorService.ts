@@ -358,7 +358,6 @@ function convert(): Labyrinth {
         new Item(
           0,
           itemModel.modelName,
-          itemModel.positionInRoom,
           itemModel.orientations
         )
       );
@@ -421,9 +420,7 @@ export function useEditorService() {
   return {
     editorState,
     updateTileModels,
-    setDimension,
     setItemOptions,
-    getTileModel,
     addTile,
     removeTile,
     addEndTile,

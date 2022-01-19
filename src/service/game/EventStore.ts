@@ -133,7 +133,7 @@ stompClient.onConnect = () => {
 
             // If both users are finished, redirect to endscreen
             if (lobbyState.users.every((user: User) => user.finished)) {
-              router.push("/end");
+              router.push(`/end/${gameState.lobbyKey}`);
             }
             break;
         case Operation.LABYRINTH_PICK:

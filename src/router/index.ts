@@ -52,7 +52,7 @@ const routes: Array<RouteRecordRaw> = [
     component: LabyrinthUploadView,
   },
   {
-    path: "/end",
+    path: "/end/:key",
     name: "EndView",
     component: EndView,
   },
