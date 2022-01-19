@@ -1,11 +1,21 @@
 import { Client } from "@stomp/stompjs";
 import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLobbyService } from "@/service/LobbyService";
   import router from "@/router";
 import { User } from "@/service/login/User";
+import { useGameService } from "@/service/game/GameService";
+import { useLobbyService } from "@/service/lobby/LobbyService";
+import { Item } from "@/service/labyrinth/Item";
 
-const { gameState, updatePlayerData, setError } = useGameStore();
+const { playerLeftGame } = useGameService();
+const {
+  gameState,
+  updatePlayerData,
+  updateGameData,
+  setError,
+  addItemToInventory,
+  setScore,
+} = useGameStore();
 const {
   updateUsers,
   setupGame,
@@ -13,7 +23,7 @@ const {
   updateLabyrinths,
   getRoleOptions,
   setUserReadyState,
-  setUserFinishedState,
+  setUserFinishState,
   lobbyState,
 } = useLobbyService();
 
@@ -61,21 +71,39 @@ stompClient.onConnect = () => {
       switch (operation) {
         case Operation.MOVEMENT:
           destTileID = Number.parseInt(eventMessage.data);
-
           if (destTileID) {
             updatePlayerData(eventMessage.username, destTileID);
-            // -> now the watcher can update the 3D Room
-            // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
           } else {
             setError("There is no tile reference for this definition of data");
           }
-
           break;
         case Operation.CLICK:
+          break;
+        case Operation.COLLECT:
+          updateGameData();
           break;
         case Operation.CHAT:
           break;
         case Operation.TRADE:
+          console.log(
+            "USERNAME GAMESTATE",
+            gameState.mainPlayer.getUsername(),
+            "USERNAME MESSAGE",
+            eventMessage.username
+          );
+          if (eventMessage.username === gameState.mainPlayer.getUsername()) {
+            addItemToInventory(JSON.parse(eventMessage.data) as Item);
+            console.log(
+              "TRADE OPERATION AT",
+              eventMessage.data,
+              "TO USER",
+              eventMessage.username
+            );
+          }
+          break;
+        case Operation.ACCESS:
+          console.log("ACCESS Nachricht kommt an");
+          setScore(eventMessage.data);
           break;
         case Operation.READY:
           console.log(eventMessage);
@@ -99,7 +127,7 @@ stompClient.onConnect = () => {
           case Operation.CHECK_END:
             lobbyState.users.forEach((user) => {
               if (user.username == eventMessage.data) {
-                setUserFinishedState(user.username, true);
+                setUserFinishState(user.username, true);
               }
             });
 
@@ -109,8 +137,7 @@ stompClient.onConnect = () => {
             }
             break;
         case Operation.LABYRINTH_PICK:
-          console.log(Number(eventMessage.data));
-          setLabyrinthSelection(Number(eventMessage.data));
+          setLabyrinthSelection(eventMessage.data);
           break;
         case Operation.UPDATE:
           updateData = (<any>Update)[eventMessage.data];
@@ -120,22 +147,19 @@ stompClient.onConnect = () => {
               break;
             case Update.USERS:
               updateUsers(eventMessage.lobbyKey);
+              if (gameState.started) playerLeftGame(eventMessage.username);
               break;
             case Update.ROLE:
               console.log("RoleOptions holen");
               getRoleOptions(eventMessage.lobbyKey);
               break;
             default:
-              console.info(
-                "No List was updated with Data: " + eventMessage.data
-              );
+              console.info("No List was updated with Data: " + eventMessage.data);
               break;
           }
           break;
         default:
-          console.error(
-            eventMessage.operation + " is no valid EventMessage Operation."
-          );
+          console.error(eventMessage.operation + " is no valid EventMessage Operation.");
           break;
       }
     }

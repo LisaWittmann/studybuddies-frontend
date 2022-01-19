@@ -49,18 +49,33 @@ async function initializeLabyrinth(
  */
 async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
   if (labyrinthData == labyrinth) return;
-  labyrinthData = labyrinth;
-  for (const [key] of labyrinth.tileMap) {
-    const tile = scene.getObjectByName(key.toString());
-    console.log("tile from scene", tile);
+
+  for (const [key, value] of labyrinth.tileMap) {
+    const labyrinthObjects = value.objectsInRoom;
+    const labyrinthDataObjects = labyrinthData.tileMap.get(key);
+    if (
+      labyrinthDataObjects &&
+      labyrinthDataObjects?.objectsInRoom.length > 0
+    ) {
+      const intersection = labyrinthDataObjects.objectsInRoom.filter(
+        (item) => !labyrinthObjects.some((object) => object.id == item.id)
+      );
+
+      if (intersection.length > 0) {
+        const id = intersection[0].id;
+        const name = intersection[0].modelName;
+
+        scene.getObjectByName("item " + name + " id " + id)?.clear();
+      }
+    }
   }
+  labyrinthData = labyrinth;
 }
 
 /**
  * updates player position of main or partner player
  * or initially creates partner player
  * @param player: main or partner player
- * @param labyrinth current labyrinth that should be rendered for player
  * @param scene: scene that contains player
  */
 function updatePlayer(
@@ -116,17 +131,14 @@ async function placeTile(
  * @returns color of tile as hexadecimal number
  */
 function getTileColor(tile: Tile) {
-  //end tile color
-  const endTile = labyrinthData.tileMap.get(labyrinthData.endTileKey);
-  if (endTile != undefined && endTile.tileId == tile.tileId) return colors.pink;
-  //both players have access to this tile
-  else if (tile.getRestrictions().length == 0) return colors.darkBrown;
+  //both players have no access to this tile
+  if (tile.getRestrictions().length == 2) return colors.grey;
   //only the designer has access to this tile
-  else if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
+  if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
   //only the hacker has access to this tile
-  else if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
+  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
   //default - this case shouldn't appear
-  return colors.grey;
+  return colors.darkBrown;
 }
 
 /**
@@ -143,7 +155,6 @@ function getTilePosition(
   scene.traverse((child) => {
     if (child.userData.tileKey == id) {
       position = child.position;
-      console.log(child);
     }
   });
   return position;

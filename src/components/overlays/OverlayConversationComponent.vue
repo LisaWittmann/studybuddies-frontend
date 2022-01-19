@@ -52,23 +52,26 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .conversation {
-  width: 80%;
-  max-width: 600px;
-  font-size: 18px;
-  color: $color-black;
+  width: $pref-width;
+  max-width: $width-l;
+  font-size: $text-l;
+
+  * {
+    color: $color-black;
+  }
 
   &__content {
     @include flex-center();
     background: $color-white;
     min-height: 200px;
-    border-radius: 10px;
+    border-radius: $border-radius-m;
     padding: $spacing-xs $spacing-s;
   }
 
   &__option {
     @include flex-center();
     background: $color-light-green;
-    border-radius: 10px;
+    border-radius: $border-radius-m;
     margin-right: $spacing-s;
     padding: $spacing-s;
     cursor: pointer;

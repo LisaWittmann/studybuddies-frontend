@@ -1,9 +1,17 @@
-import { Scene, Vector3 } from "three";
+import { Object3D, Scene, Vector3 } from "three";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
+
 import { Player, MainPlayer, PartnerPlayer } from "@/service/game/Player";
-import { direction, factors } from "./helper/SceneConstants";
-import { Labyrinth } from "../labyrinth/Labyrinth";
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
+import { Orientation } from "@/service/labyrinth/Tile";
+
+import {
+  direction,
+  directionMap,
+  factors,
+  movementRotations,
+} from "@/service/scene/helper/SceneConstants";
 
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer, checkIntersect } = useObjectFactory();
@@ -11,6 +19,11 @@ const { createPlayer, checkIntersect } = useObjectFactory();
 let playerPosition: number;
 let partnerPosition: number;
 
+/**
+ * check if stored data of players needs to be updated
+ * @param player playerObject that might contain new data
+ * @returns true if stored data is outdated
+ */
 function requiresUpdate(player: Player) {
   if (player instanceof MainPlayer) {
     return player.getPosition() != playerPosition;
@@ -55,12 +68,33 @@ function updatePartnerPlayer(
     if (!partnerPosition) {
       createPlayer(player, position, scene);
     } else if (playerObject) {
+      rotatePlayer(playerObject, position);
       playerObject.position.copy(position);
       playerObject.position.copy(
-        checkIntersect(playerObject, player, position, scene)
+        checkIntersect(playerObject, player.getPosition(), position, scene)
       );
     }
     partnerPosition = player.getPosition();
+  }
+}
+
+/**
+ * rotate playerObject to direction it will be translated to
+ * @param object object of partnerPlayer
+ * @param position position of tile that player should be placed in
+ */
+function rotatePlayer(object: Object3D, position: Vector3) {
+  const moveDirection = new Vector3()
+    .copy(object.position)
+    .addScaledVector(position, -1)
+    .normalize();
+
+  for (const [orientation, direction] of directionMap) {
+    if (direction.equals(moveDirection)) {
+      const rotationAngle = movementRotations.get(orientation) as number;
+      object.rotation.y = rotationAngle;
+      return;
+    }
   }
 }
 
@@ -90,32 +124,36 @@ function calculatePartnerPositon(
   //gets all orientations/positions of items in tile
   if (tileItems && tileItems?.length >= 1) {
     tileItems.forEach((item) => {
-      itemOrientations.push(item.orientations.toString().replace(",", ""));
+      const orientationStrings = item.orientations.map(
+        (orientation) => Orientation[orientation]
+      );
+      console.log(orientationStrings.toString());
+      itemOrientations.push(orientationStrings.toString().replace(",", ""));
     });
 
     //iterates over all orientations and checks if the planned corner position is already taken by an item
-    itemOrientations.forEach((o) => {
+    itemOrientations.forEach((orientation) => {
       //if there is an item in the corner -> move partner clockwise
-      if (playerOrientation === o) {
-        if (o === "NORTHWEST" || o === "WESTNORTH") {
+      if (playerOrientation === orientation) {
+        if (orientation === "NORTHWEST" || orientation === "WESTNORTH") {
           playerOrientation = "NORTHEAST";
           directionVector
             .copy(direction.north)
             .add(direction.east)
             .multiplyScalar(factors.partnerTranslateFactor);
-        } else if (o === "NORTHEAST" || o === "EASTNORTH") {
+        } else if (orientation === "NORTHEAST" || orientation === "EASTNORTH") {
           playerOrientation = "SOUTHEAST";
           directionVector
             .copy(direction.south)
             .add(direction.east)
             .multiplyScalar(factors.partnerTranslateFactor);
-        } else if (o === "SOUTHEAST" || o === "EASTSOUTH") {
+        } else if (orientation === "SOUTHEAST" || orientation === "EASTSOUTH") {
           playerOrientation = "SOUTHWEST";
           directionVector
             .copy(direction.south)
             .add(direction.west)
             .multiplyScalar(factors.partnerTranslateFactor);
-        } else if (o === "SOUTHWEST" || o === "WESTSOUTH") {
+        } else if (orientation === "SOUTHWEST" || orientation === "WESTSOUTH") {
           playerOrientation = "NORTHWEST";
           directionVector
             .copy(direction.north)
