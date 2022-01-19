@@ -144,7 +144,6 @@ export default defineComponent({
       getRoleOptions(gameState.lobbyKey);
     });
 
-
     return {
       selectedRole,
       readyCheck,

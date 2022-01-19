@@ -27,7 +27,9 @@
           </p>
           <span>
             Lade jetzt dein eigenes Labyrinth hoch:<br />
-            <router-link to="/upload-labyrinth">Labyrinth hochladen</router-link>
+            <router-link to="/upload-labyrinth"
+              >Labyrinth hochladen</router-link
+            >
           </span>
           <span class="error">{{ errorMessage }}</span>
         </form>

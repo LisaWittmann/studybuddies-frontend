@@ -255,14 +255,13 @@ async function deleteFromInventory() {
     });
 }
 
-
 /**
- * 
+ *
  * Adds items from NPC to inventory of player
- * 
- * @param lobbyKey 
- * @param itemName 
- * @param username 
+ *
+ * @param lobbyKey
+ * @param itemName
+ * @param username
  */
 async function givePlayerItem(
   lobbyKey: string,
@@ -281,18 +280,18 @@ async function givePlayerItem(
       headers: { "Content-Type": "application/json" },
     }
   )
-  .then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  })
-  .then((jsonData) => {
-    let inventory = new Array<Item>();
-    inventory = jsonData;
-    updateInventory(inventory);
-  })
-  .catch((error) => {
-  console.error(error);
-  });
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      let inventory = new Array<Item>();
+      inventory = jsonData;
+      updateInventory(inventory);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 }
 
 /**
@@ -314,11 +313,11 @@ async function removeItemFromTile(lobbyKey: string, itemId: string) {
 }
 
 /**
- * 
+ *
  * Moves item from mainplayer to partner
- * 
- * @param username 
- * @param itemId 
+ *
+ * @param username
+ * @param itemId
  */
 async function tradeItem(username: string, itemId: string) {
   return fetch(
