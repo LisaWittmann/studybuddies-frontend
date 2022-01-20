@@ -67,7 +67,7 @@ function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
 
       for (const object of removedObjects) {
         scene
-          .getObjectByName("item " + object.modelName + " id " + object.id)
+          .getObjectByName(`${object.modelName.toLowerCase()}-${object.id}`)
           ?.clear();
       }
     }
@@ -78,6 +78,7 @@ function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
 function clearLabyrinth(scene: THREE.Scene) {
   labyrinthData = undefined;
   resetPlayerData();
+  storedTiles.clear();
   scene.clear();
 }
 /**
@@ -140,7 +141,7 @@ async function placeTile(
  */
 function getTileColor(tile: Tile) {
   //end tile color
-  const endTile = labyrinthData.tileMap.get(labyrinthData.endTileKey);
+  const endTile = labyrinthData?.tileMap.get(labyrinthData.endTileKey);
   if (endTile != undefined && endTile.tileId == tile.tileId) return colors.pink;
   //both players have access to this tile
   else if (tile.getRestrictions().length == 0) return colors.darkBrown;
@@ -158,17 +159,12 @@ function getTileColor(tile: Tile) {
  * @returns position in scene or undefined if tile is not in scene
  */
 function getTilePosition(
-  id: number,
+  tileKey: number,
   scene: THREE.Scene
 ): THREE.Vector3 | undefined {
-  if (!id) return undefined;
-  let position = undefined;
-  scene.traverse((child) => {
-    if (child.userData.tileKey == id) {
-      position = child.position;
-    }
-  });
-  return position;
+  if (!tileKey) return undefined;
+  return scene.getObjectByName(tileKey.toString())?.getObjectByName("floor")
+    ?.position;
 }
 
 /**

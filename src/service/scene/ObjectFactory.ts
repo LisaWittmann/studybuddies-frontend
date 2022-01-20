@@ -46,7 +46,7 @@ async function createItem(
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
-      object.name = "item " + item.modelName + " id " + item.id;
+      object.name = `${model}-${item.id}`;
       parent.add(object);
     });
   });
@@ -117,7 +117,7 @@ function createWall(
   object.position.copy(position);
   object.rotateY(wall.rotationY());
   object.userData = wall;
-  object.name = "wall";
+  object.name = `wall-${orientation.toString().toLowerCase()}`;
   return object;
 }
 

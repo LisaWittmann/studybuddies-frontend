@@ -74,7 +74,7 @@ async function movePlayer(orientation: Orientation) {
 function startConversation(character: string) {
   conversation.character = character;
   conversation.visible = true;
-  await getConversationMessage("1.1");
+  getConversationMessage("1.1");
 }
 
 /**
@@ -361,13 +361,17 @@ async function tradeItem(itemId: number) {
     });
 }
 
+function endGame() {
+  resetGameEvent();
+  endConversation();
+  setStarted(false);
+}
+
 /**
  * reset all states to force game end and remove player from lobby
  */
 function forceGameEnd() {
-  resetGameEvent();
-  endConversation();
-  setStarted(false);
+  endGame();
   exitLobby();
   resetGameState();
 }
@@ -376,6 +380,7 @@ export function useGameService() {
   return {
     gameEventMessage,
     toggleEventMessage,
+    resetGameEvent,
     movePlayer,
     clickItem,
     getConversationMessage,
@@ -383,6 +388,7 @@ export function useGameService() {
     conversation,
     updateInventory,
     tradeItem,
+    endGame,
     forceGameEnd,
   };
 }

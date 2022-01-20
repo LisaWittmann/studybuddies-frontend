@@ -9,7 +9,7 @@ import { useLobbyService } from "@/service/lobby/LobbyService";
 import router from "@/router";
 
 const { setFeedback } = useAppService();
-const { updateInventory } = useGameService();
+const { updateInventory, endGame } = useGameService();
 const { gameState, updatePlayerData, updateGameData, setError, setScore } =
   useGameStore();
 const {
@@ -105,6 +105,7 @@ stompClient.onConnect = () => {
 
           // If both users are finished, redirect to endscreen
           if (lobbyState.users.every((user) => user.finished)) {
+            endGame();
             router.push(`/end/${gameState.lobbyKey}`);
           }
           break;
