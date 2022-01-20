@@ -3,8 +3,7 @@ import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
 
 import { Player, MainPlayer, PartnerPlayer } from "@/service/game/Player";
-import { Labyrinth } from "@/service/labyrinth/Labyrinth";
-import { Orientation } from "@/service/labyrinth/Tile";
+import { Orientation, Tile } from "@/service/labyrinth/Tile";
 
 import {
   direction,
@@ -13,7 +12,7 @@ import {
   movementRotations,
 } from "@/service/scene/helper/SceneConstants";
 
-const { updateCameraPosition } = useSceneFactory();
+const { updateCameraPosition, updateCameraTarget } = useSceneFactory();
 const { createPlayer, checkIntersect } = useObjectFactory();
 
 let playerPosition: number | undefined;
@@ -42,9 +41,21 @@ function requiresUpdate(player: Player) {
  * @param player: main player
  * @param tilePosition: position of tile player should be placed on
  */
-function updateMainPlayer(player: MainPlayer, tilePosition: Vector3) {
+function updateMainPlayer(
+  player: MainPlayer,
+  tile: Tile | undefined,
+  tilePosition: Vector3
+) {
   if (requiresUpdate(player)) {
     updateCameraPosition(tilePosition);
+    if (!playerPosition) {
+      if (!tile) return;
+      const relations = [...tile.getTileRelationMap().keys()];
+      const orientation = relations.find((orientation) =>
+        tile.getTileRelationMap().get(orientation)
+      );
+      if (orientation) updateCameraTarget(orientation);
+    }
     playerPosition = player.getPosition();
   }
 }
@@ -57,19 +68,15 @@ function updateMainPlayer(player: MainPlayer, tilePosition: Vector3) {
  */
 function updatePartnerPlayer(
   player: PartnerPlayer,
+  tile: Tile | undefined,
   tilePosition: Vector3,
-  labyrinth: Labyrinth,
   scene: Scene
 ) {
   if (!player.getUsername() || !requiresUpdate(player)) {
     return;
   } else {
     const playerObject = scene.getObjectByName(player.getUsername());
-    const position = calculatePartnerPositon(
-      player.getPosition(),
-      labyrinth,
-      tilePosition
-    );
+    const position = calculatePartnerPositon(tile, tilePosition);
     if (!partnerPosition) {
       createPlayer(player, position, scene);
     } else if (playerObject) {
@@ -111,11 +118,10 @@ function rotatePlayer(object: Object3D, position: Vector3) {
  * @returns position as three dimensional vector
  */
 function calculatePartnerPositon(
-  currentTileID: number,
-  labyrinth: Labyrinth,
+  tile: Tile | undefined,
   tilePosition: Vector3
 ): Vector3 {
-  const tileItems = labyrinth.tileMap.get(currentTileID)?.objectsInRoom;
+  const tileItems = tile?.objectsInRoom;
   const itemOrientations = new Array<string>();
 
   //partner initially placed in the northwest corner

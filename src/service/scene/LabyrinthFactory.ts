@@ -94,13 +94,14 @@ function updatePlayer(
 ) {
   if (!requiresUpdate(player)) return;
   console.log("Move player: " + player.getUsername());
+  const tile = labyrinth.tileMap.get(player.getPosition());
   const tilePosition = storedTiles.get(player.getPosition());
   if (tilePosition) {
     if (player instanceof MainPlayer) {
-      updateMainPlayer(player, tilePosition);
+      updateMainPlayer(player, tile, tilePosition);
     }
     if (player instanceof PartnerPlayer) {
-      updatePartnerPlayer(player, tilePosition, labyrinth, scene);
+      updatePartnerPlayer(player, tile, tilePosition, scene);
     }
   }
 }
