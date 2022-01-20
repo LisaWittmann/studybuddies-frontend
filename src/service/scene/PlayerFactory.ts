@@ -31,9 +31,9 @@ function resetPlayerData() {
  */
 function requiresUpdate(player: Player) {
   if (player instanceof MainPlayer) {
-    return player.getPosition() != playerPosition;
+    return !playerPosition || player.getPosition() != playerPosition;
   } else if (player instanceof PartnerPlayer) {
-    return player.getPosition() != partnerPosition;
+    return !partnerPosition || player.getPosition() != partnerPosition;
   } else return false;
 }
 
