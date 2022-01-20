@@ -238,8 +238,8 @@ async function getOperation(modelName: string, itemId: string) {
  * @param modelName name of clicked item
  * @param itemId contains id of clicked body
  */
-async function clickItem(modelName: string, itemId: string) {
-  const click = debounce(getOperation, 10);
+function clickItem(modelName: string, itemId: string) {
+  const click = debounce(getOperation, 20);
   click(modelName, itemId);
 }
 
