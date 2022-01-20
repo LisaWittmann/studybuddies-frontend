@@ -1,19 +1,15 @@
 import { Client } from "@stomp/stompjs";
 import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
-import { useGameStore } from "@/service/game/GameStore";
-import { useGameService } from "@/service/game/GameService";
-import { useLobbyService } from "@/service/lobby/LobbyService";
-import { Item } from "@/service/labyrinth/Item";
 
-const { playerLeftGame } = useGameService();
-const {
-  gameState,
-  updatePlayerData,
-  updateGameData,
-  setError,
-  addItemToInventory,
-  setScore,
-} = useGameStore();
+import { useAppService } from "@/service/AppService";
+import { useGameStore } from "@/service/game/GameStore";
+import { useLobbyService } from "@/service/lobby/LobbyService";
+import { useGameService } from "@/service/game/GameService";
+
+const { setFeedback } = useAppService();
+const { updateInventory } = useGameService();
+const { gameState, updatePlayerData, updateGameData, setError, setScore } =
+  useGameStore();
 const {
   updateUsers,
   setupGame,
@@ -21,7 +17,6 @@ const {
   updateLabyrinths,
   getRoleOptions,
   setUserReadyState,
-  lobbyState,
 } = useLobbyService();
 
 let wsURL = "ws://localhost:9090/messagebroker";
@@ -41,6 +36,7 @@ stompClient.onWebSocketError = () => {
   console.log("websocketerror");
   setError("WS-Fehler");
 };
+
 stompClient.onStompError = () => {
   console.log("Stomperror");
   setError("STOMP-Fehler");
@@ -63,7 +59,7 @@ stompClient.onConnect = () => {
 
       let destTileID: number;
       let updateData: Update;
-      const operation: Operation = (<any>Operation)[eventMessage.operation];
+      const operation = (<any>Operation)[eventMessage.operation];
 
       switch (operation) {
         case Operation.MOVEMENT:
@@ -74,36 +70,16 @@ stompClient.onConnect = () => {
             setError("There is no tile reference for this definition of data");
           }
           break;
-        case Operation.CLICK:
-          break;
         case Operation.COLLECT:
           updateGameData();
           break;
-        case Operation.CHAT:
-          break;
         case Operation.TRADE:
-          console.log(
-            "USERNAME GAMESTATE",
-            gameState.mainPlayer.getUsername(),
-            "USERNAME MESSAGE",
-            eventMessage.username
-          );
-          if (eventMessage.username === gameState.mainPlayer.getUsername()) {
-            addItemToInventory(JSON.parse(eventMessage.data) as Item);
-            console.log(
-              "TRADE OPERATION AT",
-              eventMessage.data,
-              "TO USER",
-              eventMessage.username
-            );
-          }
+          updateInventory();
           break;
         case Operation.ACCESS:
-          console.log("ACCESS Nachricht kommt an");
-          setScore(eventMessage.data);
+          setScore(Number(eventMessage.data));
           break;
         case Operation.READY:
-          console.log(eventMessage);
           if (
             eventMessage.username === "ALL_OF_LOBBY" &&
             eventMessage.data === "READY"
@@ -111,13 +87,8 @@ stompClient.onConnect = () => {
             setupGame();
           } else {
             setUserReadyState(
-              eventMessage.username,
-              eventMessage.data === "READY"
-            );
-            console.log(
-              lobbyState.users.find(
-                (user) => user.username == eventMessage.username
-              )
+              eventMessage.data === "READY",
+              eventMessage.username
             );
           }
           break;
@@ -131,35 +102,24 @@ stompClient.onConnect = () => {
               updateLabyrinths();
               break;
             case Update.USERS:
-              updateUsers(eventMessage.lobbyKey);
-              if (gameState.started) playerLeftGame(eventMessage.username);
+              updateUsers();
+              if (gameState.started) {
+                setFeedback(
+                  `Spieler ${eventMessage.username} hat das Spiel verlassen.`,
+                  undefined,
+                  "/find",
+                  "Zurück zur Lobbyfindung"
+                );
+              }
               break;
             case Update.ROLE:
-              console.log("RoleOptions holen");
-              getRoleOptions(eventMessage.lobbyKey);
-              break;
-            default:
-              console.info(
-                "No List was updated with Data: " + eventMessage.data
-              );
+              getRoleOptions();
               break;
           }
-          break;
-        default:
-          console.error(
-            eventMessage.operation + " is no valid EventMessage Operation."
-          );
           break;
       }
     }
   });
-};
-
-/**
- * Method to handle the Disconnection
- */
-stompClient.onDisconnect = () => {
-  //Connection closed
 };
 
 stompClient.activate();

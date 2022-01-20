@@ -32,9 +32,8 @@ export default defineComponent({
   setup() {
     const { gameState } = useGameStore();
     const { tradeItem } = useGameService();
-    let playersInSameTile = computed(() => gameState.playersInSameTile);
-    let mainPlayer = computed(() => gameState.mainPlayer);
-    let isVisible = ref(false);
+    const playersInSameTile = computed(() => gameState.playersInSameTile);
+    const isVisible = ref(false);
 
     /**
      * creates image url
@@ -63,25 +62,13 @@ export default defineComponent({
       }
     }
 
-    /**
-     * calls fetch to give clicked item to partner player
-     */
-    function giveItemToPartner(item: Item) {
-      console.log(
-        "ITEM TO TRADE FROM",
-        mainPlayer.value.username,
-        item.id.toString()
-      );
-      tradeItem(mainPlayer.value.username, item.id.toString());
-    }
-
     return {
       playersInSameTile,
       getImgUrl,
       toggleTradeButton,
       isVisible,
       getTradeValue,
-      giveItemToPartner,
+      tradeItem,
     };
   },
 });

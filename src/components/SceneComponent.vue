@@ -35,8 +35,12 @@ export default defineComponent({
       updateScene,
       getIntersections,
     } = useSceneFactory();
-    const { initializeLabyrinth, updateLabyrinth, updatePlayer } =
-      useLabyrinthFactory();
+    const {
+      initializeLabyrinth,
+      updateLabyrinth,
+      updatePlayer,
+      clearLabyrinth,
+    } = useLabyrinthFactory();
     const { gameState } = useGameStore();
 
     const labyrinth = computed(() => gameState.labyrinth);
@@ -65,7 +69,7 @@ export default defineComponent({
 
     onBeforeUnmount(() => {
       removeEventListener("resize", updateScene);
-      scene.clear();
+      clearLabyrinth(scene);
     });
 
     watch(

@@ -16,8 +16,13 @@ import {
 const { updateCameraPosition } = useSceneFactory();
 const { createPlayer, checkIntersect } = useObjectFactory();
 
-let playerPosition: number;
-let partnerPosition: number;
+let playerPosition: number | undefined;
+let partnerPosition: number | undefined;
+
+function resetPlayerData() {
+  playerPosition = undefined;
+  partnerPosition = undefined;
+}
 
 /**
  * check if stored data of players needs to be updated
@@ -176,5 +181,10 @@ function calculatePartnerPositon(
 }
 
 export function usePlayerFactory() {
-  return { requiresUpdate, updateMainPlayer, updatePartnerPlayer };
+  return {
+    requiresUpdate,
+    updateMainPlayer,
+    updatePartnerPlayer,
+    resetPlayerData,
+  };
 }

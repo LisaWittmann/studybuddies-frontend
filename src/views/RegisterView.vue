@@ -40,14 +40,17 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { useLoginService } from "@/service/login/LoginService";
+import { useAppService } from "@/service/AppService";
 import { User } from "@/service/login/User";
 
 export default defineComponent({
   name: "RegisterView",
   setup() {
-    const { register, loginState } = useLoginStore();
-    const user = new User(loginState.username);
+    const { globalState } = useAppService();
+    const { register } = useLoginService();
+
+    const user = new User(globalState.username);
     const errorMessage = ref("");
 
     function registerUser() {

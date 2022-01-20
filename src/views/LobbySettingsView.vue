@@ -35,7 +35,7 @@
             <button
               :class="{ button__ready: isReady }"
               class="button--small"
-              @click="readyCheck(loginState.username, selectedLabyrinth)"
+              @click="readyCheck(selectedLabyrinth)"
             >
               Bereit
             </button>
@@ -43,7 +43,7 @@
           <transition name="delay-fade">
             <button
               class="button button--small button__exit"
-              @click="exitLobby(lobbyKey)"
+              @click="exitLobby()"
             >
               Verlassen
             </button>
@@ -60,7 +60,6 @@ import { onBeforeRouteLeave } from "vue-router";
 
 import { useAppService } from "@/service/AppService";
 import { useLobbyService } from "@/service/lobby/LobbyService";
-import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 
 import DropdownComponent from "@/components/DropdownComponent.vue";
@@ -76,8 +75,7 @@ export default defineComponent({
     RadioButtonGroupComponent,
   },
   setup() {
-    const { appState } = useAppService();
-    const { loginState } = useLoginStore();
+    const { globalState } = useAppService();
     const {
       updateUsers,
       readyCheck,
@@ -93,10 +91,12 @@ export default defineComponent({
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
+    const lobbyKey = computed(() => gameState.lobbyKey);
+
+    const users = computed(() => lobbyState.users);
+
     const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
     const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinthName);
-    const users = computed(() => lobbyState.users);
-    const lobbyKey = computed(() => gameState.lobbyKey);
 
     const allRoles = ref([]);
     const openRoles = computed(() => lobbyState.openRoles);
@@ -104,44 +104,46 @@ export default defineComponent({
 
     const isReady = computed(
       () =>
-        lobbyState.users.find((user) => user.username === loginState.username)
+        lobbyState.users.find((user) => user.username === globalState.username)
           ?.isReady
     );
-    const loading = computed(() => appState.loading);
+    const loading = computed(() => globalState.loading);
 
-    const copy = (text: string) => navigator.clipboard.writeText(text);
+    function copy(text: string) {
+      navigator.clipboard.writeText(text);
+    }
 
     function selectLabyrinth(labyrinthName: string) {
       setLabyrinthSelection(labyrinthName);
-      updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
+      updateLabyrinthPick(labyrinthName);
     }
 
     function selectRole(name: string) {
-      updateRole(name, gameState.lobbyKey, loginState.username);
+      updateRole(name);
     }
 
     onbeforeunload = () => {
-      exitLobby(lobbyKey.value);
-      return "Leaving Lobby";
+      exitLobby();
+      return "leaving lobby";
     };
 
     // exit lobby if any other page than game is opened
     onBeforeRouteLeave((to) => {
       const nextKey = to.params.key as string;
-      if (nextKey != gameState.lobbyKey) {
-        exitLobby(gameState.lobbyKey);
+      if (nextKey != lobbyKey.value) {
+        exitLobby();
       }
     });
 
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey)
-        .then(() => updateReadyStates(gameState.lobbyKey))
+      updateUsers()
+        .then(() => updateReadyStates())
         .catch(() => router.push("/find"));
       updateLabyrinths();
-      getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
-      getRoleOptions(gameState.lobbyKey);
+      getRoles().then((data) => (allRoles.value = data));
+      getRoleOptions();
     });
 
     return {
@@ -156,7 +158,6 @@ export default defineComponent({
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
-      loginState,
       isReady,
       loading,
       copy,

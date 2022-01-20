@@ -14,11 +14,15 @@ import {
 } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
-const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } =
-  usePlayerFactory();
+const {
+  requiresUpdate,
+  updateMainPlayer,
+  updatePartnerPlayer,
+  resetPlayerData,
+} = usePlayerFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
-let labyrinthData: Labyrinth;
+let labyrinthData: Labyrinth | undefined;
 
 /**
  * gets map of all tiles of a Labyrinth
@@ -47,31 +51,35 @@ async function initializeLabyrinth(
  * @param labyrinth: labyrinth object
  * @param scene: scene that contains labyrinth
  */
-async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
+function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
   if (labyrinthData == labyrinth) return;
 
   for (const [key, value] of labyrinth.tileMap) {
     const labyrinthObjects = value.objectsInRoom;
-    const labyrinthDataObjects = labyrinthData.tileMap.get(key);
+    const labyrinthDataObjects = labyrinthData?.tileMap.get(key);
     if (
       labyrinthDataObjects &&
       labyrinthDataObjects?.objectsInRoom.length > 0
     ) {
-      const intersection = labyrinthDataObjects.objectsInRoom.filter(
+      const removedObjects = labyrinthDataObjects.objectsInRoom.filter(
         (item) => !labyrinthObjects.some((object) => object.id == item.id)
       );
 
-      if (intersection.length > 0) {
-        const id = intersection[0].id;
-        const name = intersection[0].modelName;
-
-        scene.getObjectByName("item " + name + " id " + id)?.clear();
+      for (const object of removedObjects) {
+        scene
+          .getObjectByName("item " + object.modelName + " id " + object.id)
+          ?.clear();
       }
     }
   }
   labyrinthData = labyrinth;
 }
 
+function clearLabyrinth(scene: THREE.Scene) {
+  labyrinthData = undefined;
+  resetPlayerData();
+  scene.clear();
+}
 /**
  * updates player position of main or partner player
  * or initially creates partner player
@@ -203,5 +211,6 @@ export function useLabyrinthFactory() {
     initializeLabyrinth,
     updateLabyrinth,
     updatePlayer,
+    clearLabyrinth,
   };
 }

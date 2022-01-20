@@ -8,7 +8,7 @@ import LabyrinthUploadView from "@/views/LabyrinthUploadView.vue";
 import FindLobbyView from "@/views/FindLobbyView.vue";
 import EndView from "@/views/EndView.vue";
 import EditorView from "@/views/EditorView.vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { useAppService } from "@/service/AppService";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -72,8 +72,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const { loginState } = useLoginStore();
-  if (!loginState.isLoggedIn && !noAuthentication.includes(to.name as string)) {
+  const { globalState } = useAppService();
+  if (!globalState.username && !noAuthentication.includes(to.name as string)) {
     next({ name: "LoginView" });
   } else next();
 });

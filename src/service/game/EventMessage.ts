@@ -27,9 +27,7 @@ export class EventMessage {
 
 export enum Operation {
   MOVEMENT,
-  CHAT,
   TRADE,
-  CLICK,
   READY,
   CONVERSATION,
   COLLECT,
