@@ -372,17 +372,17 @@ function setupGame() {
   startLoading();
   updateUsers(gameState.lobbyKey)
     .then(() => {
-      lobbyState.users.forEach((user) => {
-        fetch(`/api/lobby/role/${gameState.lobbyKey}/${user.username}`)
-          .then((response) => {
-            if (!response.ok) throw new Error(response.statusText);
-            return response.json();
-          })
-          .then((jsonData) => {
-            const role = (<any>Role)[jsonData];
-            setPlayerData(user.username, role);
-          });
-      });
+      fetch(`/api/lobby/users/roles/${gameState.lobbyKey}`)
+        .then((response) => {
+          if (!response.ok) throw new Error(response.statusText);
+          return response.json();
+        })
+        .then((jsonData) => {
+          for (const username in jsonData) {
+            const role = (<any>Role)[jsonData[username]];
+            setPlayerData(username, role);
+          }
+        });
     })
     .then(() => {
       updateGameData().then(() => {
