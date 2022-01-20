@@ -46,7 +46,7 @@ async function createItem(
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
-      object.name = `${model}-${item.id}`;
+      object.name = `item-${model}-${item.id}`;
       parent.add(object);
     });
   });
