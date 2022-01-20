@@ -60,13 +60,12 @@ async function createItem(
  * @param color: floor color in hex-code
  * @returns THREE.Mesh representation of floor
  */
-function createFloor(position: THREE.Vector3, key: number, color = 0x199eb0) {
+function createFloor(position: THREE.Vector3, color = 0x199eb0) {
   const object = new THREE.Mesh(
     new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.copy(position);
-  object.userData.tileKey = key;
   object.rotateX(radians(90));
   object.name = "floor";
   return object;

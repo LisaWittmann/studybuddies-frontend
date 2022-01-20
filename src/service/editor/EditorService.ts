@@ -348,7 +348,7 @@ function convert(): Labyrinth {
 
   for (const tileModel of selectedTiles.value) {
     const key = tileModel.relationKey as number;
-    const tile = new Tile(key, [], tileModel.restrictions);
+    const tile = new Tile(0, key, [], tileModel.restrictions);
     for (const [orientation, neighbor] of tileModel.tileRelationMap) {
       tile.tileRelationMap.set(orientation, neighbor?.relationKey);
     }

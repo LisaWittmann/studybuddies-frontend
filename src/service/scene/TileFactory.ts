@@ -40,7 +40,7 @@ function createTile(
   tileModel.add(createLight(position));
 
   //STATIC-ITEMS----------
-  tileModel.add(createFloor(position, tileKey, color));
+  tileModel.add(createFloor(position, color));
   tileModel.add(createCeiling(position, color));
   if (tileRestricted) {
     neighbors.forEach((neighbor, orientation) => {

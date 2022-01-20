@@ -94,7 +94,7 @@ function updatePlayer(
 ) {
   if (!requiresUpdate(player)) return;
   console.log("Move player: " + player.getUsername());
-  const tilePosition = getTilePosition(player.getPosition(), scene);
+  const tilePosition = storedTiles.get(player.getPosition());
   if (tilePosition) {
     if (player instanceof MainPlayer) {
       updateMainPlayer(player, tilePosition);
@@ -151,20 +151,6 @@ function getTileColor(tile: Tile) {
   else if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
   //default - this case shouldn't appear
   return colors.darkBrown;
-}
-
-/**
- * get tile position by in scene by tile id
- * searches scene for tile's bottom plane that contains tile's position
- * @returns position in scene or undefined if tile is not in scene
- */
-function getTilePosition(
-  tileKey: number,
-  scene: THREE.Scene
-): THREE.Vector3 | undefined {
-  if (!tileKey) return undefined;
-  return scene.getObjectByName(tileKey.toString())?.getObjectByName("floor")
-    ?.position;
 }
 
 /**

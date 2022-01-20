@@ -17,16 +17,19 @@ export enum Orientation {
  */
 export class Tile {
   tileId: number;
+  tileKey: number;
   tileRelationMap: Map<Orientation, number | undefined>;
   objectsInRoom: Array<Item>;
   restrictions: Array<Role>;
 
   constructor(
     tileId: number,
+    tileKey: number,
     objectsInRoom: Array<Item>,
     restrictions: Array<Role>
   ) {
     this.tileId = tileId;
+    this.tileKey = tileKey;
     this.objectsInRoom = objectsInRoom;
     this.restrictions = restrictions;
     this.tileRelationMap = new Map<Orientation, number | undefined>();

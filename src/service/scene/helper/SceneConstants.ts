@@ -76,15 +76,6 @@ export const movementRotations = readonly(
 );
 
 /**
- * vertical positions of objects in room
- */
-export const position = readonly({
-  floor: readonly(vector(0, 0, 0)),
-  wall: readonly(vector(0, settings.tileSize / 2, 0)),
-  ceiling: readonly(vector(0, settings.tileSize, 0)),
-});
-
-/**
  * styleguide colors
  */
 export const colors = readonly({
