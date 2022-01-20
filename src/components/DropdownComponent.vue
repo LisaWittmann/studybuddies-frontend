@@ -21,9 +21,13 @@
         class="dropdown__menu-option"
         v-for="(item, index) of items"
         :key="index"
-        @click="selectItem(item)"
       >
-        <div>{{ item }}</div>
+        <div>
+          <div @click="selectItem(item)" class="option__name">{{ item }}</div>
+          <button class="button__download" @click="download(item)">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
       </div>
       <div
         class="dropdown__menu-option dropdown__menu-option--disabled"
@@ -36,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { useLobbyService } from "@/service/LobbyService";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
@@ -50,9 +54,9 @@ export default defineComponent({
   },
   name: "DropdownComponent",
   setup(props, context) {
-    const { lobbyState } = useLobbyService();
+    const { download, lobbyState } = useLobbyService();
 
-    let isOpen = ref(false);
+    const isOpen = ref(false);
 
     // open or close the dropdown menu
     function openClose() {
@@ -66,7 +70,12 @@ export default defineComponent({
       isOpen.value = false;
     }
 
-    return { isOpen, openClose, selectItem, props };
+    return {
+      isOpen,
+      openClose,
+      selectItem,
+      download,
+    };
   },
 });
 </script>
@@ -138,7 +147,7 @@ export default defineComponent({
     top: 100%;
 
     &.button {
-      padding: $spacing-xs 0;
+      padding: 0;
       display: flex;
       justify-content: center;
     }
@@ -164,9 +173,11 @@ export default defineComponent({
       }
 
       > * {
+        cursor: pointer;
         margin: 0 $spacing-s;
         padding: $spacing-s 0;
         @include border-bottom();
+        @include flex-center(space-between, row);
       }
 
       &:last-child > * {
@@ -175,6 +186,23 @@ export default defineComponent({
 
       &:hover {
         color: $color-beige;
+      }
+
+      .option__name {
+        flex-basis: 90%;
+        @include text-break();
+      }
+
+      .button__download {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        flex-basis: 10%;
+        justify-content: flex-end;
+
+        &:hover i {
+          color: $color-beige;
+        }
       }
     }
   }

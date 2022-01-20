@@ -17,6 +17,7 @@
       :model="tileModel"
       @clicked="onClick"
       @entered="onEnter"
+      @clicked-right="onRightClick"
     />
     <TileModelOverviewComponent v-if="showTileOverview" :model="clickedTile" />
   </div>
@@ -58,9 +59,10 @@ export default defineComponent({
   setup(props) {
     const {
       editorState,
+      addTile,
+      removeTile,
       addStartTile,
       addEndTile,
-      selectTile,
       addRestriction,
       addItem,
       setName,
@@ -85,16 +87,19 @@ export default defineComponent({
     );
 
     const onEnter = (model: TileModel) => {
-      if (mousedown && (props.mode == Mode.CREATE || props.mode == Mode.RESTRICTION_PLACEMENT)) 
+      if (
+        mousedown &&
+        (props.mode == Mode.CREATE || props.mode == Mode.RESTRICTION_PLACEMENT)
+      )
         onClick(model);
-      return
+      return;
     };
 
     const onClick = (model: TileModel) => {
       clickedTile.value = model;
       switch (props.mode) {
         case Mode.CREATE: {
-          selectTile(model);
+          addTile(model);
           break;
         }
         case Mode.START_TILES: {
@@ -116,6 +121,10 @@ export default defineComponent({
       }
     };
 
+    const onRightClick = (model: TileModel) => {
+      removeTile(model);
+    };
+
     function updateName() {
       setName(labyrinthName.value);
     }
@@ -130,6 +139,7 @@ export default defineComponent({
       tileModels,
       onClick,
       onEnter,
+      onRightClick,
     };
   },
 });

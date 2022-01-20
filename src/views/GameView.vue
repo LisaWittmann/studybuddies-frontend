@@ -6,6 +6,9 @@
     @click-object="clickItem"
     @move-player="movePlayer"
   />
+  <div class="score-box">
+    <p>{{ score }}/210 CP</p>
+  </div>
   <!--warning and error messages-->
   <OverlayTerminalComponent
     :opened="gameEventMessage.visible"
@@ -20,50 +23,63 @@
     @respond="getConversationMessage"
     @close="endConversation"
   />
+  <!--player inventory-->
+  <InventoryComponent />
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, onMounted } from "vue";
 import { useGameService } from "@/service/game/GameService";
 import { useGameStore } from "@/service/game/GameStore";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
+import InventoryComponent from "@/components/InventoryComponent.vue";
 import OverlayConversationComponent from "@/components/overlays/OverlayConversationComponent.vue";
 
 import router from "@/router";
 import "@/service/game/EventStore";
+import { onBeforeRouteLeave } from "vue-router";
 
 export default defineComponent({
   name: "GameView",
   components: {
     SceneComponent,
     OverlayTerminalComponent,
+    InventoryComponent,
     OverlayConversationComponent,
   },
   setup() {
-    const { gameState, getGameSessionStorage, updateGameData, setLobbyKey } =
-      useGameStore();
+    const { exitLobby } = useLobbyService();
+    const { gameState, updateGameData, setLobbyKey } = useGameStore();
     const {
       gameEventMessage,
       toggleEventMessage,
       movePlayer,
       clickItem,
       conversation,
-      endConversation,
       getConversationMessage,
+      endConversation,
     } = useGameService();
     updateGameData();
 
     const labyrinth = computed(() => gameState.labyrinth);
     const mainPlayer = computed(() => gameState.mainPlayer);
     const partnerPlayer = computed(() => gameState.partnerPlayer);
+    const score = computed(() => gameState.score);
+
+    onBeforeRouteLeave((to) => {
+      const nextKey = to.params.key as string;
+      if (nextKey != gameState.lobbyKey) {
+        exitLobby(gameState.lobbyKey);
+      }
+    });
 
     onMounted(async () => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
       updateGameData();
-      getGameSessionStorage();
     });
 
     return {
@@ -71,10 +87,10 @@ export default defineComponent({
       clickItem,
       toggleEventMessage,
       gameEventMessage,
-      gameState,
       mainPlayer,
       partnerPlayer,
       labyrinth,
+      score,
       conversation,
       endConversation,
       getConversationMessage,
@@ -82,3 +98,30 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.score-box {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8rem;
+  height: 4rem;
+  margin: 1rem;
+  padding: $spacing-xs $spacing-s;
+  background-image: url("../../src/assets/img/score-bg.svg");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+
+  p {
+    font-family: $font-inconsolata;
+    font-weight: bold;
+    color: $color-beige;
+    padding: 0 1rem;
+    text-align: center;
+    margin: auto 0;
+  }
+}
+</style>

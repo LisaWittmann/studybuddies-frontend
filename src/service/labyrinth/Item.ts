@@ -1,7 +1,7 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { radians } from "@/service/scene/helper/GeometryHelper";
-import { direction, settings } from "@/service/scene/helper/SceneConstants";
+import { directionMap, settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * interactive items in tile
@@ -32,20 +32,9 @@ export class Item {
     this.orientations.forEach((orientation) => {
       //cast string from array to enum for simple use of enum in switch
       const directionVector = new Vector3();
-      switch (orientation) {
-        case Orientation.NORTH:
-          directionVector.copy(direction.north);
-          break;
-        case Orientation.EAST:
-          directionVector.copy(direction.east);
-          break;
-        case Orientation.SOUTH:
-          directionVector.copy(direction.south);
-          break;
-        case Orientation.WEST:
-          directionVector.copy(direction.west);
-          break;
-      }
+      const direction = directionMap.get(orientation);
+
+      if (direction) directionVector.copy(direction);
       this.calcPosition.copy(this.calcPosition.clone().add(directionVector));
     });
 

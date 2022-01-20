@@ -46,7 +46,7 @@ async function createItem(
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
-      object.name = "item " + item.modelName;
+      object.name = "item " + item.modelName + " id " + item.id;
       tileModel.add(object);
     });
   });
@@ -292,7 +292,12 @@ async function createPlayer(
       object.name = player.getUsername();
       object.position.copy(tilePosition);
       object.rotateY(90);
-      const newPos = checkIntersect(object, player, tilePosition, parent);
+      const newPos = checkIntersect(
+        object,
+        player.getPosition(),
+        tilePosition,
+        parent
+      );
       object.position.copy(newPos);
       parent.add(object);
     });
@@ -309,11 +314,11 @@ async function createPlayer(
  */
 function checkIntersect(
   playerObject: THREE.Object3D,
-  player: PartnerPlayer,
+  tileKey: number,
   position: THREE.Vector3,
   scene: THREE.Scene | THREE.Group
 ): THREE.Vector3 {
-  const tile = scene.getObjectByName(player.getPosition().toString()); //get current tile
+  const tile = scene.getObjectByName(tileKey.toString()); //get current tile
   const items = tile?.children.filter((c) => c.name.includes("item")); //get all meshes in tile
   const playerBox = new THREE.Box3().setFromObject(playerObject); //creates bounding box of player
 

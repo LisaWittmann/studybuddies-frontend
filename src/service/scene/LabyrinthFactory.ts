@@ -45,18 +45,33 @@ async function initializeLabyrinth(
  */
 async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
   if (labyrinthData == labyrinth) return;
-  labyrinthData = labyrinth;
-  for (const [key] of labyrinth.tileMap) {
-    const tile = scene.getObjectByName(key.toString());
-    console.log("tile from scene", tile);
+
+  for (const [key, value] of labyrinth.tileMap) {
+    const labyrinthObjects = value.objectsInRoom;
+    const labyrinthDataObjects = labyrinthData.tileMap.get(key);
+    if (
+      labyrinthDataObjects &&
+      labyrinthDataObjects?.objectsInRoom.length > 0
+    ) {
+      const intersection = labyrinthDataObjects.objectsInRoom.filter(
+        (item) => !labyrinthObjects.some((object) => object.id == item.id)
+      );
+
+      if (intersection.length > 0) {
+        const id = intersection[0].id;
+        const name = intersection[0].modelName;
+
+        scene.getObjectByName("item " + name + " id " + id)?.clear();
+      }
+    }
   }
+  labyrinthData = labyrinth;
 }
 
 /**
  * updates player position of main or partner player
  * or initially creates partner player
  * @param player: main or partner player
- * @param labyrinth current labyrinth that should be rendered for player
  * @param scene: scene that contains player
  */
 function updatePlayer(

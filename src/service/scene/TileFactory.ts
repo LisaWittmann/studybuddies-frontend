@@ -20,7 +20,7 @@ function createTile(
   tilePosition: THREE.Vector3,
   role: Role | undefined,
   neighbors: Map<Orientation, Tile | undefined>,
-  isEnd: boolean,
+  isEnd: boolean
 ): THREE.Group {
   const {
     createFloor,
@@ -105,9 +105,9 @@ function getColor(tile: Tile, isEnd = false) {
   //both players have access to this tile
   if (tile.getRestrictions().length == 0) return colors.darkBrown;
   //only the designer has access to this tile
-  if (tile.isRestrictedFor(Role.HACKER)) return colors.designer;
+  if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
   //only the hacker has access to this tile
-  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.hacker;
+  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
   //default - this case shouldn't appear
   return colors.grey;
 }

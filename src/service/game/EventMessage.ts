@@ -38,6 +38,7 @@ export enum Operation {
   ROLE_PICK,
   LABYRINTH_PICK,
   UPDATE,
+  DELETE,
 }
 
 export enum Update {

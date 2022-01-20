@@ -10,7 +10,6 @@ import { Role } from "@/service/game/Player";
  */
 async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
   console.log("Requested lab of lobby " + lobbyKey);
-  //TODO change this to the game api
   return fetch(`/api/lobby/${lobbyKey}`, {
     method: "GET",
   })
@@ -19,6 +18,7 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
       return response.json();
     })
     .then((jsonData) => {
+      console.log("creating new labyrinth");
       const labyrinth = new Labyrinth(
         jsonData.name,
         jsonData.endTileKey,
@@ -38,9 +38,7 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
           for (const orientation of item.orientations) {
             orientations.push((<any>Orientation)[orientation]);
           }
-          objectsInRoom.push(
-            new Item(item.id, item.modelName, item.orientations)
-          );
+          objectsInRoom.push(new Item(item.id, item.modelName, orientations));
         }
         const restrictions = new Array<Role>();
         for (const role of tile.restrictions) {

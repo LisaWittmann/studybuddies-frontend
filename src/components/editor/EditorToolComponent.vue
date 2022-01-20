@@ -6,7 +6,7 @@
           v-for="(option, index) in options"
           :key="index"
           class="button__icon--circle button--filled"
-          :class="optionClass(option)"
+          :class="optionClass(index)"
           @click="select(index)"
         >
           <img :src="image(index)" alt="Missing Option" />
@@ -24,9 +24,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, ref } from "vue";
 import { Role } from "@/service/game/Player";
 import { ItemModel } from "@/service/editor/TileModel";
-import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "EditorToolComponent",
@@ -62,14 +62,23 @@ export default defineComponent({
       }
     };
 
-    const optionClass = (index: number) => {
-      switch (props.options[index]) {
+    const getClass = (role: Role | undefined) => {
+      switch (role) {
         case Role.DESIGNER:
           return "button__option-designer";
         case Role.HACKER:
           return "button__option-hacker";
         default:
           return "";
+      }
+    };
+
+    const optionClass = (index: number) => {
+      const option = props.options[index];
+      if (option instanceof ItemModel) {
+        return getClass(option.blockedRole);
+      } else {
+        return getClass(option as Role);
       }
     };
 
@@ -83,10 +92,24 @@ export default defineComponent({
   font-size: $headline-xl;
 
   &__options {
-    margin-bottom: 20px;
+    max-height: 77vh;
+    overflow-y: scroll;
+    @include scroll-container(to top);
 
     > * {
       margin: 5px 0;
+
+      &:first-of-type {
+        margin-top: 15px;
+      }
+
+      &:last-of-type {
+        margin-bottom: 10px;
+      }
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
     }
   }
 

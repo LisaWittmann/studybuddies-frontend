@@ -43,7 +43,7 @@
           <transition name="delay-fade">
             <button
               class="button button--small button__exit"
-              @click="exitLobby(lobbyKey, loginState.username)"
+              @click="exitLobby(lobbyKey)"
             >
               Verlassen
             </button>
@@ -58,7 +58,8 @@
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 
-import { useLobbyService } from "@/service/LobbyService";
+import { useAppService } from "@/service/AppService";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useGameStore } from "@/service/game/GameStore";
 
@@ -75,6 +76,7 @@ export default defineComponent({
     RadioButtonGroupComponent,
   },
   setup() {
+    const { appState } = useAppService();
     const { loginState } = useLoginStore();
     const {
       updateUsers,
@@ -87,6 +89,7 @@ export default defineComponent({
       updateRole,
       getRoles,
       getRoleOptions,
+      updateReadyStates,
     } = useLobbyService();
     const { gameState, setLobbyKey } = useGameStore();
 
@@ -104,10 +107,10 @@ export default defineComponent({
         lobbyState.users.find((user) => user.username === loginState.username)
           ?.isReady
     );
-    const loading = computed(() => gameState.loading);
+    const loading = computed(() => appState.loading);
 
     const copy = (text: string) => navigator.clipboard.writeText(text);
-    
+
     function selectLabyrinth(labyrinthName: string) {
       setLabyrinthSelection(labyrinthName);
       updateLabyrinthPick(labyrinthName, gameState.lobbyKey);
@@ -118,37 +121,24 @@ export default defineComponent({
     }
 
     onbeforeunload = () => {
-      if (
-        lobbyState.users.some((user) => user.username === loginState.username)
-      ) {
-        exitLobby(lobbyKey.value, loginState.username);
-      }
+      exitLobby(lobbyKey.value);
       return "Leaving Lobby";
-    };
-
-    onunload = () => {
-      if (
-        lobbyState.users.some((user) => user.username === loginState.username)
-      ) {
-        exitLobby(gameState.lobbyKey, loginState.username);
-      }
     };
 
     // exit lobby if any other page than game is opened
     onBeforeRouteLeave((to) => {
       const nextKey = to.params.key as string;
-      if (
-        nextKey != gameState.lobbyKey &&
-        lobbyState.users.some((user) => user.username === loginState.username)
-      ) {
-        exitLobby(gameState.lobbyKey, loginState.username);
+      if (nextKey != gameState.lobbyKey) {
+        exitLobby(gameState.lobbyKey);
       }
     });
 
     onMounted(() => {
       const route = router.currentRoute.value;
       setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey).catch(() => router.push("/find"));
+      updateUsers(gameState.lobbyKey)
+        .then(() => updateReadyStates(gameState.lobbyKey))
+        .catch(() => router.push("/find"));
       updateLabyrinths();
       getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
       getRoleOptions(gameState.lobbyKey);

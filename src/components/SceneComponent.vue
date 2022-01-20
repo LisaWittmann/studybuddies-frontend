@@ -3,19 +3,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted, watch } from "vue";
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  watch,
+} from "vue";
 import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
-import { Labyrinth } from "@/service/labyrinth/Labyrinth";
+import { useGameStore } from "@/service/game/GameStore";
 
 export default defineComponent({
   name: "SceneComponent",
   props: {
-    labyrinth: {
-      type: Labyrinth,
-      required: true,
-    },
     player: {
       type: MainPlayer,
       required: true,
@@ -35,9 +37,12 @@ export default defineComponent({
     } = useSceneFactory();
     const { initializeLabyrinth, updateLabyrinth, updatePlayer } =
       useLabyrinthFactory();
+    const { gameState } = useGameStore();
+
+    const labyrinth = computed(() => gameState.labyrinth);
 
     const scene = createScene();
-    initializeLabyrinth(props.labyrinth, props.player, scene);
+    initializeLabyrinth(labyrinth.value, props.player, scene);
 
     const render = () => {
       renderScene();
@@ -60,14 +65,16 @@ export default defineComponent({
 
     onBeforeUnmount(() => {
       removeEventListener("resize", updateScene);
+      scene.clear();
     });
 
     watch(
-      [props.labyrinth, props.player, props.partner],
+      [labyrinth, props.player, props.partner],
       () => {
-        updateLabyrinth(props.labyrinth, scene);
-        updatePlayer(props.player, props.labyrinth, scene);
-        updatePlayer(props.partner, props.labyrinth, scene);
+        console.log("watcher triggered");
+        updateLabyrinth(labyrinth.value, scene);
+        updatePlayer(props.player, labyrinth.value, scene);
+        updatePlayer(props.partner, labyrinth.value, scene);
       },
       { deep: true }
     );
