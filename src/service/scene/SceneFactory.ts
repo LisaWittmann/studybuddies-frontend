@@ -19,11 +19,14 @@ let orbitControls: OrbitControls;
  */
 function createScene(debug = false): THREE.Scene {
   //RENDERER-----------------
+  const pixelRatio = window.devicePixelRatio;
+  const antialias = pixelRatio < 1;
+
   renderer = new THREE.WebGLRenderer({
-    alpha: true,
-    antialias: true,
+    antialias: antialias,
+    powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(pixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   //RAY_CASTER----------------

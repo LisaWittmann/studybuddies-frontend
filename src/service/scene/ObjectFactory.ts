@@ -70,8 +70,8 @@ function createFloor(
   textureLoader.load("/textures/gras-texture.png", (texture: Texture) => {
     texture.minFilter = THREE.NearestFilter;
     const object = new THREE.Mesh(
-      new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-      new THREE.MeshStandardMaterial({
+      new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+      new THREE.MeshLambertMaterial({
         side: DoubleSide,
         map: texture,
         color: color,
@@ -103,8 +103,8 @@ function createCeiling(
     (texture: Texture) => {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
-        new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-        new THREE.MeshStandardMaterial({
+        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+        new THREE.MeshLambertMaterial({
           side: DoubleSide,
           map: texture,
           color: color,
@@ -143,8 +143,8 @@ function createTexturedWall(
     (texture: Texture) => {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
-        new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-        new THREE.MeshStandardMaterial({
+        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+        new THREE.MeshLambertMaterial({
           side: DoubleSide,
           map: texture,
           color: color,
@@ -177,8 +177,8 @@ function createWall(
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const object = new THREE.Mesh(
-    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-    new THREE.MeshStandardMaterial({
+    new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+    new THREE.MeshLambertMaterial({
       side: DoubleSide,
       color: color,
       transparent: opacity < 1,
@@ -214,8 +214,8 @@ function createRestrictiveWall(
     function (texture: Texture) {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
-        new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-        new THREE.MeshStandardMaterial({
+        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+        new THREE.MeshLambertMaterial({
           side: DoubleSide,
           map: texture,
           transparent: true,

@@ -67,6 +67,7 @@ import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
 import RadioButtonGroupComponent from "@/components/RadioButtonGroupComponent.vue";
 import router from "@/router";
+import {Role} from "@/service/game/Player";
 
 export default defineComponent({
   name: "LobbySettingsView",
@@ -87,7 +88,6 @@ export default defineComponent({
       updateLabyrinths,
       lobbyState,
       updateRole,
-      getRoles,
       getRoleOptions,
       updateReadyStates,
     } = useLobbyService();
@@ -98,7 +98,7 @@ export default defineComponent({
     const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
-    const allRoles = ref([]);
+    const allRoles = ref(Object.values(Role).filter(role => typeof role === 'string'));
     const openRoles = computed(() => lobbyState.openRoles);
     const selectedRole = computed(() => lobbyState.selectedRole);
 
@@ -140,7 +140,6 @@ export default defineComponent({
         .then(() => updateReadyStates(gameState.lobbyKey))
         .catch(() => router.push("/find"));
       updateLabyrinths();
-      getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
       getRoleOptions(gameState.lobbyKey);
     });
 
@@ -166,6 +165,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+* {
+  user-select: none;
+}
+
 h1 {
   padding-top: $spacing-l;
   margin-top: 0;
