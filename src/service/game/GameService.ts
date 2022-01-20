@@ -201,6 +201,7 @@ async function checkEndGame(modelName: string) {
  * @param itemId contains id of clicked body
  */
 async function getOperation(modelName: string, itemId: string) {
+  console.log("click");
   fetch("/api/lobby/click/" + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
@@ -208,7 +209,6 @@ async function getOperation(modelName: string, itemId: string) {
     })
     .then((jsonData) => {
       const operation = (<any>Operation)[jsonData];
-      console.log("click");
       switch (operation) {
         case Operation.ACCESS:
           checkAccess(modelName);
@@ -233,15 +233,7 @@ async function getOperation(modelName: string, itemId: string) {
     });
 }
 
-/**
- * handle clicked item with debounced request to get operation
- * @param modelName name of clicked item
- * @param itemId contains id of clicked body
- */
-function clickItem(modelName: string, itemId: string) {
-  const click = debounce(getOperation, 20);
-  click(modelName, itemId);
-}
+const clickItem = debounce(getOperation, 500, { leading: true });
 
 function playerLeftGame(username: string) {
   endGame();
