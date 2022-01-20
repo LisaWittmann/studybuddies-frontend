@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
-import { DoubleSide, Texture, TextureLoader } from "three";
+import { DoubleSide, MeshBasicMaterial, MeshLambertMaterial, Texture, TextureLoader } from "three";
 
 import { Item } from "@/service/labyrinth/Item";
 import { Orientation } from "@/service/labyrinth/Tile";
@@ -75,6 +75,7 @@ function createFloor(
         side: DoubleSide,
         map: texture,
         color: color,
+        opacity: 0.6,
       })
     );
     object.position.copy(tilePosition);
@@ -108,6 +109,7 @@ function createCeiling(
           side: DoubleSide,
           map: texture,
           color: color,
+          opacity: 0.6,
         })
       );
       object.position.set(
@@ -148,6 +150,7 @@ function createTexturedWall(
           side: DoubleSide,
           map: texture,
           color: color,
+          opacity: 0.6,
         })
       );
       object.position.copy(position);
@@ -253,7 +256,9 @@ function createArrow(
     object.visible = false;
     object.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        child.material.color.setHex(arrow.color);
+        child.material = new MeshLambertMaterial({
+          color: arrow.color,
+        });
       }
     });
     object.name = "arrow";

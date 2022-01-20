@@ -118,7 +118,7 @@ function getColor(tile: Tile, isEnd = false) {
  * @returns: point light
  */
 function createLight(position: THREE.Vector3) {
-  const light = new THREE.PointLight(0xffffff, 1, 50, 2);
+  const light = new THREE.PointLight(0xffffff, 1.3, 50, 2);
   light.position.set(
     position.x,
     position.y + settings.tileSize / 2,
