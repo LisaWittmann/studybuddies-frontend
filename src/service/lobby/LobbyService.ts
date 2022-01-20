@@ -347,6 +347,17 @@ function setUserReadyState(readyState: boolean, user?: string) {
 }
 
 /**
+ * Finds the right user in the users list via the username param and sets the given ReadyState in it.
+ * @param username The username (from the BE) of the user which pressed the "Ready" Button
+ * @param finished The state to determine whether the given user is ready or not
+ */
+function setUserFinishState(username: string, finished: boolean) {
+  lobbyState.users
+    .find((user) => user.username == username)
+    ?.setFinished(finished);
+}
+
+/**
  * Initial game setup when all users are ready:
  * 1. Gathering the labyrinth information from the BE
  * 2. Updating the Users one last time, so they can get transferred to the gameState properly
@@ -422,6 +433,7 @@ export function useLobbyService() {
     readyCheck,
     setupGame,
     setUserReadyState,
+    setUserFinishState,
     download,
     lobbyState: readonly(lobbyState),
   };

@@ -228,7 +228,13 @@ function removeEndTile(model: TileModel): void {
  * @param role: role that will be restricted for tile
  */
 function addRestriction(model: TileModel, role: Role): void {
-  if (!model.relationKey || model.isEnd || model.isStart) return;
+  if (
+    !model.relationKey ||
+    model.isEnd ||
+    model.isStart ||
+    model.objectsInRoom.some((item) => item.blockedRole == role)
+  )
+    return;
   if (!model.restrictions?.includes(role)) {
     model.restrictions?.push(role);
   }
@@ -355,12 +361,7 @@ function convert(): Labyrinth {
       itemModel.orientations = orientations;
       tileModel.removePlacement(orientations);
       tile.objectsInRoom.push(
-        new Item(
-          0,
-          itemModel.modelName,
-          itemModel.positionInRoom,
-          itemModel.orientations
-        )
+        new Item(0, itemModel.modelName, itemModel.orientations)
       );
     }
     labyrinth.tileMap.set(key, tile);
@@ -421,9 +422,7 @@ export function useEditorService() {
   return {
     editorState,
     updateTileModels,
-    setDimension,
     setItemOptions,
-    getTileModel,
     addTile,
     removeTile,
     addEndTile,

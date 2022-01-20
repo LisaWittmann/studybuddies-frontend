@@ -3,8 +3,10 @@ import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 
 import { useAppService } from "@/service/AppService";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLobbyService } from "@/service/lobby/LobbyService";
 import { useGameService } from "@/service/game/GameService";
+import { useLobbyService } from "@/service/lobby/LobbyService";
+
+import router from "@/router";
 
 const { setFeedback } = useAppService();
 const { updateInventory } = useGameService();
@@ -17,6 +19,8 @@ const {
   updateLabyrinths,
   getRoleOptions,
   setUserReadyState,
+  setUserFinishState,
+  lobbyState,
 } = useLobbyService();
 
 let wsURL = "ws://localhost:9090/messagebroker";
@@ -90,6 +94,18 @@ stompClient.onConnect = () => {
               eventMessage.data === "READY",
               eventMessage.username
             );
+          }
+          break;
+        case Operation.CHECK_END:
+          lobbyState.users.forEach((user) => {
+            if (user.username == eventMessage.data) {
+              setUserFinishState(user.username, true);
+            }
+          });
+
+          // If both users are finished, redirect to endscreen
+          if (lobbyState.users.every((user) => user.finished)) {
+            router.push(`/end/${gameState.lobbyKey}`);
           }
           break;
         case Operation.LABYRINTH_PICK:

@@ -3,11 +3,11 @@ import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/lobby/LobbyService";
 
 import { EventMessage, Operation } from "@/service/game/EventMessage";
-import { Message } from "@/service/game/Conversation";
+import { Message, Response } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { Item } from "@/service/labyrinth/Item";
 
-const { gameState, setInventory, resetGameState } = useGameStore();
+const { gameState, setInventory, resetGameState, setStarted } = useGameStore();
 const { exitLobby } = useLobbyService();
 
 const lobbyKey = computed(() => gameState.lobbyKey);
@@ -69,12 +69,12 @@ async function movePlayer(orientation: Orientation) {
 
 /**
  * start conversation with a game character
- * @param character modelName of charachter
+ * @param character modelName of character
  */
 function startConversation(character: string) {
   conversation.character = character;
   conversation.visible = true;
-  getConversationMessage("1.1");
+  await getConversationMessage("1.1");
 }
 
 /**
@@ -146,9 +146,54 @@ async function checkAccess(modelName: string) {
     });
 }
 
+async function checkEndGame(modelName: string) {
+  const eventMessage = new EventMessage(
+    Operation[Operation.CHECK_END],
+    lobbyKey.value,
+    playerName.value,
+    modelName.toUpperCase()
+  );
+  fetch("/api/lobby/end", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(eventMessage),
+  })
+    .then((response) => {
+      conversation.visible = true;
+      conversation.message = new Message(
+        "",
+        "",
+        undefined,
+        Array.of(new Response("", "", ""))
+      );
+      if (response.ok) {
+        conversation.message.text =
+          "Herzlichen Glückwunsch. Du kannst das Labyrinth verlassen. Warte bis dein Partner die Trophäe gesammelt hat.";
+        conversation.message.responses = [];
+      } else {
+        conversation.message.responses[0].text = "Ich komme später wieder.";
+        if (response.status == 409) {
+          conversation.message.text =
+            "Du hast noch nicht die zu erreichende Mindestpunktzahl erreicht.";
+        } else if (response.status == 405) {
+          conversation.message.text =
+            "Du bist noch nicht zusammen mit deinem Partner am Ende angekommen.";
+        } else if (response.status == 418) {
+          conversation.message.text =
+            "Tut mir leid, aber ich glaube die Trophäe ist für jemand anderen vorgesehen.";
+        }
+        conversation.message.text += " Versuch's später noch einmal.";
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
 /**
  * request operation of clicked item
  * @param modelName name of clicked item
+ * @param itemId contains id of clicked body
  */
 async function clickItem(modelName: string, itemId: number) {
   fetch("/api/lobby/click/" + modelName, { method: "GET" })
@@ -166,6 +211,9 @@ async function clickItem(modelName: string, itemId: number) {
           break;
         case Operation.COLLECT:
           addToInventory(itemId);
+          break;
+        case Operation.CHECK_END:
+          checkEndGame(modelName);
           break;
       }
     })
@@ -319,6 +367,7 @@ async function tradeItem(itemId: number) {
 function forceGameEnd() {
   resetGameEvent();
   endConversation();
+  setStarted(false);
   exitLobby();
   resetGameState();
 }
@@ -329,8 +378,8 @@ export function useGameService() {
     toggleEventMessage,
     movePlayer,
     clickItem,
-    startConversation,
     getConversationMessage,
+    endConversation,
     conversation,
     updateInventory,
     tradeItem,

@@ -1,5 +1,4 @@
 import { Orientation } from "@/service/labyrinth/Tile";
-import { Position } from "@/service/labyrinth/Item";
 import { Role } from "@/service/game/Player";
 
 /**
@@ -119,13 +118,11 @@ export class TileModel {
 
 export class ItemModel {
   modelName: string;
-  positionInRoom: Position;
   orientations: Array<Orientation>;
   blockedRole: Role | undefined;
 
   constructor(modelName: string, blockedRole?: Role) {
     this.modelName = modelName;
-    this.positionInRoom = Position.FLOOR;
     this.orientations = new Array<Orientation>();
     this.blockedRole = blockedRole;
   }
