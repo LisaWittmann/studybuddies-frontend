@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
-import { DoubleSide, MeshBasicMaterial, MeshLambertMaterial, Texture, TextureLoader } from "three";
+import { DoubleSide, Texture, TextureLoader } from "three";
 
 import { Item } from "@/service/labyrinth/Item";
 import { Orientation } from "@/service/labyrinth/Tile";
@@ -256,7 +256,7 @@ function createArrow(
     object.visible = false;
     object.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        child.material = new MeshLambertMaterial({
+        child.material = new THREE.MeshLambertMaterial({
           color: arrow.color,
         });
       }
