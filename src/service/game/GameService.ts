@@ -1,7 +1,10 @@
 import { reactive } from "vue";
+import { debounce } from "lodash";
+
 import { useGameStore } from "@/service/game/GameStore";
 import { useLoginStore } from "@/service/login/LoginStore";
 import { useAppService } from "@/service/AppService";
+
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message, Response } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
@@ -197,7 +200,7 @@ async function checkEndGame(modelName: string) {
  * @param modelName name of clicked item
  * @param itemId contains id of clicked body
  */
-async function clickItem(modelName: string, itemId: string) {
+async function getOperation(modelName: string, itemId: string) {
   fetch("/api/lobby/click/" + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
@@ -228,6 +231,16 @@ async function clickItem(modelName: string, itemId: string) {
     .catch((error) => {
       console.error(error);
     });
+}
+
+/**
+ * handle clicked item with debounced request to get operation
+ * @param modelName name of clicked item
+ * @param itemId contains id of clicked body
+ */
+async function clickItem(modelName: string, itemId: string) {
+  const click = debounce(getOperation, 10);
+  click(modelName, itemId);
 }
 
 function playerLeftGame(username: string) {
