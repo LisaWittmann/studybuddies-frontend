@@ -1,29 +1,16 @@
-import { reactive } from "vue";
 import { Tile, Orientation } from "@/service/labyrinth/Tile";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Item } from "@/service/labyrinth/Item";
-
 import { Role } from "@/service/game/Player";
-import { Vector3 } from "three";
-
-/**
- * constant to keep the tiles or store an errormessage
- */
-const labyrinthState: Labyrinth = reactive<Labyrinth>({
-  tileMap: new Map<number, Tile>([]),
-  endTileKey: 0,
-  playerStartTileKeys: new Array<number>(),
-});
 
 /**
  * update the tiles for getting them initially and every time something changes
  * fetches labyrinth object of api and converts response into labyrinth data
  * creates simple fallback labyrinth if fetch fails
  */
-async function updateLabyrinthData(lobbyKey: string) {
+async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
   console.log("Requested lab of lobby " + lobbyKey);
-  //TODO change this to the game api
-  await fetch(`/api/lobby/${lobbyKey}`, {
+  return fetch(`/api/lobby/${lobbyKey}`, {
     method: "GET",
   })
     .then((response) => {
@@ -31,26 +18,27 @@ async function updateLabyrinthData(lobbyKey: string) {
       return response.json();
     })
     .then((jsonData) => {
+      console.log("creating new labyrinth");
       const labyrinth = new Labyrinth(
+        jsonData.name,
         jsonData.endTileKey,
         jsonData.playerStartTileKeys
       );
 
       //iterate over the tiles in the json data tileMap to create tiles for every tile in json object
-      for (const key in jsonData.tileMap) {
-        const tile = jsonData.tileMap[key];
-        const id = parseInt(key);
+      for (const tileKey in jsonData.tileMap) {
+        const tile = jsonData.tileMap[tileKey];
+        const id = parseInt(tileKey);
         const objectsInRoom = new Array<Item>();
-        for (const item of tile.objectsInRoom) {
-          objectsInRoom.push(
-            new Item(
-              item.id,
-              item.modelName,
-              item.positionInRoom,
-              item.orientations,
-              new Vector3()
-            )
-          );
+
+        for (const itemKey in tile.objectsInRoom) {
+          const item = tile.objectsInRoom[itemKey];
+          const orientations = new Array<Orientation>();
+
+          for (const orientation of item.orientations) {
+            orientations.push((<any>Orientation)[orientation]);
+          }
+          objectsInRoom.push(new Item(item.id, item.modelName, orientations));
         }
         const restrictions = new Array<Role>();
         for (const role of tile.restrictions) {
@@ -81,12 +69,7 @@ async function updateLabyrinthData(lobbyKey: string) {
         }
       }
 
-      labyrinthState.tileMap = labyrinth.tileMap;
-      labyrinthState.endTileKey = labyrinth.endTileKey;
-      labyrinthState.playerStartTileKeys = labyrinth.playerStartTileKeys;
-    })
-    .catch((error) => {
-      console.error(error);
+      return labyrinth;
     });
 }
 
@@ -107,7 +90,6 @@ function connectTiles(
 
 export function useLabyrinthStore() {
   return {
-    labyrinthState,
     updateLabyrinthData,
   };
 }

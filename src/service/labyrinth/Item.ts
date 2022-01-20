@@ -1,20 +1,7 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { radians } from "@/service/scene/helper/GeometryHelper";
-import {
-  direction,
-  position,
-  settings,
-} from "@/service/scene/helper/SceneConstants";
-
-/**
- * enumeration of vertical object position in tile
- */
-export enum Position {
-  WALL,
-  FLOOR,
-  CEILING,
-}
+import { directionMap, settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * interactive items in tile
@@ -25,22 +12,14 @@ export enum Position {
 export class Item {
   id: number;
   modelName: string;
-  positionInRoom: Position;
-  orientations: Array<string>;
+  orientations: Array<Orientation>;
   calcPosition: Vector3;
 
-  constructor(
-    id: number,
-    modelName: string,
-    positionInRoom: string,
-    orientations: Array<string>,
-    calcPosition: Vector3
-  ) {
+  constructor(id: number, modelName: string, orientations: Array<Orientation>) {
     this.id = id;
     this.modelName = modelName;
-    this.positionInRoom = (<any>Position)[positionInRoom];
     this.orientations = orientations;
-    this.calcPosition = calcPosition;
+    this.calcPosition = new Vector3();
   }
 
   /**
@@ -48,40 +27,14 @@ export class Item {
    * @returns height where item is positioned
    */
   calcPositionInRoom = (): Vector3 => {
-    //set vertical position
-    switch (this.positionInRoom) {
-      case Position.FLOOR:
-        this.calcPosition.copy(position.floor);
-        break;
-      case Position.WALL:
-        this.calcPosition.copy(position.wall);
-        break;
-      case Position.CEILING:
-        this.calcPosition.copy(position.ceiling);
-        break;
-    }
-
     //calculation for object positioning
     //set horizontal position
     this.orientations.forEach((orientation) => {
       //cast string from array to enum for simple use of enum in switch
-      const currentOrientation: Orientation = (<any>Orientation)[orientation];
       const directionVector = new Vector3();
+      const direction = directionMap.get(orientation);
 
-      switch (currentOrientation) {
-        case Orientation.NORTH:
-          directionVector.copy(direction.north);
-          break;
-        case Orientation.EAST:
-          directionVector.copy(direction.east);
-          break;
-        case Orientation.SOUTH:
-          directionVector.copy(direction.south);
-          break;
-        case Orientation.WEST:
-          directionVector.copy(direction.west);
-          break;
-      }
+      if (direction) directionVector.copy(direction);
       this.calcPosition.copy(this.calcPosition.clone().add(directionVector));
     });
 
@@ -97,28 +50,49 @@ export class Item {
    */
   rotationY = (): number => {
     let viewDirection = 0;
-    this.orientations.forEach((orientation) => {
-      const currentOrientation: Orientation = (<any>Orientation)[orientation];
-      switch (currentOrientation) {
-        case Orientation.NORTH:
-          viewDirection += 0;
-          break;
-        case Orientation.EAST:
-          viewDirection += 270;
-          break;
-        case Orientation.SOUTH:
-          viewDirection += 180;
-          break;
-        case Orientation.WEST:
-          viewDirection += 90;
-          break;
-      }
-    });
+    const fullOrientation = this.orientations
+      .map((orientation) => Orientation[orientation])
+      .toString()
+      .replace(",", "");
+    console.log("Orientation: ", fullOrientation);
 
-    //bisect angle of orientation to get view direction into corners
-    if (this.orientations.length == 2) {
-      viewDirection = viewDirection / 2;
+    if (fullOrientation === "NORTH") {
+      viewDirection = 0;
+    } else if (fullOrientation === "EAST" || fullOrientation === "WEST") {
+      viewDirection = 90;
+    } else if (fullOrientation === "SOUTH") {
+      viewDirection = 180;
+    } else if (
+      fullOrientation === "NORTHEAST" ||
+      fullOrientation === "EASTNORTH" ||
+      fullOrientation === "NORTHWEST" ||
+      fullOrientation === "WESTNORTH"
+    ) {
+      viewDirection = 45;
+    } else if (
+      fullOrientation === "SOUTHEAST" ||
+      fullOrientation === "EASTSOUTH" ||
+      fullOrientation === "SOUTHWEST" ||
+      fullOrientation === "WESTSOUTH"
+    ) {
+      viewDirection = 135;
     }
+
+    //check direction of rotation; EAST -> rotate clockwise
+    if (fullOrientation.includes("EAST")) {
+      viewDirection = viewDirection * -1;
+    }
+
     return radians(viewDirection);
   };
+
+  toJsonObject() {
+    return {
+      id: this.id,
+      modelName: this.modelName,
+      orientations: this.orientations.map(
+        (orientation) => Orientation[orientation]
+      ),
+    };
+  }
 }
