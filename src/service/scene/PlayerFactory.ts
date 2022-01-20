@@ -127,47 +127,71 @@ function calculatePartnerPositon(
       const orientationStrings = item.orientations.map(
         (orientation) => Orientation[orientation]
       );
-      console.log(orientationStrings.toString());
       itemOrientations.push(orientationStrings.toString().replace(",", ""));
     });
 
     //iterates over all orientations and checks if the planned corner position is already taken by an item
-    itemOrientations.forEach((orientation) => {
-      //if there is an item in the corner -> move partner clockwise
-      if (playerOrientation === orientation) {
-        if (orientation === "NORTHWEST" || orientation === "WESTNORTH") {
-          playerOrientation = "NORTHEAST";
-          directionVector
-            .copy(direction.north)
-            .add(direction.east)
-            .multiplyScalar(factors.partnerTranslateFactor);
-        } else if (orientation === "NORTHEAST" || orientation === "EASTNORTH") {
-          playerOrientation = "SOUTHEAST";
-          directionVector
-            .copy(direction.south)
-            .add(direction.east)
-            .multiplyScalar(factors.partnerTranslateFactor);
-        } else if (orientation === "SOUTHEAST" || orientation === "EASTSOUTH") {
-          playerOrientation = "SOUTHWEST";
-          directionVector
-            .copy(direction.south)
-            .add(direction.west)
-            .multiplyScalar(factors.partnerTranslateFactor);
-        } else if (orientation === "SOUTHWEST" || orientation === "WESTSOUTH") {
-          playerOrientation = "NORTHWEST";
-          directionVector
-            .copy(direction.north)
-            .add(direction.west)
-            .multiplyScalar(factors.partnerTranslateFactor);
-        } else {
-          playerOrientation = "NORTHWEST";
-          directionVector
-            .copy(direction.north)
-            .add(direction.west)
-            .multiplyScalar(factors.partnerTranslateFactor);
+    while (itemOrientations.includes(playerOrientation)) {
+      itemOrientations.forEach((orientation) => {
+        console.log(
+          "ITEM ORIENTATION",
+          orientation,
+          "PLAYER",
+          playerOrientation
+        );
+        //if there is an item in the corner -> move partner clockwise
+        if (playerOrientation === orientation) {
+          console.log(
+            "EQUAL POSITION PLAYER",
+            playerOrientation,
+            "ITEM ",
+            orientation
+          );
+
+          if (orientation === "NORTHWEST" || orientation === "WESTNORTH") {
+            playerOrientation = "NORTHEAST";
+            directionVector
+              .copy(direction.north)
+              .add(direction.east)
+              .multiplyScalar(factors.partnerTranslateFactor);
+          } else if (
+            orientation === "NORTHEAST" ||
+            orientation === "EASTNORTH"
+          ) {
+            playerOrientation = "SOUTHEAST";
+            directionVector
+              .copy(direction.south)
+              .add(direction.east)
+              .multiplyScalar(factors.partnerTranslateFactor);
+          } else if (
+            orientation === "SOUTHEAST" ||
+            orientation === "EASTSOUTH"
+          ) {
+            playerOrientation = "SOUTHWEST";
+            directionVector
+              .copy(direction.south)
+              .add(direction.west)
+              .multiplyScalar(factors.partnerTranslateFactor);
+          } else if (
+            orientation === "SOUTHWEST" ||
+            orientation === "WESTSOUTH"
+          ) {
+            playerOrientation = "NORTHWEST";
+            directionVector
+              .copy(direction.north)
+              .add(direction.west)
+              .multiplyScalar(factors.partnerTranslateFactor);
+          } else {
+            playerOrientation = "NORTHWEST";
+            directionVector
+              .copy(direction.north)
+              .add(direction.west)
+              .multiplyScalar(factors.partnerTranslateFactor);
+          }
         }
-      }
-    });
+        console.log("PLAYER", playerOrientation);
+      });
+    }
   }
 
   calcPartnerPosition.copy(tilePosition).add(directionVector);

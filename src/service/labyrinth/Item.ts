@@ -54,7 +54,7 @@ export class Item {
       .map((orientation) => Orientation[orientation])
       .toString()
       .replace(",", "");
-    console.log("Orientation: ", fullOrientation);
+    //console.log("Orientation: ", fullOrientation);
 
     if (fullOrientation === "NORTH") {
       viewDirection = 0;
