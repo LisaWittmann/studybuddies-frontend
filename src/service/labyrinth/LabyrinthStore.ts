@@ -45,7 +45,7 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
         }
         labyrinth.tileMap.set(
           Number(tileKey),
-          new Tile(tile.tileId, Number(tileKey), objectsInRoom, restrictions)
+          new Tile(Number(tileKey), objectsInRoom, restrictions)
         );
 
         //workaround to parse json list in map
@@ -86,7 +86,9 @@ function connectTiles(
   orientationRelation: Orientation,
   secondTile: Tile | undefined
 ) {
-  firstTile.getTileRelationMap().set(orientationRelation, secondTile?.getId());
+  firstTile
+    .getTileRelationMap()
+    .set(orientationRelation, secondTile?.getTileKey());
 }
 
 export function useLabyrinthStore() {

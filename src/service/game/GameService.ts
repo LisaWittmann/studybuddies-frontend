@@ -43,7 +43,7 @@ function toggleEventMessage() {
 
 /**
  * function which is used when clicking the arrow in Scene
- * By receiving the Orientation it creates axn EventMessage as Move-Operation to send it to the BE via GameService Methode
+ * By receiving the Orientation it creates an EventMessage as Move-Operation to send it to the BE via GameService Methode
  * @param orientation used in the backend to identify the direction to move the player
  */
 async function movePlayer(orientation: Orientation) {
@@ -99,8 +99,7 @@ async function getConversationMessage(id: string) {
       return response.json();
     })
     .then((jsonData) => {
-      conversation.message = jsonData;
-
+      conversation.message = jsonData as Message;
       if (conversation.message.id != "0.0") {
         if (conversation.message.itemName != null) {
           givePlayerItem(conversation.message.itemName);

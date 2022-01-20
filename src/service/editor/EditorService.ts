@@ -348,7 +348,7 @@ function convert(): Labyrinth {
 
   for (const tileModel of selectedTiles.value) {
     const key = tileModel.relationKey as number;
-    const tile = new Tile(0, key, [], tileModel.restrictions);
+    const tile = new Tile(key, [], tileModel.restrictions);
     for (const [orientation, neighbor] of tileModel.tileRelationMap) {
       tile.tileRelationMap.set(orientation, neighbor?.relationKey);
     }
@@ -379,7 +379,7 @@ function parseLabyrinth(labyrinth: Labyrinth): string {
   const tileMapJson = new Map<number, any>();
   for (const [key, tile] of labyrinth.tileMap) {
     tileMapJson.set(key, {
-      tileId: tile.tileId,
+      tileKey: tile.tileKey,
       objectsInRoom: tile.objectsInRoom.map((item) => item.toJsonObject()),
       restrictions: tile.restrictions.map((restriction) => Role[restriction]),
       tileRelationMap: Object.fromEntries(tile.tileRelationMap),

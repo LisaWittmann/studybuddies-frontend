@@ -142,8 +142,8 @@ async function placeTile(
  */
 function getTileColor(tile: Tile) {
   //end tile color
-  const endTile = labyrinthData?.tileMap.get(labyrinthData.endTileKey);
-  if (endTile != undefined && endTile.tileId == tile.tileId) return colors.pink;
+  const isEndTile = labyrinthData?.endTileKey == tile.tileKey;
+  if (isEndTile) return colors.pink;
   //both players have access to this tile
   else if (tile.getRestrictions().length == 0) return colors.darkBrown;
   //only the designer has access to this tile

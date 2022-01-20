@@ -61,15 +61,15 @@ stompClient.onConnect = () => {
     ) {
       console.log("new Message for the Lobby");
 
-      let destTileID: number;
+      let destTileKey: number;
       let updateData: Update;
       const operation = (<any>Operation)[eventMessage.operation];
 
       switch (operation) {
         case Operation.MOVEMENT:
-          destTileID = Number.parseInt(eventMessage.data);
-          if (destTileID) {
-            updatePlayerData(eventMessage.username, destTileID);
+          destTileKey = Number.parseInt(eventMessage.data);
+          if (destTileKey) {
+            updatePlayerData(eventMessage.username, destTileKey);
           } else {
             setError("There is no tile reference for this definition of data");
           }

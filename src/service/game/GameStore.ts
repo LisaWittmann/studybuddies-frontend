@@ -68,15 +68,15 @@ function getPlayer(username: string) {
 }
 
 /**
- * sets a Player with its username and the startTileId
+ * sets a Player with its username and the startTileKey
  * @param username : name of the user to improve identification between Main- and Partnerplayer
- * @param startTileId : start position of the player at the start of the game
+ * @param startTileKey : start position of the player at the start of the game
  */
-function setPlayerData(username: string, startTileId: number) {
+function setPlayerData(username: string, startTileKey: number) {
   if (loggedInUser.value == username) {
-    gameState.mainPlayer = new MainPlayer(username, startTileId);
+    gameState.mainPlayer = new MainPlayer(username, startTileKey);
   } else {
-    gameState.partnerPlayer = new PartnerPlayer(username, startTileId);
+    gameState.partnerPlayer = new PartnerPlayer(username, startTileKey);
   }
 }
 

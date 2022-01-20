@@ -32,7 +32,6 @@ function createTile(
   } = useObjectFactory();
   const tileModel = new THREE.Group();
   tileModel.userData = tile;
-  tileModel.userData.tileId = tileKey;
   tileModel.name = tileKey.toString();
   const tileRestricted = tile.isRestrictedFor(role);
 

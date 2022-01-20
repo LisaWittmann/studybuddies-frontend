@@ -112,8 +112,7 @@ function rotatePlayer(object: Object3D, position: Vector3) {
 
 /**
  * calculating position of player in tile
- * @param currentTileID: tileID that player should be placed in
- * @param labyrinth: labyrinth object
+ * @param tile: tile to which player has moved
  * @param tilePosition: vector position of tile that player should be placed in
  * @returns position as three dimensional vector
  */
