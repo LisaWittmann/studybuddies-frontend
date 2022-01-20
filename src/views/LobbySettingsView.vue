@@ -61,6 +61,7 @@ import { onBeforeRouteLeave } from "vue-router";
 import { useAppService } from "@/service/AppService";
 import { useLobbyService } from "@/service/lobby/LobbyService";
 import { useGameStore } from "@/service/game/GameStore";
+import { Role } from "@/service/game/Player";
 
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
@@ -85,7 +86,6 @@ export default defineComponent({
       updateLabyrinths,
       lobbyState,
       updateRole,
-      getRoles,
       getRoleOptions,
       updateReadyStates,
     } = useLobbyService();
@@ -98,7 +98,9 @@ export default defineComponent({
     const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
     const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinthName);
 
-    const allRoles = ref([]);
+    const allRoles = ref(
+      Object.values(Role).filter((role) => typeof role === "string")
+    );
     const openRoles = computed(() => lobbyState.openRoles);
     const selectedRole = computed(() => lobbyState.selectedRole);
 
@@ -142,7 +144,6 @@ export default defineComponent({
         .then(() => updateReadyStates())
         .catch(() => router.push("/find"));
       updateLabyrinths();
-      getRoles().then((data) => (allRoles.value = data));
       getRoleOptions();
     });
 
@@ -167,6 +168,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+* {
+  user-select: none;
+}
+
 h1 {
   padding-top: $spacing-l;
   margin-top: 0;

@@ -104,6 +104,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+* {
+  user-select: none;
+}
+
 .score-box {
   position: absolute;
   top: 0;

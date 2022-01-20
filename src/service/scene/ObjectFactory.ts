@@ -62,7 +62,7 @@ async function createItem(
  */
 function createFloor(position: THREE.Vector3, color = 0x199eb0) {
   const object = new THREE.Mesh(
-    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
+    new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.copy(position);
@@ -79,7 +79,7 @@ function createFloor(position: THREE.Vector3, color = 0x199eb0) {
  */
 function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
   const object = new THREE.Mesh(
-    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
+    new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
     new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
   );
   object.position.set(position.x, position.y + settings.tileSize, position.z);
@@ -105,7 +105,7 @@ function createWall(
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const object = new THREE.Mesh(
-    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
+    new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
     new THREE.MeshStandardMaterial({
       color: color,
       side: THREE.DoubleSide,
@@ -139,7 +139,7 @@ function createRestrictiveWall(
     function (texture: Texture) {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
-        new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
+        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
         new THREE.MeshStandardMaterial({
           side: DoubleSide,
           map: texture,

@@ -67,19 +67,6 @@ async function updateRole(role: string) {
 }
 
 /**
- * send request to get every role which exists
- * @param lobbyKey: identifying key of lobby that should be joined
- */
-async function getRoles() {
-  return fetch("/api/lobby/roles/" + lobbyKey.value, {
-    method: "GET",
-  }).then((response) => {
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  });
-}
-
-/**
  * send request to get every role that can be picked, without the roles that picked already
  * @param lobbyKey: identifying key of lobby that should be joined
  */
@@ -420,7 +407,6 @@ async function download(labyrinthName: string) {
 export function useLobbyService() {
   return {
     updateRole,
-    getRoles,
     resetLobbyState,
     getRoleOptions,
     joinLobby,
