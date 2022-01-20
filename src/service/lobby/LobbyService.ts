@@ -150,8 +150,10 @@ async function createLobby() {
  * @param lobbyKey: identifying key of lobby from which user should be removed
  */
 async function exitLobby() {
-  console.log("exitLobby");
-  if (!lobbyState.users.some((user) => user.username === loggedInUser.value)) {
+  if (
+    !lobbyState.users.some((user) => user.username === loggedInUser.value) ||
+    !lobbyKey.value
+  ) {
     return;
   }
   await fetch("/api/lobby/leave/" + lobbyKey.value, {

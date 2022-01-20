@@ -132,7 +132,6 @@ function calculatePartnerPositon(
       const orientationStrings = item.orientations.map(
         (orientation) => Orientation[orientation]
       );
-      console.log(orientationStrings.toString());
       itemOrientations.push(orientationStrings.toString().replace(",", ""));
     });
 

@@ -86,9 +86,6 @@ function setPlayerData(username: string, startTileId: number) {
  * @param newPosition: sets new position of player
  */
 function updatePlayerData(username: string, newPosition: number) {
-  console.log(username, newPosition);
-  console.log(loggedInUser.value);
-  console.log(gameState.partnerPlayer.getUsername());
   if (loggedInUser.value == username) {
     gameState.mainPlayer.setPosition(newPosition);
   } else if (username == gameState.partnerPlayer.getUsername()) {
