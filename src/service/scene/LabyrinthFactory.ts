@@ -67,7 +67,9 @@ function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
 
       for (const object of removedObjects) {
         scene
-          .getObjectByName(`${object.modelName.toLowerCase()}-${object.id}`)
+          .getObjectByName(
+            `item-${object.modelName.toLowerCase()}-${object.id}`
+          )
           ?.clear();
       }
     }
