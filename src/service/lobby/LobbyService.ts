@@ -101,7 +101,7 @@ async function joinLobby(lobbyKey: string) {
       if (response.status == 409) throw new Error("Diese Lobby ist voll.");
       else throw new Error("Diese Lobby konnte nicht gefunden werden.");
     }
-    router.push("/lobby/" + lobbyKey);
+    router.push("/lobby/" + lobbyKey.toUpperCase());
     updateReadyStates();
   });
 }

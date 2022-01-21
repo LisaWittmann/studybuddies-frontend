@@ -66,7 +66,7 @@ function updateMainPlayer(
  * @param tilePosition: position of tile that player should be placed in
  * @param scene: scene containing player and tile objects
  */
-function updatePartnerPlayer(
+async function updatePartnerPlayer(
   player: PartnerPlayer,
   tile: Tile | undefined,
   tilePosition: Vector3,
@@ -134,55 +134,69 @@ function calculatePartnerPositon(
   //gets all orientations/positions of items in tile
   if (tileItems && tileItems?.length >= 1) {
     tileItems.forEach((item) => {
-      const orientationStrings = item.orientations.map(
+      let orientationStrings = item.orientations.map(
         (orientation) => Orientation[orientation]
       );
+      orientationStrings = correctOrientation(orientationStrings);
       itemOrientations.push(orientationStrings.toString().replace(",", ""));
     });
 
-    //iterates over all orientations and checks if the planned corner position is already taken by an item
-    itemOrientations.forEach((orientation) => {
-      //if there is an item in the corner -> move partner clockwise
-      if (playerOrientation === orientation) {
-        if (orientation === "NORTHWEST" || orientation === "WESTNORTH") {
+    //while the planned corner for the player is taken by an item
+    while (itemOrientations.includes(playerOrientation)) {
+      //rotate the player position clockwise
+      switch (playerOrientation) {
+        case "NORTHWEST":
           playerOrientation = "NORTHEAST";
           directionVector
             .copy(direction.north)
             .add(direction.east)
             .multiplyScalar(factors.partnerTranslateFactor);
-        } else if (orientation === "NORTHEAST" || orientation === "EASTNORTH") {
+          break;
+        case "NORTHEAST":
           playerOrientation = "SOUTHEAST";
           directionVector
             .copy(direction.south)
             .add(direction.east)
             .multiplyScalar(factors.partnerTranslateFactor);
-        } else if (orientation === "SOUTHEAST" || orientation === "EASTSOUTH") {
+          break;
+        case "SOUTHEAST":
           playerOrientation = "SOUTHWEST";
           directionVector
             .copy(direction.south)
             .add(direction.west)
             .multiplyScalar(factors.partnerTranslateFactor);
-        } else if (orientation === "SOUTHWEST" || orientation === "WESTSOUTH") {
+          break;
+        case "SOUTHWEST":
           playerOrientation = "NORTHWEST";
           directionVector
             .copy(direction.north)
             .add(direction.west)
             .multiplyScalar(factors.partnerTranslateFactor);
-        } else {
-          playerOrientation = "NORTHWEST";
-          directionVector
-            .copy(direction.north)
-            .add(direction.west)
-            .multiplyScalar(factors.partnerTranslateFactor);
-        }
       }
-    });
+    }
   }
 
   calcPartnerPosition.copy(tilePosition).add(directionVector);
 
   return calcPartnerPosition;
 }
+
+/**
+ *
+ * Corrects orientations of item so that only existing values are included.
+ * These are (NORTH, WEST), (NORTH, EAST), (SOUTH, WEST), (SOUTH, EAST).
+ * Checks if the first orientation in the orientations of an item are EAST or WEST and switches orientations accordingly.
+ * @param orientationStrings
+ * @returns corrected orientations
+ */
+function correctOrientation(orientationStrings: Array<string>): Array<string> {
+  if (orientationStrings[0] === "EAST" || orientationStrings[0] === "WEST") {
+    const tempOrientation = orientationStrings[0];
+    orientationStrings[0] = orientationStrings[1];
+    orientationStrings[1] = tempOrientation;
+  }
+  return orientationStrings;
+};
 
 export function usePlayerFactory() {
   return {

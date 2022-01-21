@@ -168,10 +168,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-* {
-  user-select: none;
-}
-
 h1 {
   padding-top: $spacing-l;
   margin-top: 0;
