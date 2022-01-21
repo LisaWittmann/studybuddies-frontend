@@ -4,7 +4,7 @@
     v-if="playersInSameTile"
     :class="[isVisible ? 'show' : 'hide']"
     :title="getTradeValue(item.modelName)"
-    @click="giveItemToPartner(item)"
+    @click="tradeItem(item.id)"
   ></button>
   <img
     class="item-img"
