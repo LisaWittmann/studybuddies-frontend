@@ -55,7 +55,6 @@ function updatePlayerData(username: string, newPosition: number) {
     gameState.mainPlayer.setPosition(newPosition);
   } else if (username == gameState.partnerPlayer.getUsername()) {
     gameState.partnerPlayer.setPosition(newPosition);
-    console.log("NEW POSITION: ", newPosition);
   }
   checkPlayerProximity();
 }
@@ -65,7 +64,6 @@ function updatePlayerData(username: string, newPosition: number) {
  * @param inventory
  */
 async function updateInventory(inventory: Array<Item>) {
-  console.log(inventory);
   gameState.mainPlayer.setInventory(inventory);
 }
 
@@ -83,7 +81,6 @@ async function addItemToInventory(item: Item) {
  * @param startTileId : start position of the player at the start of the game
  */
 async function setPlayerData(username: string, startTileId: number) {
-  console.log("Starttileid is: " + startTileId + " Playername is: " + username);
   const { loginState } = useLoginStore();
   if (loginState.username == username) {
     gameState.mainPlayer = new MainPlayer(username, startTileId);
