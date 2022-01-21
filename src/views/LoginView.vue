@@ -50,7 +50,7 @@ export default defineComponent({
     const { globalState } = useAppService();
     const { login } = useLoginService();
 
-    const user = new User(globalState.username);
+    const user = ref(new User(globalState.username));
     const errorMessage = ref("");
 
     function loginUser(user: User) {
