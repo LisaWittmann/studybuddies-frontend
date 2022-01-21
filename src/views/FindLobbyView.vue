@@ -53,7 +53,7 @@ export default defineComponent({
     });
 
     function joinGame() {
-      let key = lobbyKey.value;
+      let key = lobbyKey.value.toUpperCase();
       fetch("/api/lobby/join/" + key, {
         method: "POST",
         headers: {
