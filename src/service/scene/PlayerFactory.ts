@@ -112,7 +112,6 @@ function calculatePartnerPositon(
 ): Vector3 {
   const tileItems = labyrinth.tileMap.get(currentTileID)?.objectsInRoom;
   const itemOrientations = new Array<string>();
-  console.log("TILE ITEMS ", tileItems);
 
   //partner initially placed in the northwest corner
   let playerOrientation = "NORTHWEST";
@@ -134,7 +133,6 @@ function calculatePartnerPositon(
 
     //while the planned corner for the player is taken by an item
     while (itemOrientations.includes(playerOrientation)) {
-      console.log("PLAYER ORI ", playerOrientation, "IN", itemOrientations);
       //rotate the player position clockwise
       switch (playerOrientation) {
         case "NORTHWEST":
@@ -165,68 +163,7 @@ function calculatePartnerPositon(
             .add(direction.west)
             .multiplyScalar(factors.partnerTranslateFactor);
       }
-      /* itemOrientations.forEach((orientation) => {
-        console.log(
-          "ITEM ORIENTATION",
-          orientation,
-          "PLAYER",
-          playerOrientation
-        );
-        //if there is an item in the corner -> move partner clockwise
-        if (playerOrientation === orientation) {
-          console.log(
-            "EQUAL POSITION PLAYER",
-            playerOrientation,
-            "ITEM ",
-            orientation
-          );
-
-          if (orientation === "NORTHWEST" || orientation === "WESTNORTH") {
-            playerOrientation = "NORTHEAST";
-            directionVector
-              .copy(direction.north)
-              .add(direction.east)
-              .multiplyScalar(factors.partnerTranslateFactor);
-          } else if (
-            orientation === "NORTHEAST" ||
-            orientation === "EASTNORTH"
-          ) {
-            playerOrientation = "SOUTHEAST";
-            directionVector
-              .copy(direction.south)
-              .add(direction.east)
-              .multiplyScalar(factors.partnerTranslateFactor);
-          } else if (
-            orientation === "SOUTHEAST" ||
-            orientation === "EASTSOUTH"
-          ) {
-            playerOrientation = "SOUTHWEST";
-            directionVector
-              .copy(direction.south)
-              .add(direction.west)
-              .multiplyScalar(factors.partnerTranslateFactor);
-          } else if (
-            orientation === "SOUTHWEST" ||
-            orientation === "WESTSOUTH"
-          ) {
-            playerOrientation = "NORTHWEST";
-            directionVector
-              .copy(direction.north)
-              .add(direction.west)
-              .multiplyScalar(factors.partnerTranslateFactor);
-          } else {
-            playerOrientation = "NORTHWEST";
-            directionVector
-              .copy(direction.north)
-              .add(direction.west)
-              .multiplyScalar(factors.partnerTranslateFactor);
-          }
-        }
-        console.log("PLAYER", playerOrientation);
-      }); */
     }
-
-    console.log("NEW PLAYER ORI", playerOrientation);
   }
 
   calcPartnerPosition.copy(tilePosition).add(directionVector);
@@ -234,14 +171,15 @@ function calculatePartnerPositon(
   return calcPartnerPosition;
 }
 
-
 /**
-   * Corrects orientations of item so that only existing values are included.
-   * These are (NORTH, WEST), (NORTH, EAST), (SOUTH, WEST), (SOUTH, EAST).
-   * Checks if the first orientation in the orientations of an item are EAST or WEST and switches orientations accordingly.
-   */
+ *
+ * Corrects orientations of item so that only existing values are included.
+ * These are (NORTH, WEST), (NORTH, EAST), (SOUTH, WEST), (SOUTH, EAST).
+ * Checks if the first orientation in the orientations of an item are EAST or WEST and switches orientations accordingly.
+ * @param orientationStrings
+ * @returns corrected orientations
+ */
 function correctOrientation(orientationStrings: Array<string>): Array<string> {
-  console.log("LOOK FOR CORRECT ITEM ORIENTATION");
   if (orientationStrings[0] === "EAST" || orientationStrings[0] === "WEST") {
     const tempOrientation = orientationStrings[0];
     orientationStrings[0] = orientationStrings[1];

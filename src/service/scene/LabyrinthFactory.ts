@@ -33,7 +33,6 @@ async function initializeLabyrinth(
   player: MainPlayer,
   scene: THREE.Scene
 ) {
-  console.log("INITIALIZE LAB");
   labyrinthData = labyrinth;
   const position = vector(0, 0, 0);
   for (const [key, value] of labyrinth.tileMap) {
@@ -49,11 +48,7 @@ async function initializeLabyrinth(
  * @param scene: scene that contains labyrinth
  */
 async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
-  console.log("UPDATE LAB");
-  if (labyrinthData == labyrinth) {
-    console.log("IDENTICAL LAB DATA");
-    return;
-  }
+  if (labyrinthData == labyrinth) return;
 
   for (const [key, value] of labyrinth.tileMap) {
     const labyrinthObjects = value.objectsInRoom;
