@@ -31,18 +31,16 @@
 </template>
 
 <script lang="ts">
-import { useLobbyService } from "@/service/lobby/LobbyService";
-import { useLoginStore } from "@/service/login/LoginStore";
 import { defineComponent, ref } from "vue";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 
 export default defineComponent({
   name: "LabyrinthUploadView",
   components: {},
   setup() {
-    const { loginState } = useLoginStore();
     const { uploadJsonFiles } = useLobbyService();
-    const upload = ref({} as HTMLInputElement);
 
+    const upload = ref({} as HTMLInputElement);
     const uploadResponse = ref(new Array<string>());
 
     async function uploadLabyrinth() {
@@ -56,7 +54,6 @@ export default defineComponent({
     return {
       uploadLabyrinth,
       upload,
-      username: loginState.username,
       uploadResponse,
     };
   },

@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { useLoginService } from "@/service/login/LoginService";
 import { useAppService } from "@/service/AppService";
 
 import LoadingComponent from "@/components/LoadingComponent.vue";
@@ -23,12 +23,12 @@ import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackCompo
 export default defineComponent({
   components: { LoadingComponent, OverlayFeedbackComponent },
   setup() {
-    const { getLoginSessionStorage } = useLoginStore();
-    getLoginSessionStorage();
+    const { getSession } = useLoginService();
+    getSession();
 
-    const { appFeedbackState, appState, resetFeedback } = useAppService();
-    const loading = computed(() => appState.loading);
-    const feedback = computed(() => appFeedbackState);
+    const { feedbackState, globalState, resetFeedback } = useAppService();
+    const loading = computed(() => globalState.loading);
+    const feedback = computed(() => feedbackState);
 
     return { loading, feedback, resetFeedback };
   },

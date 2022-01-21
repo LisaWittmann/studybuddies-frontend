@@ -14,6 +14,7 @@ import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 const texturePath = (fileName: string) => {
   return require(`@/assets/img/textures/${fileName}`);
 };
+
 /**
  * creates item by loading its obj representation from models directory
  * @param tilePosition: position of parent object
@@ -49,7 +50,7 @@ async function createItem(
       object.rotateY(item.rotationY());
       object.userData = item;
       object.userData.clickable = true;
-      object.name = "item " + item.modelName + " id " + item.id;
+      object.name = `item-${model}-${item.id}`;
       tileModel.add(object);
     });
   });
@@ -197,7 +198,7 @@ function createWall(
   object.position.copy(position);
   object.rotateY(wall.rotationY());
   object.userData = wall;
-  object.name = "wall";
+  object.name = `wall-${orientation.toString().toLowerCase()}`;
   tileModel.add(object);
 }
 

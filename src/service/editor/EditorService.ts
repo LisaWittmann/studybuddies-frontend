@@ -379,7 +379,7 @@ function parseLabyrinth(labyrinth: Labyrinth): string {
   const tileMapJson = new Map<number, any>();
   for (const [key, tile] of labyrinth.tileMap) {
     tileMapJson.set(key, {
-      tileId: tile.tileId,
+      tileKey: tile.tileKey,
       objectsInRoom: tile.objectsInRoom.map((item) => item.toJsonObject()),
       restrictions: tile.restrictions.map((restriction) => Role[restriction]),
       tileRelationMap: Object.fromEntries(tile.tileRelationMap),

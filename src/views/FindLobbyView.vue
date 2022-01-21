@@ -4,7 +4,7 @@
       <img class="image--header" :src="header" alt="logo" />
       <section>
         <h2>Spiel finden</h2>
-        <form class="column-wrapper" @submit.prevent="joinGame">
+        <form class="column-wrapper" @submit.prevent="join(lobbyKey)">
           <input
             class="input--medium uppercase"
             type="text"
@@ -17,7 +17,7 @@
       <transition name="delay-fade">
         <section>
           <h2>Spiel erstellen</h2>
-          <button class="button--small" @click="createGame">
+          <button class="button--small" @click="createLobby">
             Spiel erstellen
           </button>
         </section>
@@ -25,7 +25,7 @@
       <transition name="delay-slow-fade" appear>
         <section>
           <h2>Labyrinth erstellen</h2>
-          <button class="button--small" @click="createLabyrinth">
+          <button class="button--small" @click="navigateToEditor">
             Labyrinth erstellen
           </button>
         </section>
@@ -36,15 +36,23 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 import router from "@/router";
 
 export default defineComponent({
   name: "FindLobby",
   setup() {
-    const { loginState } = useLoginStore();
+    const { joinLobby, createLobby } = useLobbyService();
+
     const lobbyKey = ref("");
     const errorMessage = ref("");
+
+    const navigateToEditor = () => router.push("/editor");
+    const join = (lobbyKey: string) => {
+      joinLobby(lobbyKey).catch(
+        (error) => (errorMessage.value = error.message)
+      );
+    };
 
     const header = computed(() => {
       if (matchMedia("(prefers-color-scheme: dark)").matches)
@@ -52,54 +60,15 @@ export default defineComponent({
       return require("@/assets/img/logo_header.png");
     });
 
-    function joinGame() {
-      let key = lobbyKey.value.toUpperCase();
-      fetch("/api/lobby/join/" + key, {
-        method: "POST",
-        headers: {
-          "Content-Type": "html/text;charset=utf-8",
-        },
-        body: loginState.username,
-      }).then((response) => {
-        if (response.ok) router.push("/lobby/" + key);
-        else if (response.status == 409) errorMessage.value = "Lobby voll";
-        else if (response.status == 404)
-          errorMessage.value = "Lobby nicht gefunden";
-      });
-    }
-
-    function createGame() {
-      fetch("/api/lobby/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "html/text;charset=utf-8",
-        },
-        body: loginState.username,
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          }
-        })
-        .then((jsonData) => {
-          router.push("/lobby/" + jsonData.key);
-        })
-        .catch((err) => console.log(err));
-    }
-
-    function createLabyrinth() {
-      router.push("/editor");
-    }
-
-    onbeforeunload = () => console.log("overriding previous listener");
+    onbeforeunload = null;
 
     return {
       lobbyKey,
-      createGame,
-      createLabyrinth,
-      joinGame,
+      createLobby,
+      join,
       header,
       errorMessage,
+      navigateToEditor,
     };
   },
 });
