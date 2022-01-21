@@ -38,7 +38,7 @@ async function initializeLabyrinth(
   for (const [key, value] of labyrinth.tileMap) {
     const neighbors = getNeighbors(value, labyrinth.tileMap);
     const role = player.getRole();
-    placeTile(position, value, key, role, neighbors, scene);
+    await placeTile(position, value, key, role, neighbors, scene);
   }
 }
 
@@ -85,7 +85,7 @@ function clearLabyrinth(scene: THREE.Scene) {
  * @param player: main or partner player
  * @param scene: scene that contains player
  */
-function updatePlayer(
+async function updatePlayer(
   player: Player,
   labyrinth: Labyrinth,
   scene: THREE.Scene
@@ -96,10 +96,10 @@ function updatePlayer(
   const tilePosition = storedTiles.get(player.getPosition());
   if (tilePosition) {
     if (player instanceof MainPlayer) {
-      updateMainPlayer(player, tile, tilePosition);
+      return updateMainPlayer(player, tile, tilePosition);
     }
     if (player instanceof PartnerPlayer) {
-      updatePartnerPlayer(player, tile, tilePosition, scene);
+      return updatePartnerPlayer(player, tile, tilePosition, scene);
     }
   }
 }

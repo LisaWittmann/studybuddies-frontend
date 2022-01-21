@@ -41,7 +41,7 @@ function requiresUpdate(player: Player) {
  * @param player: main player
  * @param tilePosition: position of tile player should be placed on
  */
-function updateMainPlayer(
+async function updateMainPlayer(
   player: MainPlayer,
   tile: Tile | undefined,
   tilePosition: Vector3
