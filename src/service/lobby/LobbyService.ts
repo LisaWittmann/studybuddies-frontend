@@ -330,9 +330,10 @@ function readyCheck(labName: string) {
  * @param username The username (from the BE) of the user which pressed the "Ready" Button
  * @param readyState The state to determine whether the given user is ready or not
  */
-function setUserReadyState(readyState: boolean, user?: string) {
-  const name = user ? user : loggedInUser.value;
-  lobbyState.users.find((user) => user.username == name)?.setReady(readyState);
+function setUserReadyState(username: string, readyState: boolean) {
+  lobbyState.users
+    .find((user) => user.username == username)
+    ?.setReady(readyState);
 }
 
 /**

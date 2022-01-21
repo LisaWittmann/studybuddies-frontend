@@ -85,8 +85,8 @@ stompClient.onConnect = () => {
             setupGame();
           } else {
             setUserReadyState(
-              eventMessage.data === "READY",
-              eventMessage.username
+              eventMessage.username,
+              eventMessage.data === "READY"
             );
           }
           break;
