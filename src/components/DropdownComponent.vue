@@ -1,6 +1,6 @@
 <template>
   <section class="dropdown">
-    <button class="dropdown__button button--large" @click="openClose">
+    <button class="dropdown__button button--large" @click="toggleItems">
       <div class="text-wrapper">
         <span v-if="selectedItem">Labyrinth: {{ selectedItem }}</span>
         <span v-else>Labyrinth auswählen</span>
@@ -54,17 +54,16 @@ export default defineComponent({
   },
   name: "DropdownComponent",
   setup(props, context) {
-    const { download, lobbyState } = useLobbyService();
+    const { download } = useLobbyService();
 
     const isOpen = ref(false);
 
-    // open or close the dropdown menu
-    function openClose() {
+    const toggleItems = () => {
       isOpen.value = !isOpen.value;
-    }
+    };
 
     function selectItem(item: string) {
-      if (item != lobbyState.selectedLabyrinthName) {
+      if (item != props.selectedItem) {
         context.emit("select", item);
       }
       isOpen.value = false;
@@ -72,7 +71,7 @@ export default defineComponent({
 
     return {
       isOpen,
-      openClose,
+      toggleItems,
       selectItem,
       download,
     };

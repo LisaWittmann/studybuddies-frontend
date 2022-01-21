@@ -10,11 +10,15 @@ import { vector } from "@/service/scene/helper/GeometryHelper";
 import { direction, settings } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
-const { requiresUpdate, updateMainPlayer, updatePartnerPlayer } =
-  usePlayerFactory();
+const {
+  requiresUpdate,
+  updateMainPlayer,
+  updatePartnerPlayer,
+  resetPlayerData,
+} = usePlayerFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
-let labyrinthData: Labyrinth;
+let labyrinthData: Labyrinth | undefined;
 
 /**
  * gets map of all tiles of a Labyrinth
@@ -34,7 +38,7 @@ async function initializeLabyrinth(
   for (const [key, value] of labyrinth.tileMap) {
     const neighbors = getNeighbors(value, labyrinth.tileMap);
     const role = player.getRole();
-    await placeTile(position, value, key, role, neighbors, scene);
+    placeTile(position, value, key, role, neighbors, scene);
   }
 }
 
@@ -43,31 +47,38 @@ async function initializeLabyrinth(
  * @param labyrinth: labyrinth object
  * @param scene: scene that contains labyrinth
  */
-async function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
+function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
   if (labyrinthData == labyrinth) return;
 
   for (const [key, value] of labyrinth.tileMap) {
     const labyrinthObjects = value.objectsInRoom;
-    const labyrinthDataObjects = labyrinthData.tileMap.get(key);
+    const labyrinthDataObjects = labyrinthData?.tileMap.get(key);
     if (
       labyrinthDataObjects &&
       labyrinthDataObjects?.objectsInRoom.length > 0
     ) {
-      const intersection = labyrinthDataObjects.objectsInRoom.filter(
+      const removedObjects = labyrinthDataObjects.objectsInRoom.filter(
         (item) => !labyrinthObjects.some((object) => object.id == item.id)
       );
 
-      if (intersection.length > 0) {
-        const id = intersection[0].id;
-        const name = intersection[0].modelName;
-
-        scene.getObjectByName("item " + name + " id " + id)?.clear();
+      for (const object of removedObjects) {
+        scene
+          .getObjectByName(
+            `item-${object.modelName.toLowerCase()}-${object.id}`
+          )
+          ?.clear();
       }
     }
   }
   labyrinthData = labyrinth;
 }
 
+function clearLabyrinth(scene: THREE.Scene) {
+  labyrinthData = undefined;
+  resetPlayerData();
+  storedTiles.clear();
+  scene.clear();
+}
 /**
  * updates player position of main or partner player
  * or initially creates partner player
@@ -81,13 +92,14 @@ function updatePlayer(
 ) {
   if (!requiresUpdate(player)) return;
   console.log("Move player: " + player.getUsername());
-  const tilePosition = getTilePosition(player.getPosition(), scene);
+  const tile = labyrinth.tileMap.get(player.getPosition());
+  const tilePosition = storedTiles.get(player.getPosition());
   if (tilePosition) {
     if (player instanceof MainPlayer) {
-      updateMainPlayer(player, tilePosition);
+      updateMainPlayer(player, tile, tilePosition);
     }
     if (player instanceof PartnerPlayer) {
-      updatePartnerPlayer(player, tilePosition, labyrinth, scene);
+      updatePartnerPlayer(player, tile, tilePosition, scene);
     }
   }
 }
@@ -117,27 +129,8 @@ async function placeTile(
   }
   // store placed tile with position to calculate position of next tiles
   storedTiles.set(tileKey, position);
-  const isEnd = tileKey == labyrinthData.endTileKey;
+  const isEnd = tileKey == labyrinthData?.endTileKey;
   scene.add(createTile(tileKey, tile, position, role, neighbors, isEnd));
-}
-
-/**
- * get tile position by in scene by tile id
- * searches scene for tile's bottom plane that contains tile's position
- * @returns position in scene or undefined if tile is not in scene
- */
-function getTilePosition(
-  id: number,
-  scene: THREE.Scene
-): THREE.Vector3 | undefined {
-  if (!id) return undefined;
-  let position = undefined;
-  scene.traverse((child) => {
-    if (child.userData.tileKey == id) {
-      position = child.position;
-    }
-  });
-  return position;
 }
 
 /**
@@ -183,5 +176,6 @@ export function useLabyrinthFactory() {
     initializeLabyrinth,
     updateLabyrinth,
     updatePlayer,
+    clearLabyrinth,
   };
 }

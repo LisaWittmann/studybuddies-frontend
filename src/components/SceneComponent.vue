@@ -14,6 +14,7 @@ import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 import { useGameStore } from "@/service/game/GameStore";
+import { useAppService } from "@/service/AppService";
 
 export default defineComponent({
   name: "SceneComponent",
@@ -35,14 +36,21 @@ export default defineComponent({
       updateScene,
       getIntersections,
     } = useSceneFactory();
-    const { initializeLabyrinth, updateLabyrinth, updatePlayer } =
-      useLabyrinthFactory();
+    const {
+      initializeLabyrinth,
+      updateLabyrinth,
+      updatePlayer,
+      clearLabyrinth,
+    } = useLabyrinthFactory();
     const { gameState } = useGameStore();
+    const { endLoading } = useAppService();
 
     const labyrinth = computed(() => gameState.labyrinth);
 
     const scene = createScene();
-    initializeLabyrinth(labyrinth.value, props.player, scene);
+    initializeLabyrinth(labyrinth.value, props.player, scene).then(() =>
+      endLoading()
+    );
 
     const render = () => {
       renderScene();
@@ -65,7 +73,7 @@ export default defineComponent({
 
     onBeforeUnmount(() => {
       removeEventListener("resize", updateScene);
-      scene.clear();
+      clearLabyrinth(scene);
     });
 
     watch(

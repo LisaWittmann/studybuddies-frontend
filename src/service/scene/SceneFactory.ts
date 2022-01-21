@@ -50,7 +50,7 @@ function createScene(debug = false): THREE.Scene {
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.enableZoom = false;
   orbitControls.enablePan = true;
-  orbitControls.target = new THREE.Vector3(0, settings.cameraHeight, 0);
+  orbitControls.target = new THREE.Vector3().copy(camera.position);
   orbitControls.update();
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
@@ -106,9 +106,12 @@ function updateCameraPosition(
 }
 
 function updateCameraTarget(orientation: Orientation) {
-  const target = new Vector3().copy(camera.position);
   const direction = directionMap.get(orientation);
-  if (direction) target.add(direction);
+  if (direction) {
+    orbitControls.target = new THREE.Vector3()
+      .copy(camera.position)
+      .add(direction);
+  }
 }
 
 /**
@@ -198,6 +201,7 @@ export function useSceneFactory() {
     insertCanvas,
     updateScene,
     updateCameraPosition,
+    updateCameraTarget,
     getIntersections,
   };
 }

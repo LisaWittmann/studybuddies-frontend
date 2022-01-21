@@ -29,9 +29,9 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted } from "vue";
+import { onBeforeRouteLeave } from "vue-router";
 import { useGameService } from "@/service/game/GameService";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLobbyService } from "@/service/lobby/LobbyService";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
@@ -40,7 +40,6 @@ import OverlayConversationComponent from "@/components/overlays/OverlayConversat
 
 import router from "@/router";
 import "@/service/game/EventStore";
-import { onBeforeRouteLeave } from "vue-router";
 
 export default defineComponent({
   name: "GameView",
@@ -51,7 +50,6 @@ export default defineComponent({
     OverlayConversationComponent,
   },
   setup() {
-    const { exitLobby } = useLobbyService();
     const { gameState, updateGameData, setLobbyKey } = useGameStore();
     const {
       gameEventMessage,
@@ -60,6 +58,7 @@ export default defineComponent({
       clickItem,
       conversation,
       getConversationMessage,
+      forceGameEnd,
       endConversation,
     } = useGameService();
     updateGameData();
@@ -69,10 +68,15 @@ export default defineComponent({
     const partnerPlayer = computed(() => gameState.partnerPlayer);
     const score = computed(() => gameState.score);
 
+    onbeforeunload = () => {
+      forceGameEnd();
+      return "leaving game";
+    };
+
     onBeforeRouteLeave((to) => {
       const nextKey = to.params.key as string;
       if (nextKey != gameState.lobbyKey) {
-        exitLobby(gameState.lobbyKey);
+        forceGameEnd();
       }
     });
 
@@ -120,6 +124,7 @@ export default defineComponent({
   justify-content: center;
 
   p {
+    user-select: none;
     font-family: $font-inconsolata;
     font-weight: bold;
     color: $color-beige;
