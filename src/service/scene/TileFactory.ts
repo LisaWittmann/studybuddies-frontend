@@ -2,13 +2,13 @@ import * as THREE from "three";
 import { useObjectFactory } from "@/service/scene/ObjectFactory";
 import { Orientation, Tile } from "@/service/labyrinth/Tile";
 import { Role } from "@/service/game/Player";
-import { settings } from "@/service/scene/helper/SceneConstants";
+import { colors, settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * creates a group of objects representing a tile
  * @param tileKey: index of tile in the labyrinth
  * @param tile: representing tile data
- * @param position: position in scene
+ * @param tilePosition: position in scene
  * @param role: role of main player
  * @param neighbors: neighbor tiles with orientations
  * @param color: color of all walls
@@ -17,56 +17,99 @@ import { settings } from "@/service/scene/helper/SceneConstants";
 function createTile(
   tileKey: number,
   tile: Tile,
-  position: THREE.Vector3,
+  tilePosition: THREE.Vector3,
   role: Role | undefined,
   neighbors: Map<Orientation, Tile | undefined>,
-  color = 0xa9a9a9
+  isEnd: boolean
 ): THREE.Group {
   const {
     createFloor,
     createCeiling,
     createArrow,
-    createWall,
+    createTexturedWall,
     createRestrictiveWall,
     createItem,
   } = useObjectFactory();
   const tileModel = new THREE.Group();
   tileModel.userData = tile;
-  tileModel.userData.tileId = tileKey;
   tileModel.name = tileKey.toString();
   const tileRestricted = tile.isRestrictedFor(role);
+  const texture = getTexture(tile);
+  const color = getColor(tile, isEnd);
 
   //LIGHT-----------------
-  tileModel.add(createLight(position));
+  tileModel.add(createLight(tilePosition));
 
   //STATIC-ITEMS----------
-  tileModel.add(createFloor(position, tileKey, color));
-  tileModel.add(createCeiling(position, color));
+  createCeiling(tilePosition, tileModel, texture, color);
+  createFloor(tilePosition, tileModel, tileKey, color);
   if (tileRestricted) {
     neighbors.forEach((neighbor, orientation) => {
       if (!neighbor) {
-        tileModel.add(createWall(orientation, position, color));
+        createTexturedWall(
+          tilePosition,
+          tileModel,
+          orientation,
+          color,
+          texture
+        );
       }
     });
   } else {
     neighbors.forEach((neighbor, orientation) => {
       if (!neighbor) {
-        tileModel.add(createWall(orientation, position, color));
+        createTexturedWall(
+          tilePosition,
+          tileModel,
+          orientation,
+          color,
+          texture
+        );
       } else if (!neighbor.isRestrictedFor(role)) {
         //arrow if there are no restrictions for the player in relation to the current tile
-        createArrow(orientation, position, tileModel);
+        createArrow(tilePosition, tileModel, orientation);
       } else {
         //transparent wall if restricted zone is starting in the current orientation
-        createRestrictiveWall(tileModel, orientation, position);
+        createRestrictiveWall(
+          tilePosition,
+          tileModel,
+          orientation,
+          getTexture(neighbor),
+          getColor(neighbor)
+        );
       }
     });
   }
 
   //ITEMS-----------------
   for (const item of tile.objectsInRoom) {
-    createItem(item, tileModel, position);
+    createItem(tilePosition, tileModel, item);
   }
   return tileModel;
+}
+
+function getTexture(tile: Tile) {
+  if (tile.restrictions.length == 1) {
+    if (tile.isRestrictedFor(Role.HACKER)) return "designer";
+    if (tile.isRestrictedFor(Role.DESIGNER)) return "hacker";
+  }
+}
+
+/**
+ * get color of tile according to role restrictions
+ * @param tile: tile to get color for
+ * @returns color of tile as hexadecimal number
+ */
+function getColor(tile: Tile, isEnd = false) {
+  if (isEnd) return colors.pink;
+  //both players have access to this tile
+  if (tile.getRestrictions().length == 0) return colors.darkBrown;
+  //only the designer has access to this tile
+  if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
+  //only the hacker has access to this tile
+  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
+  //default - this case shouldn't appear
+  return colors.grey;
 }
 
 /**
@@ -75,7 +118,7 @@ function createTile(
  * @returns: point light
  */
 function createLight(position: THREE.Vector3) {
-  const light = new THREE.PointLight(0xffffff, 1, 50, 2);
+  const light = new THREE.PointLight(0xffffff, 1.3, 50, 2);
   light.position.set(
     position.x,
     position.y + settings.tileSize / 2,
