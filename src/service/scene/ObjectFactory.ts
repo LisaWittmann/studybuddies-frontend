@@ -11,6 +11,9 @@ import { PartnerPlayer, Role } from "@/service/game/Player";
 import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 
+const texturePath = (fileName: string) => {
+  return require(`@/assets/img/textures/${fileName}`);
+}
 /**
  * creates item by loading its obj representation from models directory
  * @param tilePosition: position of parent object
@@ -67,7 +70,7 @@ function createFloor(
   color = 0x199eb0
 ) {
   const textureLoader = new TextureLoader();
-  textureLoader.load("/textures/gras-texture.png", (texture: Texture) => {
+  textureLoader.load(texturePath("gras-texture.png"), (texture: Texture) => {
     texture.minFilter = THREE.NearestFilter;
     const object = new THREE.Mesh(
       new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
@@ -100,7 +103,7 @@ function createCeiling(
 ) {
   const textureLoader = new TextureLoader();
   textureLoader.load(
-    `/textures/${textureName}-ceiling-texture.png`,
+    texturePath(`${textureName}-ceiling-texture.png`),
     (texture: Texture) => {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
@@ -141,7 +144,7 @@ function createTexturedWall(
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
   textureLoader.load(
-    `/textures/${textureName}-texture.png`,
+    texturePath(`${textureName}-texture.png`),
     (texture: Texture) => {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
@@ -213,7 +216,7 @@ function createRestrictiveWall(
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
   textureLoader.load(
-    `/textures/${textureName}-texture.png`,
+    texturePath(`${textureName}-texture.png`),
     function (texture: Texture) {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
