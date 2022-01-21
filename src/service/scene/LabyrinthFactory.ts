@@ -118,7 +118,7 @@ async function placeTile(
   // store placed tile with position to calculate position of next tiles
   storedTiles.set(tileKey, position);
   const isEnd = tileKey == labyrinthData.endTileKey;
-  scene.add(createTile(tileKey, tile, position, role, neighbors, isEnd));
+  scene.add(await createTile(tileKey, tile, position, role, neighbors, isEnd));
 }
 
 /**
