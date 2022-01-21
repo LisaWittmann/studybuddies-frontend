@@ -256,11 +256,11 @@ async function addToInventory(itemId: number) {
 }
 
 /**
- * deletes item from inventory after pc was activated
+ * updates main players inventory
  */
 async function updateInventory() {
   const eventMessage = new EventMessage(
-    Operation[Operation.DELETE],
+    Operation[Operation.UPDATE],
     lobbyKey.value,
     playerName.value,
     ""

@@ -56,7 +56,7 @@ stompClient.onConnect = () => {
     const eventMessage: EventMessage = JSON.parse(message.body);
 
     if (
-      eventMessage.lobbyKey == gameState.lobbyKey ||
+      eventMessage.lobbyKey == gameState.lobbyKey.toUpperCase() ||
       eventMessage.lobbyKey == "ALL"
     ) {
       console.log("new Message for the Lobby");
@@ -73,12 +73,6 @@ stompClient.onConnect = () => {
           } else {
             setError("There is no tile reference for this definition of data");
           }
-          break;
-        case Operation.COLLECT:
-          updateGameData();
-          break;
-        case Operation.TRADE:
-          updateInventory();
           break;
         case Operation.ACCESS:
           setScore(Number(eventMessage.data));
@@ -132,7 +126,19 @@ stompClient.onConnect = () => {
             case Update.ROLE:
               getRoleOptions();
               break;
+            case Update.GAME_LAB:
+              updateGameData();
+              break;
+            case Update.INVENTORY:
+              updateInventory();
+              break;
+            default:
+              console.info("No List was updated with Data:", eventMessage.data);
+              break;
           }
+          break;
+        default:
+          console.error(eventMessage.operation, "is no valid Operation");
           break;
       }
     }
