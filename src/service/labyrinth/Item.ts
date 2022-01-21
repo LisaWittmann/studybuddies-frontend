@@ -24,9 +24,10 @@ export class Item {
 
   /**
    *
-   * @returns height where item is positioned
+   * @returns position in room as vector
    */
   calcPositionInRoom = (): Vector3 => {
+    console.log("CALCULATE ITEM POSITION");
     //calculation for object positioning
     //set horizontal position
     this.orientations.forEach((orientation) => {
