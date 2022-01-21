@@ -63,6 +63,7 @@ export default defineComponent({
       padding-top: $spacing-s;
       padding-bottom: $spacing-s;
       cursor: pointer;
+      user-select: none;
 
       img {
         width: $pref-width;
