@@ -30,6 +30,7 @@ async function login(user: User) {
   })
     .then((response) => {
       if (!response.ok) {
+        console.log(response);
         throw new Error(
           "Deine Eingabedaten waren nicht korrekt. Bitte versuche es noch einmal."
         );

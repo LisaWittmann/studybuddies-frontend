@@ -38,7 +38,7 @@ async function initializeLabyrinth(
   for (const [key, value] of labyrinth.tileMap) {
     const neighbors = getNeighbors(value, labyrinth.tileMap);
     const role = player.getRole();
-    await placeTile(position, value, key, role, neighbors, scene);
+    placeTile(position, value, key, role, neighbors, scene);
   }
 }
 

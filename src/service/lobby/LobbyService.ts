@@ -376,7 +376,6 @@ function setupGame() {
           updatePlayerData(user.username, startTile);
         });
         router.push(`/game/${gameState.lobbyKey}`);
-        endLoading();
         setStarted(true);
       });
     });

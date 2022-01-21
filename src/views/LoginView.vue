@@ -31,7 +31,7 @@
               >Labyrinth hochladen</router-link
             >
           </span>
-          <span class="error">{{ errormessage }}</span>
+          <span class="error">{{ errorMessage }}</span>
         </form>
       </section>
     </transition>
