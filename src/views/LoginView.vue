@@ -3,7 +3,7 @@
     <transition name="slow-fade" appear>
       <section>
         <h1>Anmelden</h1>
-        <form @submit.prevent="loginUser(user)" class="column-wrapper">
+        <form @submit.prevent="loginUser()" class="column-wrapper">
           <input
             class="input--medium"
             type="username"
@@ -41,20 +41,18 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useLoginService } from "@/service/login/LoginService";
-import { useAppService } from "@/service/AppService";
 import { User } from "@/service/login/User";
 
 export default defineComponent({
   name: "LoginView",
   setup() {
-    const { globalState } = useAppService();
     const { login } = useLoginService();
 
-    const user = ref(new User(globalState.username));
+    const user = ref({} as User);
     const errorMessage = ref("");
 
-    function loginUser(user: User) {
-      login(user).catch((error) => (errorMessage.value = error.message));
+    function loginUser() {
+      login(user.value).catch((error) => (errorMessage.value = error.message));
     }
 
     return {

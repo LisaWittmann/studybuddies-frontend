@@ -3,7 +3,7 @@
     <transition name="slow-fade" appear>
       <section>
         <h1>Registrieren</h1>
-        <form @submit.prevent="registerUser" class="column-wrapper">
+        <form @submit.prevent="registerUser()" class="column-wrapper">
           <input
             class="input--medium"
             type="username"
@@ -41,20 +41,20 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useLoginService } from "@/service/login/LoginService";
-import { useAppService } from "@/service/AppService";
 import { User } from "@/service/login/User";
 
 export default defineComponent({
   name: "RegisterView",
   setup() {
-    const { globalState } = useAppService();
     const { register } = useLoginService();
 
-    const user = new User(globalState.username);
+    const user = ref({} as User);
     const errorMessage = ref("");
 
     function registerUser() {
-      register(user).catch((error) => (errorMessage.value = error.message));
+      register(user.value).catch(
+        (error) => (errorMessage.value = error.message)
+      );
     }
 
     return {
