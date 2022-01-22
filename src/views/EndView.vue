@@ -61,7 +61,7 @@ export default defineComponent({
     onBeforeRouteLeave((to) => {
       const nextKey = to.params.key as string;
       if (nextKey != gameState.lobbyKey) {
-        exitLobby(gameState.lobbyKey);
+        exitLobby();
       }
     });
 

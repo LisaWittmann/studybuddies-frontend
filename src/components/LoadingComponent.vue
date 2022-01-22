@@ -23,7 +23,7 @@ $loader-size: 150px;
 .loader {
   @include flex-center();
   position: absolute;
-  z-index: 10;
+  z-index: 15;
   top: 0;
   height: 100%;
   bottom: 0;

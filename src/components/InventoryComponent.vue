@@ -8,7 +8,11 @@
   <transition name="slide-fade">
     <div class="inventory-box" v-if="isOpen">
       <div class="inventory">
-        <div v-for="item in inventory" :key="item" class="inventory-item-box">
+        <div
+          v-for="item of inventory"
+          :key="item.id"
+          class="inventory-item-box"
+        >
           <InventoryItemEntryComponent :item="item" />
         </div>
       </div>
@@ -31,10 +35,9 @@ export default defineComponent({
   },
   setup() {
     const { gameState } = useGameStore();
-    let isOpen = ref(false);
-    const invbutton = ref(null);
-    let mainPlayer = computed(() => gameState.mainPlayer);
-    let inventory = computed(() => mainPlayer.value.getInventory());
+    const isOpen = ref(false);
+    const mainPlayer = computed(() => gameState.mainPlayer);
+    const inventory = computed(() => mainPlayer.value.getInventory());
 
     /**
      * shows opened or closed backpack svg (inventory button)
@@ -70,7 +73,6 @@ export default defineComponent({
       inventory,
       toggleInventoryButton,
       isOpen,
-      invbutton,
     };
   },
 });
@@ -111,6 +113,7 @@ export default defineComponent({
   max-width: 25%;
   transform-origin: top;
 }
+
 /* Animation for opening or closing inventory */
 /* durations and timing functions.            */
 .slide-fade-enter-active {
@@ -121,6 +124,7 @@ export default defineComponent({
 }
 
 .inventory {
+  user-select: none;
   margin-top: calc(15vh + 10px);
   overflow-y: scroll;
   max-height: -webkit-fill-available;

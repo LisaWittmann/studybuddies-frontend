@@ -1,17 +1,19 @@
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
 import { debounce } from "lodash";
 
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "@/service/login/LoginStore";
-import { useAppService } from "@/service/AppService";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 
 import { EventMessage, Operation } from "@/service/game/EventMessage";
 import { Message, Response } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { Item } from "@/service/labyrinth/Item";
 
-const { gameState, updateInventory, endGame } = useGameStore();
-const { setFeedback } = useAppService();
+const { gameState, setInventory, resetGameState, setStarted } = useGameStore();
+const { exitLobby } = useLobbyService();
+
+const lobbyKey = computed(() => gameState.lobbyKey);
+const playerName = computed(() => gameState.mainPlayer.username);
 
 const gameEventMessage = reactive({
   message: "",
@@ -25,8 +27,21 @@ const conversation = reactive({
   visible: false,
 });
 
-const toggleEventMessage = () =>
-  (gameEventMessage.visible = !gameEventMessage.visible);
+function setGameEvent(message: string, state?: string) {
+  gameEventMessage.message = message;
+  gameEventMessage.state = state ? state : "";
+  gameEventMessage.visible = true;
+}
+
+function resetGameEvent() {
+  gameEventMessage.visible = false;
+  gameEventMessage.message = "";
+  gameEventMessage.state = "";
+}
+
+function toggleEventMessage() {
+  gameEventMessage.visible = !gameEventMessage.visible;
+}
 
 /**
  * function which is used when clicking the arrow in Scene
@@ -34,12 +49,10 @@ const toggleEventMessage = () =>
  * @param orientation used in the backend to identify the direction to move the player
  */
 async function movePlayer(orientation: Orientation) {
-  const { gameState } = useGameStore();
-  const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
     Operation[Operation.MOVEMENT],
-    gameState.lobbyKey,
-    loginState.username,
+    lobbyKey.value,
+    playerName.value,
     Orientation[orientation]
   );
   fetch("/api/lobby/move", {
@@ -60,10 +73,19 @@ async function movePlayer(orientation: Orientation) {
  * start conversation with a game character
  * @param character modelName of character
  */
-async function startConversation(character: string) {
+function startConversation(character: string) {
   conversation.character = character;
   conversation.visible = true;
-  await getConversationMessage("1.1");
+  getConversationMessage("1.1");
+}
+
+/**
+ * set conversation state to default values to end conversation
+ */
+function endConversation() {
+  conversation.visible = false;
+  conversation.message = new Message("", "", undefined, []);
+  conversation.character = "";
 }
 
 /**
@@ -79,17 +101,10 @@ async function getConversationMessage(id: string) {
       return response.json();
     })
     .then((jsonData) => {
-      console.log(jsonData);
       conversation.message = jsonData as Message;
-
       if (conversation.message.id != "0.0") {
         if (conversation.message.itemName != null) {
-          console.log("give Item");
-          givePlayerItem(
-            gameState.lobbyKey,
-            conversation.message.itemName,
-            gameState.mainPlayer.getUsername()
-          );
+          givePlayerItem(conversation.message.itemName);
         }
       } else {
         endConversation();
@@ -101,26 +116,15 @@ async function getConversationMessage(id: string) {
 }
 
 /**
- * set conversation state to default values to end conversation
- */
-async function endConversation() {
-  conversation.visible = false;
-  conversation.message = new Message("", "", undefined, []);
-  conversation.character = "";
-}
-
-/**
  * request access to clicked item
  * display incoming data as gameEventMessage
  * @param modelName name of the clicked item
  */
 async function checkAccess(modelName: string) {
-  const { gameState } = useGameStore();
-  const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
     Operation[Operation.ACCESS],
-    gameState.lobbyKey,
-    loginState.username,
+    lobbyKey.value,
+    playerName.value,
     modelName.toUpperCase()
   );
   fetch("/api/lobby/access", {
@@ -133,16 +137,10 @@ async function checkAccess(modelName: string) {
       return response.json();
     })
     .then((jsonData) => {
-      gameEventMessage.message = jsonData.accessText;
-      if (jsonData.firstAccess) {
-        gameEventMessage.state = "success";
-        deleteFromInventory();
-      } else if (jsonData.access) {
-        gameEventMessage.state = "success";
-      } else {
-        gameEventMessage.state = "warning";
-      }
-      gameEventMessage.visible = true;
+      let state = "success";
+      if (jsonData.firstAccess) updateInventory();
+      else if (!jsonData.access) state = "warning";
+      setGameEvent(jsonData.accessText, state);
     })
     .catch((error) => {
       console.error(error);
@@ -150,12 +148,10 @@ async function checkAccess(modelName: string) {
 }
 
 async function checkEndGame(modelName: string) {
-  const { gameState } = useGameStore();
-  const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
     Operation[Operation.CHECK_END],
-    gameState.lobbyKey,
-    loginState.username,
+    lobbyKey.value,
+    playerName.value,
     modelName.toUpperCase()
   );
   fetch("/api/lobby/end", {
@@ -200,16 +196,14 @@ async function checkEndGame(modelName: string) {
  * @param modelName name of clicked item
  * @param itemId contains id of clicked body
  */
-async function getOperation(modelName: string, itemId: string) {
-  console.log("click");
+async function getOperation(modelName: string, itemId: number) {
   fetch("/api/lobby/click/" + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((jsonData) => {
-      const operation = (<any>Operation)[jsonData];
-      switch (operation) {
+      switch ((<any>Operation)[jsonData]) {
         case Operation.ACCESS:
           checkAccess(modelName);
           break;
@@ -217,11 +211,7 @@ async function getOperation(modelName: string, itemId: string) {
           startConversation(modelName);
           break;
         case Operation.COLLECT:
-          addToInventory(
-            gameState.lobbyKey,
-            itemId,
-            gameState.mainPlayer.getUsername()
-          );
+          addToInventory(itemId);
           break;
         case Operation.CHECK_END:
           checkEndGame(modelName);
@@ -235,16 +225,6 @@ async function getOperation(modelName: string, itemId: string) {
 
 const clickItem = debounce(getOperation, 500, { leading: true });
 
-function playerLeftGame(username: string) {
-  endGame();
-  setFeedback(
-    `Spieler ${username} hat das Spiel verlassen.`,
-    undefined,
-    "/find",
-    "Zurück zur Lobbyfindung"
-  );
-}
-
 /**
  * adds item to inventory via fetch and updates frontend representation accordingly
  * calls method to delete collected item from tile
@@ -252,13 +232,14 @@ function playerLeftGame(username: string) {
  * @param itemId id of the clicked item
  * @param username username of player that collects item
  */
-async function addToInventory(
-  lobbyKey: string,
-  itemId: string,
-  username: string
-) {
+async function addToInventory(itemId: number) {
   return fetch(
-    "api/lobby/" + lobbyKey + "/username/" + username + "/item/" + itemId,
+    "api/lobby/" +
+      lobbyKey.value +
+      "/username/" +
+      playerName.value +
+      "/item/" +
+      itemId,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -269,8 +250,9 @@ async function addToInventory(
       return response.json();
     })
     .then((jsonData) => {
-      updateInventory(jsonData);
-      removeItemFromTile(lobbyKey, itemId);
+      const inventory: Item[] = jsonData;
+      setInventory(inventory);
+      removeItemFromLabyrinth(itemId);
     })
     .catch((error) => {
       console.error(error);
@@ -278,18 +260,16 @@ async function addToInventory(
 }
 
 /**
- * deletes item from inventory after pc was activated
+ * updates main players inventory
  */
-async function deleteFromInventory() {
-  const { gameState } = useGameStore();
-  const { loginState } = useLoginStore();
+async function updateInventory() {
   const eventMessage = new EventMessage(
-    Operation[Operation.DELETE],
-    gameState.lobbyKey,
-    loginState.username,
+    Operation[Operation.UPDATE],
+    lobbyKey.value,
+    playerName.value,
     ""
   );
-  fetch("api/lobby/current-inventory", {
+  fetch("/api/lobby/current-inventory", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -300,7 +280,7 @@ async function deleteFromInventory() {
     })
     .then((jsonData) => {
       const inventory: Item[] = jsonData;
-      updateInventory(inventory);
+      setInventory(inventory);
     })
     .catch((error) => {
       console.error(error);
@@ -308,23 +288,15 @@ async function deleteFromInventory() {
 }
 
 /**
- *
  * Adds items from NPC to inventory of player
- *
- * @param lobbyKey
  * @param itemName
- * @param username
  */
-async function givePlayerItem(
-  lobbyKey: string,
-  itemName: string,
-  username: string
-) {
+async function givePlayerItem(itemName: string) {
   return fetch(
-    "api/lobby/" +
-      lobbyKey +
+    "/api/lobby/" +
+      lobbyKey.value +
       "/username/" +
-      username +
+      playerName.value +
       "/give/item/" +
       itemName,
     {
@@ -338,7 +310,7 @@ async function givePlayerItem(
     })
     .then((jsonData) => {
       const inventory: Item[] = jsonData;
-      updateInventory(inventory);
+      setInventory(inventory);
     })
     .catch((error) => {
       console.error(error);
@@ -347,11 +319,10 @@ async function givePlayerItem(
 
 /**
  * Provides functionality to remove an item from a tile.
- * @param lobbyKey the key of the lobby
  * @param itemId the id of the object that is to be deleted
  */
-async function removeItemFromTile(lobbyKey: string, itemId: string) {
-  return fetch("api/lobby/" + lobbyKey + "/item/" + itemId, {
+async function removeItemFromLabyrinth(itemId: number) {
+  return fetch("/api/lobby/" + lobbyKey.value + "/item/" + itemId, {
     method: "DELETE",
     headers: { "Content-Type": "text/plain" },
   })
@@ -364,18 +335,15 @@ async function removeItemFromTile(lobbyKey: string, itemId: string) {
 }
 
 /**
- *
  * Moves item from mainplayer to partner
- *
- * @param username
  * @param itemId
  */
-async function tradeItem(username: string, itemId: string) {
+async function tradeItem(itemId: number) {
   return fetch(
-    "api/lobby/" +
-      gameState.lobbyKey +
+    "/api/lobby/" +
+      lobbyKey.value +
       "/username/" +
-      username +
+      playerName.value +
       "/trade/item/" +
       itemId,
     {
@@ -389,23 +357,41 @@ async function tradeItem(username: string, itemId: string) {
     })
     .then((jsonData) => {
       const inventory: Item[] = jsonData;
-      updateInventory(inventory);
+      setInventory(inventory);
     })
     .catch((error) => {
       console.error(error);
     });
 }
 
+function endGame() {
+  resetGameEvent();
+  endConversation();
+  setStarted(false);
+}
+
+/**
+ * reset all states to force game end and remove player from lobby
+ */
+function forceGameEnd() {
+  endGame();
+  exitLobby();
+  resetGameState();
+}
+
 export function useGameService() {
   return {
     gameEventMessage,
     toggleEventMessage,
+    resetGameEvent,
     movePlayer,
     clickItem,
     getConversationMessage,
     endConversation,
     conversation,
-    playerLeftGame,
+    updateInventory,
     tradeItem,
+    endGame,
+    forceGameEnd,
   };
 }

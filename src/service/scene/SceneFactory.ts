@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Vector3 } from "three";
 import { SetupContext } from "vue";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { settings, directionMap } from "@/service/scene/helper/SceneConstants";
@@ -19,11 +18,14 @@ let orbitControls: OrbitControls;
  */
 function createScene(debug = false): THREE.Scene {
   //RENDERER-----------------
+  const pixelRatio = window.devicePixelRatio;
+  const antialias = pixelRatio < 1;
+
   renderer = new THREE.WebGLRenderer({
-    alpha: true,
-    antialias: true,
+    antialias: antialias,
+    powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(pixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   //RAY_CASTER----------------
@@ -47,7 +49,7 @@ function createScene(debug = false): THREE.Scene {
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.enableZoom = false;
   orbitControls.enablePan = true;
-  orbitControls.target = new THREE.Vector3(0, settings.cameraHeight, 0);
+  orbitControls.target = new THREE.Vector3().copy(camera.position);
   orbitControls.update();
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
@@ -103,9 +105,13 @@ function updateCameraPosition(
 }
 
 function updateCameraTarget(orientation: Orientation) {
-  const target = new Vector3().copy(camera.position);
   const direction = directionMap.get(orientation);
-  if (direction) target.add(direction);
+  if (direction) {
+    orbitControls.target = new THREE.Vector3()
+      .copy(camera.position)
+      .add(direction);
+    orbitControls.update();
+  }
 }
 
 /**
@@ -195,6 +201,7 @@ export function useSceneFactory() {
     insertCanvas,
     updateScene,
     updateCameraPosition,
+    updateCameraTarget,
     getIntersections,
   };
 }
