@@ -1,5 +1,5 @@
 import { computed, reactive } from "vue";
-import { debounce } from "lodash";
+import { throttle } from "lodash";
 
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/lobby/LobbyService";
@@ -223,7 +223,7 @@ async function getOperation(modelName: string, itemId: number) {
     });
 }
 
-const clickItem = debounce(getOperation, 500, { leading: true });
+const clickItem = throttle(getOperation, 500, { leading: true });
 
 /**
  * adds item to inventory via fetch and updates frontend representation accordingly
