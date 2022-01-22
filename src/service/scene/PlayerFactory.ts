@@ -196,7 +196,7 @@ function correctOrientation(orientationStrings: Array<string>): Array<string> {
     orientationStrings[1] = tempOrientation;
   }
   return orientationStrings;
-};
+}
 
 export function usePlayerFactory() {
   return {

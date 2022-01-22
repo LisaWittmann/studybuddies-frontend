@@ -81,7 +81,6 @@ async function createFloor(
           side: DoubleSide,
           map: texture,
           color: color,
-          opacity: 0.6,
         })
       );
       object.position.copy(tilePosition);
@@ -116,7 +115,6 @@ async function createCeiling(
           side: DoubleSide,
           map: texture,
           color: color,
-          opacity: 0.6,
         })
       );
       object.position.set(

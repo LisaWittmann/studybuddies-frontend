@@ -105,9 +105,9 @@ function getColor(tile: Tile, isEnd = false) {
   //both players have access to this tile
   if (tile.getRestrictions().length == 0) return colors.darkBrown;
   //only the designer has access to this tile
-  if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
+  if (tile.isRestrictedFor(Role.HACKER)) return colors.designer;
   //only the hacker has access to this tile
-  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
+  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.hacker;
   //default - this case shouldn't appear
   return colors.grey;
 }
@@ -118,7 +118,7 @@ function getColor(tile: Tile, isEnd = false) {
  * @returns: point light
  */
 function createLight(position: THREE.Vector3) {
-  const light = new THREE.PointLight(0xffffff, 1.3, 50, 2);
+  const light = new THREE.PointLight(0xffffff, 1.6, 50, 2);
   light.position.set(
     position.x,
     position.y + settings.tileSize / 2,
