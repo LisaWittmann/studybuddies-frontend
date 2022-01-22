@@ -14,14 +14,14 @@ import { colors, settings } from "@/service/scene/helper/SceneConstants";
  * @param color: color of all walls
  * @returns initialized group of scene objects
  */
-function createTile(
+async function createTile(
   tileKey: number,
   tile: Tile,
   tilePosition: THREE.Vector3,
   role: Role | undefined,
   neighbors: Map<Orientation, Tile | undefined>,
   isEnd: boolean
-): THREE.Group {
+) {
   const {
     createFloor,
     createCeiling,
@@ -41,12 +41,12 @@ function createTile(
   tileModel.add(createLight(tilePosition));
 
   //STATIC-ITEMS----------
-  createCeiling(tilePosition, tileModel, texture, color);
-  createFloor(tilePosition, tileModel, tileKey, color);
+  await createCeiling(tilePosition, tileModel, texture, color);
+  await createFloor(tilePosition, tileModel, tileKey, color);
   if (tileRestricted) {
-    neighbors.forEach((neighbor, orientation) => {
+    for (const [orientation, neighbor] of neighbors) {
       if (!neighbor) {
-        createTexturedWall(
+        await createTexturedWall(
           tilePosition,
           tileModel,
           orientation,
@@ -54,11 +54,11 @@ function createTile(
           texture
         );
       }
-    });
+    }
   } else {
-    neighbors.forEach((neighbor, orientation) => {
+    for (const [orientation, neighbor] of neighbors) {
       if (!neighbor) {
-        createTexturedWall(
+        await createTexturedWall(
           tilePosition,
           tileModel,
           orientation,
@@ -70,7 +70,7 @@ function createTile(
         createArrow(tilePosition, tileModel, orientation);
       } else {
         //transparent wall if restricted zone is starting in the current orientation
-        createRestrictiveWall(
+        await createRestrictiveWall(
           tilePosition,
           tileModel,
           orientation,
@@ -78,12 +78,12 @@ function createTile(
           getColor(neighbor)
         );
       }
-    });
+    }
   }
 
   //ITEMS-----------------
   for (const item of tile.objectsInRoom) {
-    createItem(tilePosition, tileModel, item);
+    await createItem(tilePosition, tileModel, item);
   }
   return tileModel;
 }

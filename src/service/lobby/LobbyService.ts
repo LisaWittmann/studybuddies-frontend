@@ -9,7 +9,7 @@ import { Role } from "@/service/game/Player";
 
 import router from "@/router";
 
-const { startLoading, endLoading, globalState } = useAppService();
+const { startLoading, globalState } = useAppService();
 const {
   gameState,
   setLobbyKey,

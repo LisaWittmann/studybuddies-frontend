@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Vector3 } from "three";
 import { SetupContext } from "vue";
 import { Orientation } from "@/service/labyrinth/Tile";
 import { settings, directionMap } from "@/service/scene/helper/SceneConstants";
@@ -111,6 +110,7 @@ function updateCameraTarget(orientation: Orientation) {
     orbitControls.target = new THREE.Vector3()
       .copy(camera.position)
       .add(direction);
+    orbitControls.update();
   }
 }
 

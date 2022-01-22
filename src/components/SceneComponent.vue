@@ -43,19 +43,23 @@ export default defineComponent({
       clearLabyrinth,
     } = useLabyrinthFactory();
     const { gameState } = useGameStore();
-    const { endLoading } = useAppService();
+    const { endLoading, globalState } = useAppService();
 
     const labyrinth = computed(() => gameState.labyrinth);
 
     const scene = createScene();
-    initializeLabyrinth(labyrinth.value, props.player, scene).then(() =>
-      endLoading()
-    );
+    setUpGame().then(() => setTimeout(() => endLoading(), 10));
 
     const render = () => {
       renderScene();
       requestAnimationFrame(render);
     };
+
+    async function setUpGame() {
+      await initializeLabyrinth(labyrinth.value, props.player, scene);
+      await updatePlayer(props.player, labyrinth.value, scene);
+      await updatePlayer(props.partner, labyrinth.value, scene);
+    }
 
     function onClick(event: MouseEvent) {
       getIntersections(
@@ -79,10 +83,11 @@ export default defineComponent({
     watch(
       [labyrinth, props.player, props.partner],
       () => {
-        console.log("watcher triggered");
-        updateLabyrinth(labyrinth.value, scene);
-        updatePlayer(props.player, labyrinth.value, scene);
-        updatePlayer(props.partner, labyrinth.value, scene);
+        if (!globalState.loading) {
+          updateLabyrinth(labyrinth.value, scene);
+          updatePlayer(props.player, labyrinth.value, scene);
+          updatePlayer(props.partner, labyrinth.value, scene);
+        }
       },
       { deep: true }
     );

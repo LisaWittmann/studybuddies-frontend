@@ -33,7 +33,7 @@ async function createItem(
   const objLoader = new OBJLoader();
   const mtlLoader = new MTLLoader();
 
-  await mtlLoader.loadAsync(`/materials/${model}.mtl`).then((materials) => {
+  return mtlLoader.loadAsync(`/materials/${model}.mtl`).then((materials) => {
     materials.preload();
     objLoader.setMaterials(materials);
     objLoader.loadAsync(`/models/${model}.obj`).then((object) => {
@@ -64,30 +64,33 @@ async function createItem(
  * @param tileKey: index of current tile
  * @param color: color in hex-code
  */
-function createFloor(
+async function createFloor(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
   tileKey: number,
   color = 0x199eb0
 ) {
   const textureLoader = new TextureLoader();
-  textureLoader.load(texturePath("gras-texture.png"), (texture: Texture) => {
-    texture.minFilter = THREE.NearestFilter;
-    const object = new THREE.Mesh(
-      new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
-      new THREE.MeshLambertMaterial({
-        side: DoubleSide,
-        map: texture,
-        color: color,
-        opacity: 0.6,
-      })
-    );
-    object.position.copy(tilePosition);
-    object.userData.tileKey = tileKey;
-    object.rotateX(radians(90));
-    object.name = "floor";
-    tileModel.add(object);
-  });
+  return textureLoader.load(
+    texturePath("gras-texture.png"),
+    (texture: Texture) => {
+      texture.minFilter = THREE.NearestFilter;
+      const object = new THREE.Mesh(
+        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+        new THREE.MeshLambertMaterial({
+          side: DoubleSide,
+          map: texture,
+          color: color,
+          opacity: 0.6,
+        })
+      );
+      object.position.copy(tilePosition);
+      object.userData.tileKey = tileKey;
+      object.rotateX(radians(90));
+      object.name = "floor";
+      tileModel.add(object);
+    }
+  );
 }
 
 /**
@@ -96,14 +99,14 @@ function createFloor(
  * @param tileModel: parent tile to which object should be added after loading
  * @param color: color in hex-code
  */
-function createCeiling(
+async function createCeiling(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
   textureName = "leaves",
   color = 0x199eb0
 ) {
   const textureLoader = new TextureLoader();
-  textureLoader.load(
+  return textureLoader.load(
     texturePath(`${textureName}-ceiling-texture.png`),
     (texture: Texture) => {
       texture.minFilter = THREE.NearestFilter;
@@ -134,7 +137,7 @@ function createCeiling(
  * @param orientation: orientation which wall should be placed and aligned on
  * @param color: wall color in hex-code
  */
-function createTexturedWall(
+async function createTexturedWall(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
   orientation: Orientation,
@@ -144,7 +147,7 @@ function createTexturedWall(
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
-  textureLoader.load(
+  return textureLoader.load(
     texturePath(`${textureName}-texture.png`),
     (texture: Texture) => {
       texture.minFilter = THREE.NearestFilter;
@@ -206,7 +209,7 @@ function createWall(
  * @param orientation orientation which restriction wall should be placed and aligned on
  * @param opacity: opacity as decimal of mesh
  */
-function createRestrictiveWall(
+async function createRestrictiveWall(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
   orientation: Orientation,
@@ -216,7 +219,7 @@ function createRestrictiveWall(
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
-  textureLoader.load(
+  return textureLoader.load(
     texturePath(`${textureName}-texture.png`),
     function (texture: Texture) {
       texture.minFilter = THREE.NearestFilter;
@@ -245,14 +248,14 @@ function createRestrictiveWall(
  * @param orientation: orientation arrow should direct to
  * @param role: Role of main player
  */
-function createArrow(
+async function createArrow(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
   orientation: Orientation
 ) {
   const arrow = new Arrow(orientation, tilePosition);
   const objLoader = new OBJLoader();
-  objLoader.loadAsync("/models/arrow.obj").then((object) => {
+  return objLoader.loadAsync("/models/arrow.obj").then((object) => {
     object.position.copy(arrow.position());
     object.userData = arrow;
     object.userData.clickable = true;
@@ -293,7 +296,7 @@ async function createPlayer(
   }
   const objLoader = new OBJLoader();
   const mtlLoader = new MTLLoader();
-  await mtlLoader.loadAsync(`/materials/${model}.mtl`).then((materials) => {
+  return mtlLoader.loadAsync(`/materials/${model}.mtl`).then((materials) => {
     materials.preload();
     objLoader.setMaterials(materials);
     objLoader.loadAsync(`/models/${model}.obj`).then((object) => {
