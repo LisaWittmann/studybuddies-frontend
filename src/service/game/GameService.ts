@@ -223,7 +223,7 @@ async function getOperation(modelName: string, itemId: number) {
     });
 }
 
-const clickItem = throttle(getOperation, 500, { leading: true });
+const clickItem = throttle(getOperation, 2000, { leading: true});
 
 /**
  * adds item to inventory via fetch and updates frontend representation accordingly
