@@ -9,7 +9,7 @@
           :class="optionClass(index)"
           @click="select(index)"
         >
-          <img :src="image(index)" alt="Missing Option" />
+          <img :src="image(index)" :alt="option.toString()" />
         </button>
       </div>
     </transition>
@@ -18,7 +18,7 @@
       :class="[{ open: showOptions }, optionClass(selected)]"
       @click="toggleOptions"
     >
-      <img :src="image(selected)" />
+      <img :src="image(selected)" :alt="selected.toString()" />
     </button>
   </div>
 </template>

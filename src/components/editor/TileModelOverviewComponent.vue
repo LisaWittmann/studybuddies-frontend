@@ -23,7 +23,7 @@
           v-for="(role, index) of model.restrictions"
           :key="index"
         >
-          <img :src="roleImage(role)" />
+          <img :src="roleImage(role)" :alt="role.toString()" />
           <i class="fas fa-trash" @click="removeRestriction(model, role)"></i>
         </div>
       </div>
@@ -34,7 +34,7 @@
           v-for="(item, index) of model.objectsInRoom"
           :key="index"
         >
-          <img :src="itemImage(item)" />
+          <img :src="itemImage(item)" :alt="item.modelName" />
           <i class="fas fa-trash" @click="removeItem(model, item)"></i>
         </div>
       </div>
