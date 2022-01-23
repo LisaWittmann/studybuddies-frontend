@@ -90,6 +90,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .editor-tool {
   font-size: $headline-xl;
+  user-select: none;
 
   &__options {
     max-height: 77vh;

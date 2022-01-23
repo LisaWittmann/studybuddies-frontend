@@ -1,4 +1,4 @@
-import { reactive, computed, readonly } from "vue";
+import { reactive, computed } from "vue";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Tile } from "@/service/labyrinth/Tile";
 import { Item } from "@/service/labyrinth/Item";
@@ -162,9 +162,9 @@ function removeTile(model: TileModel): void {
  */
 function isValidStartTile(model: TileModel) {
   return (
-    !model.isEnd ||
-    !model.isStart ||
-    model.objectsInRoom.length == 0 ||
+    !model.isEnd &&
+    !model.isStart &&
+    model.objectsInRoom.length == 0 &&
     model.restrictions.length == 0
   );
 }
@@ -245,7 +245,7 @@ function isValidForRestriction(model: TileModel, role: Role) {
   return (
     !model.isEnd &&
     !model.isStart &&
-    !model.objectsInRoom.some((item) => item.blockedRole == role) &&
+    !model.objectsInRoom.some((item) => item.blockedRole !== role) &&
     !(model.objectsInRoom.length > 0 && model.restrictions.length > 0)
   );
 }
@@ -280,24 +280,28 @@ function setName(labyrinthName: string): void {
 }
 
 /**
- * item may not be empty,
  * end and starttile may not contain any items,
  * tile can only contain max items - 1,
  * tile may not be restricted for all roles,
- * if item is blocked for a role, the tile may not have
- * a restiction for the role
+ * if item is blocked for a role, the tile may hat have
+ * a restriction or only a restricion for the blocked role
  * @param model: tilemodel to verify for item
  * @param item: item that should be placed in tile
  * @returns true if tile is valid for item
  */
 function isValidForItem(model: TileModel, item: ItemModel) {
+  let itemAcessable = true;
+  if (item.blockedRole != undefined) {
+    itemAcessable =
+      model.restrictions.length == 0 ||
+      model.restrictions.includes(item.blockedRole);
+  }
   return (
-    item &&
     !model.isEnd &&
     !model.isStart &&
     model.objectsInRoom.length < editorConfig.maxItems &&
     model.restrictions.length < 2 &&
-    !(item.blockedRole && model.restrictions.includes(item.blockedRole))
+    itemAcessable
   );
 }
 
@@ -307,7 +311,7 @@ function isValidForItem(model: TileModel, item: ItemModel) {
  * @param item: item model to add
  */
 function addItem(model: TileModel, item: ItemModel): void {
-  if (!model.relationKey || isValidForItem(model, item)) return;
+  if (!model.relationKey || !isValidForItem(model, item)) return;
   model.objectsInRoom.push(item);
   editorState.itemOptions = editorState.itemOptions.filter(
     (i) => i.modelName != item.modelName
@@ -450,7 +454,7 @@ async function saveLabyrinth(): Promise<string> {
 
 export function useEditorService() {
   return {
-    editorState: readonly(editorState),
+    editorState,
     updateTileModels,
     setItemOptions,
     addTile,

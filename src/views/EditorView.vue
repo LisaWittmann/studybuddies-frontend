@@ -36,6 +36,7 @@
     <transition name="fade" appear>
       <div class="editor__stage">
         <EditorStageComponent
+          :tile-models="tileModels"
           :tile-size="tileSize"
           :mode="currentMode"
           :role="currentRole"
@@ -48,7 +49,7 @@
       <div class="editor__steps">
         <PaginationComponent
           :items="modes"
-          :activeIndex="modes.indexOf(currentMode)"
+          :active-index="modes.indexOf(currentMode)"
           @select="changeMode"
           @complete="onComplete"
         />
@@ -111,6 +112,8 @@ export default defineComponent({
     const maxZoom = 150;
     const zoomFactor = 10;
 
+    const tileModels = computed(() => editorState.tileModels);
+
     const zoomOutDisabled = computed(() => tileSize.value <= minZoom);
     const zoomInDisabled = computed(() => tileSize.value >= maxZoom);
     const zoomIn = () => {
@@ -129,10 +132,8 @@ export default defineComponent({
 
     const itemsMode = computed(() => currentMode.value == Mode.ITEM_PLACEMENT);
     const itemOptions = computed(() => editorState.itemOptions);
-    const currentItem = ref({} as ItemModel);
-    setItemOptions().then(
-      () => (currentItem.value = itemOptions.value[0] as ItemModel)
-    );
+    const currentItem = ref(new ItemModel(""));
+    setItemOptions().then(() => (currentItem.value = itemOptions.value[0]));
     const changeItem = (item: ItemModel) => (currentItem.value = item);
 
     const showInstruction = ref(false);
@@ -182,6 +183,7 @@ export default defineComponent({
     });
 
     return {
+      tileModels,
       modes,
       currentMode,
       changeMode,
