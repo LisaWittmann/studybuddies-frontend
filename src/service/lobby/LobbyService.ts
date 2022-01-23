@@ -351,7 +351,7 @@ function setLabyrinthSelection(blueprintLabName: string) {
  * and updates the local labyrinth selection in the lobbyState
  */
 function getLabyrinthSelection() {
-  fetch(`${lobbyAPI}/selectedLabyrinth/${lobbyKey.value}`)
+  fetch(`${lobbyAPI}/selected-labyrinth/${lobbyKey.value}`)
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.text();
