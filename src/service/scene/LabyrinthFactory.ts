@@ -35,10 +35,10 @@ async function initializeLabyrinth(
 ) {
   labyrinthData = labyrinth;
   const position = vector(0, 0, 0);
-  for (const [key, value] of labyrinth.tileMap) {
-    const neighbors = getNeighbors(value, labyrinth.tileMap);
+  for (const tile of labyrinth.tileMap.values()) {
+    const neighbors = getNeighbors(tile, labyrinth.tileMap);
     const role = player.getRole();
-    await placeTile(position, value, key, role, neighbors, scene);
+    await placeTile(position, tile, role, neighbors, scene);
   }
 }
 
@@ -73,12 +73,17 @@ function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
   labyrinthData = labyrinth;
 }
 
+/**
+ * reset stored data and remove all scene objects
+ * @param scene: scene containing game objects
+ */
 function clearLabyrinth(scene: THREE.Scene) {
   labyrinthData = undefined;
   resetPlayerData();
   storedTiles.clear();
   scene.clear();
 }
+
 /**
  * updates player position of main or partner player
  * or initially creates partner player
@@ -116,21 +121,23 @@ async function updatePlayer(
 async function placeTile(
   position: THREE.Vector3,
   tile: Tile,
-  tileKey: number,
   role: Role | undefined,
   neighbors: Map<Orientation, Tile | undefined>,
   scene: THREE.Scene
 ) {
-  for (const [key, value] of tile.tileRelationMap) {
-    if (value && storedTiles.get(value)) {
-      position = getNextPosition(storedTiles.get(value) as THREE.Vector3, key);
+  for (const [orientation, tileKey] of tile.tileRelationMap) {
+    if (tileKey && storedTiles.get(tileKey)) {
+      position = getNextPosition(
+        storedTiles.get(tileKey) as THREE.Vector3,
+        orientation
+      );
       break;
     }
   }
   // store placed tile with position to calculate position of next tiles
-  storedTiles.set(tileKey, position);
-  const isEnd = tileKey == labyrinthData?.endTileKey;
-  scene.add(await createTile(tileKey, tile, position, role, neighbors, isEnd));
+  storedTiles.set(tile.tileKey, position);
+  const isEnd = tile.tileKey == labyrinthData?.endTileKey;
+  scene.add(await createTile(tile, position, role, neighbors, isEnd));
 }
 
 /**

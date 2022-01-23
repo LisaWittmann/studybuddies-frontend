@@ -4,6 +4,9 @@ import router from "@/router";
 
 const { globalState, setUsername } = useAppService();
 
+const loginAPI = "/api/login";
+const registerAPI = "/api/register";
+
 /**
  * log out current user by setting loginState
  * to default values
@@ -15,13 +18,13 @@ function logout() {
 
 /**
  * send request to log in user with given username and password
- * updates loginState with user data if request was successful
+ * updates globalState with user data if request was successful
  * and redirects to LobbyView
- * sets errorMessage of loginState if request was not successful
  * @param user: user object containing username and password
+ * @throws error with error message
  */
 async function login(user: User) {
-  return fetch("/api/login", {
+  return fetch(loginAPI, {
     method: "POST",
     headers: {
       "Content-Type": "application/json;charset=utf-8",
@@ -51,7 +54,7 @@ async function login(user: User) {
  * @throws error with error message
  */
 async function register(user: User) {
-  return fetch("/api/register", {
+  return fetch(registerAPI, {
     method: "POST",
     headers: {
       "Content-Type": "application/json;charset=utf-8",

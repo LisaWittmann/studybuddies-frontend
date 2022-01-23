@@ -6,16 +6,14 @@ import { colors, settings } from "@/service/scene/helper/SceneConstants";
 
 /**
  * creates a group of objects representing a tile
- * @param tileKey: index of tile in the labyrinth
  * @param tile: representing tile data
  * @param tilePosition: position in scene
  * @param role: role of main player
  * @param neighbors: neighbor tiles with orientations
- * @param color: color of all walls
+ * @param isEnd: information if tile is set as endTile in labyrinth
  * @returns initialized group of scene objects
  */
 async function createTile(
-  tileKey: number,
   tile: Tile,
   tilePosition: THREE.Vector3,
   role: Role | undefined,
@@ -31,18 +29,13 @@ async function createTile(
     createItem,
   } = useObjectFactory();
   const tileModel = new THREE.Group();
-  tileModel.userData = tile;
-  tileModel.name = tileKey.toString();
   const tileRestricted = tile.isRestrictedFor(role);
   const texture = getTexture(tile);
   const color = getColor(tile, isEnd);
 
-  //LIGHT-----------------
-  tileModel.add(createLight(tilePosition));
-
-  //STATIC-ITEMS----------
-  await createCeiling(tilePosition, tileModel, texture, color);
-  await createFloor(tilePosition, tileModel, tileKey, color);
+  //FIXED-OBJECTS----------
+  await createCeiling(tilePosition, tileModel, color, texture);
+  await createFloor(tilePosition, tileModel, color);
   if (tileRestricted) {
     for (const [orientation, neighbor] of neighbors) {
       if (!neighbor) {
@@ -74,8 +67,8 @@ async function createTile(
           tilePosition,
           tileModel,
           orientation,
-          getTexture(neighbor),
-          getColor(neighbor)
+          getColor(neighbor),
+          getTexture(neighbor)
         );
       }
     }
@@ -85,9 +78,19 @@ async function createTile(
   for (const item of tile.objectsInRoom) {
     await createItem(tilePosition, tileModel, item);
   }
+
+  //LIGHT-----------------
+  tileModel.add(createLight(tilePosition));
+
+  tileModel.name = tile.tileKey.toString();
   return tileModel;
 }
 
+/**
+ * get texture of tile according to role restricions
+ * @param tile: tile to get texture for
+ * @returns prefix of name of texture file in /assets/img/textures
+ */
 function getTexture(tile: Tile) {
   if (tile.restrictions.length == 1) {
     if (tile.isRestrictedFor(Role.HACKER)) return "designer";
@@ -98,16 +101,17 @@ function getTexture(tile: Tile) {
 /**
  * get color of tile according to role restrictions
  * @param tile: tile to get color for
+ * @param isEnd: signalizes that tile is set as endtile in labyrinth
  * @returns color of tile as hexadecimal number
  */
 function getColor(tile: Tile, isEnd = false) {
   if (isEnd) return colors.pink;
   //both players have access to this tile
-  if (tile.getRestrictions().length == 0) return colors.darkBrown;
+  if (tile.getRestrictions().length == 0) return colors.brown;
   //only the designer has access to this tile
-  if (tile.isRestrictedFor(Role.HACKER)) return colors.designer;
+  if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
   //only the hacker has access to this tile
-  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.hacker;
+  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
   //default - this case shouldn't appear
   return colors.grey;
 }

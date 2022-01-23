@@ -90,8 +90,8 @@ export default defineComponent({
       updateTileModels,
       setItemOptions,
       hasErrors,
-      save,
-      reset,
+      saveLabyrinth,
+      resetEditorState,
     } = useEditorService();
     const { setFeedback, setFeedbackError } = useAppService();
 
@@ -129,8 +129,10 @@ export default defineComponent({
 
     const itemsMode = computed(() => currentMode.value == Mode.ITEM_PLACEMENT);
     const itemOptions = computed(() => editorState.itemOptions);
-    setItemOptions().then(() => (currentItem.value = itemOptions.value[0]));
-    const currentItem = ref(new ItemModel(""));
+    const currentItem = ref({} as ItemModel);
+    setItemOptions().then(
+      () => (currentItem.value = itemOptions.value[0] as ItemModel)
+    );
     const changeItem = (item: ItemModel) => (currentItem.value = item);
 
     const showInstruction = ref(false);
@@ -144,7 +146,7 @@ export default defineComponent({
       if (rollback) {
         currentMode.value = rollback;
       } else {
-        save()
+        saveLabyrinth()
           .then((name) => {
             setFeedback(
               "Gespeichert",
@@ -152,7 +154,7 @@ export default defineComponent({
               "/find",
               "Jetzt spielen"
             );
-            reset();
+            resetEditorState();
           })
           .catch(() => {
             setFeedbackError(
@@ -170,7 +172,7 @@ export default defineComponent({
     watch(
       () => editorState.itemOptions,
       () => {
-        currentItem.value = itemOptions.value[0];
+        currentItem.value = itemOptions.value[0] as ItemModel;
       },
       { deep: true }
     );
