@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DoubleSide, Texture, TextureLoader } from "three";
 
 import { Item } from "@/service/labyrinth/Item";
@@ -10,9 +11,14 @@ import { PartnerPlayer, Role } from "@/service/game/Player";
 
 import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 const modelPath = (fileName: string) => {
   return `/models/${fileName}.obj`;
+};
+
+const modelPath2 = (fileName: string) => {
+  return `/gltf/${fileName}.gltf`;
 };
 
 const materialPath = (fileName: string) => {
@@ -37,29 +43,28 @@ async function createItem(
   const model = item.modelName.toLowerCase();
   let factor = 1;
   const size = new THREE.Vector3();
+  const gltfLoader = new GLTFLoader();
+  const dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath(`/decoder`);
+  gltfLoader.setDRACOLoader(dracoLoader);
 
-  const objLoader = new OBJLoader();
-  const mtlLoader = new MTLLoader();
+  console.log("createItem modelPath2: ", modelPath2(model));
 
-  return mtlLoader.loadAsync(materialPath(model)).then((materials) => {
-    materials.preload();
-    objLoader.setMaterials(materials);
-    objLoader.loadAsync(modelPath(model)).then((object) => {
-      object.position.copy(item.calcPositionInRoom().add(tilePosition));
-      //get object size before rotation
-      const box = new THREE.Box3().setFromObject(object);
-      box.getSize(size);
-      if (size.x > settings.tileSize / 4) {
-        factor = 1 / (size.x / factors.objectScaleFactor);
-      } else if (size.y > settings.tileSize / 4) {
-        factor = 1 / (size.y / factors.objectScaleFactor);
-      }
-      object.scale.set(factor, factor, factor); //scale object to max size
-      object.rotateY(item.rotationY());
-      object.userData = item;
-      object.name = `item-${model}-${item.id}`;
-      tileModel.add(object);
-    });
+  return gltfLoader.loadAsync(modelPath2(model)).then((object) => {
+    object.scene.position.copy(item.calcPositionInRoom().add(tilePosition));
+    //get object size before rotation
+    const box = new THREE.Box3().setFromObject(object.scene);
+    box.getSize(size);
+    if (size.x > settings.tileSize / 4) {
+      factor = 1 / (size.x / factors.objectScaleFactor);
+    } else if (size.y > settings.tileSize / 4) {
+      factor = 1 / (size.y / factors.objectScaleFactor);
+    }
+    object.scene.scale.set(factor, factor, factor); //scale object to max size
+    object.scene.rotateY(item.rotationY());
+    object.userData = item;
+    object.userData.name = `item-${model}-${item.id}`;
+    tileModel.add(object.scene);
   });
 }
 

@@ -1,0 +1,149 @@
+{
+  "accessors": [
+    {
+      "name": "touchpen-Mesh_0_indices",
+      "componentType": 5123,
+      "count": 750,
+      "min": [
+        0
+      ],
+      "max": [
+        447
+      ],
+      "type": "SCALAR"
+    },
+    {
+      "name": "touchpen-Mesh_0_positions",
+      "componentType": 5126,
+      "count": 448,
+      "min": [
+        -0.11136399120461828,
+        0.005111007444591466,
+        0.009653007570685091
+      ],
+      "max": [
+        0.11133993828590025,
+        0.22781493693510999,
+        3.1138730859793413
+      ],
+      "type": "VEC3"
+    },
+    {
+      "name": "touchpen-Mesh_0_normals",
+      "componentType": 5126,
+      "count": 448,
+      "min": [
+        -1.0030297045614205,
+        -1.0030297045614205,
+        -1.007843137254902
+      ],
+      "max": [
+        1.0048134326934814,
+        1.0048134326934814,
+        1.007843137254902
+      ],
+      "type": "VEC3"
+    },
+    {
+      "name": "touchpen-Mesh_0_texcoords",
+      "componentType": 5126,
+      "count": 448,
+      "min": [
+        -0.0009775171065493646,
+        -0.0009775171065493646
+      ],
+      "max": [
+        1.0009775171065494,
+        0.9912023460410557
+      ],
+      "type": "VEC2"
+    }
+  ],
+  "asset": {
+    "generator": "obj2gltf",
+    "version": "2.0"
+  },
+  "buffers": [
+    {
+      "name": "touchpen",
+      "byteLength": 1464,
+      "uri": "data:application/octet-stream;base64,RFJBQ08CAgEBAAAAoQH6AQL5ARYARn+/bylt3/db1FpvbUshUohuS70VBQooULYWBdYCWoW3bdu2bdu2bdu2bet//vzJnz/58ydJ0lZVVVVVq6qqqqqqqqpUVRWrA9RbgHEt4Oennsf6qYfZkLDjx12VB2s+FzDKPZi23rIgY77boeUBd8aJaOS1FCTvtZqAtSii8N/dDmjtFxYA3kvRmVZdGw2acTVXcOsUvLiLAiAcwGYMLeR6306AA/8AAAABAAEBAAEACQMAAAIBAQkDAAEDAQMJAgACAgEBAQALA4UNkQWNCczJAikHlQPBBlUM/QE/vIFPyE0rNv43LFFBkaifM4HQXVGcXZY1PViy0vNi0vNiCTTiDzSkRrN4V+gxn8S/bHSGMT1mA1WCcl1X38qDOlrKCRDJ+mA/iHAAm4EACmWGh2QCgmSZgD0BHIIAHIMAMCIAowECCWUCgg7ItoBTBUCUICgDhDTAxgAiFNAxCEBsAuwLkChQZlAegG0BEgjKBGCARQExCACKBm4BABFSoYwRCoJrBg5OlDEUCagZsPhQxgCAMiT0BEYEOfBVsdzIQ/6wwSIB+QtlyB8oxv44S/KH+bK/yZv9M/rs31BoP4BC+zUU2k+jz34mb/aD+bJfTpL9fmbkN3QhvyIB+Q1xyO8HR345TPKDIZOfCZ38MgDl14AoPwBG+Tsgyj8DUP4mdPKHEZN/jpP81rwiJooCsYITTggTIxAas4MK2N4BQgZghgrCBIgghGggCGiAAALEhAkICCIBGIAYcgAO4AAUYIEGKYACDwYYIEwcatAAQwUAAAAA/wcAAIP44L3rHtk7/fk2POZ5RkALBgMBAQT/Ad0TyRndAjkBbQEk////v0gDSCQUlN0DgQIBBY0ChRI9A93LUEWs5J4TPwPRJEvyEsQKBuIXweRDwscQozZY87aIrTzb8mBkTvtYx/4iog8TXZLV+UkAKCgPwaAgkHEYlCny2RD8KTZX6Mfa5q3LPM6PKmLJBLxkbEN9jGRsQ32MY/AWrrE6XEVpDgZb+uDwDkDuQYIXy8U6R/bYU5yDgY0YY2IUsWNrnWuzdTqit0a3otJoVG4eKSYCMgoRs0Wq8pVRqAKch/Kb7cIYeyye7Xh8sLzFnTjyEgiPQ102LbLr4KwWkR7ON8JWQEKXeAN2I/5C6duB3g/98Q7B/rO7N9G92zv4EOFXhx1kbEN9jGRsFqI89btkbEN9jGRsQ32MZM6sHAYt5zsZNoL/AAAAfwAAAP8DxE6ACAUBAQALA9UEFQXFBqkCzQXZGdUELQItAt0DX6BoozpvUVFRUVFRUSlXZzBVEApf+Dmzk2hAzaoROusCTJsUCHHPLSZkxP4z19vQh14w+Q276m8FgEm2MkKngBxyitst1RPKLQHZIGF4SbvIz4pXPDxWlM4xndnO48+dQP0PxP80mAAeJmASKqAaIiASgEACAMD/JsCHCfCBAhu4mUZyR56xXppaJ4xITYLkqPQxH2zOfpcg/PB/NyFQzQeTjEA2JbDNB5OEQDUp0M0GO5zAOXzwwwiUwQiUwQmkQwc9jMAYjMAYnMA5fPADqr3zlKTNwjID/COzR1LMIhsOoYSmYhPConYJxP8wqMAf/1u54qxQJKQgCcYDseKH9ureYk8JEoqFYSUY5m19r3sXjAQDRUQQ05MznOKd/xAOjAojhkgCopoqIiIi6h8HjhZFIljLjfmG3EYOYcQpbc9i4X5u2DiVh9NuI/+hHDfE9I08EP/jQA3UQA3UQA3UQA3cQA3UQA3UQA3cQA3UQA3UQA3UwA3UwA3cwA3MQA3UQA3cwA3UwA3UwA3UwA3cwA3Uwg3UwA3UQA3Uwg3UwA3UwA3UQA3UQA3UwA3UQA0E8j8Q/+NADQDxPxD/48ANAOUAAAACBBqAb0cAAAAA/wMAAAAAAAAAAAAAAACAPwoAAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1460
+    }
+  ],
+  "materials": [
+    {
+      "name": "touchpen.001",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.8,
+          0.8,
+          0.8,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 0.775
+      },
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ],
+      "alphaMode": "OPAQUE",
+      "doubleSided": false
+    }
+  ],
+  "meshes": [
+    {
+      "name": "touchpen-Mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 1,
+            "NORMAL": 2,
+            "TEXCOORD_0": 3
+          },
+          "indices": 0,
+          "material": 0,
+          "mode": 4,
+          "extensions": {
+            "KHR_draco_mesh_compression": {
+              "bufferView": 0,
+              "attributes": {
+                "POSITION": 0,
+                "NORMAL": 1,
+                "TEXCOORD_0": 2
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "touchpen",
+      "mesh": 0
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "extensionsRequired": [
+    "KHR_draco_mesh_compression"
+  ],
+  "extensionsUsed": [
+    "KHR_draco_mesh_compression"
+  ]
+}
