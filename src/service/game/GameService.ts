@@ -14,6 +14,7 @@ const lobbyKey = computed(() => gameState.lobbyKey);
 const playerName = computed(() => gameState.mainPlayer.username);
 
 const lobbyAPI = "/api/lobby";
+const gameAPI = "/api/game";
 const bodyAPI = "/api/body";
 
 const gameEventMessage = reactive({
@@ -86,7 +87,7 @@ async function movePlayer(orientation: Orientation) {
     playerName.value,
     Orientation[orientation]
   );
-  fetch(`${lobbyAPI}/move`, {
+  fetch(`${gameAPI}/move`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -139,7 +140,7 @@ async function checkAccess(modelName: string) {
     playerName.value,
     modelName.toUpperCase()
   );
-  fetch(`${lobbyAPI}/access`, {
+  fetch(`${gameAPI}/access`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -171,7 +172,7 @@ async function checkEndGame(modelName: string) {
     playerName.value,
     modelName.toUpperCase()
   );
-  fetch(`${lobbyAPI}/end`, {
+  fetch(`${gameAPI}/end`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -277,7 +278,7 @@ async function updateInventory() {
     playerName.value,
     Update[Update.INVENTORY]
   );
-  fetch(`${lobbyAPI}/current-inventory`, {
+  fetch(`${gameAPI}/current-inventory`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
