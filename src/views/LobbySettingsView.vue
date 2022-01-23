@@ -35,7 +35,7 @@
             <button
               :class="{ button__ready: isReady }"
               class="button--small"
-              @click="readyCheck(selectedLabyrinth)"
+              @click="readyCheck()"
             >
               Bereit
             </button>
@@ -89,8 +89,9 @@ export default defineComponent({
       updateRole,
       getRoleOptions,
       updateReadyStates,
+      getLabyrinthSelection,
     } = useLobbyService();
-    const { gameState, setLobbyKey } = useGameStore();
+    const { gameState } = useGameStore();
 
     const lobbyKey = computed(() => gameState.lobbyKey);
 
@@ -141,12 +142,14 @@ export default defineComponent({
 
     onMounted(() => {
       const route = router.currentRoute.value;
-      setLobbyKey(route.params.key as string);
+      if (lobbyKey.value != (route.params.key as string)) router.push("/find");
       updateUsers()
         .then(() => updateReadyStates())
         .catch(() => router.push("/find"));
       updateLabyrinths();
       getRoleOptions();
+      updateReadyStates();
+      getLabyrinthSelection();
     });
 
     return {

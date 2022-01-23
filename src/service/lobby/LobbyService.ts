@@ -136,8 +136,9 @@ async function joinLobby(lobbyKey: string) {
       if (response.status == 409) throw new Error("Diese Lobby ist voll.");
       else throw new Error("Diese Lobby konnte nicht gefunden werden.");
     }
-    router.push("/lobby/" + lobbyKey.toUpperCase());
-    updateReadyStates();
+    const key = lobbyKey.toUpperCase();
+    setLobbyKey(key);
+    router.push("/lobby/" + key);
   });
 }
 
@@ -160,6 +161,7 @@ async function createLobby() {
       return response.json();
     })
     .then((jsonData) => {
+      setLobbyKey(jsonData.key);
       router.push("/lobby/" + jsonData.key);
     })
     .catch((error) => console.error(error));
@@ -257,7 +259,7 @@ async function updateUsers() {
         const foundUser: User | undefined = tempUsers.find(
           (user) => user.username === username
         );
-        console.log(foundUser);
+
         if (foundUser) {
           lobbyState.users.push(foundUser);
         } else {
@@ -345,21 +347,36 @@ function setLabyrinthSelection(blueprintLabName: string) {
 }
 
 /**
+ * gets the selected Labyrinth from the Backend
+ * and updates the local labyrinth selection in the lobbyState
+ */
+function getLabyrinthSelection() {
+  fetch(`${lobbyAPI}/selected-labyrinth/${lobbyKey.value}`)
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.text();
+    })
+    .then((jsonData) => {
+      lobbyState.selectedLabyrinthName = jsonData
+    })
+    .catch((error) => console.error(error));
+}
+
+/**
  * sends a List of two Arguments to the BE, so there can be checked, whether every Player is ready or not
  * (and reacts to a wrong respond after receiving it)
  * @param username name of the user in the backend, which shall be taken out of the lobby
  * @param labName name of the blueprint labyrinth, used for the Game Progression
  */
-async function readyCheck(labName: string) {
+function readyCheck() {
   if (!lobbyState.selectedLabyrinthName || !lobbyState.selectedRole) return;
-  const args = new Array<string>(loggedInUser.value, labName);
 
   fetch(`${lobbyAPI}/ready/${lobbyKey.value}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(args),
+    body: JSON.stringify(loggedInUser.value),
   })
     .then((response) => {
       if (!response.ok) {
@@ -429,6 +446,7 @@ export function useLobbyService() {
     updateLabyrinths,
     updateReadyStates,
     setLabyrinthSelection,
+    getLabyrinthSelection,
     updateLabyrinthPick,
     readyCheck,
     setupGame,
