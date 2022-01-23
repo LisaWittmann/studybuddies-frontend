@@ -55,9 +55,8 @@ export class Wall extends FixedObject {
  * contains orientation where it directs to
  */
 export class Arrow extends FixedObject {
-  showInView = true;
   modelName = "arrow";
-  color = colors.arrow;
+  color = colors.beige;
 
   position = (): Vector3 => {
     return this.getPosition(settings.tileSize / 2 - 2);

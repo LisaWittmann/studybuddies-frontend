@@ -126,4 +126,8 @@ export class ItemModel {
     this.orientations = new Array<Orientation>();
     this.blockedRole = blockedRole;
   }
+
+  toString(): string {
+    return this.modelName;
+  }
 }

@@ -62,6 +62,7 @@ import { useAppService } from "@/service/AppService";
 import { useLobbyService } from "@/service/lobby/LobbyService";
 import { useGameStore } from "@/service/game/GameStore";
 import { Role } from "@/service/game/Player";
+import { User } from "@/service/login/User";
 
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
@@ -107,8 +108,9 @@ export default defineComponent({
 
     const isReady = computed(
       () =>
-        lobbyState.users.find((user) => user.username === globalState.username)
-          ?.isReady
+        lobbyState.users.find(
+          (user: User) => user.username === globalState.username
+        )?.isReady
     );
     const loading = computed(() => globalState.loading);
 

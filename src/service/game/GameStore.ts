@@ -24,6 +24,20 @@ const gameState = reactive({
   playersInSameTile: false,
 });
 
+/**
+ * set gameState to initial values
+ */
+function resetGameState() {
+  gameState.started = false;
+  gameState.labyrinthName = "";
+  gameState.labyrinth = new Labyrinth("", 0, []);
+  gameState.mainPlayer = new MainPlayer("", 0);
+  gameState.partnerPlayer = new PartnerPlayer("", 0);
+  gameState.errormessage = "";
+  gameState.score = 0;
+  gameState.playersInSameTile = false;
+}
+
 function setStarted(started: boolean) {
   gameState.started = started;
 }
@@ -40,25 +54,19 @@ function setScore(score: number) {
   gameState.score = score;
 }
 
-function resetGameState() {
-  gameState.started = false;
-  gameState.labyrinthName = "";
-  gameState.labyrinth = new Labyrinth("", 0, []);
-  gameState.mainPlayer = new MainPlayer("", 0);
-  gameState.partnerPlayer = new PartnerPlayer("", 0);
-  gameState.errormessage = "";
-  gameState.score = 0;
-  gameState.playersInSameTile = false;
-}
-
 /**
- * Updates complete inventory after delete or collect
- * @param inventory
+ * Updates complete inventory of mainPlayer
+ * @param inventory: current inventroy
  */
 function setInventory(inventory: Array<Item>) {
   gameState.mainPlayer.setInventory(inventory);
 }
 
+/**
+ * get player from gameState by username
+ * @param username: username of player
+ * @returns player object with username
+ */
 function getPlayer(username: string) {
   if (gameState.mainPlayer.username == username) {
     return gameState.mainPlayer;
@@ -102,6 +110,10 @@ function checkPlayerProximity() {
     gameState.mainPlayer.position == gameState.partnerPlayer.position;
 }
 
+/**
+ * request labyrinth data from labyrinthStore and replace gameStates labyrinth
+ * @returns promise of type labyrinth
+ */
 async function updateGameData() {
   return updateLabyrinthData(gameState.lobbyKey).then(
     (labyrinth) => (gameState.labyrinth = labyrinth)

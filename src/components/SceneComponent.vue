@@ -34,7 +34,7 @@ export default defineComponent({
       renderScene,
       insertCanvas,
       updateScene,
-      getIntersections,
+      getIntersection,
     } = useSceneFactory();
     const {
       initializeLabyrinth,
@@ -62,7 +62,7 @@ export default defineComponent({
     }
 
     function onClick(event: MouseEvent) {
-      getIntersections(
+      getIntersection(
         context,
         (event.clientX / innerWidth) * 2 - 1,
         -(event.clientY / innerHeight) * 2 + 1
@@ -96,11 +96,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-#scene {
-  overflow: hidden;
-  height: -webkit-fill-available;
-  width: 100vw;
-}
-</style>
