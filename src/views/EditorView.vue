@@ -64,7 +64,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onUnmounted, ref, watch } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useAppService } from "@/service/AppService";
 import { useEditorService } from "@/service/editor/EditorService";
 import { ItemModel } from "@/service/editor/TileModel";
@@ -178,7 +178,7 @@ export default defineComponent({
       { deep: true }
     );
 
-    onUnmounted(() => {
+    onMounted(() => {
       updateTileModels();
     });
 

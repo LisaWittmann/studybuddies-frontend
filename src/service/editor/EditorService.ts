@@ -18,8 +18,6 @@ const editorState = reactive({
   errorMessage: "",
 });
 
-updateTileModels();
-
 // counter for relationKeys
 let counter = 1;
 
@@ -44,6 +42,7 @@ function resetEditorState(): void {
   editorState.endPosition = 0;
   editorState.labyrinthName = "";
   editorState.errorMessage = "";
+  counter = 1;
 }
 
 /**
