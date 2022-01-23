@@ -1,7 +1,11 @@
 <template>
   <transition name="fade" appear>
     <div class="container">
-      <img class="image--header" :src="header" alt="logo" />
+      <img
+        class="image--header"
+        :src="header"
+        alt="Study Buddies - the quest for mazelnut"
+      />
       <section>
         <h2>Spiel finden</h2>
         <form class="column-wrapper" @submit.prevent="join(lobbyKey)">

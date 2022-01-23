@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="home__background">
+    <div class="home__background container container--fixed">
       <transition name="slow-fade" appear>
         <img
           class="home__background-image"
@@ -12,7 +12,11 @@
     <div class="flex-container">
       <div class="column-wrapper">
         <transition name="slow-fade" appear>
-          <img class="home__header" :src="header" alt="logo" />
+          <img
+            class="home__header"
+            :src="header"
+            alt="Study Buddies - the quest for mazelnut"
+          />
         </transition>
         <transition name="delay-slow-fade" appear>
           <router-link
@@ -47,22 +51,16 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .home {
-  &__background {
-    position: relative;
-    overflow: hidden;
-    height: 100vh;
+  &__background-image {
+    width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%) brightness(70%);
+    opacity: 0.2;
 
-    &-image {
-      width: 100%;
-      min-height: 100%;
-      object-fit: cover;
-      filter: grayscale(20%) brightness(70%);
-      opacity: 0.2;
-
-      @include color-scheme(dark) {
-        opacity: 0.15;
-        filter: grayscale(0%) brightness(90%);
-      }
+    @include color-scheme(dark) {
+      opacity: 0.15;
+      filter: grayscale(0%) brightness(90%);
     }
   }
 

@@ -18,8 +18,7 @@ const editorState = reactive({
   errorMessage: "",
 });
 
-updateTileModels();
-
+// counter for relationKeys
 let counter = 1;
 
 /**
@@ -35,7 +34,7 @@ const selectedTiles = computed(() => {
 /**
  * set editorState to initial values
  */
-function reset(): void {
+function resetEditorState(): void {
   editorState.rows = 15;
   editorState.columns = 30;
   editorState.tileModels = new Array<TileModel>();
@@ -43,22 +42,12 @@ function reset(): void {
   editorState.endPosition = 0;
   editorState.labyrinthName = "";
   editorState.errorMessage = "";
+  counter = 1;
 }
 
 /**
- * set dimension of labyrinth editor by changing amount of rows and columns
- * and add new created tile models to editorState's tile models
- *
- * @param rows: number of row of labyrinth editor (size of x-axis)
- * @param columns: number of columns of labyrinth editor (size of y-axis)
+ * get placeable bodies for editormode item placement
  */
-function setDimension(rows: number, columns: number): void {
-  if (editorState.rows < editorConfig.maxRows) editorState.rows = rows;
-  if (editorState.columns < editorConfig.maxColumns)
-    editorState.columns = columns;
-  updateTileModels();
-}
-
 async function setItemOptions() {
   await fetch("/api/body/placeable-bodies")
     .then((response) => {
@@ -74,7 +63,6 @@ async function setItemOptions() {
           );
         }
       }
-      console.log(editorState.itemOptions);
     });
 }
 
@@ -148,6 +136,10 @@ function addTile(model: TileModel): void {
   setSelectableTiles();
 }
 
+/**
+ * mark tile as unselected and reset tileModel's data to delete it from selectedTiles
+ * @param model tile model to delete
+ */
 function removeTile(model: TileModel): void {
   if (!model.relationKey || model.getNeighborsAsList().length > 1) return;
   model.restrictions = [];
@@ -162,17 +154,26 @@ function removeTile(model: TileModel): void {
 }
 
 /**
+ * starttile can not be endtile,
+ * starttile may not have any restrictions or contain any items
+ * @param model: model to verify as starttile
+ * @returns true if tileModel can be set as starttile
+ */
+function isValidStartTile(model: TileModel) {
+  return (
+    !model.isEnd &&
+    !model.isStart &&
+    model.objectsInRoom.length == 0 &&
+    model.restrictions.length == 0
+  );
+}
+
+/**
  * add given tile to start tiles
  * @param model tile model to set as a starting position
  */
 function addStartTile(model: TileModel): void {
-  if (
-    !model.relationKey ||
-    model.isEnd ||
-    model.isStart ||
-    model.restrictions.length > 0
-  )
-    return;
+  if (!model.relationKey || !isValidStartTile(model)) return;
   if (editorState.startPositions.length < editorConfig.maxStartPositions) {
     editorState.startPositions.push(model.relationKey);
     model.isStart = true;
@@ -191,19 +192,28 @@ function removeStartTile(model: TileModel) {
 }
 
 /**
+ * endtile can not be starttile,
+ * endtile may not have any restrictions or contain any items,
+ * endtile must be dead end
+ * @param model: model to verify as entile
+ * @returns true if tileModel can be set as endtile
+ */
+function isValidEndTile(model: TileModel) {
+  return (
+    !model.isStart &&
+    !model.isEnd &&
+    model.restrictions.length == 0 &&
+    model.objectsInRoom.length == 0 &&
+    model.getNeighborsAsList().length == 1
+  );
+}
+
+/**
  * set given tile as end tile
  * @param model tile model to set as end tile
  */
 function addEndTile(model: TileModel): void {
-  if (
-    !model.relationKey ||
-    model.isStart ||
-    model.isEnd ||
-    model.restrictions.length > 0 ||
-    model.getNeighborsAsList().length > 1
-  ) {
-    return;
-  }
+  if (!model.relationKey || !isValidEndTile(model)) return;
   const endTile = editorState.tileModels.find(
     (tileModel) => tileModel.relationKey == editorState.endPosition
   );
@@ -223,18 +233,29 @@ function removeEndTile(model: TileModel): void {
 }
 
 /**
+ * start and enttile may not have any restricions,
+ * tile may not contain any blocked item for the role,
+ * if tile contains item, the tile may not be resticted for both roles
+ * @param model: model to verify restriction for
+ * @param role: restriction for role
+ * @returns true if restriction is valid for tile
+ */
+function isValidForRestriction(model: TileModel, role: Role) {
+  return (
+    !model.isEnd &&
+    !model.isStart &&
+    !model.objectsInRoom.some((item) => item.blockedRole !== role) &&
+    !(model.objectsInRoom.length > 0 && model.restrictions.length > 0)
+  );
+}
+
+/**
  * set restriction on tile model for given role
  * @param model: tile model to add  restriction for role
  * @param role: role that will be restricted for tile
  */
 function addRestriction(model: TileModel, role: Role): void {
-  if (
-    !model.relationKey ||
-    model.isEnd ||
-    model.isStart ||
-    model.objectsInRoom.some((item) => item.blockedRole == role)
-  )
-    return;
+  if (!model.relationKey || !isValidForRestriction(model, role)) return;
   if (!model.restrictions?.includes(role)) {
     model.restrictions?.push(role);
   }
@@ -258,29 +279,42 @@ function setName(labyrinthName: string): void {
 }
 
 /**
+ * end and starttile may not contain any items,
+ * tile can only contain max items - 1,
+ * tile may not be restricted for all roles,
+ * if item is blocked for a role, the tile may hat have
+ * a restriction or only a restricion for the blocked role
+ * @param model: tilemodel to verify for item
+ * @param item: item that should be placed in tile
+ * @returns true if tile is valid for item
+ */
+function isValidForItem(model: TileModel, item: ItemModel) {
+  let itemAcessable = true;
+  if (item.blockedRole != undefined) {
+    itemAcessable =
+      model.restrictions.length == 0 ||
+      model.restrictions.includes(item.blockedRole);
+  }
+  return (
+    !model.isEnd &&
+    !model.isStart &&
+    model.objectsInRoom.length < editorConfig.maxItems &&
+    model.restrictions.length < 2 &&
+    itemAcessable
+  );
+}
+
+/**
  * add item model to tile models objectsInRoom
  * @param model: tile model to add item to
  * @param item: item model to add
  */
 function addItem(model: TileModel, item: ItemModel): void {
-  if (
-    !item ||
-    !model.relationKey ||
-    model.isEnd ||
-    model.objectsInRoom.length >= editorConfig.maxItems ||
-    !isAccessable(item, model)
-  )
-    return;
+  if (!model.relationKey || !isValidForItem(model, item)) return;
   model.objectsInRoom.push(item);
   editorState.itemOptions = editorState.itemOptions.filter(
     (i) => i.modelName != item.modelName
   );
-}
-
-function isAccessable(item: ItemModel, tile: TileModel) {
-  if (item.blockedRole == undefined) return true;
-  if (tile.restrictions.length == 0) return true;
-  else return tile.restrictions.includes(item.blockedRole);
 }
 
 /**
@@ -332,7 +366,7 @@ function hasErrors(): Mode | undefined {
  * convert editorState with tile models to a labyrinth object
  * @returns data of editorState as labyrinth
  */
-function convert(): Labyrinth {
+function convertToLabyrinth(): Labyrinth {
   for (
     let i = editorState.startPositions.length;
     i < editorConfig.maxStartPositions;
@@ -397,8 +431,8 @@ function parseLabyrinth(labyrinth: Labyrinth): string {
  * convert labyrinth and save by API call
  * return promise with id of saved labyrinth
  */
-async function save(): Promise<string> {
-  const labyrinth = convert();
+async function saveLabyrinth(): Promise<string> {
+  const labyrinth = convertToLabyrinth();
   return fetch("/api/labyrinth/save", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -413,7 +447,6 @@ async function save(): Promise<string> {
         "Labyrinth ist invalide. Bitte prüfe es erneut";
       throw new Error(response.statusText);
     }
-
     return response.text();
   });
 }
@@ -435,7 +468,7 @@ export function useEditorService() {
     removeItem,
     setName,
     hasErrors,
-    save,
-    reset,
+    saveLabyrinth,
+    resetEditorState,
   };
 }

@@ -79,17 +79,9 @@ export const movementRotations = readonly(
  * styleguide colors
  */
 export const colors = readonly({
-  lightGreen: 0x94a878,
-  green: 0x5d702f,
-  darkGreen: 0x30431f,
-  beige: 0xe6bf5f,
-  brown: 0x994814,
-  darkBrown: 0x995c2e,
+  brown: 0x995c2e,
+  beige: 0x997f3f,
+  green: 0x678f42,
   pink: 0xd874d8,
-  white: 0xf8f7f5,
   grey: 0xd7d9d5,
-  black: 0x1a1e16,
-  designer: 0x997f3f,
-  hacker: 0x678f42,
-  arrow: 0x997f3f,
 });

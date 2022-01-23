@@ -18,6 +18,9 @@ const { createPlayer, checkIntersect } = useObjectFactory();
 let playerPosition: number | undefined;
 let partnerPosition: number | undefined;
 
+/**
+ * remove stored player data on scene destroy
+ */
 function resetPlayerData() {
   playerPosition = undefined;
   partnerPosition = undefined;
@@ -39,30 +42,33 @@ function requiresUpdate(player: Player) {
 /**
  * update position of main player
  * @param player: main player
- * @param tilePosition: position of tile player should be placed on
+ * @param tile: tile of labyrinth data in which player should be placed in
+ * @param tilePosition: position of tile player should be placed in
  */
 async function updateMainPlayer(
   player: MainPlayer,
   tile: Tile | undefined,
   tilePosition: Vector3
 ) {
-  if (requiresUpdate(player)) {
-    updateCameraPosition(tilePosition);
-    if (!playerPosition) {
-      if (!tile) return;
-      const relations = [...tile.getTileRelationMap().keys()];
-      const orientation = relations.find((orientation) =>
-        tile.getTileRelationMap().get(orientation)
-      );
-      if (orientation) updateCameraTarget(orientation);
-    }
-    playerPosition = player.getPosition();
+  if (!requiresUpdate(player)) return;
+
+  updateCameraPosition(tilePosition);
+  if (!playerPosition) {
+    if (!tile) return;
+    // update camera target on initial creation so player won't face a wall
+    const relations = [...tile.getTileRelationMap().keys()];
+    const orientation = relations.find((orientation) =>
+      tile.getTileRelationMap().get(orientation)
+    );
+    if (orientation) updateCameraTarget(orientation);
   }
+  playerPosition = player.getPosition();
 }
 
 /**
  * update position of partner players
  * @param player: partner player
+ * @param tile: tile of labyrinth data in which player should be placed in
  * @param tilePosition: position of tile that player should be placed in
  * @param scene: scene containing player and tile objects
  */
@@ -72,22 +78,20 @@ async function updatePartnerPlayer(
   tilePosition: Vector3,
   scene: Scene
 ) {
-  if (!player.getUsername() || !requiresUpdate(player)) {
-    return;
-  } else {
-    const playerObject = scene.getObjectByName(player.getUsername());
-    const position = calculatePartnerPositon(tile, tilePosition);
-    if (!partnerPosition) {
-      createPlayer(player, position, scene);
-    } else if (playerObject) {
-      rotatePlayer(playerObject, position);
-      playerObject.position.copy(position);
-      playerObject.position.copy(
-        checkIntersect(playerObject, player.getPosition(), position, scene)
-      );
-    }
-    partnerPosition = player.getPosition();
+  if (!requiresUpdate(player)) return;
+
+  const playerObject = scene.getObjectByName(player.getUsername());
+  const position = calculatePartnerPositon(tile, tilePosition);
+  if (!partnerPosition) {
+    createPlayer(player, position, scene);
+  } else if (playerObject) {
+    rotatePlayer(playerObject, position);
+    playerObject.position.copy(position);
+    playerObject.position.copy(
+      checkIntersect(playerObject, player.getPosition(), position, scene)
+    );
   }
+  partnerPosition = player.getPosition();
 }
 
 /**
