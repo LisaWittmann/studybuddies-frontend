@@ -55,7 +55,6 @@ export class Wall extends FixedObject {
  * contains orientation where it directs to
  */
 export class Arrow extends FixedObject {
-  showInView = true;
   modelName = "arrow";
   color = colors.beige;
 

@@ -11,8 +11,16 @@ import { PartnerPlayer, Role } from "@/service/game/Player";
 import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 
+const modelPath = (fileName: string) => {
+  return `/models/${fileName}.obj`;
+};
+
+const materialPath = (fileName: string) => {
+  return `/materials/${fileName}.mtl`;
+};
+
 const texturePath = (fileName: string) => {
-  return require(`@/assets/img/textures/${fileName}`);
+  return require(`@/assets/img/textures/${fileName}-texture.png`);
 };
 
 /**
@@ -33,10 +41,10 @@ async function createItem(
   const objLoader = new OBJLoader();
   const mtlLoader = new MTLLoader();
 
-  return mtlLoader.loadAsync(`/materials/${model}.mtl`).then((materials) => {
+  return mtlLoader.loadAsync(materialPath(model)).then((materials) => {
     materials.preload();
     objLoader.setMaterials(materials);
-    objLoader.loadAsync(`/models/${model}.obj`).then((object) => {
+    objLoader.loadAsync(modelPath(model)).then((object) => {
       object.position.copy(item.calcPositionInRoom().add(tilePosition));
       //get object size before rotation
       const box = new THREE.Box3().setFromObject(object);
@@ -49,7 +57,6 @@ async function createItem(
       object.scale.set(factor, factor, factor); //scale object to max size
       object.rotateY(item.rotationY());
       object.userData = item;
-      object.userData.clickable = true;
       object.name = `item-${model}-${item.id}`;
       tileModel.add(object);
     });
@@ -61,18 +68,18 @@ async function createItem(
  * contains tile position and userData
  * @param tilePosition: tile position
  * @param tileModel: parent tile to which object should be added after loading
- * @param tileKey: index of current tile
  * @param color: color in hex-code
+ * @param textureName: prefix of texture name
  */
 async function createFloor(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
-  tileKey: number,
-  color = 0x199eb0
+  color = 0x199eb0,
+  textureName = "gras"
 ) {
   const textureLoader = new TextureLoader();
   return textureLoader.load(
-    texturePath("gras-texture.png"),
+    texturePath(`${textureName}-floor`),
     (texture: Texture) => {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
@@ -81,11 +88,9 @@ async function createFloor(
           side: DoubleSide,
           map: texture,
           color: color,
-          opacity: 0.6,
         })
       );
       object.position.copy(tilePosition);
-      object.userData.tileKey = tileKey;
       object.rotateX(radians(90));
       object.name = "floor";
       tileModel.add(object);
@@ -98,16 +103,17 @@ async function createFloor(
  * @param tilePosition: tile position
  * @param tileModel: parent tile to which object should be added after loading
  * @param color: color in hex-code
+ * @param textureName: prefix of texture name
  */
 async function createCeiling(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
-  textureName = "leaves",
-  color = 0x199eb0
+  color = 0x199eb0,
+  textureName = "leaves"
 ) {
   const textureLoader = new TextureLoader();
   return textureLoader.load(
-    texturePath(`${textureName}-ceiling-texture.png`),
+    texturePath(`${textureName}-ceiling`),
     (texture: Texture) => {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
@@ -116,7 +122,6 @@ async function createCeiling(
           side: DoubleSide,
           map: texture,
           color: color,
-          opacity: 0.6,
         })
       );
       object.position.set(
@@ -136,6 +141,7 @@ async function createCeiling(
  * @param tileModel: parent tile to which object should be added
  * @param orientation: orientation which wall should be placed and aligned on
  * @param color: wall color in hex-code
+ * @param textureName: prefix of texture name
  */
 async function createTexturedWall(
   tilePosition: THREE.Vector3,
@@ -147,26 +153,21 @@ async function createTexturedWall(
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
-  return textureLoader.load(
-    texturePath(`${textureName}-texture.png`),
-    (texture: Texture) => {
-      texture.minFilter = THREE.NearestFilter;
-      const object = new THREE.Mesh(
-        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
-        new THREE.MeshLambertMaterial({
-          side: DoubleSide,
-          map: texture,
-          color: color,
-          opacity: 0.6,
-        })
-      );
-      object.position.copy(position);
-      object.rotateY(wall.rotationY());
-      object.userData = wall;
-      object.name = "wall";
-      tileModel.add(object);
-    }
-  );
+  return textureLoader.load(texturePath(textureName), (texture: Texture) => {
+    texture.minFilter = THREE.NearestFilter;
+    const object = new THREE.Mesh(
+      new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+      new THREE.MeshLambertMaterial({
+        side: DoubleSide,
+        map: texture,
+        color: color,
+        opacity: 0.6,
+      })
+    );
+    object.position.copy(position);
+    object.rotateY(wall.rotationY());
+    tileModel.add(object);
+  });
 }
 
 /**
@@ -197,8 +198,6 @@ function createWall(
   );
   object.position.copy(position);
   object.rotateY(wall.rotationY());
-  object.userData = wall;
-  object.name = `wall-${orientation.toString().toLowerCase()}`;
   tileModel.add(object);
 }
 
@@ -208,19 +207,21 @@ function createWall(
  * @param tileModel contains TileGroup to add image of restriction
  * @param orientation orientation which restriction wall should be placed and aligned on
  * @param opacity: opacity as decimal of mesh
+ * @param color: wall color in hex-code
+ * @param textureName: prefix of texture name
  */
 async function createRestrictiveWall(
   tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
   orientation: Orientation,
-  textureName = "restricted",
-  color = 0x199eb0
+  color = 0x199eb0,
+  textureName = "restricted"
 ) {
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
   return textureLoader.load(
-    texturePath(`${textureName}-texture.png`),
+    texturePath(textureName),
     function (texture: Texture) {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
@@ -234,7 +235,6 @@ async function createRestrictiveWall(
         })
       );
       object.position.copy(position);
-      object.userData = wall;
       object.rotateY(wall.rotationY());
       tileModel.add(object);
     }
@@ -246,7 +246,6 @@ async function createRestrictiveWall(
  * @param tilePosition: position of parent tile
  * @param tileModel group on which arrow is placed
  * @param orientation: orientation arrow should direct to
- * @param role: Role of main player
  */
 async function createArrow(
   tilePosition: THREE.Vector3,
@@ -255,10 +254,10 @@ async function createArrow(
 ) {
   const arrow = new Arrow(orientation, tilePosition);
   const objLoader = new OBJLoader();
-  return objLoader.loadAsync("/models/arrow.obj").then((object) => {
+  return objLoader.loadAsync(modelPath(arrow.modelName)).then((object) => {
     object.position.copy(arrow.position());
-    object.userData = arrow;
-    object.userData.clickable = true;
+    object.userData.orientation = arrow.orientation;
+    object.userData.showInView = true;
     object.rotateY(arrow.rotationY());
     object.visible = false;
     object.traverse((child) => {
@@ -268,7 +267,7 @@ async function createArrow(
         });
       }
     });
-    object.name = "arrow";
+    object.name = arrow.modelName;
     tileModel.add(object);
   });
 }
@@ -296,11 +295,10 @@ async function createPlayer(
   }
   const objLoader = new OBJLoader();
   const mtlLoader = new MTLLoader();
-  return mtlLoader.loadAsync(`/materials/${model}.mtl`).then((materials) => {
+  return mtlLoader.loadAsync(materialPath(model)).then((materials) => {
     materials.preload();
     objLoader.setMaterials(materials);
-    objLoader.loadAsync(`/models/${model}.obj`).then((object) => {
-      object.userData.username = player.getUsername();
+    objLoader.loadAsync(modelPath(model)).then((object) => {
       object.name = player.getUsername();
       object.position.copy(tilePosition);
       object.rotateY(90);
@@ -319,10 +317,10 @@ async function createPlayer(
 /**
  * checks for intersections of partner model with items and updates position of partner accordingly
  * @param playerObject: model/Three.Group of PartnerPlayer
- * @param player: data of PartnerPlayer
+ * @param tileKey: tileKey of PartnerPlayers position
  * @param position: current vector position of player
  * @param scene: scene that contains all models + the partner
- * @returns
+ * @returns new position of partnerPlayer
  */
 function checkIntersect(
   playerObject: THREE.Object3D,
@@ -331,7 +329,7 @@ function checkIntersect(
   scene: THREE.Scene | THREE.Group
 ): THREE.Vector3 {
   const tile = scene.getObjectByName(tileKey.toString()); //get current tile
-  const items = tile?.children.filter((c) => c.name.includes("item")); //get all meshes in tile
+  const items = tile?.children.filter((child) => child.name.includes("item")); //get all meshes in tile
   const playerBox = new THREE.Box3().setFromObject(playerObject); //creates bounding box of player
 
   items?.forEach((i) => {

@@ -3,7 +3,7 @@
     <transition name="slow-fade" appear>
       <section>
         <h1>Anmelden</h1>
-        <form @submit.prevent="loginUser()" class="column-wrapper">
+        <form @submit.prevent="loginUser" class="column-wrapper">
           <input
             class="input--medium"
             type="username"

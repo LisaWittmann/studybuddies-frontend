@@ -1,6 +1,6 @@
 <template>
   <div class="end">
-    <div class="end__background">
+    <div class="end__background container container--fixed">
       <transition name="slow-fade" appear>
         <img
           class="end__background-image"
@@ -12,7 +12,11 @@
     <div class="flex-container">
       <div class="column-wrapper">
         <transition name="slow-fade" appear>
-          <img class="end__header" :src="header" alt="logo" />
+          <img
+            class="end__header"
+            :src="header"
+            alt="Study Buddies - the quest for mazelnut"
+          />
         </transition>
         <transition name="slow-fade" appear>
           <div class="text-wrapper">
@@ -29,10 +33,16 @@
       </div>
       <div class="role-box">
         <div>
-          <img src="../assets/img/roles/designer-role-cap.svg" />
+          <img
+            src="@/assets/img/roles/designer-role-cap.svg"
+            alt="Designer Hörnchen mit Abschlusszeugnis"
+          />
         </div>
         <div>
-          <img src="../assets/img/roles/hacker-role-cap.svg" />
+          <img
+            src="@/assets/img/roles/hacker-role-cap.svg"
+            alt="Hacker Hörnchen mit Abschlusszeugnis"
+          />
         </div>
       </div>
     </div>
@@ -72,22 +82,16 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .end {
-  &__background {
-    position: relative;
-    overflow: hidden;
-    height: 100vh;
+  &__background-image {
+    width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%) brightness(70%);
+    opacity: 0.2;
 
-    &-image {
-      width: 100%;
-      min-height: 100%;
-      object-fit: cover;
-      filter: grayscale(20%) brightness(70%);
-      opacity: 0.2;
-
-      @include color-scheme(dark) {
-        opacity: 0.15;
-        filter: grayscale(0%) brightness(90%);
-      }
+    @include color-scheme(dark) {
+      opacity: 0.15;
+      filter: grayscale(0%) brightness(90%);
     }
   }
 
@@ -107,12 +111,8 @@ export default defineComponent({
   }
 
   h1 {
-    color: $color-black;
+    @include color-primary();
     margin: 0;
-
-    @include color-scheme(dark) {
-      color: $color-white;
-    }
   }
 
   p {

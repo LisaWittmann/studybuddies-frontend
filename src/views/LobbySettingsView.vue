@@ -35,7 +35,7 @@
             <button
               :class="{ button__ready: isReady }"
               class="button--small"
-              @click="readyCheck(selectedLabyrinth)"
+              @click="readyCheck()"
             >
               Bereit
             </button>
@@ -62,6 +62,7 @@ import { useAppService } from "@/service/AppService";
 import { useLobbyService } from "@/service/lobby/LobbyService";
 import { useGameStore } from "@/service/game/GameStore";
 import { Role } from "@/service/game/Player";
+import { User } from "@/service/login/User";
 
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
@@ -88,8 +89,9 @@ export default defineComponent({
       updateRole,
       getRoleOptions,
       updateReadyStates,
+      getLabyrinthSelection,
     } = useLobbyService();
-    const { gameState, setLobbyKey } = useGameStore();
+    const { gameState } = useGameStore();
 
     const lobbyKey = computed(() => gameState.lobbyKey);
 
@@ -106,8 +108,9 @@ export default defineComponent({
 
     const isReady = computed(
       () =>
-        lobbyState.users.find((user) => user.username === globalState.username)
-          ?.isReady
+        lobbyState.users.find(
+          (user: User) => user.username === globalState.username
+        )?.isReady
     );
     const loading = computed(() => globalState.loading);
 
@@ -139,12 +142,14 @@ export default defineComponent({
 
     onMounted(() => {
       const route = router.currentRoute.value;
-      setLobbyKey(route.params.key as string);
+      if (lobbyKey.value != (route.params.key as string)) router.push("/find");
       updateUsers()
         .then(() => updateReadyStates())
         .catch(() => router.push("/find"));
       updateLabyrinths();
       getRoleOptions();
+      updateReadyStates();
+      getLabyrinthSelection();
     });
 
     return {

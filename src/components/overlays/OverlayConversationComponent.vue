@@ -55,6 +55,7 @@ export default defineComponent({
   width: $pref-width;
   max-width: $width-l;
   font-size: $text-l;
+  white-space: pre-line;
 
   * {
     color: $color-black;

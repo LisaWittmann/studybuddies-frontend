@@ -39,6 +39,10 @@ export default defineComponent({
     TileModelOverviewComponent,
   },
   props: {
+    tileModels: {
+      type: Array,
+      required: true,
+    },
     tileSize: {
       type: Number,
       required: true,
@@ -77,7 +81,6 @@ export default defineComponent({
     const nameMode = computed(() => props.mode == Mode.LABYRINTH_NAME);
     const labyrinthName = ref(editorState.labyrinthName);
 
-    const tileModels = computed(() => editorState.tileModels);
     const clickedTile = ref({} as TileModel);
     const showTileOverview = computed(
       () =>
@@ -136,7 +139,6 @@ export default defineComponent({
       showTileOverview,
       labyrinthName,
       updateName,
-      tileModels,
       onClick,
       onEnter,
       onRightClick,
