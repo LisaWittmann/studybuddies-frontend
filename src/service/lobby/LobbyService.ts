@@ -71,7 +71,7 @@ async function updateRole(role: string) {
  * @param lobbyKey: identifying key of lobby that should be joined
  */
 async function getRoleOptions() {
-  return fetch("/api/lobby/selectable-roles/" + lobbyKey.value, {
+  return fetch(`/api/lobby/selectable-roles/${lobbyKey.value}`, {
     method: "GET",
   })
     .then((response) => {
@@ -90,7 +90,7 @@ async function getRoleOptions() {
  * @param username: identifying name of user that should join lobby
  */
 async function joinLobby(lobbyKey: string) {
-  return fetch("/api/lobby/join/" + lobbyKey, {
+  return fetch(`/api/lobby/join/${lobbyKey}`, {
     method: "POST",
     headers: {
       "Content-Type": "html/text;charset=utf-8",
@@ -101,8 +101,9 @@ async function joinLobby(lobbyKey: string) {
       if (response.status == 409) throw new Error("Diese Lobby ist voll.");
       else throw new Error("Diese Lobby konnte nicht gefunden werden.");
     }
-    router.push("/lobby/" + lobbyKey.toUpperCase());
-    updateReadyStates();
+    const key = lobbyKey.toUpperCase();
+    setLobbyKey(key);
+    router.push("/lobby/" + key);
   });
 }
 
@@ -126,6 +127,7 @@ async function createLobby() {
       return response.json();
     })
     .then((jsonData) => {
+      setLobbyKey(jsonData.key);
       router.push("/lobby/" + jsonData.key);
     })
     .catch((error) => console.error(error));
@@ -143,7 +145,7 @@ async function exitLobby() {
   ) {
     return;
   }
-  await fetch("/api/lobby/leave/" + lobbyKey.value, {
+  await fetch(`/api/lobby/leave/${lobbyKey.value}`, {
     method: "POST",
     headers: {
       "Content-Type": "html/text;charset=utf-8",
@@ -201,7 +203,7 @@ async function uploadJsonFiles(fileList: FileList) {
  * @throws error if request was not successful
  */
 async function updateUsers() {
-  return fetch("/api/lobby/users/" + lobbyKey.value, {
+  return fetch(`/api/lobby/users/${lobbyKey.value}`, {
     method: "GET",
   })
     .then((response) => {
@@ -216,7 +218,7 @@ async function updateUsers() {
         const foundUser: User | undefined = tempUsers.find(
           (user) => user.username === username
         );
-        console.log(foundUser);
+
         if (foundUser) {
           lobbyState.users.push(foundUser);
         } else {
@@ -228,7 +230,7 @@ async function updateUsers() {
 
 async function updateReadyStates() {
   if (lobbyState.users.length > 1) {
-    return fetch("/api/lobby/users/ready/" + lobbyKey.value, {
+    return fetch(`/api/lobby/users/ready/${lobbyKey.value}`, {
       method: "GET",
     })
       .then((response) => {
@@ -299,21 +301,36 @@ function setLabyrinthSelection(blueprintLabName: string) {
 }
 
 /**
+ * gets the selected Labyrinth from the Backend
+ * and updates the local labyrinth selection in the lobbyState
+ */
+function getLabyrinthSelection() {
+  fetch(`/api/lobby/selectedLabyrinth/${lobbyKey.value}`)
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.text();
+    })
+    .then((jsonData) => {
+      lobbyState.selectedLabyrinthName = jsonData
+    })
+    .catch((error) => console.error(error));
+}
+
+/**
  * sends a List of two Arguments to the BE, so there can be checked, whether every Player is ready or not
  * (and reacts to a wrong respond after receiving it)
  * @param username name of the user in the backend, which shall be taken out of the lobby
  * @param labName name of the blueprint labyrinth, used for the Game Progression
  */
-function readyCheck(labName: string) {
+function readyCheck() {
   if (!lobbyState.selectedLabyrinthName || !lobbyState.selectedRole) return;
-  const args = new Array<string>(loggedInUser.value, labName);
 
   fetch(`/api/lobby/ready/${lobbyKey.value}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(args),
+    body: JSON.stringify(loggedInUser.value),
   })
     .then((response) => {
       if (!response.ok) {
@@ -358,7 +375,7 @@ function setupGame() {
   startLoading();
   updateUsers()
     .then(() => {
-      fetch(`/api/lobby/users/roles/${gameState.lobbyKey}`)
+      fetch(`/api/lobby/users/roles/${lobbyKey.value}`)
         .then((response) => {
           if (!response.ok) throw new Error(response.statusText);
           return response.json();
@@ -376,17 +393,18 @@ function setupGame() {
           const startTile = gameState.labyrinth.playerStartTileKeys[index];
           updatePlayerData(user.username, startTile);
         });
-        router.push(`/game/${gameState.lobbyKey}`);
+        router.push(`/game/${lobbyKey.value}`);
         setStarted(true);
       });
     });
 }
+
 /**
  * Request to Backend to get a JSON represented Labyrinth by given name and
  * download it to Client's local storage as JSON-File.
  */
 async function download(labyrinthName: string) {
-  fetch("/api/labyrinth/export?labyrinthName=" + labyrinthName, {
+  fetch(`/api/labyrinth/export?labyrinthName=${labyrinthName}`, {
     method: "GET",
     headers: {
       "Content-Type": "text/plain",
@@ -417,6 +435,7 @@ export function useLobbyService() {
     updateLabyrinths,
     updateReadyStates,
     setLabyrinthSelection,
+    getLabyrinthSelection,
     updateLabyrinthPick,
     readyCheck,
     setupGame,
