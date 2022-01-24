@@ -42,7 +42,7 @@ export default defineComponent({
       music.value.play();
     };
 
-    onMounted(() => setVolume(0.1));
+    onMounted(() => setVolume(0.05));
 
     return {
       loading,

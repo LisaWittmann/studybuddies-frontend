@@ -80,8 +80,9 @@ function endConversation() {
   conversation.character = "";
 }
 
-function playSound(name: string) {
+function playSound(name: string, volume = 0.1) {
   sound.src = audioPath(name);
+  sound.volume = volume;
   sound.play();
 }
 
@@ -275,7 +276,7 @@ async function addToInventory(itemId: number) {
       return response.json();
     })
     .then((jsonData) => {
-      playSound("collect");
+      playSound("collect", 0.01);
       const inventory: Item[] = jsonData;
       setInventory(inventory);
       removeItemFromLabyrinth(itemId);
@@ -307,7 +308,7 @@ async function updateInventory() {
     .then((jsonData) => {
       const inventory: Item[] = jsonData;
       if (inventory.length > gameState.mainPlayer.getInventory().length) {
-        playSound("collect");
+        playSound("collect", 0.01);
       }
       setInventory(inventory);
     })
@@ -333,7 +334,7 @@ async function givePlayerItem(itemName: string) {
       return response.json();
     })
     .then((jsonData) => {
-      playSound("collect");
+      playSound("collect", 0.05);
       const inventory: Item[] = jsonData;
       setInventory(inventory);
     })
