@@ -80,9 +80,10 @@ export default defineComponent({
       }
     });
 
-    onMounted(async () => {
+    onMounted(() => {
       const route = router.currentRoute.value;
-      setLobbyKey(route.params.key as string);
+      if (gameState.lobbyKey != (route.params.key as string))
+        router.push("/find");
       updateGameData();
     });
 

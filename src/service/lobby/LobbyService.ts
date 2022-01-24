@@ -171,7 +171,7 @@ async function createLobby() {
  * send request to remove user with given username from lobby
  * redirects back to find lobby view if request was successful
  */
-async function exitLobby() {
+function exitLobby() {
   if (
     !lobbyState.users.some((user) => user.username === loggedInUser.value) ||
     !lobbyKey.value ||
@@ -179,7 +179,7 @@ async function exitLobby() {
   ) {
     return;
   }
-  return fetch(`${lobbyAPI}/leave/${lobbyKey.value}`, {
+  fetch(`${lobbyAPI}/leave/${lobbyKey.value}`, {
     method: "POST",
     headers: {
       "Content-Type": "html/text;charset=utf-8",
@@ -357,7 +357,7 @@ function getLabyrinthSelection() {
       return response.text();
     })
     .then((jsonData) => {
-      lobbyState.selectedLabyrinthName = jsonData
+      lobbyState.selectedLabyrinthName = jsonData;
     })
     .catch((error) => console.error(error));
 }

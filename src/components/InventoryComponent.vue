@@ -53,7 +53,7 @@ export default defineComponent({
       const button = document.getElementById("invbutton");
       if (button) {
         button.classList.add("button--lightup");
-        setTimeout(() => button.classList.remove("button--lightup"), 20000);
+        setTimeout(() => button.classList.remove("button--lightup"), 2000);
       }
     };
 

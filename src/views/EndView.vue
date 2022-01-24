@@ -50,10 +50,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, onMounted } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/lobby/LobbyService";
+import router from "@/router";
 
 export default defineComponent({
   name: "EndView",
@@ -67,12 +68,14 @@ export default defineComponent({
       return require("@/assets/img/logo_header.png");
     });
 
-    // exit lobby if any other page than game is opened
-    onBeforeRouteLeave((to) => {
-      const nextKey = to.params.key as string;
-      if (nextKey != gameState.lobbyKey) {
-        exitLobby();
-      }
+    onBeforeRouteLeave(() => {
+      exitLobby();
+    });
+
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      if (gameState.lobbyKey != (route.params.key as string))
+        router.push("/find");
     });
 
     return { header };
