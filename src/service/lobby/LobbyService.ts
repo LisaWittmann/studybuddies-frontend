@@ -357,7 +357,7 @@ function getLabyrinthSelection() {
       return response.text();
     })
     .then((jsonData) => {
-      lobbyState.selectedLabyrinthName = jsonData
+      lobbyState.selectedLabyrinthName = jsonData;
     })
     .catch((error) => console.error(error));
 }

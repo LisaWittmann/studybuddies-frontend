@@ -45,7 +45,9 @@ async function createItem(
   const size = new THREE.Vector3();
   const gltfLoader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
-  dracoLoader.setDecoderPath(`/decoder`);
+
+  dracoLoader.setDecoderPath(`/decoder/`);
+  dracoLoader.preload();
   gltfLoader.setDRACOLoader(dracoLoader);
 
   console.log("createItem modelPath2: ", modelPath2(model));
@@ -62,8 +64,9 @@ async function createItem(
     }
     object.scene.scale.set(factor, factor, factor); //scale object to max size
     object.scene.rotateY(item.rotationY());
-    object.userData = item;
-    object.userData.name = `item-${model}-${item.id}`;
+    object.scene.userData = item;
+    object.scene.userData.clickable = true;
+    object.scene.name = `item-${model}-${item.id}`;
     tileModel.add(object.scene);
   });
 }
