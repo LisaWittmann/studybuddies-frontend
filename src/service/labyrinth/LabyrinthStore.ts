@@ -10,7 +10,7 @@ import { Role } from "@/service/game/Player";
  */
 async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
   console.log("Requested lab of lobby " + lobbyKey);
-  return fetch(`/api/lobby/${lobbyKey}`, {
+  return fetch(`/api/game/${lobbyKey}`, {
     method: "GET",
   })
     .then((response) => {
