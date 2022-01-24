@@ -84,4 +84,5 @@ export const colors = readonly({
   green: 0x678f42,
   pink: 0xd874d8,
   grey: 0xd7d9d5,
+  offwhite: 0x998a73,
 });

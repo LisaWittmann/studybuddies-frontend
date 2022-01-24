@@ -30,12 +30,13 @@ async function createTile(
   } = useObjectFactory();
   const tileModel = new THREE.Group();
   const tileRestricted = tile.isRestrictedFor(role);
-  const texture = getTexture(tile);
+  const texture = getTexture(tile, isEnd);
   const color = getColor(tile, isEnd);
+  const floor = isEnd ? texture : undefined;
 
   //FIXED-OBJECTS----------
   await createCeiling(tilePosition, tileModel, color, texture);
-  await createFloor(tilePosition, tileModel, color);
+  await createFloor(tilePosition, tileModel, color, floor);
   if (tileRestricted) {
     for (const [orientation, neighbor] of neighbors) {
       if (!neighbor) {
@@ -91,7 +92,8 @@ async function createTile(
  * @param tile: tile to get texture for
  * @returns prefix of name of texture file in /assets/img/textures
  */
-function getTexture(tile: Tile) {
+function getTexture(tile: Tile, isEnd = false) {
+  if (isEnd) return "end";
   if (tile.restrictions.length == 1) {
     if (tile.isRestrictedFor(Role.HACKER)) return "designer";
     if (tile.isRestrictedFor(Role.DESIGNER)) return "hacker";
@@ -105,8 +107,8 @@ function getTexture(tile: Tile) {
  * @returns color of tile as hexadecimal number
  */
 function getColor(tile: Tile, isEnd = false) {
-  if (isEnd) return colors.pink;
-  //both players have access to this tile
+  if (isEnd) return colors.offwhite;
+  //both players have access this tile
   if (tile.getRestrictions().length == 0) return colors.brown;
   //only the designer has access to this tile
   if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
