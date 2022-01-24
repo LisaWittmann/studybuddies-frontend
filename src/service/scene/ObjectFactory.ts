@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
-import { DoubleSide, Texture, TextureLoader } from "three";
+import { DoubleSide, TextureLoader } from "three";
 
 import { Item } from "@/service/labyrinth/Item";
 import { Orientation } from "@/service/labyrinth/Tile";
@@ -11,6 +11,16 @@ import { PartnerPlayer, Role } from "@/service/game/Player";
 import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 
+const gltfLoader = new GLTFLoader();
+const dracoLoader = new DRACOLoader();
+
+dracoLoader.setDecoderPath("/decoder/");
+dracoLoader.preload();
+gltfLoader.setDRACOLoader(dracoLoader);
+
+const textureLoader = new TextureLoader();
+const textures = new Map<string, THREE.Texture>();
+
 const modelPath = (fileName: string) => {
   return `/gltf/${fileName}.gltf`;
 };
@@ -19,12 +29,25 @@ const texturePath = (fileName: string) => {
   return require(`@/assets/img/textures/${fileName}-texture.png`);
 };
 
-const gltfLoader = new GLTFLoader();
-const dracoLoader = new DRACOLoader();
+const loadTexture = (fileName: string) => {
+  return textureLoader.loadAsync(texturePath(fileName));
+};
 
-dracoLoader.setDecoderPath("/decoder/");
-dracoLoader.preload();
-gltfLoader.setDRACOLoader(dracoLoader);
+async function initTextures() {
+  textures.set("end", await loadTexture("end"));
+  textures.set("end-ceiling", await loadTexture("end-ceiling"));
+  textures.set("end-floor", await loadTexture("end-floor"));
+  textures.set("designer", await loadTexture("designer"));
+  textures.set("designer-ceiling", await loadTexture("designer"));
+  textures.set("hacker", await loadTexture("hacker"));
+  textures.set("hacker-ceiling", await loadTexture("hacker-ceiling"));
+  textures.set("bark", await loadTexture("bark"));
+  textures.set("gras-floor", await loadTexture("gras-floor"));
+  textures.set("restricted", await loadTexture("restricted"));
+  textures.set("leaves-ceiling", await loadTexture("leaves-ceiling"));
+}
+
+initTextures();
 
 /**
  * creates item by loading its obj representation from models directory
@@ -74,26 +97,21 @@ async function createFloor(
   color = 0x199eb0,
   textureName = "gras"
 ) {
-  const textureLoader = new TextureLoader();
-  return textureLoader.load(
-    texturePath(`${textureName}-floor`),
-    (texture: Texture) => {
-      texture.minFilter = THREE.NearestFilter;
-      const object = new THREE.Mesh(
-        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
-        new THREE.MeshLambertMaterial({
-          side: DoubleSide,
-          map: texture,
-          color: color,
-        })
-      );
-      object.position.copy(tilePosition);
-      object.rotateX(radians(90));
-      object.name = "floor";
-      tileModel.add(object);
-    }
+  const texture = textures.get(`${textureName}-floor`) as THREE.Texture;
+  texture.minFilter = THREE.NearestFilter;
+  const object = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+    new THREE.MeshLambertMaterial({
+      side: DoubleSide,
+      map: texture,
+      color: color,
+    })
   );
-}
+  object.position.copy(tilePosition);
+  object.rotateX(radians(90));
+  object.name = "floor";
+  tileModel.add(object);
+  }
 
 /**
  * creates plane representing tile's ceiling
@@ -108,28 +126,23 @@ async function createCeiling(
   color = 0x199eb0,
   textureName = "leaves"
 ) {
-  const textureLoader = new TextureLoader();
-  return textureLoader.load(
-    texturePath(`${textureName}-ceiling`),
-    (texture: Texture) => {
-      texture.minFilter = THREE.NearestFilter;
-      const object = new THREE.Mesh(
-        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
-        new THREE.MeshLambertMaterial({
-          side: DoubleSide,
-          map: texture,
-          color: color,
-        })
-      );
-      object.position.set(
-        tilePosition.x,
-        tilePosition.y + settings.tileSize,
-        tilePosition.z
-      );
-      object.rotateX(radians(90));
-      tileModel.add(object);
-    }
+  const texture = textures.get(`${textureName}-ceiling`) as THREE.Texture;
+  texture.minFilter = THREE.NearestFilter;
+  const object = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+    new THREE.MeshLambertMaterial({
+      side: DoubleSide,
+      map: texture,
+      color: color,
+    })
   );
+  object.position.set(
+    tilePosition.x,
+    tilePosition.y + settings.tileSize,
+    tilePosition.z
+  );
+  object.rotateX(radians(90));
+  tileModel.add(object);
 }
 
 /**
@@ -149,22 +162,20 @@ async function createTexturedWall(
 ) {
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
-  const textureLoader = new TextureLoader();
-  return textureLoader.load(texturePath(textureName), (texture: Texture) => {
-    texture.minFilter = THREE.NearestFilter;
-    const object = new THREE.Mesh(
-      new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
-      new THREE.MeshLambertMaterial({
-        side: DoubleSide,
-        map: texture,
-        color: color,
-        opacity: 0.6,
-      })
-    );
-    object.position.copy(position);
-    object.rotateY(wall.rotationY());
-    tileModel.add(object);
-  });
+  const texture = textures.get(textureName) as THREE.Texture;
+  texture.minFilter = THREE.NearestFilter;
+  const object = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+    new THREE.MeshLambertMaterial({
+      side: DoubleSide,
+      map: texture,
+      color: color,
+      opacity: 0.6,
+    })
+  );
+  object.position.copy(position);
+  object.rotateY(wall.rotationY());
+  tileModel.add(object);
 }
 
 /**
@@ -216,26 +227,21 @@ async function createRestrictiveWall(
 ) {
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
-  const textureLoader = new TextureLoader();
-  return textureLoader.load(
-    texturePath(textureName),
-    function (texture: Texture) {
-      texture.minFilter = THREE.NearestFilter;
-      const object = new THREE.Mesh(
-        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
-        new THREE.MeshLambertMaterial({
-          side: DoubleSide,
-          map: texture,
-          transparent: true,
-          opacity: 0.5,
-          color: color,
-        })
-      );
-      object.position.copy(position);
-      object.rotateY(wall.rotationY());
-      tileModel.add(object);
-    }
+  const texture = textures.get(textureName) as THREE.Texture;
+  texture.minFilter = THREE.NearestFilter;
+  const object = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+    new THREE.MeshLambertMaterial({
+      side: DoubleSide,
+      map: texture,
+      transparent: true,
+      opacity: 0.5,
+      color: color,
+    })
   );
+  object.position.copy(position);
+  object.rotateY(wall.rotationY());
+  tileModel.add(object);
 }
 
 /**
