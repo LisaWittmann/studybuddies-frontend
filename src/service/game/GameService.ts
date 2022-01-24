@@ -1,4 +1,5 @@
 import { computed, reactive, readonly } from "vue";
+
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/lobby/LobbyService";
 
@@ -15,6 +16,8 @@ const playerName = computed(() => gameState.mainPlayer.username);
 
 const gameAPI = "/api/game";
 const bodyAPI = "/api/body";
+
+let clickedItem = false;
 
 const gameEventMessage = reactive({
   message: "",
@@ -213,31 +216,32 @@ async function checkEndGame(modelName: string) {
  * @param modelName name of clicked item
  * @param itemId contains id of clicked body
  */
+
 async function clickItem(modelName: string, itemId: number) {
-  fetch(`${gameAPI}/click/` + modelName, { method: "GET" })
-    .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
-      return response.json();
-    })
-    .then((jsonData) => {
+  if (!clickedItem) {
+    clickedItem = true;
+    const response = await fetch(`${gameAPI}/click/` + modelName, {
+      method: "GET",
+    });
+    const jsonData = await response.json();
+    if (jsonData) {
       switch ((<any>Operation)[jsonData]) {
         case Operation.ACCESS:
-          checkAccess(modelName);
+          await checkAccess(modelName);
           break;
         case Operation.CONVERSATION:
           startConversation(modelName);
           break;
         case Operation.COLLECT:
-          addToInventory(itemId);
+          await addToInventory(itemId);
           break;
         case Operation.CHECK_END:
-          checkEndGame(modelName);
+          await checkEndGame(modelName);
           break;
       }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+    }
+    setTimeout(() => (clickedItem = false), 2000);
+  }
 }
 
 /**
