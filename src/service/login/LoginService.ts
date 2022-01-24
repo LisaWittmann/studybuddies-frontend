@@ -63,7 +63,7 @@ async function register(user: User) {
   }).then((response) => {
     if (!response.ok) {
       throw new Error(
-        "Deine Registrierung ist fehlgeschlagen. Bitte versuche es noch einmal"
+        "Deine Registrierung ist fehlgeschlagen. Bitte beachte, dass der Name nur aus Wortcharaktern bestehen darf."
       );
     }
     router.push("/login");

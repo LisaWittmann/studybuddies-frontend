@@ -14,7 +14,7 @@ const { exitLobby } = useLobbyService();
 const lobbyKey = computed(() => gameState.lobbyKey);
 const playerName = computed(() => gameState.mainPlayer.username);
 
-const lobbyAPI = "/api/lobby";
+const gameAPI = "/api/game";
 const bodyAPI = "/api/body";
 
 let clickedItem = false;
@@ -89,7 +89,7 @@ async function movePlayer(orientation: Orientation) {
     playerName.value,
     Orientation[orientation]
   );
-  fetch(`${lobbyAPI}/move`, {
+  fetch(`${gameAPI}/move`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -142,7 +142,7 @@ async function checkAccess(modelName: string) {
     playerName.value,
     modelName.toUpperCase()
   );
-  fetch(`${lobbyAPI}/access`, {
+  fetch(`${gameAPI}/access`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -174,7 +174,7 @@ async function checkEndGame(modelName: string) {
     playerName.value,
     modelName.toUpperCase()
   );
-  fetch(`${lobbyAPI}/end`, {
+  fetch(`${gameAPI}/end`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -220,7 +220,7 @@ async function checkEndGame(modelName: string) {
 async function clickItem(modelName: string, itemId: number) {
   if (!clickedItem) {
     clickedItem = true;
-    const response = await fetch(`${lobbyAPI}/click/` + modelName, {
+    const response = await fetch(`${gameAPI}/click/` + modelName, {
       method: "GET",
     });
     const jsonData = await response.json();
@@ -251,7 +251,7 @@ async function clickItem(modelName: string, itemId: number) {
  */
 async function addToInventory(itemId: number) {
   fetch(
-    `${lobbyAPI}/${lobbyKey.value}/username/${playerName.value}/item/${itemId}`,
+    `${gameAPI}/${lobbyKey.value}/username/${playerName.value}/item/${itemId}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -281,7 +281,7 @@ async function updateInventory() {
     playerName.value,
     Update[Update.INVENTORY]
   );
-  fetch(`${lobbyAPI}/current-inventory`, {
+  fetch(`${gameAPI}/current-inventory`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -305,7 +305,7 @@ async function updateInventory() {
  */
 async function givePlayerItem(itemName: string) {
   fetch(
-    `${lobbyAPI}/${lobbyKey.value}/username/${playerName.value}/give/item/${itemName}`,
+    `${gameAPI}/${lobbyKey.value}/username/${playerName.value}/give/item/${itemName}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -329,7 +329,7 @@ async function givePlayerItem(itemName: string) {
  * @param itemId: the id of the item that should be deleted
  */
 async function removeItemFromLabyrinth(itemId: number) {
-  fetch(`${lobbyAPI}/${lobbyKey.value}/item/${itemId}`, {
+  fetch(`${gameAPI}/${lobbyKey.value}/item/${itemId}`, {
     method: "DELETE",
     headers: { "Content-Type": "text/plain" },
   })
@@ -348,7 +348,7 @@ async function removeItemFromLabyrinth(itemId: number) {
  */
 async function tradeItem(itemId: number) {
   fetch(
-    `${lobbyAPI}/${lobbyKey.value}/username/${playerName.value}/trade/item/${itemId}`,
+    `${gameAPI}/${lobbyKey.value}/username/${playerName.value}/trade/item/${itemId}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

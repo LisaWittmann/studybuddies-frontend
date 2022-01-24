@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import { DoubleSide, Texture, TextureLoader } from "three";
 
 import { Item } from "@/service/labyrinth/Item";
@@ -12,16 +12,19 @@ import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 
 const modelPath = (fileName: string) => {
-  return `/models/${fileName}.obj`;
-};
-
-const materialPath = (fileName: string) => {
-  return `/materials/${fileName}.mtl`;
+  return `/gltf/${fileName}.gltf`;
 };
 
 const texturePath = (fileName: string) => {
   return require(`@/assets/img/textures/${fileName}-texture.png`);
 };
+
+const gltfLoader = new GLTFLoader();
+const dracoLoader = new DRACOLoader();
+
+dracoLoader.setDecoderPath("/decoder/");
+dracoLoader.preload();
+gltfLoader.setDRACOLoader(dracoLoader);
 
 /**
  * creates item by loading its obj representation from models directory
@@ -38,28 +41,22 @@ async function createItem(
   let factor = 1;
   const size = new THREE.Vector3();
 
-  const objLoader = new OBJLoader();
-  const mtlLoader = new MTLLoader();
-
-  return mtlLoader.loadAsync(materialPath(model)).then((materials) => {
-    materials.preload();
-    objLoader.setMaterials(materials);
-    objLoader.loadAsync(modelPath(model)).then((object) => {
-      object.position.copy(item.calcPositionInRoom().add(tilePosition));
-      //get object size before rotation
-      const box = new THREE.Box3().setFromObject(object);
-      box.getSize(size);
-      if (size.x > settings.tileSize / 4) {
-        factor = 1 / (size.x / factors.objectScaleFactor);
-      } else if (size.y > settings.tileSize / 4) {
-        factor = 1 / (size.y / factors.objectScaleFactor);
-      }
-      object.scale.set(factor, factor, factor); //scale object to max size
-      object.rotateY(item.rotationY());
-      object.userData = item;
-      object.name = `item-${model}-${item.id}`;
-      tileModel.add(object);
-    });
+  return gltfLoader.loadAsync(modelPath(model)).then((object) => {
+    object.scene.position.copy(item.calcPositionInRoom().add(tilePosition));
+    //get object size before rotation
+    const box = new THREE.Box3().setFromObject(object.scene);
+    box.getSize(size);
+    if (size.x > settings.tileSize / 4) {
+      factor = 1 / (size.x / factors.objectScaleFactor);
+    } else if (size.y > settings.tileSize / 4) {
+      factor = 1 / (size.y / factors.objectScaleFactor);
+    }
+    object.scene.scale.set(factor, factor, factor); //scale object to max size
+    object.scene.rotateY(item.rotationY());
+    object.scene.userData = item;
+    object.scene.userData.clickable = true;
+    object.scene.name = `item-${model}-${item.id}`;
+    tileModel.add(object.scene);
   });
 }
 
@@ -253,22 +250,21 @@ async function createArrow(
   orientation: Orientation
 ) {
   const arrow = new Arrow(orientation, tilePosition);
-  const objLoader = new OBJLoader();
-  return objLoader.loadAsync(modelPath(arrow.modelName)).then((object) => {
-    object.position.copy(arrow.position());
-    object.userData.orientation = arrow.orientation;
-    object.userData.showInView = true;
-    object.rotateY(arrow.rotationY());
-    object.visible = false;
-    object.traverse((child) => {
+  return gltfLoader.loadAsync(modelPath(arrow.modelName)).then((object) => {
+    object.scene.position.copy(arrow.position());
+    object.scene.userData.orientation = arrow.orientation;
+    object.scene.userData.showInView = true;
+    object.scene.rotateY(arrow.rotationY());
+    object.scene.visible = false;
+    object.scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.material = new THREE.MeshLambertMaterial({
           color: arrow.color,
         });
       }
     });
-    object.name = arrow.modelName;
-    tileModel.add(object);
+    object.scene.name = arrow.modelName;
+    tileModel.add(object.scene);
   });
 }
 
@@ -293,24 +289,18 @@ async function createPlayer(
       model += "-hacker";
       break;
   }
-  const objLoader = new OBJLoader();
-  const mtlLoader = new MTLLoader();
-  return mtlLoader.loadAsync(materialPath(model)).then((materials) => {
-    materials.preload();
-    objLoader.setMaterials(materials);
-    objLoader.loadAsync(modelPath(model)).then((object) => {
-      object.name = player.getUsername();
-      object.position.copy(tilePosition);
-      object.rotateY(90);
-      const newPos = checkIntersect(
-        object,
-        player.getPosition(),
-        tilePosition,
-        parent
-      );
-      object.position.copy(newPos);
-      parent.add(object);
-    });
+  return gltfLoader.loadAsync(modelPath(model)).then((object) => {
+    object.scene.name = player.getUsername();
+    object.scene.position.copy(tilePosition);
+    object.scene.rotateY(90);
+    const newPos = checkIntersect(
+      object.scene,
+      player.getPosition(),
+      tilePosition,
+      parent
+    );
+    object.scene.position.copy(newPos);
+    parent.add(object.scene);
   });
 }
 

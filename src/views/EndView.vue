@@ -1,6 +1,6 @@
 <template>
-  <div class="end">
-    <div class="end__background container container--fixed">
+  <div class="end container container--fixed">
+    <div class="end__background">
       <transition name="slow-fade" appear>
         <img
           class="end__background-image"
@@ -31,29 +31,26 @@
           </div>
         </transition>
       </div>
-      <div class="role-box">
-        <div>
-          <img
-            src="@/assets/img/roles/designer-role-cap.svg"
-            alt="Designer Hörnchen mit Abschlusszeugnis"
-          />
-        </div>
-        <div>
-          <img
-            src="@/assets/img/roles/hacker-role-cap.svg"
-            alt="Hacker Hörnchen mit Abschlusszeugnis"
-          />
-        </div>
-      </div>
     </div>
+    <img
+      class="role role--left"
+      src="@/assets/img/roles/designer-role-cap.svg"
+      alt="Designer Hörnchen mit Abschlusszeugnis"
+    />
+    <img
+      class="role role--right"
+      src="@/assets/img/roles/hacker-role-cap.svg"
+      alt="Hacker Hörnchen mit Abschlusszeugnis"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, onMounted } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/lobby/LobbyService";
+import router from "@/router";
 
 export default defineComponent({
   name: "EndView",
@@ -67,12 +64,14 @@ export default defineComponent({
       return require("@/assets/img/logo_header.png");
     });
 
-    // exit lobby if any other page than game is opened
-    onBeforeRouteLeave((to) => {
-      const nextKey = to.params.key as string;
-      if (nextKey != gameState.lobbyKey) {
-        exitLobby();
-      }
+    onBeforeRouteLeave(() => {
+      exitLobby();
+    });
+
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      if (gameState.lobbyKey != (route.params.key as string))
+        router.push("/find");
     });
 
     return { header };
@@ -82,16 +81,21 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .end {
-  &__background-image {
+  &__background {
+    height: 100%;
     width: 100%;
-    min-height: 100%;
-    object-fit: cover;
-    filter: grayscale(20%) brightness(70%);
-    opacity: 0.2;
 
-    @include color-scheme(dark) {
-      opacity: 0.15;
-      filter: grayscale(0%) brightness(90%);
+    &-image {
+      width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      filter: grayscale(20%) brightness(70%);
+      opacity: 0.2;
+
+      @include color-scheme(dark) {
+        opacity: 0.15;
+        filter: grayscale(0%) brightness(90%);
+      }
     }
   }
 
@@ -101,6 +105,21 @@ export default defineComponent({
 
     @include color-scheme(dark) {
       filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
+    }
+  }
+
+  .role {
+    position: absolute;
+    width: 35vw;
+    max-width: 300px;
+    bottom: 0;
+
+    &--left {
+      left: 0;
+    }
+
+    &--right {
+      right: 0;
     }
   }
 
@@ -124,25 +143,6 @@ export default defineComponent({
     z-index: 2;
     top: 0;
   }
-
-  .role-box {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    margin: 0 auto;
-    justify-content: space-between;
-    position: absolute;
-    bottom: 0;
-
-    div {
-      padding: 0 3rem;
-    }
-
-    img {
-      height: 100%;
-      width: auto;
-    }
-  }
 }
 
 @media (min-width: 1051px) {
@@ -161,10 +161,6 @@ export default defineComponent({
 
     p {
       font-size: 3rem;
-    }
-
-    .role-box {
-      height: 30vh;
     }
   }
 }
@@ -186,16 +182,6 @@ export default defineComponent({
     p {
       font-size: 1.5rem;
     }
-
-    .role-box {
-      height: 20vh;
-    }
-  }
-}
-
-@media (max-width: 600px) {
-  .role-box {
-    height: 15vh;
   }
 }
 </style>

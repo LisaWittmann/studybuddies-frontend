@@ -113,7 +113,6 @@ stompClient.onConnect = () => {
               updateLabyrinths();
               break;
             case Update.USERS:
-              updateUsers();
               if (gameState.started) {
                 setFeedback(
                   `Spieler ${eventMessage.username} hat das Spiel verlassen.`,
@@ -121,6 +120,8 @@ stompClient.onConnect = () => {
                   "/find",
                   "Zurück zur Lobbyfindung"
                 );
+              } else {
+                updateUsers();
               }
               break;
             case Update.ROLE:

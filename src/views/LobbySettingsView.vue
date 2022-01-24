@@ -143,13 +143,15 @@ export default defineComponent({
     onMounted(() => {
       const route = router.currentRoute.value;
       if (lobbyKey.value != (route.params.key as string)) router.push("/find");
-      updateUsers()
-        .then(() => updateReadyStates())
-        .catch(() => router.push("/find"));
-      updateLabyrinths();
-      getRoleOptions();
-      updateReadyStates();
-      getLabyrinthSelection();
+      else {
+        updateUsers()
+          .then(() => updateReadyStates())
+          .catch(() => router.push("/find"));
+        updateLabyrinths();
+        getRoleOptions();
+        updateReadyStates();
+        getLabyrinthSelection();
+      }
     });
 
     return {
