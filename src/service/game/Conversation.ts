@@ -1,3 +1,6 @@
+/**
+ * datatype for conversation message
+ */
 export class Message {
   id: string;
   text: string;
@@ -17,6 +20,9 @@ export class Message {
   }
 }
 
+/**
+ * datatype for conversation response
+ */
 export class Response {
   id: string;
   text: string;

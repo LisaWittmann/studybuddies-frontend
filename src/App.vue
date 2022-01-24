@@ -3,15 +3,35 @@
     <source src="@/assets/sounds/background.mp3" type="audio/mpeg" />
   </audio>
   <router-view @play="play" @pause="pause" @volume="setVolume" />
+  <LoadingComponent v-if="loading" />
+  <OverlayFeedbackComponent
+    :opened="feedback.opened"
+    :headline="feedback.headline"
+    :subLine="feedback.subline"
+    :error="feedback.error"
+    :link="feedback.link"
+    :linkText="feedback.linkText"
+    @close="resetFeedback"
+  />
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { defineComponent, computed, onMounted, ref } from "vue";
+import { useLoginService } from "@/service/login/LoginService";
+import { useAppService } from "@/service/AppService";
+
+import LoadingComponent from "@/components/LoadingComponent.vue";
+import OverlayFeedbackComponent from "@/components/overlays/OverlayFeedbackComponent.vue";
+
 export default defineComponent({
+  components: { LoadingComponent, OverlayFeedbackComponent },
   setup() {
-    const { getLoginSessionStorage } = useLoginStore();
-    getLoginSessionStorage();
+    const { getSession } = useLoginService();
+    getSession();
+
+    const { feedbackState, globalState, resetFeedback } = useAppService();
+    const loading = computed(() => globalState.loading);
+    const feedback = computed(() => feedbackState);
 
     const music = ref({} as HTMLAudioElement);
     const play = () => music.value.play();
@@ -20,7 +40,7 @@ export default defineComponent({
 
     onMounted(() => setVolume(0.006));
 
-    return { music, play, pause, setVolume };
+    return { loading, feedback, resetFeedback, music, play, pause, setVolume };
   },
 });
 </script>

@@ -2,46 +2,86 @@ import * as THREE from "three";
 import { useTileFactory } from "@/service/scene/TileFactory";
 import { usePlayerFactory } from "@/service/scene/PlayerFactory";
 
+import { Labyrinth } from "@/service/labyrinth/Labyrinth";
 import { Orientation, Tile } from "@/service/labyrinth/Tile";
 import { MainPlayer, PartnerPlayer, Player, Role } from "@/service/game/Player";
 
 import { vector } from "@/service/scene/helper/GeometryHelper";
-import {
-  colors,
-  direction,
-  settings,
-} from "@/service/scene/helper/SceneConstants";
+import { direction, settings } from "@/service/scene/helper/SceneConstants";
 
 const { createTile } = useTileFactory();
-const { updateMainPlayer, updatePartnerPlayer } = usePlayerFactory();
+const {
+  requiresUpdate,
+  updateMainPlayer,
+  updatePartnerPlayer,
+  resetPlayerData,
+} = usePlayerFactory();
 
 const storedTiles = new Map<number, THREE.Vector3>();
-let labyrinthInitialized = false;
+let labyrinthData: Labyrinth | undefined;
 
 /**
  * gets map of all tiles of a Labyrinth
  * creates or updates them using TileFactory
  * adds Tiles to scene
- * @param labyrinth: reactive labyrinth object
+ * @param labyrinth: labyrinth object
  * @param player: main player
  * @param scene: scene that contains labyrinth
  */
-async function updateLabyrinth(
-  labyrinth: any,
+async function initializeLabyrinth(
+  labyrinth: Labyrinth,
   player: MainPlayer,
   scene: THREE.Scene
 ) {
-  if (labyrinthInitialized) return;
-  labyrinthInitialized = true;
+  labyrinthData = labyrinth;
   const position = vector(0, 0, 0);
+  for (const tile of labyrinth.tileMap.values()) {
+    const neighbors = getNeighbors(tile, labyrinth.tileMap);
+    const role = player.getRole();
+    await placeTile(position, tile, role, neighbors, scene);
+  }
+}
+
+/**
+ * updates tile
+ * @param labyrinth: labyrinth object
+ * @param scene: scene that contains labyrinth
+ */
+function updateLabyrinth(labyrinth: Labyrinth, scene: THREE.Scene) {
+  if (labyrinthData == labyrinth) return;
+
   for (const [key, value] of labyrinth.tileMap) {
-    const tile = getTile(value.tileId, scene);
-    if (!tile) {
-      const neighbors = getNeighbors(value, labyrinth.tileMap);
-      const role = player.getRole();
-      await placeTile(position, value, key, role, neighbors, scene);
+    const labyrinthObjects = value.objectsInRoom;
+    const labyrinthDataObjects = labyrinthData?.tileMap.get(key);
+    if (
+      labyrinthDataObjects &&
+      labyrinthDataObjects?.objectsInRoom.length > 0
+    ) {
+      const removedObjects = labyrinthDataObjects.objectsInRoom.filter(
+        (item) => !labyrinthObjects.some((object) => object.id == item.id)
+      );
+
+      for (const object of removedObjects) {
+        scene
+          .getObjectByName(
+            `item-${object.modelName.toLowerCase()}-${object.id}`
+          )
+          ?.clear();
+      }
     }
   }
+  labyrinthData = labyrinth;
+}
+
+/**
+ * reset stored data and remove all scene objects
+ * @param scene: scene containing game objects
+ */
+function clearLabyrinth(scene: THREE.Scene) {
+  labyrinthData = undefined;
+  resetPlayerData();
+  storedTiles.clear();
+  scene.clear();
 }
 
 /**
@@ -50,15 +90,21 @@ async function updateLabyrinth(
  * @param player: main or partner player
  * @param scene: scene that contains player
  */
-function updatePlayer(player: Player, scene: THREE.Scene) {
+async function updatePlayer(
+  player: Player,
+  labyrinth: Labyrinth,
+  scene: THREE.Scene
+) {
+  if (!requiresUpdate(player)) return;
   console.log("Move player: " + player.getUsername());
-  const tilePosition = getTilePosition(player.getPosition(), scene);
+  const tile = labyrinth.tileMap.get(player.getPosition());
+  const tilePosition = storedTiles.get(player.getPosition());
   if (tilePosition) {
     if (player instanceof MainPlayer) {
-      updateMainPlayer(tilePosition);
+      return updateMainPlayer(player, tile, tilePosition);
     }
     if (player instanceof PartnerPlayer) {
-      updatePartnerPlayer(player, tilePosition, scene);
+      return updatePartnerPlayer(player, tile, tilePosition, scene);
     }
   }
 }
@@ -75,74 +121,23 @@ function updatePlayer(player: Player, scene: THREE.Scene) {
 async function placeTile(
   position: THREE.Vector3,
   tile: Tile,
-  tileKey: number,
   role: Role | undefined,
   neighbors: Map<Orientation, Tile | undefined>,
   scene: THREE.Scene
 ) {
-  for (const [key, value] of tile.tileRelationMap) {
-    if (value && storedTiles.get(value)) {
-      position = getNextPosition(storedTiles.get(value) as THREE.Vector3, key);
+  for (const [orientation, tileKey] of tile.tileRelationMap) {
+    if (tileKey && storedTiles.get(tileKey)) {
+      position = getNextPosition(
+        storedTiles.get(tileKey) as THREE.Vector3,
+        orientation
+      );
       break;
     }
   }
   // store placed tile with position to calculate position of next tiles
-  storedTiles.set(tileKey, position);
-  const color = getTileColor(tile);
-  scene.add(createTile(tileKey, tile, position, role, neighbors, color));
-}
-
-/**
- * get color of tile according to role restrictions
- * @param tile: tile to get color for
- * @returns color of tile as hexadecimal number
- */
-function getTileColor(tile: Tile) {
-  //both players have access to this tile
-  if (tile.getRestrictions().length == 0) return colors.darkBrown;
-  //only the designer has access to this tile
-  if (tile.isRestrictedFor(Role.HACKER)) return colors.beige;
-  //only the hacker has access to this tile
-  if (tile.isRestrictedFor(Role.DESIGNER)) return colors.green;
-  //default - this case shouldn't appear
-  return colors.grey;
-}
-
-/**
- * get tile 3D object by tileKey
- * @param tileKey: unique relation key of tile in scene
- * @param scene: scene that might contain tile
- * @returns 3D representation of tile with key
- */
-function getTile(
-  tileKey: number,
-  scene: THREE.Scene
-): THREE.Object3D | undefined {
-  let tile = undefined;
-  for (const child of scene.children) {
-    if (child.userData.tileId == tileKey) tile = child;
-  }
-  return tile;
-}
-
-/**
- * get tile position by in scene by tile id
- * searches scene for tile's bottom plane that contains tile's position
- * @returns position in scene or undefined if tile is not in scene
- */
-function getTilePosition(
-  id: number,
-  scene: THREE.Scene
-): THREE.Vector3 | undefined {
-  if (!id) return undefined;
-  let position = undefined;
-  scene.traverse((child) => {
-    if (child.userData.tileKey == id) {
-      position = child.position;
-      console.log(child);
-    }
-  });
-  return position;
+  storedTiles.set(tile.tileKey, position);
+  const isEnd = tile.tileKey == labyrinthData?.endTileKey;
+  scene.add(await createTile(tile, position, role, neighbors, isEnd));
 }
 
 /**
@@ -185,7 +180,9 @@ function getNeighbors(tile: Tile, tileMap: Map<number, Tile>) {
 
 export function useLabyrinthFactory() {
   return {
+    initializeLabyrinth,
     updateLabyrinth,
     updatePlayer,
+    clearLabyrinth,
   };
 }

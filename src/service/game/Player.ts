@@ -34,12 +34,12 @@ export class MainPlayer implements Player {
   username: string;
   position!: number;
   role: Role | undefined;
-  inventory: Map<number, Item>;
+  inventory: Item[];
 
   constructor(username: string, role: Role | undefined) {
     this.username = username;
     this.role = role;
-    this.inventory = new Map<number, Item>();
+    this.inventory = new Array<Item>();
   }
 
   /**
@@ -47,7 +47,7 @@ export class MainPlayer implements Player {
    * @param item: item that should be added to players inventory
    */
   addItem(item: Item): void {
-    this.inventory.set(item.id, item);
+    this.inventory.push(item);
   }
 
   getUsername(): string {
@@ -62,12 +62,16 @@ export class MainPlayer implements Player {
     return this.role;
   }
 
-  getInventory(): Map<number, Item> {
+  getInventory(): Array<Item> {
     return this.inventory;
   }
 
   setPosition(position: number): void {
     this.position = position;
+  }
+
+  setInventory(inventory: Array<Item>): void {
+    this.inventory = inventory;
   }
 }
 

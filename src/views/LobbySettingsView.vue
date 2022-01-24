@@ -1,9 +1,9 @@
 <template>
   <transition name="fade" appear>
-    <div class="container">
+    <div class="container" :class="{ 'container--fixed': loading }">
       <h1>
         Lobby
-        <span class="uppercase"> {{ lobbyKey }}</span>
+        <span class="uppercase" @click="copy(lobbyKey)"> {{ lobbyKey }}</span>
       </h1>
       <section>
         <p>{{ users.length }}/2 Spieler verbunden</p>
@@ -35,7 +35,7 @@
             <button
               :class="{ button__ready: isReady }"
               class="button--small"
-              @click="readyCheck(loginState.username, selectedLabyrinth)"
+              @click="readyCheck()"
             >
               Bereit
             </button>
@@ -43,7 +43,7 @@
           <transition name="delay-fade">
             <button
               class="button button--small button__exit"
-              @click="exitLobby(lobbyKey, loginState.username)"
+              @click="exitLobby()"
             >
               Verlassen
             </button>
@@ -58,9 +58,11 @@
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 
-import { useLobbyService } from "@/service/LobbyService";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { useAppService } from "@/service/AppService";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 import { useGameStore } from "@/service/game/GameStore";
+import { Role } from "@/service/game/Player";
+import { User } from "@/service/login/User";
 
 import DropdownComponent from "@/components/DropdownComponent.vue";
 import UserListComponent from "@/components/UserListComponent.vue";
@@ -75,7 +77,7 @@ export default defineComponent({
     RadioButtonGroupComponent,
   },
   setup() {
-    const { loginState } = useLoginStore();
+    const { globalState } = useAppService();
     const {
       updateUsers,
       readyCheck,
@@ -85,65 +87,71 @@ export default defineComponent({
       updateLabyrinths,
       lobbyState,
       updateRole,
-      getRoles,
       getRoleOptions,
+      updateReadyStates,
+      getLabyrinthSelection,
     } = useLobbyService();
-    const { gameState, setLobbyKey } = useGameStore();
+    const { gameState } = useGameStore();
 
-    const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
-    const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinth);
-    const users = computed(() => lobbyState.users);
     const lobbyKey = computed(() => gameState.lobbyKey);
 
-    const allRoles = ref([]);
+    const users = computed(() => lobbyState.users);
+
+    const labyrinthOptions = computed(() => lobbyState.labyrinthOptions);
+    const selectedLabyrinth = computed(() => lobbyState.selectedLabyrinthName);
+
+    const allRoles = ref(
+      Object.values(Role).filter((role) => typeof role === "string")
+    );
     const openRoles = computed(() => lobbyState.openRoles);
     const selectedRole = computed(() => lobbyState.selectedRole);
 
     const isReady = computed(
       () =>
-        lobbyState.users.find((user) => user.username === loginState.username)
-          ?.isReady
+        lobbyState.users.find(
+          (user: User) => user.username === globalState.username
+        )?.isReady
     );
+    const loading = computed(() => globalState.loading);
 
-    function selectLabyrinth(id: number) {
-      setLabyrinthSelection(id);
-      updateLabyrinthPick(id, gameState.lobbyKey);
+    function copy(text: string) {
+      navigator.clipboard.writeText(text);
+    }
+
+    function selectLabyrinth(labyrinthName: string) {
+      setLabyrinthSelection(labyrinthName);
+      updateLabyrinthPick(labyrinthName);
     }
 
     function selectRole(name: string) {
-      updateRole(name, gameState.lobbyKey, loginState.username);
+      updateRole(name);
     }
 
     onbeforeunload = () => {
-      return "Leaving Lobby";
-    };
-
-    onunload = () => {
-      if (
-        lobbyState.users.some((user) => user.username === loginState.username)
-      ) {
-        exitLobby(gameState.lobbyKey, loginState.username);
-      }
+      exitLobby();
+      return "leaving lobby";
     };
 
     // exit lobby if any other page than game is opened
     onBeforeRouteLeave((to) => {
       const nextKey = to.params.key as string;
-      if (
-        nextKey != gameState.lobbyKey &&
-        lobbyState.users.some((user) => user.username === loginState.username)
-      ) {
-        exitLobby(gameState.lobbyKey, loginState.username);
+      if (nextKey != lobbyKey.value) {
+        exitLobby();
       }
     });
 
     onMounted(() => {
       const route = router.currentRoute.value;
-      setLobbyKey(route.params.key as string);
-      updateUsers(gameState.lobbyKey).catch(() => router.push("/find"));
-      updateLabyrinths();
-      getRoles(gameState.lobbyKey).then((data) => (allRoles.value = data));
-      getRoleOptions(gameState.lobbyKey);
+      if (lobbyKey.value != (route.params.key as string)) router.push("/find");
+      else {
+        updateUsers()
+          .then(() => updateReadyStates())
+          .catch(() => router.push("/find"));
+        updateLabyrinths();
+        getRoleOptions();
+        updateReadyStates();
+        getLabyrinthSelection();
+      }
     });
 
     return {
@@ -158,8 +166,9 @@ export default defineComponent({
       lobbyKey,
       labyrinthOptions,
       selectedLabyrinth,
-      loginState,
       isReady,
+      loading,
+      copy,
     };
   },
 });
@@ -172,6 +181,11 @@ h1 {
 
   span {
     font-weight: inherit;
+    cursor: copy;
+
+    &:hover {
+      color: $color-light-green;
+    }
   }
 }
 </style>

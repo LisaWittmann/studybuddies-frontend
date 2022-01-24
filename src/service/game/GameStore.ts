@@ -1,126 +1,72 @@
-import { reactive } from "vue";
-import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
+import { reactive, computed } from "vue";
+
+import { useAppService } from "@/service/AppService";
 import { useLabyrinthStore } from "@/service/labyrinth/LabyrinthStore";
-import { useLoginStore } from "@/service/login/LoginStore";
+
+import { Item } from "@/service/labyrinth/Item";
 import { Labyrinth } from "@/service/labyrinth/Labyrinth";
+import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 
-const { labyrinthState, updateLabyrinthData } = useLabyrinthStore();
+const { updateLabyrinthData } = useLabyrinthStore();
+const { globalState } = useAppService();
 
-/**
- * Errormessage: To display all kind of Errors in the according scene
- */
+const loggedInUser = computed(() => globalState.username);
+
 const gameState = reactive({
   lobbyKey: "",
-  labyrinthId: 1,
-  labyrinth: labyrinthState,
+  labyrinthName: "",
+  labyrinth: new Labyrinth("", 0, []),
   mainPlayer: new MainPlayer("", 0),
   partnerPlayer: new PartnerPlayer("", 0),
+  started: false,
   errormessage: "",
   score: 0,
+  playersInSameTile: false,
 });
 
-function setGameState(
-  lobbyKey: string | null,
-  labyrinthId: string | null,
-  labyrinth: string | null,
-  mainPlayer: string | null,
-  partnerPlayer: string | null,
-  errormessage: string | null,
-  score: string | null
-) {
-  if (lobbyKey) gameState.lobbyKey = lobbyKey;
-  if (labyrinthId) gameState.labyrinthId = JSON.parse(labyrinthId) as number;
-  if (labyrinth) gameState.labyrinth = JSON.parse(labyrinth) as Labyrinth;
-  if (mainPlayer) {
-    Object.assign(gameState.mainPlayer, JSON.parse(mainPlayer));
-  }
-  if (partnerPlayer) {
-    Object.assign(gameState.partnerPlayer, JSON.parse(partnerPlayer));
-  }
-  if (errormessage) gameState.errormessage = errormessage;
-  if (score) gameState.score = JSON.parse(score) as number;
-}
-
-function setGameSessionStorage() {
-  sessionStorage.setItem("lobbyKey", JSON.stringify(gameState.lobbyKey)),
-    sessionStorage.setItem(
-      "selectedLabyrinth",
-      JSON.stringify(gameState.labyrinthId)
-    ),
-    sessionStorage.setItem("labyrinth", JSON.stringify(gameState.labyrinth)),
-    sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer)),
-    sessionStorage.setItem(
-      "partnerPlayer",
-      JSON.stringify(gameState.partnerPlayer)
-    ),
-    sessionStorage.setItem(
-      "errormessage",
-      JSON.stringify(gameState.errormessage)
-    ),
-    sessionStorage.setItem("score", JSON.stringify(gameState.score));
-}
-
-function getGameSessionStorage() {
-  setGameState(
-    sessionStorage.getItem("lobbyKey"),
-    sessionStorage.getItem("selectedLabyrinth"),
-    sessionStorage.getItem("labyrinth"),
-    sessionStorage.getItem("mainPlayer"),
-    sessionStorage.getItem("partnerPlayer"),
-    sessionStorage.getItem("errormessage"),
-    sessionStorage.getItem("score")
-  );
-}
-
-function updateGameData() {
-  return updateLabyrinthData(gameState.lobbyKey);
-}
-
 /**
- * Updates the Player so, the watcher can build the changes
- * Adds changed Player to sessionStorage
- * @param username: username of the player which position will be updated
- * @param newPosition: sets new position of player
+ * set gameState to initial values
  */
-function updatePlayerData(username: string, newPosition: number) {
-  if (username == gameState.mainPlayer.getUsername()) {
-    gameState.mainPlayer.setPosition(newPosition);
-    sessionStorage.setItem("mainPlayer", JSON.stringify(gameState.mainPlayer));
-  } else if (username == gameState.partnerPlayer.getUsername()) {
-    gameState.partnerPlayer.setPosition(newPosition);
-    console.log("NEW POSITION: ", newPosition);
-    sessionStorage.setItem(
-      "partnerPlayer",
-      JSON.stringify(gameState.partnerPlayer)
-    );
-  }
+function resetGameState() {
+  gameState.started = false;
+  gameState.labyrinthName = "";
+  gameState.labyrinth = new Labyrinth("", 0, []);
+  gameState.mainPlayer = new MainPlayer("", 0);
+  gameState.partnerPlayer = new PartnerPlayer("", 0);
+  gameState.errormessage = "";
+  gameState.score = 0;
+  gameState.playersInSameTile = false;
 }
 
-/**
- * sets a Player with its username and the startTileId
- * @param username : name of the user to improve identification between Main- and Partnerplayer
- * @param startTileId : start position of the player at the start of the game
- */
-async function setPlayerData(username: string, startTileId: number) {
-  console.log("Starttileid is: " + startTileId + " Playername is: " + username);
-  const { loginState } = useLoginStore();
-  if (loginState.username == username) {
-    gameState.mainPlayer = new MainPlayer(username, startTileId);
-  } else {
-    gameState.partnerPlayer = new PartnerPlayer(username, startTileId);
-  }
+function setStarted(started: boolean) {
+  gameState.started = started;
 }
 
-async function setLobbyKey(lobbyKey: string) {
+function setLobbyKey(lobbyKey: string) {
   gameState.lobbyKey = lobbyKey;
-  sessionStorage.setItem("lobbyKey", lobbyKey);
 }
 
-async function setError(error: string) {
+function setError(error: string) {
   gameState.errormessage = error;
-  sessionStorage.setItem("errormessage", error);
 }
 
+function setScore(score: number) {
+  gameState.score = score;
+}
+
+/**
+ * Updates complete inventory of mainPlayer
+ * @param inventory: current inventroy
+ */
+function setInventory(inventory: Array<Item>) {
+  gameState.mainPlayer.setInventory(inventory);
+}
+
+/**
+ * get player from gameState by username
+ * @param username: username of player
+ * @returns player object with username
+ */
 function getPlayer(username: string) {
   if (gameState.mainPlayer.username == username) {
     return gameState.mainPlayer;
@@ -129,17 +75,63 @@ function getPlayer(username: string) {
   }
 }
 
+/**
+ * sets a Player with its username and the startTileKey
+ * @param username : name of the user to improve identification between Main- and Partnerplayer
+ * @param startTileKey : start position of the player at the start of the game
+ */
+function setPlayerData(username: string, startTileKey: number) {
+  if (loggedInUser.value == username) {
+    gameState.mainPlayer = new MainPlayer(username, startTileKey);
+  } else {
+    gameState.partnerPlayer = new PartnerPlayer(username, startTileKey);
+  }
+}
+
+/**
+ * Updates the Player so, the watcher can build the changes
+ * @param username: username of the player which position will be updated
+ * @param newPosition: sets new position of player
+ */
+function updatePlayerData(username: string, newPosition: number) {
+  if (loggedInUser.value == username) {
+    gameState.mainPlayer.setPosition(newPosition);
+  } else if (username == gameState.partnerPlayer.getUsername()) {
+    gameState.partnerPlayer.setPosition(newPosition);
+  }
+  checkPlayerProximity();
+}
+
+/**
+ * Provides a way to check if both players are in the same tile
+ */
+function checkPlayerProximity() {
+  gameState.playersInSameTile =
+    gameState.mainPlayer.position == gameState.partnerPlayer.position;
+}
+
+/**
+ * request labyrinth data from labyrinthStore and replace gameStates labyrinth
+ * @returns promise of type labyrinth
+ */
+async function updateGameData() {
+  return updateLabyrinthData(gameState.lobbyKey).then(
+    (labyrinth) => (gameState.labyrinth = labyrinth)
+  );
+}
+
 export function useGameStore() {
   return {
     gameState,
-    setGameState,
-    updateGameData,
-    updatePlayerData,
-    setPlayerData,
-    setLobbyKey,
-    setError,
     getPlayer,
-    setGameSessionStorage,
-    getGameSessionStorage,
+    setLobbyKey,
+    setScore,
+    setStarted,
+    setError,
+    setInventory,
+    resetGameState,
+    setPlayerData,
+    updatePlayerData,
+    updateGameData,
   };
 }

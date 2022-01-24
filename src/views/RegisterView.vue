@@ -23,11 +23,13 @@
           </button>
           <p>
             Du bist bereits registriert?
-            <router-link to="/">Jetzt anmelden</router-link>
+            <router-link to="/login">Jetzt anmelden</router-link>
           </p>
           <span>
             Lade jetzt dein eigenes Labyrinth hoch:<br />
-            <router-link to="/upload">Labyrinth hochladen</router-link>
+            <router-link to="/upload-labyrinth"
+              >Labyrinth hochladen</router-link
+            >
           </span>
           <span class="error">{{ errorMessage }}</span>
         </form>
@@ -38,18 +40,21 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { useLoginService } from "@/service/login/LoginService";
 import { User } from "@/service/login/User";
 
 export default defineComponent({
   name: "RegisterView",
   setup() {
-    const { register, loginState } = useLoginStore();
-    const user = new User(loginState.username);
+    const { register } = useLoginService();
+
+    const user = ref({} as User);
     const errorMessage = ref("");
 
     function registerUser() {
-      register(user).catch((error) => (errorMessage.value = error.message));
+      register(user.value).catch(
+        (error) => (errorMessage.value = error.message)
+      );
     }
 
     return {

@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="home__background">
+    <div class="home__background container container--fixed">
       <transition name="slow-fade" appear>
         <img
           class="home__background-image"
@@ -12,7 +12,11 @@
     <div class="flex-container">
       <div class="column-wrapper">
         <transition name="slow-fade" appear>
-          <img class="home__header" :src="header" alt="logo" />
+          <img
+            class="home__header"
+            :src="header"
+            alt="Study Buddies - the quest for mazelnut"
+          />
         </transition>
         <transition name="delay-slow-fade" appear>
           <router-link
@@ -47,48 +51,25 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .home {
-  &__background {
-    position: relative;
-    overflow: hidden;
-    height: 100vh;
+  &__background-image {
+    width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%) brightness(70%);
+    opacity: 0.2;
 
-    &-image {
-      width: 100%;
-      min-height: 100%;
-      object-fit: cover;
-      filter: grayscale(20%) brightness(70%);
-      opacity: 0.2;
-
-      @include color-scheme(dark) {
-        opacity: 0.15;
-        filter: grayscale(0%) brightness(90%);
-      }
+    @include color-scheme(dark) {
+      opacity: 0.15;
+      filter: grayscale(0%) brightness(90%);
     }
   }
 
   &__header {
     width: 100%;
-    max-width: 800px;
+    max-width: $width-xl;
 
     @include color-scheme(dark) {
       filter: drop-shadow(1px 1px 10px rgba(215, 208, 213, 0.02));
-    }
-  }
-
-  a {
-    color: $color-white;
-    font-size: 18px;
-    display: flex;
-    font-weight: 300;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-
-    @include color-scheme(dark) {
-      color: $color-black;
-      &:hover {
-        color: $color-green;
-      }
     }
   }
 

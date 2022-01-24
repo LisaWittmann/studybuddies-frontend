@@ -6,7 +6,9 @@ import GameView from "@/views/GameView.vue";
 import LobbySettingsView from "@/views/LobbySettingsView.vue";
 import LabyrinthUploadView from "@/views/LabyrinthUploadView.vue";
 import FindLobbyView from "@/views/FindLobbyView.vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import EndView from "@/views/EndView.vue";
+import EditorView from "@/views/EditorView.vue";
+import { useAppService } from "@/service/AppService";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -33,18 +35,26 @@ const routes: Array<RouteRecordRaw> = [
     path: "/lobby/:key",
     name: "LobbySettingsView",
     component: LobbySettingsView,
-    props: true,
   },
   {
     path: "/game/:key",
     name: "GameView",
     component: GameView,
-    props: true,
   },
   {
-    path: "/upload",
+    path: "/editor",
+    name: "Editor",
+    component: EditorView,
+  },
+  {
+    path: "/upload-labyrinth",
     name: "LabyrinthUploadView",
     component: LabyrinthUploadView,
+  },
+  {
+    path: "/end/:key",
+    name: "EndView",
+    component: EndView,
   },
 ];
 
@@ -53,6 +63,7 @@ const noAuthentication = [
   "RegisterView",
   "LoginView",
   "LabyrinthUploadView",
+  "EndView",
 ];
 
 const router = createRouter({
@@ -61,8 +72,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const { loginState } = useLoginStore();
-  if (!loginState.isLoggedIn && !noAuthentication.includes(to.name as string)) {
+  const { globalState } = useAppService();
+  if (!globalState.username && !noAuthentication.includes(to.name as string)) {
     next({ name: "LoginView" });
   } else next();
 });

@@ -1,9 +1,17 @@
 import { Client } from "@stomp/stompjs";
-import { EventMessage } from "@/service/game/EventMessage";
-import { useGameStore } from "@/service/game/GameStore";
-import { useLobbyService } from "@/service/LobbyService";
+import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
 
-const { gameState, updatePlayerData, setError } = useGameStore();
+import { useAppService } from "@/service/AppService";
+import { useGameStore } from "@/service/game/GameStore";
+import { useGameService } from "@/service/game/GameService";
+import { useLobbyService } from "@/service/lobby/LobbyService";
+
+import router from "@/router";
+
+const { setFeedback } = useAppService();
+const { updateInventory, endGame } = useGameService();
+const { gameState, updatePlayerData, updateGameData, setError, setScore } =
+  useGameStore();
 const {
   updateUsers,
   setupGame,
@@ -11,6 +19,7 @@ const {
   updateLabyrinths,
   getRoleOptions,
   setUserReadyState,
+  setUserFinishState,
   lobbyState,
 } = useLobbyService();
 
@@ -31,6 +40,7 @@ stompClient.onWebSocketError = () => {
   console.log("websocketerror");
   setError("WS-Fehler");
 };
+
 stompClient.onStompError = () => {
   console.log("Stomperror");
   setError("STOMP-Fehler");
@@ -46,34 +56,28 @@ stompClient.onConnect = () => {
     const eventMessage: EventMessage = JSON.parse(message.body);
 
     if (
-      eventMessage.lobbyKey == gameState.lobbyKey ||
+      eventMessage.lobbyKey == gameState.lobbyKey.toUpperCase() ||
       eventMessage.lobbyKey == "ALL"
     ) {
       console.log("new Message for the Lobby");
 
-      let destTileID: number;
+      let destTileKey: number;
+      let updateData: Update;
+      const operation = (<any>Operation)[eventMessage.operation];
 
-      switch (eventMessage.operation) {
-        case "MOVEMENT":
-          destTileID = Number.parseInt(eventMessage.data);
-
-          if (destTileID) {
-            updatePlayerData(eventMessage.username, destTileID);
-            // -> now the watcher can update the 3D Room
-            // and the player should move the right Player to the corresponding Tile (in the 3D-Room)
+      switch (operation) {
+        case Operation.MOVEMENT:
+          destTileKey = Number.parseInt(eventMessage.data);
+          if (destTileKey) {
+            updatePlayerData(eventMessage.username, destTileKey);
           } else {
             setError("There is no tile reference for this definition of data");
           }
-
           break;
-        case "CLICK":
+        case Operation.ACCESS:
+          setScore(Number(eventMessage.data));
           break;
-        case "CHAT":
-          break;
-        case "TRADE":
-          break;
-        case "READY":
-          console.log(eventMessage);
+        case Operation.READY:
           if (
             eventMessage.username === "ALL_OF_LOBBY" &&
             eventMessage.data === "READY"
@@ -84,51 +88,62 @@ stompClient.onConnect = () => {
               eventMessage.username,
               eventMessage.data === "READY"
             );
-            console.log(
-              lobbyState.users.find(
-                (user) => user.username == eventMessage.username
-              )
-            );
           }
           break;
-        case "LABYRINTH_PICK":
-          console.log(Number(eventMessage.data));
-          setLabyrinthSelection(Number(eventMessage.data));
+        case Operation.CHECK_END:
+          lobbyState.users.forEach((user) => {
+            if (user.username == eventMessage.data) {
+              setUserFinishState(user.username, true);
+            }
+          });
+
+          // If both users are finished, redirect to endscreen
+          if (lobbyState.users.every((user) => user.finished)) {
+            endGame();
+            router.push(`/end/${gameState.lobbyKey}`);
+          }
           break;
-        case "UPDATE":
-          switch (eventMessage.data) {
-            case "LABYRINTHS":
+        case Operation.LABYRINTH_PICK:
+          setLabyrinthSelection(eventMessage.data);
+          break;
+        case Operation.UPDATE:
+          updateData = (<any>Update)[eventMessage.data];
+          switch (updateData) {
+            case Update.LABYRINTHS:
               updateLabyrinths();
               break;
-            case "USERS":
-              updateUsers(eventMessage.lobbyKey);
+            case Update.USERS:
+              if (gameState.started) {
+                setFeedback(
+                  `Spieler ${eventMessage.username} hat das Spiel verlassen.`,
+                  undefined,
+                  "/find",
+                  "Zurück zur Lobbyfindung"
+                );
+              } else {
+                updateUsers();
+              }
               break;
-            case "ROLE":
-              console.log("RoleOptions holen");
-              getRoleOptions(eventMessage.lobbyKey);
+            case Update.ROLE:
+              getRoleOptions();
+              break;
+            case Update.GAME_LAB:
+              updateGameData();
+              break;
+            case Update.INVENTORY:
+              updateInventory();
               break;
             default:
-              console.info(
-                "No List was updated with Data: " + eventMessage.data
-              );
+              console.info("No List was updated with Data:", eventMessage.data);
               break;
           }
           break;
         default:
-          console.error(
-            eventMessage.operation + " is no valid EventMessage Operation."
-          );
+          console.error(eventMessage.operation, "is no valid Operation");
           break;
       }
     }
   });
-};
-
-/**
- * Method to handle the Disconnection
- */
-stompClient.onDisconnect = () => {
-  //Connection closed
 };
 
 stompClient.activate();

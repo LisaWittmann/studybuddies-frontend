@@ -1,9 +1,20 @@
-import { reactive } from "vue";
+import { computed, reactive, readonly } from "vue";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLoginStore } from "@/service/login/LoginStore";
-import { EventMessage, Operation } from "@/service/game/EventMessage";
-import { Message } from "@/service/game/Conversation";
+import { useLobbyService } from "@/service/lobby/LobbyService";
+
+import { EventMessage, Operation, Update } from "@/service/game/EventMessage";
+import { Message, Response } from "@/service/game/Conversation";
 import { Orientation } from "@/service/labyrinth/Tile";
+import { Item } from "@/service/labyrinth/Item";
+
+const { gameState, setInventory, resetGameState, setStarted } = useGameStore();
+const { exitLobby } = useLobbyService();
+
+const lobbyKey = computed(() => gameState.lobbyKey);
+const playerName = computed(() => gameState.mainPlayer.username);
+
+const lobbyAPI = "/api/lobby";
+const bodyAPI = "/api/body";
 
 const gameEventMessage = reactive({
   message: "",
@@ -13,12 +24,55 @@ const gameEventMessage = reactive({
 
 const conversation = reactive({
   character: "",
-  message: new Message("", "", undefined, []),
+  message: {} as Message,
   visible: false,
 });
 
-const toggleEventMessage = () =>
-  (gameEventMessage.visible = !gameEventMessage.visible);
+/**
+ * set gameEventMessage and update visibility
+ * @param message: message of gameEvent
+ * @param state: state of message
+ */
+function setGameEvent(message: string, state?: string) {
+  gameEventMessage.message = message;
+  gameEventMessage.state = state ? state : "";
+  gameEventMessage.visible = true;
+}
+
+/**
+ * set gameEvent to initial values
+ */
+function resetGameEvent() {
+  gameEventMessage.visible = false;
+  gameEventMessage.message = "";
+  gameEventMessage.state = "";
+}
+
+/**
+ * toggle visibility of gameEventMessage
+ */
+function toggleEventMessage() {
+  gameEventMessage.visible = !gameEventMessage.visible;
+}
+
+/**
+ * start conversation with a game character
+ * @param character modelName of character
+ */
+function startConversation(character: string) {
+  conversation.character = character;
+  conversation.visible = true;
+  getConversationMessage("1.1");
+}
+
+/**
+ * set conversation state to default values to end conversation
+ */
+function endConversation() {
+  conversation.visible = false;
+  conversation.message = new Message("", "", undefined, []);
+  conversation.character = "";
+}
 
 /**
  * function which is used when clicking the arrow in Scene
@@ -26,15 +80,13 @@ const toggleEventMessage = () =>
  * @param orientation used in the backend to identify the direction to move the player
  */
 async function movePlayer(orientation: Orientation) {
-  const { gameState } = useGameStore();
-  const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
     Operation[Operation.MOVEMENT],
-    gameState.lobbyKey,
-    loginState.username,
+    lobbyKey.value,
+    playerName.value,
     Orientation[orientation]
   );
-  fetch("/api/lobby/move", {
+  fetch(`${lobbyAPI}/move`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -49,21 +101,11 @@ async function movePlayer(orientation: Orientation) {
 }
 
 /**
- * start conversation with a game character
- * @param character modelName of charachter
- */
-async function startConversation(character: string) {
-  conversation.character = character;
-  conversation.visible = true;
-  getConversationMessage("1.1");
-}
-
-/**
  * get next message of conversation with game character
  * @param id message id
  */
 async function getConversationMessage(id: string) {
-  fetch(`/api/body/npc/${conversation.character}/${id}`, {
+  fetch(`${bodyAPI}/npc/${conversation.character}/${id}`, {
     method: "GET",
   })
     .then((response) => {
@@ -71,12 +113,10 @@ async function getConversationMessage(id: string) {
       return response.json();
     })
     .then((jsonData) => {
-      console.log(jsonData);
       conversation.message = jsonData as Message;
-
       if (conversation.message.id != "0.0") {
         if (conversation.message.itemName != null) {
-          console.log("give Item");
+          givePlayerItem(conversation.message.itemName);
         }
       } else {
         endConversation();
@@ -88,29 +128,18 @@ async function getConversationMessage(id: string) {
 }
 
 /**
- * set conversation state to default values to end conversation
- */
-async function endConversation() {
-  conversation.visible = false;
-  conversation.message = new Message("", "", undefined, []);
-  conversation.character = "";
-}
-
-/**
  * request access to clicked item
  * display incoming data as gameEventMessage
  * @param modelName name of the clicked item
  */
 async function checkAccess(modelName: string) {
-  const { gameState } = useGameStore();
-  const { loginState } = useLoginStore();
   const eventMessage = new EventMessage(
     Operation[Operation.ACCESS],
-    gameState.lobbyKey,
-    loginState.username,
+    lobbyKey.value,
+    playerName.value,
     modelName.toUpperCase()
   );
-  fetch("/api/lobby/access", {
+  fetch(`${lobbyAPI}/access`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -120,13 +149,59 @@ async function checkAccess(modelName: string) {
       return response.json();
     })
     .then((jsonData) => {
-      gameEventMessage.message = jsonData.accesstext;
-      if (jsonData.access) {
-        gameEventMessage.state = "success";
+      let state = "success";
+      if (jsonData.firstAccess) updateInventory();
+      else if (!jsonData.access) state = "warning";
+      setGameEvent(jsonData.accessText, state);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+/**
+ * request to end game,
+ * opens conversation overlay to display feedback
+ * @param modelName name of the clicked item
+ */
+async function checkEndGame(modelName: string) {
+  const eventMessage = new EventMessage(
+    Operation[Operation.CHECK_END],
+    lobbyKey.value,
+    playerName.value,
+    modelName.toUpperCase()
+  );
+  fetch(`${lobbyAPI}/end`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(eventMessage),
+  })
+    .then((response) => {
+      conversation.visible = true;
+      conversation.message = new Message(
+        "",
+        "",
+        undefined,
+        Array.of(new Response("", "", ""))
+      );
+      if (response.ok) {
+        conversation.message.text =
+          "Herzlichen Glückwunsch. Du kannst das Labyrinth verlassen. Warte bis dein Partner die Trophäe gesammelt hat.";
+        conversation.message.responses = [];
       } else {
-        gameEventMessage.state = "warning";
+        conversation.message.responses[0].text = "Ich komme später wieder.";
+        if (response.status == 409) {
+          conversation.message.text =
+            "Du hast noch nicht die zu erreichende Mindestpunktzahl erreicht.";
+        } else if (response.status == 405) {
+          conversation.message.text =
+            "Du bist noch nicht zusammen mit deinem Partner am Ende angekommen.";
+        } else if (response.status == 418) {
+          conversation.message.text =
+            "Tut mir leid, aber ich glaube die Trophäe ist für jemand anderen vorgesehen.";
+        }
+        conversation.message.text += " Versuch's später noch einmal.";
       }
-      gameEventMessage.visible = true;
     })
     .catch((error) => {
       console.error(error);
@@ -136,23 +211,27 @@ async function checkAccess(modelName: string) {
 /**
  * request operation of clicked item
  * @param modelName name of clicked item
+ * @param itemId contains id of clicked body
  */
-async function clickItem(modelName: string) {
-  console.log("click", modelName);
-  fetch("/api/lobby/click/" + modelName, { method: "GET" })
+async function clickItem(modelName: string, itemId: number) {
+  fetch(`${lobbyAPI}/click/` + modelName, { method: "GET" })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);
       return response.json();
     })
     .then((jsonData) => {
-      const operation = (<any>Operation)[jsonData];
-      switch (operation) {
+      switch ((<any>Operation)[jsonData]) {
         case Operation.ACCESS:
           checkAccess(modelName);
           break;
         case Operation.CONVERSATION:
-          console.log("test");
           startConversation(modelName);
+          break;
+        case Operation.COLLECT:
+          addToInventory(itemId);
+          break;
+        case Operation.CHECK_END:
+          checkEndGame(modelName);
           break;
       }
     })
@@ -161,14 +240,160 @@ async function clickItem(modelName: string) {
     });
 }
 
+/**
+ * adds item to inventory via fetch and updates frontend representation accordingly
+ * calls method to delete collected item from labyrinth
+ * @param itemId id of the clicked item
+ */
+async function addToInventory(itemId: number) {
+  fetch(
+    `${lobbyAPI}/${lobbyKey.value}/username/${playerName.value}/item/${itemId}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      const inventory: Item[] = jsonData;
+      setInventory(inventory);
+      removeItemFromLabyrinth(itemId);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+/**
+ * updates main players inventory
+ */
+async function updateInventory() {
+  const eventMessage = new EventMessage(
+    Operation[Operation.UPDATE],
+    lobbyKey.value,
+    playerName.value,
+    Update[Update.INVENTORY]
+  );
+  fetch(`${lobbyAPI}/current-inventory`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(eventMessage),
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      const inventory: Item[] = jsonData;
+      setInventory(inventory);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+/**
+ * creates new body with the given modelname and puts it into players inventory
+ * @param itemName: name of the item
+ */
+async function givePlayerItem(itemName: string) {
+  fetch(
+    `${lobbyAPI}/${lobbyKey.value}/username/${playerName.value}/give/item/${itemName}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      const inventory: Item[] = jsonData;
+      setInventory(inventory);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+/**
+ * Provides functionality to remove an item from labyrinth
+ * @param itemId: the id of the item that should be deleted
+ */
+async function removeItemFromLabyrinth(itemId: number) {
+  fetch(`${lobbyAPI}/${lobbyKey.value}/item/${itemId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "text/plain" },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+/**
+ * removes item with given id from players inventory
+ * and puts it in partner players inventory
+ * @param itemId: id of item that should be traded
+ */
+async function tradeItem(itemId: number) {
+  fetch(
+    `${lobbyAPI}/${lobbyKey.value}/username/${playerName.value}/trade/item/${itemId}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) throw new Error(response.statusText);
+      return response.json();
+    })
+    .then((jsonData) => {
+      const inventory: Item[] = jsonData;
+      setInventory(inventory);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+/**
+ * end in game events
+ */
+function endGame() {
+  resetGameEvent();
+  endConversation();
+  setStarted(false);
+}
+
+/**
+ * reset all game states to force game end and remove player from lobby
+ */
+function forceGameEnd() {
+  endGame();
+  exitLobby();
+  resetGameState();
+}
+
 export function useGameService() {
   return {
-    gameEventMessage,
+    gameEventMessage: readonly(gameEventMessage),
     toggleEventMessage,
+    resetGameEvent,
     movePlayer,
     clickItem,
-    startConversation,
     getConversationMessage,
-    conversation,
+    endConversation,
+    conversation: readonly(conversation),
+    updateInventory,
+    tradeItem,
+    endGame,
+    forceGameEnd,
   };
 }

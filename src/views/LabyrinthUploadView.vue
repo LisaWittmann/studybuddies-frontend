@@ -1,7 +1,7 @@
 <template>
   <section>
     <h1>Labyrinth hochladen:</h1>
-    <label class="file-upload">
+    <label class="button button--small button__upload">
       <input
         type="file"
         ref="upload"
@@ -31,18 +31,16 @@
 </template>
 
 <script lang="ts">
-import { useLobbyService } from "@/service/LobbyService";
-import { useLoginStore } from "@/service/login/LoginStore";
 import { defineComponent, ref } from "vue";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 
 export default defineComponent({
   name: "LabyrinthUploadView",
   components: {},
   setup() {
-    const { loginState } = useLoginStore();
     const { uploadJsonFiles } = useLobbyService();
-    const upload = ref({} as HTMLInputElement);
 
+    const upload = ref({} as HTMLInputElement);
     const uploadResponse = ref(new Array<string>());
 
     async function uploadLabyrinth() {
@@ -56,7 +54,6 @@ export default defineComponent({
     return {
       uploadLabyrinth,
       upload,
-      username: loginState.username,
       uploadResponse,
     };
   },
@@ -68,27 +65,14 @@ input[type="file"] {
   display: none;
 }
 
-.file-upload,
 .response-wrapper {
-  border: 1px solid $color-grey;
-  border-radius: 8px;
-  font-weight: 300;
+  @include border();
+  border-radius: $border-radius-m;
+  font-weight: $outfit-light;
   display: inline-block;
-  padding: 10px 12px;
-  width: 80%;
-  max-width: 200px;
-}
-
-.file-upload {
-  cursor: pointer;
-}
-
-.file-upload:hover {
-  color: $color-beige;
-  font-weight: 400;
-}
-
-.response-wrapper {
+  padding: $spacing-xs;
+  width: $pref-width;
+  max-width: $width-s;
   color: $color-beige;
 }
 </style>

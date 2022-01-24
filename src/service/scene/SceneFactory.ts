@@ -1,9 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Orientation } from "@/service/labyrinth/Tile";
-import { Vector3 } from "three";
-import { settings, direction } from "@/service/scene/helper/SceneConstants";
 import { SetupContext } from "vue";
+import { Orientation } from "@/service/labyrinth/Tile";
+import { settings, directionMap } from "@/service/scene/helper/SceneConstants";
 
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
@@ -15,24 +14,23 @@ let orbitControls: OrbitControls;
 /**
  * creates new Three js 3D scene
  * @param debug: activates grid helper
- * @returns initialized scene with simple lightning
+ * @returns initialized scene
  */
 function createScene(debug = false): THREE.Scene {
   //RENDERER-----------------
+  const pixelRatio = window.devicePixelRatio;
+  const antialias = pixelRatio < 1;
+
   renderer = new THREE.WebGLRenderer({
-    alpha: true,
-    antialias: true,
+    antialias: antialias,
+    powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(pixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   //RAY_CASTER----------------
   rayCaster = new THREE.Raycaster();
-  rayCaster.far = Math.ceil(
-    Math.sqrt(
-      Math.pow(settings.tileSize / 2, 2) + Math.pow(settings.cameraHeight, 2)
-    )
-  );
+  rayCaster.far = getInteractionRadius();
 
   //CAMERA-------------------
   const ratio = window.innerWidth / window.innerHeight;
@@ -47,6 +45,7 @@ function createScene(debug = false): THREE.Scene {
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.enableZoom = false;
   orbitControls.enablePan = true;
+  orbitControls.target = new THREE.Vector3().copy(camera.position);
   orbitControls.update();
   orbitControls.addEventListener("end", () => {
     updateCameraOrbit();
@@ -66,6 +65,9 @@ function createScene(debug = false): THREE.Scene {
   return scene;
 }
 
+/**
+ * render function for animation loop
+ */
 function renderScene() {
   renderer.render(scene, camera);
   orbitControls.update();
@@ -101,21 +103,17 @@ function updateCameraPosition(
   else updateCameraOrbit();
 }
 
+/**
+ * turn camera in given orientation
+ * @param orientation: orientation in which camera should look
+ */
 function updateCameraTarget(orientation: Orientation) {
-  const target = new Vector3().copy(camera.position);
-  switch (orientation) {
-    case Orientation.NORTH:
-      orbitControls.target = target.add(direction.north);
-      break;
-    case Orientation.EAST:
-      orbitControls.target = target.add(direction.east);
-      break;
-    case Orientation.SOUTH:
-      orbitControls.target = target.add(direction.south);
-      break;
-    case Orientation.WEST:
-      orbitControls.target = target.add(direction.west);
-      break;
+  const direction = directionMap.get(orientation);
+  if (direction) {
+    orbitControls.target = new THREE.Vector3()
+      .copy(camera.position)
+      .add(direction);
+    orbitControls.update();
   }
 }
 
@@ -135,20 +133,19 @@ function updateCameraOrbit() {
  * @param x: converted x position of cursor
  * @param y: converted y position of cursor
  */
-function getIntersections(context: SetupContext, x: number, y: number) {
+function getIntersection(context: SetupContext, x: number, y: number) {
   rayCaster.setFromCamera({ x: x, y: y }, camera);
   const intersects = rayCaster.intersectObjects(scene.children);
 
-  for (const intersection of intersects) {
-    const object = intersection.object;
-    // if parent object is a 'valid' object (no tile)
-    if (object.parent?.userData.id != null) {
-      // mock inventory
-      if (object.parent.userData.modelName == "USB") {
-        object.parent.visible = false;
-      }
-      context.emit("click-object", object.parent.userData.modelName);
-    } else if (object.parent?.userData.showInView) {
+  if (intersects.length > 0) {
+    const object = intersects[0].object;
+    if (object.parent?.name.includes("item")) {
+      context.emit(
+        "click-object",
+        object.parent.userData.modelName,
+        object.parent.userData.id
+      );
+    } else if (object.parent?.name.includes("arrow")) {
       context.emit("move-player", object.parent.userData.orientation);
     }
   }
@@ -179,14 +176,27 @@ function updateObjectsInView() {
 }
 
 /**
+ * calculates interaction radius by pythagorean theorem based on tileSize and cameraheight
+ * @returns interaction radius
+ */
+function getInteractionRadius(): number {
+  return Math.ceil(
+    Math.sqrt(
+      Math.pow(settings.tileSize / 2, 2) + Math.pow(settings.cameraHeight, 2)
+    )
+  );
+}
+
+/**
  * check if object is in interaction radius
  * @param position: position of object
  */
 function isInInteractionRadius(position: THREE.Vector3) {
-  const radius = settings.tileSize / 2;
   return (
-    Math.abs(position.x - Math.floor(camera.position.x)) <= radius &&
-    Math.abs(position.z - Math.floor(camera.position.z)) <= radius
+    Math.abs(position.x - Math.floor(camera.position.x)) <
+      getInteractionRadius() &&
+    Math.abs(position.z - Math.floor(camera.position.z)) <
+      getInteractionRadius()
   );
 }
 
@@ -207,6 +217,7 @@ export function useSceneFactory() {
     insertCanvas,
     updateScene,
     updateCameraPosition,
-    getIntersections,
+    updateCameraTarget,
+    getIntersection,
   };
 }

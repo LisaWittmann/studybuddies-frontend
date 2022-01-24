@@ -1,10 +1,10 @@
 import { Vector3 } from "three";
 import { Orientation } from "@/service/labyrinth/Tile";
-import { radians } from "@/service/scene/helper/GeometryHelper";
 import {
   settings,
-  direction,
   colors,
+  directionMap,
+  rotations,
 } from "@/service/scene/helper/SceneConstants";
 
 /**
@@ -22,16 +22,8 @@ class FixedObject {
   }
 
   rotationY = (): number => {
-    switch (this.orientation) {
-      case Orientation.NORTH:
-        return radians(0);
-      case Orientation.EAST:
-        return radians(270);
-      case Orientation.SOUTH:
-        return radians(180);
-      case Orientation.WEST:
-        return radians(90);
-    }
+    const rotation = rotations.get(this.orientation);
+    return rotation ? rotation : 0;
   };
 
   /**
@@ -41,16 +33,9 @@ class FixedObject {
    */
   protected getPosition(distance: number): Vector3 {
     const position = new Vector3().copy(this.tilePosition);
-    switch (this.orientation) {
-      case Orientation.NORTH:
-        return position.addScaledVector(direction.north, distance);
-      case Orientation.EAST:
-        return position.addScaledVector(direction.east, distance);
-      case Orientation.SOUTH:
-        return position.addScaledVector(direction.south, distance);
-      case Orientation.WEST:
-        return position.addScaledVector(direction.west, distance);
-    }
+    const direction = directionMap.get(this.orientation);
+    if (direction) position.addScaledVector(direction, distance);
+    return position;
   }
 }
 
@@ -70,7 +55,6 @@ export class Wall extends FixedObject {
  * contains orientation where it directs to
  */
 export class Arrow extends FixedObject {
-  showInView = true;
   modelName = "arrow";
   color = colors.beige;
 

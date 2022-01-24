@@ -1,26 +1,36 @@
 <template>
   <transition name="fade" appear>
     <div class="container">
-      <img class="image--header" :src="header" alt="logo" />
+      <img
+        class="image--header"
+        :src="header"
+        alt="Study Buddies - the quest for mazelnut"
+      />
       <section>
         <h2>Spiel finden</h2>
-        <div class="column-wrapper">
+        <form class="column-wrapper" @submit.prevent="join(lobbyKey)">
           <input
-            class="input--small uppercase"
+            class="input--medium uppercase"
             type="text"
             v-model="lobbyKey"
           />
-          <button class="button--small" @click="joinGame">
-            Spiel beitreten
-          </button>
-        </div>
+          <button type="submit" class="button--small">Spiel beitreten</button>
+        </form>
         <span class="error" v-if="errorMessage">{{ errorMessage }}</span>
       </section>
       <transition name="delay-fade">
         <section>
           <h2>Spiel erstellen</h2>
-          <button class="button--small" @click="createGame">
+          <button class="button--small" @click="createLobby">
             Spiel erstellen
+          </button>
+        </section>
+      </transition>
+      <transition name="delay-slow-fade" appear>
+        <section>
+          <h2>Labyrinth erstellen</h2>
+          <button class="button--small" @click="navigateToEditor">
+            Labyrinth erstellen
           </button>
         </section>
       </transition>
@@ -30,15 +40,23 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { useLobbyService } from "@/service/lobby/LobbyService";
 import router from "@/router";
 
 export default defineComponent({
   name: "FindLobby",
   setup() {
-    const { loginState } = useLoginStore();
+    const { joinLobby, createLobby } = useLobbyService();
+
     const lobbyKey = ref("");
     const errorMessage = ref("");
+
+    const navigateToEditor = () => router.push("/editor");
+    const join = (lobbyKey: string) => {
+      joinLobby(lobbyKey).catch(
+        (error) => (errorMessage.value = error.message)
+      );
+    };
 
     const header = computed(() => {
       if (matchMedia("(prefers-color-scheme: dark)").matches)
@@ -46,43 +64,16 @@ export default defineComponent({
       return require("@/assets/img/logo_header.png");
     });
 
-    function joinGame() {
-      let key = lobbyKey.value;
-      fetch("/api/lobby/join/" + key, {
-        method: "POST",
-        headers: {
-          "Content-Type": "html/text;charset=utf-8",
-        },
-        body: loginState.username,
-      }).then((response) => {
-        if (response.ok) router.push("/lobby/" + key);
-        else if (response.status == 409) errorMessage.value = "Lobby voll";
-        else if (response.status == 404)
-          errorMessage.value = "Lobby nicht gefunden";
-      });
-    }
+    onbeforeunload = null;
 
-    function createGame() {
-      fetch("/api/lobby/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "html/text;charset=utf-8",
-        },
-        body: loginState.username,
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          }
-        })
-        .then((jsonData) => {
-          router.push("/lobby/" + jsonData.key);
-        })
-        .catch((err) => console.log(err));
-    }
-
-    onbeforeunload = () => console.log("overriding previous listener");
-    return { lobbyKey, createGame, joinGame, header, errorMessage };
+    return {
+      lobbyKey,
+      createLobby,
+      join,
+      header,
+      errorMessage,
+      navigateToEditor,
+    };
   },
 });
 </script>
@@ -90,7 +81,11 @@ export default defineComponent({
 <style lang="scss" scoped>
 .image--header {
   width: 100%;
-  max-width: 600px;
+  max-width: $width-l;
   padding-top: $spacing-l;
+}
+
+input {
+  text-align: center;
 }
 </style>

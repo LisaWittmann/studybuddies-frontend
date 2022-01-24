@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
+import { DoubleSide, Texture, TextureLoader } from "three";
 
 import { Item } from "@/service/labyrinth/Item";
 import { Orientation } from "@/service/labyrinth/Tile";
@@ -9,18 +10,29 @@ import { PartnerPlayer, Role } from "@/service/game/Player";
 
 import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
-import { DoubleSide, Texture, TextureLoader } from "three";
+
+const modelPath = (fileName: string) => {
+  return `/models/${fileName}.obj`;
+};
+
+const materialPath = (fileName: string) => {
+  return `/materials/${fileName}.mtl`;
+};
+
+const texturePath = (fileName: string) => {
+  return require(`@/assets/img/textures/${fileName}-texture.png`);
+};
 
 /**
  * creates item by loading its obj representation from models directory
+ * @param tilePosition: position of parent object
+ * @param tileModel: group or scene object will be added to after loading
  * @param item: item that should be loaded and added to scene
- * @param parent: group or scene object will be added to after loading
- * @param position: position of parent object
  */
 async function createItem(
-  item: Item,
-  parent: THREE.Group | THREE.Scene,
-  position: THREE.Vector3
+  tilePosition: THREE.Vector3,
+  tileModel: THREE.Group | THREE.Scene,
+  item: Item
 ) {
   const model = item.modelName.toLowerCase();
   let factor = 1;
@@ -29,11 +41,11 @@ async function createItem(
   const objLoader = new OBJLoader();
   const mtlLoader = new MTLLoader();
 
-  await mtlLoader.loadAsync(`/materials/${model}.mtl`).then((materials) => {
+  return mtlLoader.loadAsync(materialPath(model)).then((materials) => {
     materials.preload();
     objLoader.setMaterials(materials);
-    objLoader.loadAsync(`/models/${model}.obj`).then((object) => {
-      object.position.copy(item.calcPositionInRoom().add(position));
+    objLoader.loadAsync(modelPath(model)).then((object) => {
+      object.position.copy(item.calcPositionInRoom().add(tilePosition));
       //get object size before rotation
       const box = new THREE.Box3().setFromObject(object);
       box.getSize(size);
@@ -45,9 +57,8 @@ async function createItem(
       object.scale.set(factor, factor, factor); //scale object to max size
       object.rotateY(item.rotationY());
       object.userData = item;
-      object.userData.clickable = true;
-      object.name = "item " + item.modelName;
-      parent.add(object);
+      object.name = `item-${model}-${item.id}`;
+      tileModel.add(object);
     });
   });
 }
@@ -55,100 +66,175 @@ async function createItem(
 /**
  * creates plane representing tile's floor
  * contains tile position and userData
- * @param position: tile position
- * @param key: index of current tile
- * @param color: floor color in hex-code
- * @returns THREE.Mesh representation of floor
+ * @param tilePosition: tile position
+ * @param tileModel: parent tile to which object should be added after loading
+ * @param color: color in hex-code
+ * @param textureName: prefix of texture name
  */
-function createFloor(position: THREE.Vector3, key: number, color = 0x199eb0) {
-  const object = new THREE.Mesh(
-    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-    new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
+async function createFloor(
+  tilePosition: THREE.Vector3,
+  tileModel: THREE.Group,
+  color = 0x199eb0,
+  textureName = "gras"
+) {
+  const textureLoader = new TextureLoader();
+  return textureLoader.load(
+    texturePath(`${textureName}-floor`),
+    (texture: Texture) => {
+      texture.minFilter = THREE.NearestFilter;
+      const object = new THREE.Mesh(
+        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+        new THREE.MeshLambertMaterial({
+          side: DoubleSide,
+          map: texture,
+          color: color,
+        })
+      );
+      object.position.copy(tilePosition);
+      object.rotateX(radians(90));
+      object.name = "floor";
+      tileModel.add(object);
+    }
   );
-  object.position.copy(position);
-  object.userData.tileKey = key;
-  object.rotateX(radians(90));
-  object.name = "floor";
-  return object;
 }
 
 /**
  * creates plane representing tile's ceiling
- * @param position: tile position
- * @param color: floor color in hex-code
- * @returns THREE.Mesh representation of ceiling
+ * @param tilePosition: tile position
+ * @param tileModel: parent tile to which object should be added after loading
+ * @param color: color in hex-code
+ * @param textureName: prefix of texture name
  */
-function createCeiling(position: THREE.Vector3, color = 0x199eb0) {
-  const object = new THREE.Mesh(
-    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-    new THREE.MeshStandardMaterial({ color: color, side: THREE.DoubleSide })
+async function createCeiling(
+  tilePosition: THREE.Vector3,
+  tileModel: THREE.Group,
+  color = 0x199eb0,
+  textureName = "leaves"
+) {
+  const textureLoader = new TextureLoader();
+  return textureLoader.load(
+    texturePath(`${textureName}-ceiling`),
+    (texture: Texture) => {
+      texture.minFilter = THREE.NearestFilter;
+      const object = new THREE.Mesh(
+        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+        new THREE.MeshLambertMaterial({
+          side: DoubleSide,
+          map: texture,
+          color: color,
+        })
+      );
+      object.position.set(
+        tilePosition.x,
+        tilePosition.y + settings.tileSize,
+        tilePosition.z
+      );
+      object.rotateX(radians(90));
+      tileModel.add(object);
+    }
   );
-  object.position.set(position.x, position.y + settings.tileSize, position.z);
-  object.rotateX(radians(90));
-  object.name = "ceiling";
-  return object;
+}
+
+/**
+ * creates textured plane representing tile's wall on given orientation
+ * @param tilePosition: position of parent tile
+ * @param tileModel: parent tile to which object should be added
+ * @param orientation: orientation which wall should be placed and aligned on
+ * @param color: wall color in hex-code
+ * @param textureName: prefix of texture name
+ */
+async function createTexturedWall(
+  tilePosition: THREE.Vector3,
+  tileModel: THREE.Group,
+  orientation: Orientation,
+  color = 0x199eb0,
+  textureName = "bark"
+) {
+  const wall = new Wall(orientation, tilePosition);
+  const position = baseline(wall.position(), settings.tileSize);
+  const textureLoader = new TextureLoader();
+  return textureLoader.load(texturePath(textureName), (texture: Texture) => {
+    texture.minFilter = THREE.NearestFilter;
+    const object = new THREE.Mesh(
+      new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+      new THREE.MeshLambertMaterial({
+        side: DoubleSide,
+        map: texture,
+        color: color,
+        opacity: 0.6,
+      })
+    );
+    object.position.copy(position);
+    object.rotateY(wall.rotationY());
+    tileModel.add(object);
+  });
 }
 
 /**
  * creates plane representing tile's wall on given orientation
- * @param orientation: orientation which wall should be placed and aligned on
  * @param tilePosition: position of parent tile
+ * @param tileModel: parent tile to which object should be added after loading
+ * @param orientation: orientation which wall should be placed and aligned on
  * @param color: wall color in hex-code
  * @param opacity: opacity as decimal of mesh
- * @returns THREE.Mesh representation of wall
  */
 function createWall(
-  orientation: Orientation,
   tilePosition: THREE.Vector3,
+  tileModel: THREE.Group,
+  orientation: Orientation,
   color = 0x199eb0,
   opacity = 1
-): THREE.Mesh {
+) {
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const object = new THREE.Mesh(
-    new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-    new THREE.MeshStandardMaterial({
+    new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+    new THREE.MeshLambertMaterial({
+      side: DoubleSide,
       color: color,
-      side: THREE.DoubleSide,
-      transparent: true,
+      transparent: opacity < 1,
       opacity: opacity,
     })
   );
   object.position.copy(position);
   object.rotateY(wall.rotationY());
-  object.userData = wall;
-  object.name = "wall";
-  return object;
+  tileModel.add(object);
 }
 
 /**
  * creates optical restriction wall for user that isn't allowed to enter this area
+ * @param tilePosition position of parent tile
  * @param tileModel contains TileGroup to add image of restriction
  * @param orientation orientation which restriction wall should be placed and aligned on
- * @param tilePosition position of parent tile
+ * @param opacity: opacity as decimal of mesh
+ * @param color: wall color in hex-code
+ * @param textureName: prefix of texture name
  */
-function createRestrictiveWall(
+async function createRestrictiveWall(
+  tilePosition: THREE.Vector3,
   tileModel: THREE.Group,
   orientation: Orientation,
-  tilePosition: THREE.Vector3
+  color = 0x199eb0,
+  textureName = "restricted"
 ) {
   const wall = new Wall(orientation, tilePosition);
   const position = baseline(wall.position(), settings.tileSize);
   const textureLoader = new TextureLoader();
-  textureLoader.load(
-    "/textures/RestrictedTexture.png",
+  return textureLoader.load(
+    texturePath(textureName),
     function (texture: Texture) {
       texture.minFilter = THREE.NearestFilter;
       const object = new THREE.Mesh(
-        new THREE.PlaneGeometry(settings.tileSize, settings.tileSize),
-        new THREE.MeshStandardMaterial({
+        new THREE.PlaneBufferGeometry(settings.tileSize, settings.tileSize),
+        new THREE.MeshLambertMaterial({
           side: DoubleSide,
           map: texture,
           transparent: true,
+          opacity: 0.5,
+          color: color,
         })
       );
       object.position.copy(position);
-      object.userData = wall;
       object.rotateY(wall.rotationY());
       tileModel.add(object);
     }
@@ -157,31 +243,32 @@ function createRestrictiveWall(
 
 /**
  * creates an arrow object that is aligned and directs to given orientation
- * @param orientation: orientation arrow should direct to
  * @param tilePosition: position of parent tile
- * @param parent group on which arrow is placed
- * @returns: clickable arrow representation
+ * @param tileModel group on which arrow is placed
+ * @param orientation: orientation arrow should direct to
  */
-function createArrow(
-  orientation: Orientation,
+async function createArrow(
   tilePosition: THREE.Vector3,
-  parent: THREE.Group
+  tileModel: THREE.Group,
+  orientation: Orientation
 ) {
   const arrow = new Arrow(orientation, tilePosition);
   const objLoader = new OBJLoader();
-  objLoader.loadAsync("/models/arrow.obj").then((object) => {
+  return objLoader.loadAsync(modelPath(arrow.modelName)).then((object) => {
     object.position.copy(arrow.position());
-    object.userData = arrow;
-    object.userData.clickable = true;
+    object.userData.orientation = arrow.orientation;
+    object.userData.showInView = true;
     object.rotateY(arrow.rotationY());
     object.visible = false;
     object.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        child.material.color.setHex(arrow.color);
+        child.material = new THREE.MeshLambertMaterial({
+          color: arrow.color,
+        });
       }
     });
-    object.name = "arrow";
-    parent.add(object);
+    object.name = arrow.modelName;
+    tileModel.add(object);
   });
 }
 
@@ -189,12 +276,12 @@ function createArrow(
  * creates a new partner player representation
  * appearance of player is defined by its role
  * @param player: player that should be represented
- * @param position: global position of player
+ * @param tilePosition: global position of player
  * @param parent: scene or group to which player should be added
  */
 async function createPlayer(
   player: PartnerPlayer,
-  position: THREE.Vector3,
+  tilePosition: THREE.Vector3,
   parent: THREE.Scene | THREE.Group
 ) {
   let model = "squirrel";
@@ -208,15 +295,19 @@ async function createPlayer(
   }
   const objLoader = new OBJLoader();
   const mtlLoader = new MTLLoader();
-  await mtlLoader.loadAsync(`/materials/${model}.mtl`).then((materials) => {
+  return mtlLoader.loadAsync(materialPath(model)).then((materials) => {
     materials.preload();
     objLoader.setMaterials(materials);
-    objLoader.loadAsync(`/models/${model}.obj`).then((object) => {
-      object.userData.username = player.getUsername();
+    objLoader.loadAsync(modelPath(model)).then((object) => {
       object.name = player.getUsername();
-      object.position.copy(position);
+      object.position.copy(tilePosition);
       object.rotateY(90);
-      const newPos = checkIntersect(object, player, position, parent);
+      const newPos = checkIntersect(
+        object,
+        player.getPosition(),
+        tilePosition,
+        parent
+      );
       object.position.copy(newPos);
       parent.add(object);
     });
@@ -226,19 +317,19 @@ async function createPlayer(
 /**
  * checks for intersections of partner model with items and updates position of partner accordingly
  * @param playerObject: model/Three.Group of PartnerPlayer
- * @param player: data of PartnerPlayer
+ * @param tileKey: tileKey of PartnerPlayers position
  * @param position: current vector position of player
  * @param scene: scene that contains all models + the partner
- * @returns
+ * @returns new position of partnerPlayer
  */
 function checkIntersect(
-  playerObject: THREE.Group,
-  player: PartnerPlayer,
+  playerObject: THREE.Object3D,
+  tileKey: number,
   position: THREE.Vector3,
   scene: THREE.Scene | THREE.Group
 ): THREE.Vector3 {
-  const tile = scene.getObjectByName(player.getPosition().toString()); //get current tile
-  const items = tile?.children.filter((c) => c.name.includes("item")); //get all meshes in tile
+  const tile = scene.getObjectByName(tileKey.toString()); //get current tile
+  const items = tile?.children.filter((child) => child.name.includes("item")); //get all meshes in tile
   const playerBox = new THREE.Box3().setFromObject(playerObject); //creates bounding box of player
 
   items?.forEach((i) => {
@@ -339,6 +430,7 @@ export function useObjectFactory() {
   return {
     createArrow,
     createWall,
+    createTexturedWall,
     createRestrictiveWall,
     createCeiling,
     createFloor,

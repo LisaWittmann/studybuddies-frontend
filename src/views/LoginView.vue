@@ -3,7 +3,7 @@
     <transition name="slow-fade" appear>
       <section>
         <h1>Anmelden</h1>
-        <form @submit.prevent="login(user)" class="column-wrapper">
+        <form @submit.prevent="loginUser" class="column-wrapper">
           <input
             class="input--medium"
             type="username"
@@ -27,9 +27,11 @@
           </p>
           <span>
             Lade jetzt dein eigenes Labyrinth hoch:<br />
-            <router-link to="/upload">Labyrinth hochladen</router-link>
+            <router-link to="/upload-labyrinth"
+              >Labyrinth hochladen</router-link
+            >
           </span>
-          <span class="error">{{ loginState.errormessage }}</span>
+          <span class="error">{{ errorMessage }}</span>
         </form>
       </section>
     </transition>
@@ -37,20 +39,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { defineComponent, ref } from "vue";
+import { useLoginService } from "@/service/login/LoginService";
 import { User } from "@/service/login/User";
 
 export default defineComponent({
   name: "LoginView",
   setup() {
-    const { loginState, login } = useLoginStore();
-    const user = new User(loginState.username);
+    const { login } = useLoginService();
+
+    const user = ref({} as User);
+    const errorMessage = ref("");
+
+    function loginUser() {
+      login(user.value).catch((error) => (errorMessage.value = error.message));
+    }
 
     return {
       user,
-      login,
-      loginState,
+      loginUser,
+      errorMessage,
     };
   },
 });

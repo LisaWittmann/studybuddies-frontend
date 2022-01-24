@@ -14,9 +14,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import OverlayComponent from "@/components/overlays/OverlayComponent.vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { useAppService } from "@/service/AppService";
 
 export default defineComponent({
   name: "OverlayTerminalComponent",
@@ -40,8 +40,8 @@ export default defineComponent({
     },
   },
   setup(_, { emit }) {
-    const { loginState } = useLoginStore();
-    const username = loginState.username;
+    const { globalState } = useAppService();
+    const username = computed(() => globalState.username);
     const close = () => emit("close");
 
     return { username, close };
@@ -51,16 +51,16 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .terminal {
-  max-width: 500px;
-  width: 80%;
+  max-width: $width-l;
+  width: $pref-width;
   pointer-events: none;
 
   &__header {
     @include flex-center();
     font-family: $font-inconsolata;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    border: 1px solid #252525;
+    border-top-left-radius: $border-radius-xs;
+    border-top-right-radius: $border-radius-xs;
+    @include border(#252525);
     background: $color-white;
     color: $color-black;
     position: relative;
@@ -83,10 +83,10 @@ export default defineComponent({
   &__content {
     position: relative;
     font-family: $font-inconsolata;
-    border-bottom-left-radius: 3px;
-    border-bottom-right-radius: 3px;
-    border: 1px solid #252525;
-    background: $color-black;
+    border-bottom-left-radius: $border-radius-xs;
+    border-bottom-right-radius: $border-radius-xs;
+    @include border(#252525);
+    background: $color-black-background;
     color: $color-white;
     min-height: 220px;
     line-height: 130%;
