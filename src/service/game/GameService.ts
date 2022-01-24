@@ -333,7 +333,7 @@ async function givePlayerItem(itemName: string) {
       return response.json();
     })
     .then((jsonData) => {
-      playSound("collect", 0.05);
+      playSound("collect", 0.01);
       const inventory: Item[] = jsonData;
       setInventory(inventory);
     })
