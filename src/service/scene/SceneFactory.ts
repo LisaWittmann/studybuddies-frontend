@@ -44,7 +44,7 @@ function createScene(debug = false): THREE.Scene {
   //CONTROLS-----------------
   orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.enableZoom = false;
-  orbitControls.enablePan = true;
+  orbitControls.enablePan = false;
   orbitControls.target = new THREE.Vector3().copy(camera.position);
   orbitControls.update();
   orbitControls.addEventListener("end", () => {
