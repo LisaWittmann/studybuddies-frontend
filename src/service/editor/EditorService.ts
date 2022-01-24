@@ -444,7 +444,7 @@ async function saveLabyrinth(): Promise<string> {
       throw new Error(response.statusText);
     } else if (!response.ok) {
       editorState.errorMessage =
-        "Labyrinth ist invalide. Bitte prüfe es erneut";
+        "Ungültige Konfiguration oder Sonderzeichen im Namen";
       throw new Error(response.statusText);
     }
     return response.text();
