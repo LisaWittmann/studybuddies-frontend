@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onBeforeUnmount, onMounted } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useGameService } from "@/service/game/GameService";
 import { useGameStore } from "@/service/game/GameStore";
@@ -50,7 +50,7 @@ export default defineComponent({
     OverlayConversationComponent,
   },
   setup(_, { emit }) {
-    const { gameState, updateGameData, setLobbyKey } = useGameStore();
+    const { gameState, updateGameData } = useGameStore();
     const {
       gameEventMessage,
       toggleEventMessage,
@@ -88,6 +88,10 @@ export default defineComponent({
         emit("volume", 0.1);
         updateGameData();
       }
+    });
+
+    onBeforeUnmount(() => {
+      emit("volume", 0.006);
     });
 
     return {
