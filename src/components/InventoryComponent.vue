@@ -108,38 +108,35 @@ export default defineComponent({
   box-sizing: border-box;
   display: grid;
 
-    .inventory-button {
-      box-shadow: none;
-      border: none;
-      z-index: 11;
-      background-position: left;
-      display: inline-block;
-      height: 100%;
-      padding: 0;
-    }
+  .inventory-button {
+    box-shadow: none;
+    border: none;
+    z-index: 11;
+    background-position: left;
+    display: inline-block;
+    height: 100%;
+    padding: 0;
+  }
 
-    .inventory-box {
-      height: 100%;
-      width: 100%;
-      z-index: 10;
-      left: 0;
-      top: 0;
-      transform-origin: top;
-      overflow: scroll;
+  .inventory-box {
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    transform-origin: top;
+    overflow: scroll;
+    scrollbar-width: none;
+
+    .inventory-items {
+      user-select: none;
+      overflow-y: scroll;
+      max-height: -webkit-fill-available;
+      direction: rtl;
       scrollbar-width: none;
-
-
-      .inventory-items {
-        user-select: none;
-        overflow-y: scroll;
-        max-height: -webkit-fill-available;
-        direction: rtl;
-        scrollbar-width: none;
-
-      }
     }
+  }
 }
-
 
 .inventory-item-box {
   display: flex;
