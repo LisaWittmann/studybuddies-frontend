@@ -130,6 +130,7 @@ export default defineComponent({
       left: 0;
       top: 0;
       transform-origin: top;
+      overflow: scroll;
 
 
       .inventory-items {
