@@ -131,6 +131,7 @@ export default defineComponent({
       top: 0;
       transform-origin: top;
       overflow: scroll;
+      scrollbar-width: none;
 
 
       .inventory-items {
@@ -138,6 +139,8 @@ export default defineComponent({
         overflow-y: scroll;
         max-height: -webkit-fill-available;
         direction: rtl;
+        scrollbar-width: none;
+
       }
     }
 }
@@ -156,6 +159,7 @@ export default defineComponent({
 .inventory-item-box:first-child {
   margin-top: 0;
 }
+
 
 
 /*SCROLLBAR----*/
