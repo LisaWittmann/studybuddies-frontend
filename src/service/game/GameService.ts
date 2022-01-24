@@ -240,7 +240,7 @@ async function clickItem(modelName: string, itemId: number) {
           break;
       }
     }
-    setTimeout(() => (clickedItem = false), 1000);
+    setTimeout(() => (clickedItem = false), 500);
   }
 }
 
