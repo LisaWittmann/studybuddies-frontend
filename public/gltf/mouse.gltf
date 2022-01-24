@@ -1,7 +1,7 @@
 {
   "accessors": [
     {
-      "name": "mouse-Mesh_0_indices",
+      "name": "mouse_mouse_aiStandardSurface9SG_1_0_indices",
       "componentType": 5123,
       "count": 4866,
       "min": [
@@ -13,7 +13,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "mouse-Mesh_0_positions",
+      "name": "mouse_mouse_aiStandardSurface9SG_1_0_positions",
       "componentType": 5126,
       "count": 829,
       "min": [
@@ -29,7 +29,7 @@
       "type": "VEC3"
     },
     {
-      "name": "mouse-Mesh_0_normals",
+      "name": "mouse_mouse_aiStandardSurface9SG_1_0_normals",
       "componentType": 5126,
       "count": 829,
       "min": [
@@ -45,7 +45,7 @@
       "type": "VEC3"
     },
     {
-      "name": "mouse-Mesh_0_texcoords",
+      "name": "mouse_mouse_aiStandardSurface9SG_1_0_texcoords",
       "componentType": 5126,
       "count": 829,
       "min": [
@@ -59,7 +59,7 @@
       "type": "VEC2"
     },
     {
-      "name": "mouse-Mesh_1_indices",
+      "name": "mouse_mouse_aiStandardSurface6SG_1_0_indices",
       "componentType": 5123,
       "count": 3426,
       "min": [
@@ -71,7 +71,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "mouse-Mesh_1_positions",
+      "name": "mouse_mouse_aiStandardSurface6SG_1_0_positions",
       "componentType": 5126,
       "count": 1516,
       "min": [
@@ -87,7 +87,7 @@
       "type": "VEC3"
     },
     {
-      "name": "mouse-Mesh_1_normals",
+      "name": "mouse_mouse_aiStandardSurface6SG_1_0_normals",
       "componentType": 5126,
       "count": 1516,
       "min": [
@@ -103,7 +103,7 @@
       "type": "VEC3"
     },
     {
-      "name": "mouse-Mesh_1_texcoords",
+      "name": "mouse_mouse_aiStandardSurface6SG_1_0_texcoords",
       "componentType": 5126,
       "count": 1516,
       "min": [
@@ -117,7 +117,7 @@
       "type": "VEC2"
     },
     {
-      "name": "mouse-Mesh_2_indices",
+      "name": "mouse_mouse_aiStandardSurface7SG_1_0_indices",
       "componentType": 5123,
       "count": 1764,
       "min": [
@@ -129,7 +129,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "mouse-Mesh_2_positions",
+      "name": "mouse_mouse_aiStandardSurface7SG_1_0_positions",
       "componentType": 5126,
       "count": 729,
       "min": [
@@ -145,7 +145,7 @@
       "type": "VEC3"
     },
     {
-      "name": "mouse-Mesh_2_normals",
+      "name": "mouse_mouse_aiStandardSurface7SG_1_0_normals",
       "componentType": 5126,
       "count": 729,
       "min": [
@@ -161,7 +161,7 @@
       "type": "VEC3"
     },
     {
-      "name": "mouse-Mesh_2_texcoords",
+      "name": "mouse_mouse_aiStandardSurface7SG_1_0_texcoords",
       "componentType": 5126,
       "count": 729,
       "min": [
@@ -175,7 +175,7 @@
       "type": "VEC2"
     },
     {
-      "name": "mouse-Mesh_3_indices",
+      "name": "mouse_mouse_aiStandardSurface3SG_1_0_indices",
       "componentType": 5123,
       "count": 2400,
       "min": [
@@ -187,7 +187,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "mouse-Mesh_3_positions",
+      "name": "mouse_mouse_aiStandardSurface3SG_1_0_positions",
       "componentType": 5126,
       "count": 654,
       "min": [
@@ -203,7 +203,7 @@
       "type": "VEC3"
     },
     {
-      "name": "mouse-Mesh_3_normals",
+      "name": "mouse_mouse_aiStandardSurface3SG_1_0_normals",
       "componentType": 5126,
       "count": 654,
       "min": [
@@ -219,7 +219,7 @@
       "type": "VEC3"
     },
     {
-      "name": "mouse-Mesh_3_texcoords",
+      "name": "mouse_mouse_aiStandardSurface3SG_1_0_texcoords",
       "componentType": 5126,
       "count": 654,
       "min": [
@@ -233,7 +233,7 @@
       "type": "VEC2"
     },
     {
-      "name": "mouse-Mesh_4_indices",
+      "name": "mouse_mouse_aiStandardSurface2SG_1_0_indices",
       "componentType": 5123,
       "count": 2358,
       "min": [
@@ -245,7 +245,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "mouse-Mesh_4_positions",
+      "name": "mouse_mouse_aiStandardSurface2SG_1_0_positions",
       "componentType": 5126,
       "count": 1700,
       "min": [
@@ -261,7 +261,7 @@
       "type": "VEC3"
     },
     {
-      "name": "mouse-Mesh_4_normals",
+      "name": "mouse_mouse_aiStandardSurface2SG_1_0_normals",
       "componentType": 5126,
       "count": 1700,
       "min": [
@@ -277,7 +277,7 @@
       "type": "VEC3"
     },
     {
-      "name": "mouse-Mesh_4_texcoords",
+      "name": "mouse_mouse_aiStandardSurface2SG_1_0_texcoords",
       "componentType": 5126,
       "count": 1700,
       "min": [
@@ -433,7 +433,7 @@
   ],
   "meshes": [
     {
-      "name": "mouse-Mesh",
+      "name": "mouse_mouse_aiStandardSurface9SG_1",
       "primitives": [
         {
           "attributes": {
@@ -454,7 +454,12 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "mouse_mouse_aiStandardSurface6SG_1",
+      "primitives": [
         {
           "attributes": {
             "POSITION": 5,
@@ -474,7 +479,12 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "mouse_mouse_aiStandardSurface7SG_1",
+      "primitives": [
         {
           "attributes": {
             "POSITION": 9,
@@ -494,7 +504,12 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "mouse_mouse_aiStandardSurface3SG_1",
+      "primitives": [
         {
           "attributes": {
             "POSITION": 13,
@@ -514,7 +529,12 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "mouse_mouse_aiStandardSurface2SG_1",
+      "primitives": [
         {
           "attributes": {
             "POSITION": 17,
@@ -540,15 +560,35 @@
   ],
   "nodes": [
     {
-      "name": "mouse",
+      "name": "mouse_mouse_aiStandardSurface9SG",
       "mesh": 0
+    },
+    {
+      "name": "mouse_mouse_aiStandardSurface6SG",
+      "mesh": 1
+    },
+    {
+      "name": "mouse_mouse_aiStandardSurface7SG",
+      "mesh": 2
+    },
+    {
+      "name": "mouse_mouse_aiStandardSurface3SG",
+      "mesh": 3
+    },
+    {
+      "name": "mouse_mouse_aiStandardSurface2SG",
+      "mesh": 4
     }
   ],
   "scene": 0,
   "scenes": [
     {
       "nodes": [
-        0
+        0,
+        1,
+        2,
+        3,
+        4
       ]
     }
   ],

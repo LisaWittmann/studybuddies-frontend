@@ -13,17 +13,17 @@ import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
-const modelPath = (fileName: string) => {
-  return `/models/${fileName}.obj`;
-};
+// const modelPath = (fileName: string) => {
+//   return `/models/${fileName}.obj`;
+// };
 
-const modelPath2 = (fileName: string) => {
+const modelPath = (fileName: string) => {
   return `/gltf/${fileName}.gltf`;
 };
 
-const materialPath = (fileName: string) => {
-  return `/materials/${fileName}.mtl`;
-};
+// const materialPath = (fileName: string) => {
+//   return `/materials/${fileName}.mtl`;
+// };
 
 const texturePath = (fileName: string) => {
   return require(`@/assets/img/textures/${fileName}-texture.png`);
@@ -50,9 +50,7 @@ async function createItem(
   dracoLoader.preload();
   gltfLoader.setDRACOLoader(dracoLoader);
 
-  console.log("createItem modelPath2: ", modelPath2(model));
-
-  return gltfLoader.loadAsync(modelPath2(model)).then((object) => {
+  return gltfLoader.loadAsync(modelPath(model)).then((object) => {
     object.scene.position.copy(item.calcPositionInRoom().add(tilePosition));
     //get object size before rotation
     const box = new THREE.Box3().setFromObject(object.scene);
@@ -261,22 +259,28 @@ async function createArrow(
   orientation: Orientation
 ) {
   const arrow = new Arrow(orientation, tilePosition);
-  const objLoader = new OBJLoader();
-  return objLoader.loadAsync(modelPath(arrow.modelName)).then((object) => {
-    object.position.copy(arrow.position());
-    object.userData.orientation = arrow.orientation;
-    object.userData.showInView = true;
-    object.rotateY(arrow.rotationY());
-    object.visible = false;
-    object.traverse((child) => {
+  const gltfLoader = new GLTFLoader();
+  const dracoLoader = new DRACOLoader();
+
+  dracoLoader.setDecoderPath(`/decoder/`);
+  dracoLoader.preload();
+  gltfLoader.setDRACOLoader(dracoLoader);
+
+  return gltfLoader.loadAsync(modelPath(arrow.modelName)).then((object) => {
+    object.scene.position.copy(arrow.position());
+    object.scene.userData.orientation = arrow.orientation;
+    object.scene.userData.showInView = true;
+    object.scene.rotateY(arrow.rotationY());
+    object.scene.visible = false;
+    object.scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.material = new THREE.MeshLambertMaterial({
           color: arrow.color,
         });
       }
     });
-    object.name = arrow.modelName;
-    tileModel.add(object);
+    object.scene.name = arrow.modelName;
+    tileModel.add(object.scene);
   });
 }
 
@@ -301,24 +305,25 @@ async function createPlayer(
       model += "-hacker";
       break;
   }
-  const objLoader = new OBJLoader();
-  const mtlLoader = new MTLLoader();
-  return mtlLoader.loadAsync(materialPath(model)).then((materials) => {
-    materials.preload();
-    objLoader.setMaterials(materials);
-    objLoader.loadAsync(modelPath(model)).then((object) => {
-      object.name = player.getUsername();
-      object.position.copy(tilePosition);
-      object.rotateY(90);
-      const newPos = checkIntersect(
-        object,
-        player.getPosition(),
-        tilePosition,
-        parent
-      );
-      object.position.copy(newPos);
-      parent.add(object);
-    });
+  const gltfLoader = new GLTFLoader();
+  const dracoLoader = new DRACOLoader();
+
+  dracoLoader.setDecoderPath(`/decoder/`);
+  dracoLoader.preload();
+  gltfLoader.setDRACOLoader(dracoLoader);
+
+  return gltfLoader.loadAsync(modelPath(model)).then((object) => {
+    object.scene.name = player.getUsername();
+    object.scene.position.copy(tilePosition);
+    object.scene.rotateY(90);
+    const newPos = checkIntersect(
+      object.scene,
+      player.getPosition(),
+      tilePosition,
+      parent
+    );
+    object.scene.position.copy(newPos);
+    parent.add(object.scene);
   });
 }
 

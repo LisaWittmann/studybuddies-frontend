@@ -1,7 +1,7 @@
 {
   "accessors": [
     {
-      "name": "tablet-Mesh_0_indices",
+      "name": "tablet_tablet_bod_1_0_indices",
       "componentType": 5123,
       "count": 12894,
       "min": [
@@ -13,7 +13,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "tablet-Mesh_0_positions",
+      "name": "tablet_tablet_bod_1_0_positions",
       "componentType": 5126,
       "count": 4477,
       "min": [
@@ -29,7 +29,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_0_normals",
+      "name": "tablet_tablet_bod_1_0_normals",
       "componentType": 5126,
       "count": 4477,
       "min": [
@@ -45,7 +45,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_0_texcoords",
+      "name": "tablet_tablet_bod_1_0_texcoords",
       "componentType": 5126,
       "count": 4477,
       "min": [
@@ -59,7 +59,7 @@
       "type": "VEC2"
     },
     {
-      "name": "tablet-Mesh_1_indices",
+      "name": "tablet_tablet_sc.001_1_0_indices",
       "componentType": 5123,
       "count": 1695,
       "min": [
@@ -71,7 +71,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "tablet-Mesh_1_positions",
+      "name": "tablet_tablet_sc.001_1_0_positions",
       "componentType": 5126,
       "count": 633,
       "min": [
@@ -87,7 +87,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_1_normals",
+      "name": "tablet_tablet_sc.001_1_0_normals",
       "componentType": 5126,
       "count": 633,
       "min": [
@@ -103,7 +103,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_1_texcoords",
+      "name": "tablet_tablet_sc.001_1_0_texcoords",
       "componentType": 5126,
       "count": 633,
       "min": [
@@ -117,7 +117,7 @@
       "type": "VEC2"
     },
     {
-      "name": "tablet-Mesh_2_indices",
+      "name": "tablet_tablet_TabletMaterial.001_1_0_indices",
       "componentType": 5123,
       "count": 111,
       "min": [
@@ -129,7 +129,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "tablet-Mesh_2_positions",
+      "name": "tablet_tablet_TabletMaterial.001_1_0_positions",
       "componentType": 5126,
       "count": 39,
       "min": [
@@ -145,7 +145,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_2_normals",
+      "name": "tablet_tablet_TabletMaterial.001_1_0_normals",
       "componentType": 5126,
       "count": 39,
       "min": [
@@ -161,7 +161,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_2_texcoords",
+      "name": "tablet_tablet_TabletMaterial.001_1_0_texcoords",
       "componentType": 5126,
       "count": 39,
       "min": [
@@ -175,7 +175,7 @@
       "type": "VEC2"
     },
     {
-      "name": "tablet-Mesh_3_indices",
+      "name": "tablet_tablet_scre_1_0_indices",
       "componentType": 5123,
       "count": 738,
       "min": [
@@ -187,7 +187,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "tablet-Mesh_3_positions",
+      "name": "tablet_tablet_scre_1_0_positions",
       "componentType": 5126,
       "count": 248,
       "min": [
@@ -203,7 +203,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_3_normals",
+      "name": "tablet_tablet_scre_1_0_normals",
       "componentType": 5126,
       "count": 248,
       "min": [
@@ -219,7 +219,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_3_texcoords",
+      "name": "tablet_tablet_scre_1_0_texcoords",
       "componentType": 5126,
       "count": 248,
       "min": [
@@ -233,7 +233,7 @@
       "type": "VEC2"
     },
     {
-      "name": "tablet-Mesh_4_indices",
+      "name": "tablet_tablet_bod.001_1_0_indices",
       "componentType": 5123,
       "count": 2346,
       "min": [
@@ -245,7 +245,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "tablet-Mesh_4_positions",
+      "name": "tablet_tablet_bod.001_1_0_positions",
       "componentType": 5126,
       "count": 557,
       "min": [
@@ -261,7 +261,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_4_normals",
+      "name": "tablet_tablet_bod.001_1_0_normals",
       "componentType": 5126,
       "count": 557,
       "min": [
@@ -277,7 +277,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_4_texcoords",
+      "name": "tablet_tablet_bod.001_1_0_texcoords",
       "componentType": 5126,
       "count": 557,
       "min": [
@@ -291,7 +291,7 @@
       "type": "VEC2"
     },
     {
-      "name": "tablet-Mesh_5_indices",
+      "name": "tablet_tablet_bod.002_1_0_indices",
       "componentType": 5123,
       "count": 288,
       "min": [
@@ -303,7 +303,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "tablet-Mesh_5_positions",
+      "name": "tablet_tablet_bod.002_1_0_positions",
       "componentType": 5126,
       "count": 101,
       "min": [
@@ -319,7 +319,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_5_normals",
+      "name": "tablet_tablet_bod.002_1_0_normals",
       "componentType": 5126,
       "count": 101,
       "min": [
@@ -335,7 +335,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_5_texcoords",
+      "name": "tablet_tablet_bod.002_1_0_texcoords",
       "componentType": 5126,
       "count": 101,
       "min": [
@@ -349,7 +349,7 @@
       "type": "VEC2"
     },
     {
-      "name": "tablet-Mesh_6_indices",
+      "name": "tablet_tablet_wirles_1_0_indices",
       "componentType": 5123,
       "count": 270,
       "min": [
@@ -361,7 +361,7 @@
       "type": "SCALAR"
     },
     {
-      "name": "tablet-Mesh_6_positions",
+      "name": "tablet_tablet_wirles_1_0_positions",
       "componentType": 5126,
       "count": 96,
       "min": [
@@ -377,7 +377,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_6_normals",
+      "name": "tablet_tablet_wirles_1_0_normals",
       "componentType": 5126,
       "count": 96,
       "min": [
@@ -393,7 +393,7 @@
       "type": "VEC3"
     },
     {
-      "name": "tablet-Mesh_6_texcoords",
+      "name": "tablet_tablet_wirles_1_0_texcoords",
       "componentType": 5126,
       "count": 96,
       "min": [
@@ -599,7 +599,7 @@
   ],
   "meshes": [
     {
-      "name": "tablet-Mesh",
+      "name": "tablet_tablet_bod_1",
       "primitives": [
         {
           "attributes": {
@@ -620,7 +620,12 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "tablet_tablet_sc.001_1",
+      "primitives": [
         {
           "attributes": {
             "POSITION": 5,
@@ -640,7 +645,12 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "tablet_tablet_TabletMaterial.001_1",
+      "primitives": [
         {
           "attributes": {
             "POSITION": 9,
@@ -660,7 +670,12 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "tablet_tablet_scre_1",
+      "primitives": [
         {
           "attributes": {
             "POSITION": 13,
@@ -680,7 +695,12 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "tablet_tablet_bod.001_1",
+      "primitives": [
         {
           "attributes": {
             "POSITION": 17,
@@ -700,7 +720,12 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "tablet_tablet_bod.002_1",
+      "primitives": [
         {
           "attributes": {
             "POSITION": 21,
@@ -720,7 +745,12 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "tablet_tablet_wirles_1",
+      "primitives": [
         {
           "attributes": {
             "POSITION": 25,
@@ -746,15 +776,45 @@
   ],
   "nodes": [
     {
-      "name": "tablet",
+      "name": "tablet_tablet_bod",
       "mesh": 0
+    },
+    {
+      "name": "tablet_tablet_sc.001",
+      "mesh": 1
+    },
+    {
+      "name": "tablet_tablet_TabletMaterial.001",
+      "mesh": 2
+    },
+    {
+      "name": "tablet_tablet_scre",
+      "mesh": 3
+    },
+    {
+      "name": "tablet_tablet_bod.001",
+      "mesh": 4
+    },
+    {
+      "name": "tablet_tablet_bod.002",
+      "mesh": 5
+    },
+    {
+      "name": "tablet_tablet_wirles",
+      "mesh": 6
     }
   ],
   "scene": 0,
   "scenes": [
     {
       "nodes": [
-        0
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
       ]
     }
   ],
