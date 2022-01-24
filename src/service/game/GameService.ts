@@ -11,6 +11,9 @@ import { Item } from "@/service/labyrinth/Item";
 const { gameState, setInventory, resetGameState, setStarted } = useGameStore();
 const { exitLobby } = useLobbyService();
 
+const audioPath = (name: string) => require(`@/assets/sounds/${name}.mp3`);
+const sound = new Audio();
+
 const lobbyKey = computed(() => gameState.lobbyKey);
 const playerName = computed(() => gameState.mainPlayer.username);
 
@@ -75,6 +78,11 @@ function endConversation() {
   conversation.visible = false;
   conversation.message = new Message("", "", undefined, []);
   conversation.character = "";
+}
+
+function playSound(name: string) {
+  sound.src = audioPath(name);
+  sound.play();
 }
 
 /**
@@ -153,8 +161,13 @@ async function checkAccess(modelName: string) {
     })
     .then((jsonData) => {
       let state = "success";
-      if (jsonData.firstAccess) updateInventory();
-      else if (!jsonData.access) state = "warning";
+      if (jsonData.firstAccess) {
+        playSound("access");
+        updateInventory();
+      } else if (!jsonData.access) {
+        state = "warning";
+        playSound("access-denied");
+      }
       setGameEvent(jsonData.accessText, state);
     })
     .catch((error) => {
@@ -262,6 +275,7 @@ async function addToInventory(itemId: number) {
       return response.json();
     })
     .then((jsonData) => {
+      playSound("collect");
       const inventory: Item[] = jsonData;
       setInventory(inventory);
       removeItemFromLabyrinth(itemId);
@@ -292,6 +306,9 @@ async function updateInventory() {
     })
     .then((jsonData) => {
       const inventory: Item[] = jsonData;
+      if (inventory.length > gameState.mainPlayer.getInventory().length) {
+        playSound("collect");
+      }
       setInventory(inventory);
     })
     .catch((error) => {
@@ -316,6 +333,7 @@ async function givePlayerItem(itemName: string) {
       return response.json();
     })
     .then((jsonData) => {
+      playSound("collect");
       const inventory: Item[] = jsonData;
       setInventory(inventory);
     })

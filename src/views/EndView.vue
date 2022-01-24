@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onBeforeUnmount, onMounted } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/lobby/LobbyService";
@@ -54,7 +54,7 @@ import router from "@/router";
 
 export default defineComponent({
   name: "EndView",
-  setup() {
+  setup(_, { emit }) {
     const { exitLobby } = useLobbyService();
     const { gameState } = useGameStore();
     const header = computed(() => {
@@ -70,8 +70,15 @@ export default defineComponent({
 
     onMounted(() => {
       const route = router.currentRoute.value;
-      if (gameState.lobbyKey != (route.params.key as string))
+      if (gameState.lobbyKey != (route.params.key as string)) {
         router.push("/find");
+      } else {
+        emit("music", "outro");
+      }
+    });
+
+    onBeforeUnmount(() => {
+      emit("pause");
     });
 
     return { header };

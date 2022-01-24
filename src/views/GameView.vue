@@ -85,13 +85,13 @@ export default defineComponent({
       if (gameState.lobbyKey != (route.params.key as string))
         router.push("/find");
       else {
-        emit("volume", 0.1);
+        emit("music", "background");
         updateGameData();
       }
     });
 
     onBeforeUnmount(() => {
-      emit("volume", 0.006);
+      emit("pause");
     });
 
     return {
