@@ -50,7 +50,7 @@ export default defineComponent({
     OverlayConversationComponent,
   },
   setup() {
-    const { gameState, updateGameData, setLobbyKey } = useGameStore();
+    const { gameState, updateGameData } = useGameStore();
     const {
       gameEventMessage,
       toggleEventMessage,

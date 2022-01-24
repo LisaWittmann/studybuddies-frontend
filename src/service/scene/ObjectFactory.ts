@@ -111,7 +111,7 @@ async function createFloor(
   object.rotateX(radians(90));
   object.name = "floor";
   tileModel.add(object);
-  }
+}
 
 /**
  * creates plane representing tile's ceiling
