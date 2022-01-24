@@ -1,6 +1,6 @@
 <template>
   <audio hidden loop ref="music"></audio>
-  <router-view @music="setMusic" @volume="setVolume" />
+  <router-view @music="setMusic" @volume="setVolume" @pause="pause" />
   <LoadingComponent v-if="loading" />
   <OverlayFeedbackComponent
     :opened="feedback.opened"
@@ -34,7 +34,6 @@ export default defineComponent({
     const music = ref({} as HTMLAudioElement);
     const audioPath = (name: string) => require(`@/assets/sounds/${name}.mp3`);
 
-    const play = () => music.value.play();
     const pause = () => music.value.pause();
 
     const setVolume = (volume: number) => (music.value.volume = volume);
@@ -50,7 +49,6 @@ export default defineComponent({
       feedback,
       resetFeedback,
       music,
-      play,
       pause,
       setVolume,
       setMusic,
