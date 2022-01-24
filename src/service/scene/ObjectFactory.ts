@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import { DoubleSide, Texture, TextureLoader } from "three";
 
 import { Item } from "@/service/labyrinth/Item";
@@ -9,23 +10,21 @@ import { PartnerPlayer, Role } from "@/service/game/Player";
 
 import { settings, factors } from "@/service/scene/helper/SceneConstants";
 import { baseline, radians } from "@/service/scene/helper/GeometryHelper";
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
-
-// const modelPath = (fileName: string) => {
-//   return `/models/${fileName}.obj`;
-// };
 
 const modelPath = (fileName: string) => {
   return `/gltf/${fileName}.gltf`;
 };
 
-// const materialPath = (fileName: string) => {
-//   return `/materials/${fileName}.mtl`;
-// };
-
 const texturePath = (fileName: string) => {
   return require(`@/assets/img/textures/${fileName}-texture.png`);
 };
+
+const gltfLoader = new GLTFLoader();
+const dracoLoader = new DRACOLoader();
+
+dracoLoader.setDecoderPath("/decoder/");
+dracoLoader.preload();
+gltfLoader.setDRACOLoader(dracoLoader);
 
 /**
  * creates item by loading its obj representation from models directory
@@ -41,12 +40,6 @@ async function createItem(
   const model = item.modelName.toLowerCase();
   let factor = 1;
   const size = new THREE.Vector3();
-  const gltfLoader = new GLTFLoader();
-  const dracoLoader = new DRACOLoader();
-
-  dracoLoader.setDecoderPath(`/decoder/`);
-  dracoLoader.preload();
-  gltfLoader.setDRACOLoader(dracoLoader);
 
   return gltfLoader.loadAsync(modelPath(model)).then((object) => {
     object.scene.position.copy(item.calcPositionInRoom().add(tilePosition));
@@ -257,13 +250,6 @@ async function createArrow(
   orientation: Orientation
 ) {
   const arrow = new Arrow(orientation, tilePosition);
-  const gltfLoader = new GLTFLoader();
-  const dracoLoader = new DRACOLoader();
-
-  dracoLoader.setDecoderPath(`/decoder/`);
-  dracoLoader.preload();
-  gltfLoader.setDRACOLoader(dracoLoader);
-
   return gltfLoader.loadAsync(modelPath(arrow.modelName)).then((object) => {
     object.scene.position.copy(arrow.position());
     object.scene.userData.orientation = arrow.orientation;
@@ -303,13 +289,6 @@ async function createPlayer(
       model += "-hacker";
       break;
   }
-  const gltfLoader = new GLTFLoader();
-  const dracoLoader = new DRACOLoader();
-
-  dracoLoader.setDecoderPath(`/decoder/`);
-  dracoLoader.preload();
-  gltfLoader.setDRACOLoader(dracoLoader);
-
   return gltfLoader.loadAsync(modelPath(model)).then((object) => {
     object.scene.name = player.getUsername();
     object.scene.position.copy(tilePosition);
