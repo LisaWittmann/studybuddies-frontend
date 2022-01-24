@@ -1,6 +1,4 @@
 import * as THREE from "three";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DoubleSide, Texture, TextureLoader } from "three";
 
