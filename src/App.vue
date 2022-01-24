@@ -1,5 +1,6 @@
 <template>
-  <router-view />
+  <audio hidden loop ref="music"></audio>
+  <router-view @music="setMusic" @volume="setVolume" @pause="pause" />
   <LoadingComponent v-if="loading" />
   <OverlayFeedbackComponent
     :opened="feedback.opened"
@@ -13,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, onMounted, ref } from "vue";
 import { useLoginService } from "@/service/login/LoginService";
 import { useAppService } from "@/service/AppService";
 
@@ -30,7 +31,28 @@ export default defineComponent({
     const loading = computed(() => globalState.loading);
     const feedback = computed(() => feedbackState);
 
-    return { loading, feedback, resetFeedback };
+    const music = ref({} as HTMLAudioElement);
+    const audioPath = (name: string) => require(`@/assets/sounds/${name}.mp3`);
+
+    const pause = () => music.value.pause();
+
+    const setVolume = (volume: number) => (music.value.volume = volume);
+    const setMusic = (name: string) => {
+      music.value.src = audioPath(name);
+      music.value.play();
+    };
+
+    onMounted(() => setVolume(0.05));
+
+    return {
+      loading,
+      feedback,
+      resetFeedback,
+      music,
+      pause,
+      setVolume,
+      setMusic,
+    };
   },
 });
 </script>
