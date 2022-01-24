@@ -96,7 +96,7 @@ async function download(labyrinthName: string) {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = labyrinthName + ".json";
+      a.download = labyrinthName + ".JSON";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -239,7 +239,6 @@ async function getRoleOptions() {
 
 /**
  * send request to get all current users by username in lobby
- * @param lobbyKey: identifying key for lobby in which users should be requested
  * @returns promise of type void
  * @throws error if request was not successful
  */
@@ -287,7 +286,7 @@ async function updateReadyStates() {
           .filter((user) =>
             jsonData.some((username: string) => username == user.username)
           )
-          .map((user) => user.setReady(true));
+          .forEach((user) => user.setReady(true));
       })
       .catch((error) => {
         console.error(error);
@@ -365,8 +364,6 @@ function getLabyrinthSelection() {
 /**
  * sends a List of two Arguments to the BE, so there can be checked, whether every Player is ready or not
  * (and reacts to a wrong respond after receiving it)
- * @param username name of the user in the backend, which shall be taken out of the lobby
- * @param labName name of the blueprint labyrinth, used for the Game Progression
  */
 function readyCheck() {
   if (!lobbyState.selectedLabyrinthName || !lobbyState.selectedRole) return;
