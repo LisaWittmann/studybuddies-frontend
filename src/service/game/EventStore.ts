@@ -122,6 +122,7 @@ stompClient.onConnect = () => {
                 );
               } else {
                 updateUsers();
+                getRoleOptions();
               }
               break;
             case Update.ROLE:
