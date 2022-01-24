@@ -163,7 +163,6 @@ async function checkAccess(modelName: string) {
     .then((jsonData) => {
       let state = "success";
       if (jsonData.firstAccess) {
-        playSound("access");
         updateInventory();
       } else if (!jsonData.access) {
         state = "warning";
@@ -418,5 +417,6 @@ export function useGameService() {
     tradeItem,
     endGame,
     forceGameEnd,
+    playSound,
   };
 }

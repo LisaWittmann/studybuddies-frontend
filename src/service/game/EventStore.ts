@@ -9,7 +9,7 @@ import { useLobbyService } from "@/service/lobby/LobbyService";
 import router from "@/router";
 
 const { setFeedback } = useAppService();
-const { updateInventory, endGame } = useGameService();
+const { updateInventory, endGame, playSound } = useGameService();
 const { gameState, updatePlayerData, updateGameData, setError, setScore } =
   useGameStore();
 const {
@@ -76,6 +76,7 @@ stompClient.onConnect = () => {
           break;
         case Operation.ACCESS:
           setScore(Number(eventMessage.data));
+          playSound("access");
           break;
         case Operation.READY:
           if (
