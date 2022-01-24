@@ -1,4 +1,5 @@
 import { computed, reactive, readonly } from "vue";
+
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/lobby/LobbyService";
 
@@ -13,8 +14,10 @@ const { exitLobby } = useLobbyService();
 const lobbyKey = computed(() => gameState.lobbyKey);
 const playerName = computed(() => gameState.mainPlayer.username);
 
-const lobbyAPI = "/api/lobby";
+const gameAPI = "/api/game";
 const bodyAPI = "/api/body";
+
+let clickedItem = false;
 
 const gameEventMessage = reactive({
   message: "",
@@ -86,7 +89,7 @@ async function movePlayer(orientation: Orientation) {
     playerName.value,
     Orientation[orientation]
   );
-  fetch(`${lobbyAPI}/move`, {
+  fetch(`${gameAPI}/move`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -139,7 +142,7 @@ async function checkAccess(modelName: string) {
     playerName.value,
     modelName.toUpperCase()
   );
-  fetch(`${lobbyAPI}/access`, {
+  fetch(`${gameAPI}/access`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -171,7 +174,7 @@ async function checkEndGame(modelName: string) {
     playerName.value,
     modelName.toUpperCase()
   );
-  fetch(`${lobbyAPI}/end`, {
+  fetch(`${gameAPI}/end`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -213,31 +216,32 @@ async function checkEndGame(modelName: string) {
  * @param modelName name of clicked item
  * @param itemId contains id of clicked body
  */
+
 async function clickItem(modelName: string, itemId: number) {
-  fetch(`${lobbyAPI}/click/` + modelName, { method: "GET" })
-    .then((response) => {
-      if (!response.ok) throw new Error(response.statusText);
-      return response.json();
-    })
-    .then((jsonData) => {
+  if (!clickedItem) {
+    clickedItem = true;
+    const response = await fetch(`${gameAPI}/click/` + modelName, {
+      method: "GET",
+    });
+    const jsonData = await response.json();
+    if (jsonData) {
       switch ((<any>Operation)[jsonData]) {
         case Operation.ACCESS:
-          checkAccess(modelName);
+          await checkAccess(modelName);
           break;
         case Operation.CONVERSATION:
           startConversation(modelName);
           break;
         case Operation.COLLECT:
-          addToInventory(itemId);
+          await addToInventory(itemId);
           break;
         case Operation.CHECK_END:
-          checkEndGame(modelName);
+          await checkEndGame(modelName);
           break;
       }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+    }
+    setTimeout(() => (clickedItem = false), 1000);
+  }
 }
 
 /**
@@ -247,7 +251,7 @@ async function clickItem(modelName: string, itemId: number) {
  */
 async function addToInventory(itemId: number) {
   fetch(
-    `${lobbyAPI}/${lobbyKey.value}/username/${playerName.value}/item/${itemId}`,
+    `${gameAPI}/${lobbyKey.value}/username/${playerName.value}/item/${itemId}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -277,7 +281,7 @@ async function updateInventory() {
     playerName.value,
     Update[Update.INVENTORY]
   );
-  fetch(`${lobbyAPI}/current-inventory`, {
+  fetch(`${gameAPI}/current-inventory`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventMessage),
@@ -301,7 +305,7 @@ async function updateInventory() {
  */
 async function givePlayerItem(itemName: string) {
   fetch(
-    `${lobbyAPI}/${lobbyKey.value}/username/${playerName.value}/give/item/${itemName}`,
+    `${gameAPI}/${lobbyKey.value}/username/${playerName.value}/give/item/${itemName}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -325,7 +329,7 @@ async function givePlayerItem(itemName: string) {
  * @param itemId: the id of the item that should be deleted
  */
 async function removeItemFromLabyrinth(itemId: number) {
-  fetch(`${lobbyAPI}/${lobbyKey.value}/item/${itemId}`, {
+  fetch(`${gameAPI}/${lobbyKey.value}/item/${itemId}`, {
     method: "DELETE",
     headers: { "Content-Type": "text/plain" },
   })
@@ -344,7 +348,7 @@ async function removeItemFromLabyrinth(itemId: number) {
  */
 async function tradeItem(itemId: number) {
   fetch(
-    `${lobbyAPI}/${lobbyKey.value}/username/${playerName.value}/trade/item/${itemId}`,
+    `${gameAPI}/${lobbyKey.value}/username/${playerName.value}/trade/item/${itemId}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

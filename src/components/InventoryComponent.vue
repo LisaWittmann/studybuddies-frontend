@@ -1,26 +1,25 @@
 <template>
-<div class="inventory">
-  <button
-    id="invbutton"
-    class="inventory-button"
-    v-bind:class="[isOpen ? 'open' : 'closed']"
-    @click="toggleInventoryButton"
-  ></button>
-  <transition name="slide-fade">
-    <div class="inventory-box" v-if="isOpen">
-      <div class="inventory-items">
-        <div
-          v-for="item of inventory"
-          :key="item.id"
-          class="inventory-item-box"
-        >
-          <InventoryItemEntryComponent :item="item" />
+  <div class="inventory">
+    <button
+      id="invbutton"
+      class="inventory-button"
+      v-bind:class="[isOpen ? 'open' : 'closed']"
+      @click="toggleInventoryButton"
+    ></button>
+    <transition name="slide-fade">
+      <div class="inventory-box" v-if="isOpen">
+        <div class="inventory-items">
+          <div
+            v-for="item of inventory"
+            :key="item.id"
+            class="inventory-item-box"
+          >
+            <InventoryItemEntryComponent :item="item" />
+          </div>
         </div>
       </div>
-    </div>
-  </transition>
-
-</div>
+    </transition>
+  </div>
 </template>
 
 <script lang="ts">
@@ -92,9 +91,6 @@ export default defineComponent({
     left;
 }
 
-
-
-
 /* Animation for opening or closing inventory */
 /* durations and timing functions.            */
 .slide-fade-enter-active {
@@ -111,7 +107,6 @@ export default defineComponent({
   left: 10px;
   box-sizing: border-box;
   display: grid;
-
 
     .inventory-button {
       box-shadow: none;
@@ -146,12 +141,11 @@ export default defineComponent({
 }
 
 
-
 .inventory-item-box {
   display: flex;
   border: 1.5px dashed $color-beige;
   background-color: rgba($color-dark-brown, 0.5);
-  margin: 2rem auto 2rem .2rem;
+  margin: 2rem auto 2rem 0.2rem;
   direction: ltr;
   position: relative;
 }
@@ -159,8 +153,6 @@ export default defineComponent({
 .inventory-item-box:first-child {
   margin-top: 0;
 }
-
-
 
 /*SCROLLBAR----*/
 /* width */
@@ -185,16 +177,15 @@ export default defineComponent({
   border-radius: 2px;
 }
 
-//media-queries 
+//media-queries
 @media (min-width: 1921px) {
   .inventory {
     grid-template-rows: 1fr 6fr;
     width: 10%;
 
-     .inventory-item-box {
+    .inventory-item-box {
       width: 40%;
     }
-
   }
 }
 
@@ -204,9 +195,9 @@ export default defineComponent({
     width: 10%;
   }
 
-     .inventory-item-box {
-      width: 45%;
-    }
+  .inventory-item-box {
+    width: 45%;
+  }
 }
 
 @media (min-width: 1001px) and (max-width: 1500px) {
@@ -214,12 +205,10 @@ export default defineComponent({
     grid-template-rows: 1fr 5fr;
     width: 20%;
 
-
-     .inventory-item-box {
+    .inventory-item-box {
       width: 30%;
     }
   }
-   
 }
 
 @media (max-width: 1000px) {
@@ -228,12 +217,8 @@ export default defineComponent({
     grid-template-rows: 2fr 9fr;
 
     .inventory-item-box {
-    width: 45%;
+      width: 45%;
+    }
   }
-  }
-  
 }
-
-
-
 </style>
