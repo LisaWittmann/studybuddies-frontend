@@ -125,12 +125,15 @@ export default defineComponent({
     left: 0;
     top: 0;
     transform-origin: top;
+    overflow: scroll;
+    scrollbar-width: none;
 
     .inventory-items {
       user-select: none;
       overflow-y: scroll;
       max-height: -webkit-fill-available;
       direction: rtl;
+      scrollbar-width: none;
     }
   }
 }
