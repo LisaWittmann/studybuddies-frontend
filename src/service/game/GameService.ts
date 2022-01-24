@@ -218,7 +218,6 @@ async function checkEndGame(modelName: string) {
  */
 
 async function clickItem(modelName: string, itemId: number) {
-  console.log("clicked");
   if (!clickedItem) {
     clickedItem = true;
     const response = await fetch(`${lobbyAPI}/click/` + modelName, {
