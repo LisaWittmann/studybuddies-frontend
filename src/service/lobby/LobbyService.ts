@@ -417,6 +417,7 @@ function setUserFinishState(username: string, finished: boolean) {
  */
 async function setupGame() {
   startLoading();
+  setScore(0);
   await updateUsers();
   await updateSelectedRoles();
   await updateGameData();
@@ -453,3 +454,7 @@ export function useLobbyService() {
     lobbyState: readonly(lobbyState),
   };
 }
+function setScore(arg0: number) {
+  throw new Error("Function not implemented.");
+}
+
