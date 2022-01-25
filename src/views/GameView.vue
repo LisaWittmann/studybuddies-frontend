@@ -74,10 +74,7 @@ export default defineComponent({
     };
 
     onBeforeRouteLeave((to) => {
-      const nextKey = to.params.key as string;
-      if (nextKey != gameState.lobbyKey) {
-        forceGameEnd();
-      }
+      if (!to.path.includes("end")) forceGameEnd();
     });
 
     onMounted(() => {
