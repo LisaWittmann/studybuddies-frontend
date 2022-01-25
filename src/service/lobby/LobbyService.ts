@@ -17,6 +17,7 @@ const {
   setPlayerData,
   updatePlayerData,
   setStarted,
+  setScore,
 } = useGameStore();
 
 const lobbyKey = computed(() => gameState.lobbyKey);
@@ -454,7 +455,3 @@ export function useLobbyService() {
     lobbyState: readonly(lobbyState),
   };
 }
-function setScore(arg0: number) {
-  throw new Error("Function not implemented.");
-}
-
