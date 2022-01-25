@@ -49,13 +49,13 @@
 import { computed, defineComponent, onBeforeUnmount, onMounted } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLobbyService } from "@/service/lobby/LobbyService";
+import { useGameService } from "@/service/game/GameService";
 import router from "@/router";
 
 export default defineComponent({
   name: "EndView",
   setup(_, { emit }) {
-    const { exitLobby } = useLobbyService();
+    const { forceGameEnd } = useGameService();
     const { gameState } = useGameStore();
     const header = computed(() => {
       if (matchMedia("(prefers-color-scheme: dark)").matches) {
@@ -65,7 +65,7 @@ export default defineComponent({
     });
 
     onBeforeRouteLeave(() => {
-      exitLobby();
+      forceGameEnd();
     });
 
     onMounted(() => {

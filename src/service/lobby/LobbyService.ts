@@ -17,6 +17,7 @@ const {
   setPlayerData,
   updatePlayerData,
   setStarted,
+  setScore,
 } = useGameStore();
 
 const lobbyKey = computed(() => gameState.lobbyKey);
@@ -417,6 +418,7 @@ function setUserFinishState(username: string, finished: boolean) {
  */
 async function setupGame() {
   startLoading();
+  setScore(0);
   await updateUsers();
   await updateSelectedRoles();
   await updateGameData();
