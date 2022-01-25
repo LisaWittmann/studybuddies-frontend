@@ -14,6 +14,7 @@ import { useSceneFactory } from "@/service/scene/SceneFactory";
 import { useLabyrinthFactory } from "@/service/scene/LabyrinthFactory";
 import { MainPlayer, PartnerPlayer } from "@/service/game/Player";
 import { useGameStore } from "@/service/game/GameStore";
+import { useAppService } from "@/service/AppService";
 
 export default defineComponent({
   name: "SceneComponent",
@@ -33,24 +34,35 @@ export default defineComponent({
       renderScene,
       insertCanvas,
       updateScene,
-      getIntersections,
+      getIntersection,
     } = useSceneFactory();
-    const { initializeLabyrinth, updateLabyrinth, updatePlayer } =
-      useLabyrinthFactory();
+    const {
+      initializeLabyrinth,
+      updateLabyrinth,
+      updatePlayer,
+      clearLabyrinth,
+    } = useLabyrinthFactory();
     const { gameState } = useGameStore();
+    const { endLoading, globalState } = useAppService();
 
     const labyrinth = computed(() => gameState.labyrinth);
 
     const scene = createScene();
-    initializeLabyrinth(labyrinth.value, props.player, scene);
+    setUpGame().then(() => setTimeout(() => endLoading(), 10));
 
     const render = () => {
       renderScene();
       requestAnimationFrame(render);
     };
 
+    async function setUpGame() {
+      await initializeLabyrinth(labyrinth.value, props.player, scene);
+      await updatePlayer(props.player, labyrinth.value, scene);
+      await updatePlayer(props.partner, labyrinth.value, scene);
+    }
+
     function onClick(event: MouseEvent) {
-      getIntersections(
+      getIntersection(
         context,
         (event.clientX / innerWidth) * 2 - 1,
         -(event.clientY / innerHeight) * 2 + 1
@@ -65,16 +77,17 @@ export default defineComponent({
 
     onBeforeUnmount(() => {
       removeEventListener("resize", updateScene);
-      scene.clear();
+      clearLabyrinth(scene);
     });
 
     watch(
       [labyrinth, props.player, props.partner],
       () => {
-        console.log("watcher triggered");
-        updateLabyrinth(labyrinth.value, scene);
-        updatePlayer(props.player, labyrinth.value, scene);
-        updatePlayer(props.partner, labyrinth.value, scene);
+        if (!globalState.loading) {
+          updateLabyrinth(labyrinth.value, scene);
+          updatePlayer(props.player, labyrinth.value, scene);
+          updatePlayer(props.partner, labyrinth.value, scene);
+        }
       },
       { deep: true }
     );
@@ -83,11 +96,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-#scene {
-  overflow: hidden;
-  height: -webkit-fill-available;
-  width: 100vw;
-}
-</style>

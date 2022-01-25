@@ -23,8 +23,8 @@ export class Item {
   }
 
   /**
-   *
-   * @returns height where item is positioned
+   * calculates position of item in tile
+   * @returns position in room as vector
    */
   calcPositionInRoom = (): Vector3 => {
     //calculation for object positioning
@@ -44,7 +44,7 @@ export class Item {
   };
 
   /**
-   * currently rotates item so that the front of the item is always pointed at the user
+   * rotates item so that the front of the item is always pointed at the user
    * rotation counterclockwise
    * @returns how many degrees object must be rotated
    */
@@ -54,7 +54,6 @@ export class Item {
       .map((orientation) => Orientation[orientation])
       .toString()
       .replace(",", "");
-    console.log("Orientation: ", fullOrientation);
 
     if (fullOrientation === "NORTH") {
       viewDirection = 0;

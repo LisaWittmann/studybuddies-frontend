@@ -1,6 +1,6 @@
 import { reactive, readonly } from "vue";
 
-const appFeedbackState = reactive({
+const feedbackState = reactive({
   opened: false,
   headline: "",
   subline: "",
@@ -9,8 +9,10 @@ const appFeedbackState = reactive({
   linkText: "",
 });
 
-const appState = reactive({
+const globalState = reactive({
   loading: false,
+  username: "",
+  errormessage: "",
 });
 
 function setFeedback(
@@ -20,46 +22,51 @@ function setFeedback(
   linkText?: string
 ) {
   resetFeedback();
-  appFeedbackState.headline = headline;
-  appFeedbackState.subline = subline ? subline : "";
-  appFeedbackState.link = link ? link : "";
-  appFeedbackState.linkText = linkText ? linkText : "";
-  appFeedbackState.opened = true;
+  feedbackState.headline = headline;
+  feedbackState.subline = subline ? subline : "";
+  feedbackState.link = link ? link : "";
+  feedbackState.linkText = linkText ? linkText : "";
+  feedbackState.opened = true;
 }
 
 function setFeedbackError(headline: string, error: string, linkText: string) {
   resetFeedback();
-  appFeedbackState.headline = headline;
-  appFeedbackState.error = error;
-  appFeedbackState.linkText = linkText;
-  appFeedbackState.opened = true;
+  feedbackState.headline = headline;
+  feedbackState.error = error;
+  feedbackState.linkText = linkText;
+  feedbackState.opened = true;
 }
 
 function resetFeedback() {
-  appFeedbackState.opened = false;
-  appFeedbackState.headline = "";
-  appFeedbackState.subline = "";
-  appFeedbackState.error = "";
-  appFeedbackState.link = "";
-  appFeedbackState.linkText = "";
+  feedbackState.opened = false;
+  feedbackState.headline = "";
+  feedbackState.subline = "";
+  feedbackState.error = "";
+  feedbackState.link = "";
+  feedbackState.linkText = "";
 }
 
 function startLoading() {
-  appState.loading = true;
+  globalState.loading = true;
 }
 
 function endLoading() {
-  appState.loading = false;
+  globalState.loading = false;
+}
+
+function setUsername(username: string) {
+  globalState.username = username;
 }
 
 export function useAppService() {
   return {
-    appFeedbackState: readonly(appFeedbackState),
-    appState: readonly(appState),
+    feedbackState: readonly(feedbackState),
+    globalState: readonly(globalState),
     setFeedback,
     setFeedbackError,
     resetFeedback,
     startLoading,
     endLoading,
+    setUsername,
   };
 }

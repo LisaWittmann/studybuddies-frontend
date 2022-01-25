@@ -27,9 +27,7 @@ export class EventMessage {
 
 export enum Operation {
   MOVEMENT,
-  CHAT,
   TRADE,
-  CLICK,
   READY,
   CONVERSATION,
   COLLECT,
@@ -38,11 +36,12 @@ export enum Operation {
   ROLE_PICK,
   LABYRINTH_PICK,
   UPDATE,
-  DELETE,
 }
 
 export enum Update {
   LABYRINTHS,
   USERS,
   ROLE,
+  GAME_LAB,
+  INVENTORY,
 }

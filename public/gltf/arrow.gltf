@@ -1,0 +1,149 @@
+{
+  "accessors": [
+    {
+      "name": "arrow-Mesh_0_indices",
+      "componentType": 5123,
+      "count": 96,
+      "min": [
+        0
+      ],
+      "max": [
+        63
+      ],
+      "type": "SCALAR"
+    },
+    {
+      "name": "arrow-Mesh_0_positions",
+      "componentType": 5126,
+      "count": 50,
+      "min": [
+        -0.6049089515040313,
+        -0.0009739482233916834,
+        -0.9946979367564117
+      ],
+      "max": [
+        0.6057086901718312,
+        0.2045291269122535,
+        1.0009219729731476
+      ],
+      "type": "VEC3"
+    },
+    {
+      "name": "arrow-Mesh_0_normals",
+      "componentType": 5126,
+      "count": 50,
+      "min": [
+        -1.007843137254902,
+        -1.007843137254902,
+        -0.6455357079412423
+      ],
+      "max": [
+        1.007843137254902,
+        1.007843137254902,
+        1.0093662528430714
+      ],
+      "type": "VEC3"
+    },
+    {
+      "name": "arrow-Mesh_0_texcoords",
+      "componentType": 5126,
+      "count": 50,
+      "min": [
+        0.12402248289345064,
+        -0.0009775171065493646
+      ],
+      "max": [
+        0.875733137829912,
+        1.0009775171065494
+      ],
+      "type": "VEC2"
+    }
+  ],
+  "asset": {
+    "generator": "obj2gltf",
+    "version": "2.0"
+  },
+  "buffers": [
+    {
+      "name": "arrow",
+      "byteLength": 336,
+      "uri": "data:application/octet-stream;base64,RFJBQ08CAgEBAAAAEiACHwIACN9eeaVaSikKAQEQhQj4NVUVfgksj7UHaghZZINLZwP/AAAAAQABAQABAAkDAAACAQEJAwABAwEDCQIAAgIBAQEADAM5DpEDG5EDqSoFyvhyc0hNBgB3swmA7WpTNNwFAETDXZQJANyNEwC4KwAAcDebotmunADAXQEAgLtxEk13YSYAdFc4UzQAAAAAAAD/BwAAfJsavwAAAACyZH6/pTD/PwsGAwEBAQEBQAEA/wAAAH8AAAD/AmpDCAUBAQALAwEEDwECAQwBDgEQARAMAIAsDmfQqsQ1uY+BAP7/95vPoOwexg3MAQCAfg8iAABvjrKAIKsBhCYCAGC5J+UAhQB9UCFAHwTAm4AsgP4BCAAAAdv2AuA/2XWEBgAcAAAAEgTkH0KAAAAAAP8DAAAAAAA+AAAAAAAAgD8KAAAA"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 333
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material.003",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 1
+      },
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ],
+      "alphaMode": "OPAQUE",
+      "doubleSided": false
+    }
+  ],
+  "meshes": [
+    {
+      "name": "arrow-Mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 1,
+            "NORMAL": 2,
+            "TEXCOORD_0": 3
+          },
+          "indices": 0,
+          "material": 0,
+          "mode": 4,
+          "extensions": {
+            "KHR_draco_mesh_compression": {
+              "bufferView": 0,
+              "attributes": {
+                "POSITION": 0,
+                "NORMAL": 1,
+                "TEXCOORD_0": 2
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "arrow",
+      "mesh": 0
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "extensionsRequired": [
+    "KHR_draco_mesh_compression"
+  ],
+  "extensionsUsed": [
+    "KHR_draco_mesh_compression"
+  ]
+}

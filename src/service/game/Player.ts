@@ -70,7 +70,7 @@ export class MainPlayer implements Player {
     this.position = position;
   }
 
-  setInventory(inventory: Array<Item>) {
+  setInventory(inventory: Array<Item>): void {
     this.inventory = inventory;
   }
 }

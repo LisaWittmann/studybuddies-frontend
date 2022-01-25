@@ -1,19 +1,25 @@
 <template>
-  <button
-    id="invbutton"
-    class="inventory-button"
-    v-bind:class="[isOpen ? 'open' : 'closed']"
-    @click="toggleInventoryButton"
-  ></button>
-  <transition name="slide-fade">
-    <div class="inventory-box" v-if="isOpen">
-      <div class="inventory">
-        <div v-for="item in inventory" :key="item" class="inventory-item-box">
-          <InventoryItemEntryComponent :item="item" />
+  <div class="inventory">
+    <button
+      id="invbutton"
+      class="inventory-button"
+      v-bind:class="[isOpen ? 'open' : 'closed']"
+      @click="toggleInventoryButton"
+    ></button>
+    <transition name="slide-fade">
+      <div class="inventory-box" v-if="isOpen">
+        <div class="inventory-items">
+          <div
+            v-for="item of inventory"
+            :key="item.id"
+            class="inventory-item-box"
+          >
+            <InventoryItemEntryComponent :item="item" />
+          </div>
         </div>
       </div>
-    </div>
-  </transition>
+    </transition>
+  </div>
 </template>
 
 <script lang="ts">
@@ -31,10 +37,9 @@ export default defineComponent({
   },
   setup() {
     const { gameState } = useGameStore();
-    let isOpen = ref(false);
-    const invbutton = ref(null);
-    let mainPlayer = computed(() => gameState.mainPlayer);
-    let inventory = computed(() => mainPlayer.value.getInventory());
+    const isOpen = ref(false);
+    const mainPlayer = computed(() => gameState.mainPlayer);
+    const inventory = computed(() => mainPlayer.value.getInventory());
 
     /**
      * shows opened or closed backpack svg (inventory button)
@@ -50,7 +55,7 @@ export default defineComponent({
       const button = document.getElementById("invbutton");
       if (button) {
         button.classList.add("button--lightup");
-        setTimeout(() => button.classList.remove("button--lightup"), 20000);
+        setTimeout(() => button.classList.remove("button--lightup"), 2000);
       }
     };
 
@@ -70,7 +75,6 @@ export default defineComponent({
       inventory,
       toggleInventoryButton,
       isOpen,
-      invbutton,
     };
   },
 });
@@ -87,30 +91,6 @@ export default defineComponent({
     left;
 }
 
-.inventory-button {
-  box-shadow: none;
-  border: none;
-  position: absolute;
-  left: 0;
-  top: 10px;
-  z-index: 11;
-  background-position: bottom;
-  display: inline-block;
-  height: 15%;
-  width: 10%;
-  max-width: 120px;
-}
-
-.inventory-box {
-  position: absolute;
-  height: 100%;
-  width: 25%;
-  z-index: 10;
-  left: 0;
-  top: 0;
-  max-width: 25%;
-  transform-origin: top;
-}
 /* Animation for opening or closing inventory */
 /* durations and timing functions.            */
 .slide-fade-enter-active {
@@ -121,19 +101,48 @@ export default defineComponent({
 }
 
 .inventory {
-  margin-top: calc(15vh + 10px);
-  overflow-y: scroll;
-  max-height: -webkit-fill-available;
-  direction: rtl;
-  padding-left: 10px;
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 10px;
+  box-sizing: border-box;
+  display: grid;
+
+  .inventory-button {
+    box-shadow: none;
+    border: none;
+    z-index: 11;
+    background-position: left;
+    display: inline-block;
+    height: 100%;
+    padding: 0;
+  }
+
+  .inventory-box {
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    transform-origin: top;
+    overflow: scroll;
+    scrollbar-width: none;
+
+    .inventory-items {
+      user-select: none;
+      overflow-y: scroll;
+      max-height: -webkit-fill-available;
+      direction: rtl;
+      scrollbar-width: none;
+    }
+  }
 }
 
 .inventory-item-box {
-  width: 20%;
   display: flex;
   border: 1.5px dashed $color-beige;
   background-color: rgba($color-dark-brown, 0.5);
-  margin: 2rem auto 2rem 0;
+  margin: 2rem auto 2rem 0.2rem;
   direction: ltr;
   position: relative;
 }
@@ -163,5 +172,50 @@ export default defineComponent({
 ::-webkit-scrollbar-thumb {
   background-color: rgba($color-grey, 0.2);
   border-radius: 2px;
+}
+
+//media-queries
+@media (min-width: 1921px) {
+  .inventory {
+    grid-template-rows: 1fr 6fr;
+    width: 10%;
+
+    .inventory-item-box {
+      width: 40%;
+    }
+  }
+}
+
+@media (min-width: 1501px) and (max-width: 1920px) {
+  .inventory {
+    grid-template-rows: 1fr 6fr;
+    width: 10%;
+  }
+
+  .inventory-item-box {
+    width: 45%;
+  }
+}
+
+@media (min-width: 1001px) and (max-width: 1500px) {
+  .inventory {
+    grid-template-rows: 1fr 5fr;
+    width: 20%;
+
+    .inventory-item-box {
+      width: 30%;
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  .inventory {
+    width: 30%;
+    grid-template-rows: 2fr 9fr;
+
+    .inventory-item-box {
+      width: 45%;
+    }
+  }
 }
 </style>

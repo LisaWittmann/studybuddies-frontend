@@ -10,7 +10,7 @@ import { Role } from "@/service/game/Player";
  */
 async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
   console.log("Requested lab of lobby " + lobbyKey);
-  return fetch(`/api/lobby/${lobbyKey}`, {
+  return fetch(`/api/game/${lobbyKey}`, {
     method: "GET",
   })
     .then((response) => {
@@ -28,7 +28,6 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
       //iterate over the tiles in the json data tileMap to create tiles for every tile in json object
       for (const tileKey in jsonData.tileMap) {
         const tile = jsonData.tileMap[tileKey];
-        const id = parseInt(tileKey);
         const objectsInRoom = new Array<Item>();
 
         for (const itemKey in tile.objectsInRoom) {
@@ -45,8 +44,8 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
           restrictions.push((<any>Role)[role]);
         }
         labyrinth.tileMap.set(
-          id,
-          new Tile(tile.tileId, objectsInRoom, restrictions)
+          Number(tileKey),
+          new Tile(Number(tileKey), objectsInRoom, restrictions)
         );
 
         //workaround to parse json list in map
@@ -58,7 +57,9 @@ async function updateLabyrinthData(lobbyKey: string): Promise<Labyrinth> {
           );
         }
 
-        labyrinth.tileMap.get(id)?.setTileRelationMap(tileRelationMap);
+        labyrinth.tileMap
+          .get(Number(tileKey))
+          ?.setTileRelationMap(tileRelationMap);
       }
       //add empty relations for unset orientations of tilemap
       for (const [, tile] of labyrinth.tileMap) {
@@ -85,7 +86,9 @@ function connectTiles(
   orientationRelation: Orientation,
   secondTile: Tile | undefined
 ) {
-  firstTile.getTileRelationMap().set(orientationRelation, secondTile?.getId());
+  firstTile
+    .getTileRelationMap()
+    .set(orientationRelation, secondTile?.getTileKey());
 }
 
 export function useLabyrinthStore() {

@@ -76,26 +76,13 @@ export const movementRotations = readonly(
 );
 
 /**
- * vertical positions of objects in room
- */
-export const position = readonly({
-  floor: readonly(vector(0, 0, 0)),
-  wall: readonly(vector(0, settings.tileSize / 2, 0)),
-  ceiling: readonly(vector(0, settings.tileSize, 0)),
-});
-
-/**
  * styleguide colors
  */
 export const colors = readonly({
-  lightGreen: 0x94a878,
-  green: 0x5d702f,
-  darkGreen: 0x39432f,
-  beige: 0xe6bf5f,
-  brown: 0x994814,
-  darkBrown: 0x56341a,
-  white: 0xf8f7f5,
-  grey: 0xd7d9d5,
-  black: 0x1a1e16,
+  brown: 0x995c2e,
+  beige: 0x997f3f,
+  green: 0x678f42,
   pink: 0xd874d8,
+  grey: 0xd7d9d5,
+  offwhite: 0x998a73,
 });

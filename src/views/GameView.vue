@@ -28,10 +28,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onBeforeUnmount, onMounted } from "vue";
+import { onBeforeRouteLeave } from "vue-router";
 import { useGameService } from "@/service/game/GameService";
 import { useGameStore } from "@/service/game/GameStore";
-import { useLobbyService } from "@/service/lobby/LobbyService";
 
 import SceneComponent from "@/components/SceneComponent.vue";
 import OverlayTerminalComponent from "@/components/overlays/OverlayTerminalComponent.vue";
@@ -40,7 +40,6 @@ import OverlayConversationComponent from "@/components/overlays/OverlayConversat
 
 import router from "@/router";
 import "@/service/game/EventStore";
-import { onBeforeRouteLeave } from "vue-router";
 
 export default defineComponent({
   name: "GameView",
@@ -50,9 +49,8 @@ export default defineComponent({
     InventoryComponent,
     OverlayConversationComponent,
   },
-  setup() {
-    const { exitLobby } = useLobbyService();
-    const { gameState, updateGameData, setLobbyKey } = useGameStore();
+  setup(_, { emit }) {
+    const { gameState, updateGameData } = useGameStore();
     const {
       gameEventMessage,
       toggleEventMessage,
@@ -60,6 +58,7 @@ export default defineComponent({
       clickItem,
       conversation,
       getConversationMessage,
+      forceGameEnd,
       endConversation,
     } = useGameService();
     updateGameData();
@@ -69,17 +68,30 @@ export default defineComponent({
     const partnerPlayer = computed(() => gameState.partnerPlayer);
     const score = computed(() => gameState.score);
 
+    onbeforeunload = () => {
+      forceGameEnd();
+      return "leaving game";
+    };
+
     onBeforeRouteLeave((to) => {
       const nextKey = to.params.key as string;
       if (nextKey != gameState.lobbyKey) {
-        exitLobby(gameState.lobbyKey);
+        forceGameEnd();
       }
     });
 
-    onMounted(async () => {
+    onMounted(() => {
       const route = router.currentRoute.value;
-      setLobbyKey(route.params.key as string);
-      updateGameData();
+      if (gameState.lobbyKey != (route.params.key as string))
+        router.push("/find");
+      else {
+        emit("music", "background");
+        updateGameData();
+      }
+    });
+
+    onBeforeUnmount(() => {
+      emit("pause");
     });
 
     return {
@@ -100,6 +112,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+* {
+  user-select: none;
+}
+
 .score-box {
   position: absolute;
   top: 0;
@@ -116,6 +132,7 @@ export default defineComponent({
   justify-content: center;
 
   p {
+    user-select: none;
     font-family: $font-inconsolata;
     font-weight: bold;
     color: $color-beige;

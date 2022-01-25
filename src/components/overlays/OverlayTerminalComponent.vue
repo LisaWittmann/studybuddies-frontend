@@ -14,9 +14,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import OverlayComponent from "@/components/overlays/OverlayComponent.vue";
-import { useLoginStore } from "@/service/login/LoginStore";
+import { useAppService } from "@/service/AppService";
 
 export default defineComponent({
   name: "OverlayTerminalComponent",
@@ -40,8 +40,8 @@ export default defineComponent({
     },
   },
   setup(_, { emit }) {
-    const { loginState } = useLoginStore();
-    const username = loginState.username;
+    const { globalState } = useAppService();
+    const username = computed(() => globalState.username);
     const close = () => emit("close");
 
     return { username, close };

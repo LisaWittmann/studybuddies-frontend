@@ -1,5 +1,5 @@
 <template>
-  <div class="end">
+  <div class="end container container--fixed">
     <div class="end__background">
       <transition name="slow-fade" appear>
         <img
@@ -12,7 +12,11 @@
     <div class="flex-container">
       <div class="column-wrapper">
         <transition name="slow-fade" appear>
-          <img class="end__header" :src="header" alt="logo" />
+          <img
+            class="end__header"
+            :src="header"
+            alt="Study Buddies - the quest for mazelnut"
+          />
         </transition>
         <transition name="slow-fade" appear>
           <div class="text-wrapper">
@@ -27,27 +31,30 @@
           </div>
         </transition>
       </div>
-      <div class="role-box">
-        <div>
-          <img src="../assets/img/roles/designer-role-cap.svg" />
-        </div>
-        <div>
-          <img src="../assets/img/roles/hacker-role-cap.svg" />
-        </div>
-      </div>
     </div>
+    <img
+      class="role role--left"
+      src="@/assets/img/roles/designer-role-cap.svg"
+      alt="Designer Hörnchen mit Abschlusszeugnis"
+    />
+    <img
+      class="role role--right"
+      src="@/assets/img/roles/hacker-role-cap.svg"
+      alt="Hacker Hörnchen mit Abschlusszeugnis"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, onBeforeUnmount, onMounted } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useGameStore } from "@/service/game/GameStore";
 import { useLobbyService } from "@/service/lobby/LobbyService";
+import router from "@/router";
 
 export default defineComponent({
   name: "EndView",
-  setup() {
+  setup(_, { emit }) {
     const { exitLobby } = useLobbyService();
     const { gameState } = useGameStore();
     const header = computed(() => {
@@ -57,12 +64,21 @@ export default defineComponent({
       return require("@/assets/img/logo_header.png");
     });
 
-    // exit lobby if any other page than game is opened
-    onBeforeRouteLeave((to) => {
-      const nextKey = to.params.key as string;
-      if (nextKey != gameState.lobbyKey) {
-        exitLobby(gameState.lobbyKey);
+    onBeforeRouteLeave(() => {
+      exitLobby();
+    });
+
+    onMounted(() => {
+      const route = router.currentRoute.value;
+      if (gameState.lobbyKey != (route.params.key as string)) {
+        router.push("/find");
+      } else {
+        emit("music", "outro");
       }
+    });
+
+    onBeforeUnmount(() => {
+      emit("pause");
     });
 
     return { header };
@@ -73,9 +89,8 @@ export default defineComponent({
 <style lang="scss" scoped>
 .end {
   &__background {
-    position: relative;
-    overflow: hidden;
-    height: 100vh;
+    height: 100%;
+    width: 100%;
 
     &-image {
       width: 100%;
@@ -100,6 +115,21 @@ export default defineComponent({
     }
   }
 
+  .role {
+    position: absolute;
+    width: 35vw;
+    max-width: 300px;
+    bottom: 0;
+
+    &--left {
+      left: 0;
+    }
+
+    &--right {
+      right: 0;
+    }
+  }
+
   .text-wrapper {
     display: flex;
     flex-direction: column;
@@ -107,12 +137,8 @@ export default defineComponent({
   }
 
   h1 {
-    color: $color-black;
+    @include color-primary();
     margin: 0;
-
-    @include color-scheme(dark) {
-      color: $color-white;
-    }
   }
 
   p {
@@ -123,25 +149,6 @@ export default defineComponent({
     position: absolute;
     z-index: 2;
     top: 0;
-  }
-
-  .role-box {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    margin: 0 auto;
-    justify-content: space-between;
-    position: absolute;
-    bottom: 0;
-
-    div {
-      padding: 0 3rem;
-    }
-
-    img {
-      height: 100%;
-      width: auto;
-    }
   }
 }
 
@@ -161,10 +168,6 @@ export default defineComponent({
 
     p {
       font-size: 3rem;
-    }
-
-    .role-box {
-      height: 30vh;
     }
   }
 }
@@ -186,16 +189,6 @@ export default defineComponent({
     p {
       font-size: 1.5rem;
     }
-
-    .role-box {
-      height: 20vh;
-    }
-  }
-}
-
-@media (max-width: 600px) {
-  .role-box {
-    height: 15vh;
   }
 }
 </style>
